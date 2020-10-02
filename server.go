@@ -15,7 +15,7 @@ type Handlers struct {
 	echo.Context
 	users    *[]User
 	mu       *sync.Mutex
-	sessions map[string]uint64 //map[sessionID]userID
+	sessions *map[string]uint64 //map[sessionID]userID
 }
 
 type UserInputLogin struct {
@@ -110,34 +110,44 @@ func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, er
 
 func (h *Handlers) checkUserAuthorized(c echo.Context) (responseUser, error) {
 	session, err := c.Cookie("session_id")
-	sessionID := session.Value
-	//TODO проверку на не nil
-	var authorized bool
-	if err == nil && session != nil {
-		_, authorized = h.sessions[sessionID]
+	if err != nil {
+		fmt.Println(err)
+		return responseUser{}, err
 	}
+	sessionID := session.Value
+	fmt.Println("Got cookie:", sessionID)
+
+	userID, authorized := (*h.sessions)[sessionID]
+	fmt.Println(userID, authorized)
 
 	if authorized {
 		for _, user := range *h.users {
-			if user.ID == h.sessions[sessionID] {
+			if user.ID == userID {
 				response := new(responseUser)
 				response.WriteResponse(user)
+				fmt.Println("Cookie exists")
 				return *response, nil
 			}
 		}
 	}
+	fmt.Println("Cookie not exists")
 	return responseUser{}, errors.New("No such session ")
 }
 
 func setCookie(c echo.Context, userID uint64) {
 	cookie := new(http.Cookie)
 	SID := RandStringRunes(32)
+	cc := c.(*Handlers)
 
-	c.(*Handlers).sessions[SID] = userID
+	(*cc.sessions)[SID] = userID
+
+	fmt.Println("Setting: ", SID)
 
 	cookie.Name = "session_id"
 	cookie.Value = SID
 	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	fmt.Println(cc.sessions)
 	c.SetCookie(cookie)
 }
 
@@ -147,8 +157,8 @@ func login(c echo.Context) error {
 	//проверка на авторизованность
 	response, err := cc.checkUserAuthorized(c)
 	if err == nil {
+		fmt.Println("Authorized")
 		return c.JSON(http.StatusOK, response)
-		//http.StatusUnauthorized
 	}
 
 	userInput := new(UserInputLogin)
@@ -159,7 +169,8 @@ func login(c echo.Context) error {
 	var userID uint64
 	response, userID, err = cc.checkUser(*userInput)
 	if err != nil {
-		return c.JSON(http.StatusForbidden, response)
+		fmt.Println("Not authorized")
+		return c.JSON(http.StatusUnauthorized, response)
 	}
 
 	setCookie(c, userID)
@@ -172,7 +183,6 @@ func registration(c echo.Context) error {
 	response, err := cc.checkUserAuthorized(c)
 	if err == nil {
 		return c.JSON(http.StatusOK, response)
-		//http.StatusUnauthorized
 	}
 
 	userInput := new(UserInputReg)
@@ -183,14 +193,25 @@ func registration(c echo.Context) error {
 	var userID uint64
 	response, userID, err = cc.createUser(*userInput)
 	if err != nil {
-		return c.JSON(http.StatusForbidden, response)
+		return c.JSON(http.StatusUnauthorized, response)
 	}
 
 	setCookie(c, userID)
 	return c.JSON(http.StatusOK, response)
 }
 
+func root(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	response, err := cc.checkUserAuthorized(c)
+	if err == nil {
+		return c.JSON(http.StatusOK, response)
+	}
+	return c.JSON(http.StatusTeapot, response)
+}
+
 func urls(e *echo.Echo) {
+	e.Any("/", root)
 	e.POST("/login/", login)
 	e.POST("/reg/", registration)
 }
@@ -202,8 +223,9 @@ func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://127.0.0.1:3033"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowOrigins:     []string{"http://127.0.0.1:3033"},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowCredentials: true,
 	}))
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -211,7 +233,7 @@ func main() {
 			cc := &Handlers{c,
 				&someUsers,
 				&sync.Mutex{},
-				sessions,
+				&sessions,
 			}
 			return next(cc)
 		}
