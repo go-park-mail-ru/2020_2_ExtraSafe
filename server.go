@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"math/rand"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Handlers struct {
 	echo.Context
-	users *[]User
-	mu    *sync.Mutex
+	users    *[]User
+	mu       *sync.Mutex
+	sessions map[string]uint64 //map[sessionID]userID
 }
 
 type UserInputLogin struct {
@@ -39,18 +42,30 @@ type responseUser struct {
 	Nickname string `json:"nickname"`
 }
 
-func (h *Handlers) createUser(userInput UserInputReg) (responseUser, error) {
+var (
+	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+)
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, error) {
 	for _, user := range *h.users {
 		if userInput.Email == user.Email {
 			fmt.Println("Email already exist ")
-			return responseUser{}, errors.New("Email already exist ")
+			return responseUser{}, 0, errors.New("Email already exist ")
 		}
 	}
 
 	for _, user := range *h.users {
 		if userInput.Nickname == user.Nickname {
 			fmt.Println("Nickname already exist ")
-			return responseUser{}, errors.New("Nickname already exist ")
+			return responseUser{}, 0, errors.New("Nickname already exist ")
 		}
 	}
 
@@ -73,7 +88,7 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, error) {
 	response := new(responseUser)
 	response.WriteResponse(newUser)
 
-	return *response, nil
+	return *response, id, nil
 }
 
 func (response *responseUser) WriteResponse(user User) {
@@ -82,44 +97,96 @@ func (response *responseUser) WriteResponse(user User) {
 	response.Nickname = user.Nickname
 }
 
-func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, error) {
+func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, error) {
 	response := new(responseUser)
 	for _, user := range *h.users {
 		if userInput.Email == user.Email && userInput.Password == user.Password {
 			response.WriteResponse(user)
-			return *response, nil
+			return *response, user.ID, nil
 		}
 	}
-	return responseUser{}, errors.New("No such user ")
+	return responseUser{}, 0, errors.New("No such user ")
+}
+
+func (h *Handlers) checkUserAuthorized(c echo.Context) (responseUser, error) {
+	session, err := c.Cookie("session_id")
+	sessionID := session.Value
+	//TODO проверку на не nil
+	var authorized bool
+	if err == nil && session != nil {
+		_, authorized = h.sessions[sessionID]
+	}
+
+	if authorized {
+		for _, user := range *h.users {
+			if user.ID == h.sessions[sessionID] {
+				response := new(responseUser)
+				response.WriteResponse(user)
+				return *response, nil
+			}
+		}
+	}
+	return responseUser{}, errors.New("No such session ")
+}
+
+func setCookie(c echo.Context, userID uint64) {
+	cookie := new(http.Cookie)
+	SID := RandStringRunes(32)
+
+	c.(*Handlers).sessions[SID] = userID
+
+	cookie.Name = "session_id"
+	cookie.Value = SID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	c.SetCookie(cookie)
 }
 
 func login(c echo.Context) error {
 	cc := c.(*Handlers)
+
+	//проверка на авторизованность
+	response, err := cc.checkUserAuthorized(c)
+	if err == nil {
+		return c.JSON(http.StatusOK, response)
+		//http.StatusUnauthorized
+	}
+
 	userInput := new(UserInputLogin)
 	if err := c.Bind(userInput); err != nil {
 		return err
 	}
 
-	response, err := cc.checkUser(*userInput)
+	var userID uint64
+	response, userID, err = cc.checkUser(*userInput)
 	if err != nil {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	setCookie(c, userID)
 	return c.JSON(http.StatusOK, response)
 }
 
 func registration(c echo.Context) error {
 	cc := c.(*Handlers)
+
+	response, err := cc.checkUserAuthorized(c)
+	if err == nil {
+		return c.JSON(http.StatusOK, response)
+		//http.StatusUnauthorized
+	}
+
 	userInput := new(UserInputReg)
 	if err := c.Bind(userInput); err != nil {
 		return err
 	}
 
-	response, err := cc.createUser(*userInput)
+	var userID uint64
+	response, userID, err = cc.createUser(*userInput)
 	if err != nil {
 		return c.JSON(http.StatusForbidden, response)
 	}
 
+	setCookie(c, userID)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -130,6 +197,7 @@ func urls(e *echo.Echo) {
 
 func main() {
 	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
 
 	e := echo.New()
 
@@ -143,6 +211,7 @@ func main() {
 			cc := &Handlers{c,
 				&someUsers,
 				&sync.Mutex{},
+				sessions,
 			}
 			return next(cc)
 		}
