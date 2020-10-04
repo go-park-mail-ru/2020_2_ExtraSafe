@@ -23,13 +23,24 @@ type UserInputReg struct {
 	Password string `json:"password"`
 }
 
+type UserInputProfile struct {
+	Email    string `json:"email"`
+	Nickname string `json:"nickname"`
+	FullName string `json:"fullname"`
+}
+
+type UserInputPassword struct {
+	OldPassword string `json:"oldpassword"`
+	Password    string `json:"password"`
+}
+
 type User struct {
 	ID       uint64 `json:"id"`
 	Email    string `json:"email"`
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 	FullName string `json:"fullname"`
-	Links *UserLinks
+	Links    *UserLinks
 }
 
 type responseUser struct {
@@ -40,25 +51,25 @@ type responseUser struct {
 }
 
 type responseUserLinks struct {
-	Status   int    `json:"status"`
-	Nickname string `json:"nickname"`
-	Telegram string `json:"telegram"`
+	Status    int    `json:"status"`
+	Nickname  string `json:"nickname"`
+	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
-	Github string `json:"github"`
+	Github    string `json:"github"`
 	Bitbucket string `json:"bitbucket"`
-	Vk string `json:"vk"`
-	Facebook string `json:"facebook"`
+	Vk        string `json:"vk"`
+	Facebook  string `json:"facebook"`
 }
 
 //TODO подумать, как организовать структуры так, чтобы удобно было изменять данные (в том числе пароль, логин, почту)
 
 type UserLinks struct {
-	Telegram string `json:"telegram"`
+	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
-	Github string `json:"github"`
+	Github    string `json:"github"`
 	Bitbucket string `json:"bitbucket"`
-	Vk string `json:"vk"`
-	Facebook string `json:"facebook"`
+	Vk        string `json:"vk"`
+	Facebook  string `json:"facebook"`
 }
 
 var (

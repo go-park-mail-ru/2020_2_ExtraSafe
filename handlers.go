@@ -11,8 +11,85 @@ func urls(e *echo.Echo) {
 	e.Any("/", root)
 	e.POST("/login/", login)
 	e.POST("/reg/", registration)
-	e.GET("/profile", profile)
-	e.GET("/accounts", accounts)
+	e.GET("/profile/", profile)
+	e.GET("/accounts/", accounts)
+	e.POST("/profile/", profileChange)
+	e.POST("/accounts/", accountsChange)
+	e.POST("/password/", passwordChange)
+}
+
+func passwordChange(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value
+
+	userID := (*cc.sessions)[sessionID]
+
+	userInput := new(UserInputPassword)
+	if err := c.Bind(userInput); err != nil {
+		return err
+	}
+
+	var response responseUser
+	var err error
+	for _, user := range *cc.users {
+		if user.ID == userID {
+			response, err = cc.changeUserPassword(userInput, user)
+		}
+	}
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func accountsChange(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value
+
+	userID := (*cc.sessions)[sessionID]
+
+	userInput := new(UserLinks)
+	if err := c.Bind(userInput); err != nil {
+		return err
+	}
+
+	var response responseUserLinks
+	for _, user := range *cc.users {
+		if user.ID == userID {
+			response, _ = cc.changeUserAccounts(userInput, user)
+		}
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func profileChange(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value
+
+	userID := (*cc.sessions)[sessionID]
+
+	userInput := new(UserInputProfile)
+	if err := c.Bind(userInput); err != nil {
+		return err
+	}
+
+	var response responseUser
+	for _, user := range *cc.users {
+		if user.ID == userID {
+			response, _ = cc.changeUserProfile(userInput, user)
+		}
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func profile(c echo.Context) error {
@@ -20,7 +97,7 @@ func profile(c echo.Context) error {
 
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value // не может быть nil, тк мы на руте проверяем авторизованность,
-								// а на авторизации/регистрации выдаем куки
+	// а на авторизации/регистрации выдаем куки
 	userID := (*cc.sessions)[sessionID]
 
 	response := new(responseUser)
@@ -99,17 +176,18 @@ func registration(c echo.Context) error {
 
 func root(c echo.Context) error {
 	cc := c.(*Handlers)
+	fmt.Println("root")
 
 	response, err := cc.checkUserAuthorized(c)
 	if err == nil {
 		return c.JSON(http.StatusOK, response)
 	}
-	return c.JSON(http.StatusTeapot, response)
+	return c.JSON(http.StatusUnauthorized, response)
 }
 
 func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, error) {
 	for _, user := range *h.users {
-		if userInput.Email == user.Email || userInput.Nickname == user.Nickname{
+		if userInput.Email == user.Email || userInput.Nickname == user.Nickname {
 			fmt.Println("Email or nickname already exist ")
 			return responseUser{}, 0, errors.New("Email already exist ")
 		}
@@ -127,7 +205,7 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		Nickname: userInput.Nickname,
 		Email:    userInput.Email,
 		Password: userInput.Password,
-		Links: &UserLinks{},
+		Links:    &UserLinks{},
 	}
 
 	*h.users = append(*h.users, newUser)
@@ -137,6 +215,62 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 	response.WriteResponse(newUser)
 
 	return *response, id, nil
+}
+
+func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist User) (responseUser, error) {
+	for _, user := range *h.users {
+		if userInput.Email == user.Email || userInput.Nickname == user.Nickname {
+			fmt.Println("Email or nickname already exist ")
+			return responseUser{}, errors.New("Email already exist ")
+		}
+	}
+
+	h.mu.Lock()
+
+	userExist.Nickname = userInput.Nickname
+	userExist.Email = userInput.Email
+	userExist.FullName = userInput.FullName
+
+	h.mu.Unlock()
+
+	response := new(responseUser)
+	response.WriteResponse(userExist)
+
+	return *response, nil
+}
+
+func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist User) (responseUserLinks, error) {
+	h.mu.Lock()
+
+	userExist.Links.Bitbucket = userInput.Bitbucket
+	userExist.Links.Github = userInput.Github
+	userExist.Links.Instagram = userInput.Instagram
+	userExist.Links.Telegram = userInput.Telegram
+	userExist.Links.Facebook = userInput.Facebook
+
+	h.mu.Unlock()
+
+	response := new(responseUserLinks)
+	response.WriteResponse(userExist.Nickname, *userExist.Links)
+
+	return *response, nil
+}
+
+func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist User) (responseUser, error) {
+	if userInput.OldPassword != userExist.Password {
+		return responseUser{}, errors.New("Invalid password ")
+	}
+
+	h.mu.Lock()
+
+	userExist.Password = userInput.Password
+
+	h.mu.Unlock()
+
+	response := new(responseUser)
+	response.WriteResponse(userExist)
+
+	return *response, nil
 }
 
 func (response *responseUser) WriteResponse(user User) {
@@ -156,7 +290,6 @@ func (response *responseUserLinks) WriteResponse(nickname string, links UserLink
 	response.Vk = links.Bitbucket
 	response.Facebook = links.Facebook
 }
-
 
 func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, error) {
 	response := new(responseUser)
