@@ -11,6 +11,42 @@ func urls(e *echo.Echo) {
 	e.Any("/", root)
 	e.POST("/login/", login)
 	e.POST("/reg/", registration)
+	e.GET("/profile", profile)
+	e.GET("/accounts", accounts)
+}
+
+func profile(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value // не может быть nil, тк мы на руте проверяем авторизованность,
+								// а на авторизации/регистрации выдаем куки
+	userID := (*cc.sessions)[sessionID]
+
+	response := new(responseUser)
+	for _, user := range *cc.users {
+		if user.ID == userID {
+			response.WriteResponse(user)
+		}
+	}
+	return c.JSON(http.StatusOK, response)
+}
+
+func accounts(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value
+
+	userID := (*cc.sessions)[sessionID]
+
+	response := new(responseUserLinks)
+	for _, user := range *cc.users {
+		if user.ID == userID {
+			response.WriteResponse(user.Nickname, *user.Links)
+		}
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 func login(c echo.Context) error {
@@ -73,16 +109,9 @@ func root(c echo.Context) error {
 
 func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, error) {
 	for _, user := range *h.users {
-		if userInput.Email == user.Email {
-			fmt.Println("Email already exist ")
+		if userInput.Email == user.Email || userInput.Nickname == user.Nickname{
+			fmt.Println("Email or nickname already exist ")
 			return responseUser{}, 0, errors.New("Email already exist ")
-		}
-	}
-
-	for _, user := range *h.users {
-		if userInput.Nickname == user.Nickname {
-			fmt.Println("Nickname already exist ")
-			return responseUser{}, 0, errors.New("Nickname already exist ")
 		}
 	}
 
@@ -98,7 +127,9 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		Nickname: userInput.Nickname,
 		Email:    userInput.Email,
 		Password: userInput.Password,
+		Links: &UserLinks{},
 	}
+
 	*h.users = append(*h.users, newUser)
 	h.mu.Unlock()
 
@@ -112,7 +143,20 @@ func (response *responseUser) WriteResponse(user User) {
 	response.Status = 200
 	response.Email = user.Email
 	response.Nickname = user.Nickname
+	response.FullName = user.FullName
 }
+
+func (response *responseUserLinks) WriteResponse(nickname string, links UserLinks) {
+	response.Status = 200
+	response.Nickname = nickname
+	response.Telegram = links.Telegram
+	response.Instagram = links.Instagram
+	response.Github = links.Github
+	response.Bitbucket = links.Bitbucket
+	response.Vk = links.Bitbucket
+	response.Facebook = links.Facebook
+}
+
 
 func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, error) {
 	response := new(responseUser)

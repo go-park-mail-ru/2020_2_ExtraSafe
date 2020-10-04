@@ -27,13 +27,38 @@ type User struct {
 	ID       uint64 `json:"id"`
 	Email    string `json:"email"`
 	Nickname string `json:"nickname"`
-	Password string `json:"-"`
+	Password string `json:"password"`
+	FullName string `json:"fullname"`
+	Links *UserLinks
 }
 
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
 	Nickname string `json:"nickname"`
+	FullName string `json:"fullname"`
+}
+
+type responseUserLinks struct {
+	Status   int    `json:"status"`
+	Nickname string `json:"nickname"`
+	Telegram string `json:"telegram"`
+	Instagram string `json:"instagram"`
+	Github string `json:"github"`
+	Bitbucket string `json:"bitbucket"`
+	Vk string `json:"vk"`
+	Facebook string `json:"facebook"`
+}
+
+//TODO подумать, как организовать структуры так, чтобы удобно было изменять данные (в том числе пароль, логин, почту)
+
+type UserLinks struct {
+	Telegram string `json:"telegram"`
+	Instagram string `json:"instagram"`
+	Github string `json:"github"`
+	Bitbucket string `json:"bitbucket"`
+	Vk string `json:"vk"`
+	Facebook string `json:"facebook"`
 }
 
 var (
