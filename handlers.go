@@ -33,9 +33,9 @@ func passwordChange(c echo.Context) error {
 
 	var response responseUser
 	var err error
-	for _, user := range *cc.users {
+	for i, user := range *cc.users {
 		if user.ID == userID {
-			response, err = cc.changeUserPassword(userInput, user)
+			response, err = cc.changeUserPassword(userInput, &(*cc.users)[i])
 		}
 	}
 
@@ -60,9 +60,9 @@ func accountsChange(c echo.Context) error {
 	}
 
 	var response responseUserLinks
-	for _, user := range *cc.users {
+	for i, user := range *cc.users {
 		if user.ID == userID {
-			response, _ = cc.changeUserAccounts(userInput, user)
+			response, _ = cc.changeUserAccounts(userInput, &(*cc.users)[i])
 		}
 	}
 
@@ -83,9 +83,9 @@ func profileChange(c echo.Context) error {
 	}
 
 	var response responseUser
-	for _, user := range *cc.users {
+	for i, user := range *cc.users {
 		if user.ID == userID {
-			response, _ = cc.changeUserProfile(userInput, user)
+			response, _ = cc.changeUserProfile(userInput, &(*cc.users)[i])
 		}
 	}
 
@@ -217,11 +217,13 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 	return *response, id, nil
 }
 
-func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist User) (responseUser, error) {
+func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *User) (responseUser, error) {
+	response := new(responseUser)
 	for _, user := range *h.users {
-		if userInput.Email == user.Email || userInput.Nickname == user.Nickname {
+		if (userInput.Email == user.Email || userInput.Nickname == user.Nickname) && (user.ID != userExist.ID) {
 			fmt.Println("Email or nickname already exist ")
-			return responseUser{}, errors.New("Email already exist ")
+			response.WriteResponse(*userExist)
+			return *response, errors.New("Email already exist ")
 		}
 	}
 
@@ -233,13 +235,12 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist User
 
 	h.mu.Unlock()
 
-	response := new(responseUser)
-	response.WriteResponse(userExist)
-
+	response.WriteResponse(*userExist)
+	fmt.Println(h.users)
 	return *response, nil
 }
 
-func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist User) (responseUserLinks, error) {
+func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (responseUserLinks, error) {
 	h.mu.Lock()
 
 	userExist.Links.Bitbucket = userInput.Bitbucket
@@ -256,7 +257,7 @@ func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist User) (res
 	return *response, nil
 }
 
-func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist User) (responseUser, error) {
+func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *User) (responseUser, error) {
 	if userInput.OldPassword != userExist.Password {
 		return responseUser{}, errors.New("Invalid password ")
 	}
@@ -268,7 +269,7 @@ func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist Us
 	h.mu.Unlock()
 
 	response := new(responseUser)
-	response.WriteResponse(userExist)
+	response.WriteResponse(*userExist)
 
 	return *response, nil
 }
