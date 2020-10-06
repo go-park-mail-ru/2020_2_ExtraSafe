@@ -86,15 +86,32 @@ func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, er
 			return *response, user.ID, nil
 		}
 	}
-	return responseUser{}, 0, errors.New("No such user ")
+
+	errorMessage := []Messages{{Message: "No user", ErrorName: "password"}}
+	return responseUser{}, 0, responseError{Messages: errorMessage, Status: 500}
 }
 
 func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, error) {
+	errorMessage := make([]Messages, 0)
 	for _, user := range *h.users {
-		if userInput.Email == user.Email || userInput.Nickname == user.Nickname {
-			fmt.Println("Email or nickname already exist ")
-			return responseUser{}, 0, errors.New("Email already exist ")
+		if userInput.Email == user.Email {
+			fmt.Println("Email already exist ")
+			msg := Messages{
+				Message: "Email already exist", ErrorName: "email",
+			}
+			errorMessage = append(errorMessage, msg)
 		}
+
+		if userInput.Nickname == user.Nickname {
+			msg := Messages{
+				Message: "Nickname already exist", ErrorName: "username",
+			}
+			errorMessage = append(errorMessage, msg)
+		}
+	}
+
+	if len(errorMessage) != 0 {
+		return responseUser{}, 0, responseError{Messages: errorMessage, Status: 500}
 	}
 
 	var id uint64 = 0
@@ -119,14 +136,30 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 }
 
 func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *User) (responseUser, error) {
-	response := new(responseUser)
+	errorMessage := make([]Messages, 0)
 	for _, user := range *h.users {
-		if (userInput.Email == user.Email || userInput.Nickname == user.Nickname) && (user.ID != userExist.ID) {
-			fmt.Println("Email or nickname already exist ")
-			response.WriteResponse(*userExist)
-			return *response, errors.New("Email already exist ")
+		if (userInput.Email == user.Email) && (user.ID != userExist.ID) {
+			fmt.Println("Email already exist ")
+			msg := Messages{
+				Message: "Email already exist", ErrorName: "email",
+			}
+			errorMessage = append(errorMessage, msg)
+		}
+
+		if (userInput.Nickname == user.Nickname) && (user.ID != userExist.ID) {
+			fmt.Println("Nickname already exist ")
+			msg := Messages{
+				Message: "Nickname already exist", ErrorName: "username",
+			}
+			errorMessage = append(errorMessage, msg)
 		}
 	}
+
+	if len(errorMessage) != 0 {
+		return responseUser{}, responseError{Messages: errorMessage, Status: 500}
+	}
+
+	response := new(responseUser)
 
 	userExist.Nickname = userInput.Nickname
 	userExist.Email = userInput.Email
@@ -152,7 +185,8 @@ func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (re
 
 func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *User) (responseUser, error) {
 	if userInput.OldPassword != userExist.Password {
-		return responseUser{}, errors.New("Invalid password ")
+		errorMessage := []Messages{{Message: "Invalid password", ErrorName: "oldPassword"}}
+		return responseUser{}, responseError{Messages: errorMessage, Status: 500}
 	}
 
 	userExist.Password = userInput.Password

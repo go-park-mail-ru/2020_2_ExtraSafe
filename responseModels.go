@@ -3,13 +3,13 @@ package main
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
-	FullName string `json:"fullname"`
+	Nickname string `json:"username"`
+	FullName string `json:"fullName"`
 }
 
 type responseUserLinks struct {
 	Status    int    `json:"status"`
-	Nickname  string `json:"nickname"`
+	Nickname  string `json:"username"`
 	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
 	Github    string `json:"github"`
@@ -19,14 +19,24 @@ type responseUserLinks struct {
 }
 
 type responseError struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+	OriginalError error      `json:"-"`
+	Status        int        `json:"status"`
+	Messages      []Messages `json:"messages"`
 }
 
-func (response *responseError) WriteResponse(message string) {
-	response.Status = 500
-	response.Message = message
+type Messages struct {
+	ErrorName string `json:"errorName"`
+	Message   string `json:"message"`
 }
+
+func (c responseError) Error() string {
+	return c.OriginalError.Error()
+}
+
+/*func (c *responseError) WriteResponse(message string) {
+	c.Status = 500
+	c.Message = message
+}*/
 
 func (response *responseUser) WriteResponse(user User) {
 	response.Status = 200
