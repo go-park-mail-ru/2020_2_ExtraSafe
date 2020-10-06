@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"math/rand"
 	"net/http"
@@ -23,7 +22,6 @@ func setCookie(c echo.Context, userID uint64) {
 	cookie.Value = SID
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	cookie.Path = "/"
-	fmt.Println(cc.sessions)
 	c.SetCookie(cookie)
 }
 

@@ -24,7 +24,6 @@ func router(e *echo.Echo) {
 
 func root(c echo.Context) error {
 	cc := c.(*Handlers)
-	fmt.Println("root")
 
 	response, err := cc.checkUserAuthorized(c)
 	if err == nil {
@@ -122,7 +121,7 @@ func accounts(c echo.Context) error {
 	response := new(responseUserLinks)
 	for _, user := range *cc.users {
 		if user.ID == userID {
-			response.WriteResponse(user.Nickname, *user.Links)
+			response.WriteResponse(user.Username, *user.Links)
 		}
 	}
 	return c.JSON(http.StatusOK, response)

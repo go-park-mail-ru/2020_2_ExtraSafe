@@ -20,7 +20,7 @@ type Handlers struct {
 type User struct {
 	ID       uint64 `json:"id"`
 	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 	FullName string `json:"fullname"`
 	Links    *UserLinks
@@ -31,7 +31,7 @@ type UserLinks struct {
 	Instagram string `json:"instagram"`
 	Github    string `json:"github"`
 	Bitbucket string `json:"bitbucket"`
-	Vk        string `json:"vk"`
+	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
 }
 
@@ -42,13 +42,13 @@ type UserInputLogin struct {
 
 type UserInputReg struct {
 	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 type UserInputProfile struct {
 	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	Username string `json:"username"`
 	FullName string `json:"fullname"`
 }
 
@@ -87,7 +87,7 @@ func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, er
 		}
 	}
 
-	errorMessage := []Messages{{Message: "No user", ErrorName: "password"}}
+	errorMessage := []Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
 	return responseUser{}, 0, responseError{Messages: errorMessage, Status: 500}
 }
 
@@ -95,16 +95,15 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 	errorMessage := make([]Messages, 0)
 	for _, user := range *h.users {
 		if userInput.Email == user.Email {
-			fmt.Println("Email already exist ")
 			msg := Messages{
-				Message: "Email already exist", ErrorName: "email",
+				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
 			}
 			errorMessage = append(errorMessage, msg)
 		}
 
-		if userInput.Nickname == user.Nickname {
+		if userInput.Username == user.Username {
 			msg := Messages{
-				Message: "Nickname already exist", ErrorName: "username",
+				Message: "Такое имя пользователя уже существует", ErrorName: "username",
 			}
 			errorMessage = append(errorMessage, msg)
 		}
@@ -121,7 +120,7 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 
 	newUser := User{
 		ID:       id,
-		Nickname: userInput.Nickname,
+		Username: userInput.Username,
 		Email:    userInput.Email,
 		Password: userInput.Password,
 		Links:    &UserLinks{},
@@ -139,17 +138,15 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 	errorMessage := make([]Messages, 0)
 	for _, user := range *h.users {
 		if (userInput.Email == user.Email) && (user.ID != userExist.ID) {
-			fmt.Println("Email already exist ")
 			msg := Messages{
-				Message: "Email already exist", ErrorName: "email",
+				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
 			}
 			errorMessage = append(errorMessage, msg)
 		}
 
-		if (userInput.Nickname == user.Nickname) && (user.ID != userExist.ID) {
-			fmt.Println("Nickname already exist ")
+		if (userInput.Username == user.Username) && (user.ID != userExist.ID) {
 			msg := Messages{
-				Message: "Nickname already exist", ErrorName: "username",
+				Message: "Такое имя пользователя уже существует", ErrorName: "username",
 			}
 			errorMessage = append(errorMessage, msg)
 		}
@@ -161,12 +158,11 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 
 	response := new(responseUser)
 
-	userExist.Nickname = userInput.Nickname
+	userExist.Username = userInput.Username
 	userExist.Email = userInput.Email
 	userExist.FullName = userInput.FullName
 
 	response.WriteResponse(*userExist)
-	fmt.Println(h.users)
 	return *response, nil
 }
 
@@ -176,16 +172,17 @@ func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (re
 	userExist.Links.Instagram = userInput.Instagram
 	userExist.Links.Telegram = userInput.Telegram
 	userExist.Links.Facebook = userInput.Facebook
+	userExist.Links.Vk = userInput.Vk
 
 	response := new(responseUserLinks)
-	response.WriteResponse(userExist.Nickname, *userExist.Links)
+	response.WriteResponse(userExist.Username, *userExist.Links)
 
 	return *response, nil
 }
 
 func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *User) (responseUser, error) {
 	if userInput.OldPassword != userExist.Password {
-		errorMessage := []Messages{{Message: "Invalid password", ErrorName: "oldPassword"}}
+		errorMessage := []Messages{{Message: "Неверный пароль", ErrorName: "oldPassword"}}
 		return responseUser{}, responseError{Messages: errorMessage, Status: 500}
 	}
 
@@ -199,7 +196,7 @@ func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *U
 
 func getFormParams(params url.Values) (userInput *UserInputProfile) {
 	userInput = new(UserInputProfile)
-	userInput.Nickname = params.Get("username")
+	userInput.Username = params.Get("username")
 	userInput.Email = params.Get("email")
 	userInput.FullName = params.Get("fullName")
 
@@ -215,7 +212,7 @@ func uploadAvatar(file *multipart.FileHeader, userID uint64) error {
 	defer src.Close()
 
 	filename := strconv.FormatUint(userID, 10)
-	dst, err := os.Create("./avatars/" + filename)
+	dst, err := os.Create("./avatars/" + filename + ".png")
 	if err != nil {
 		fmt.Println(err)
 		return err

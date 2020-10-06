@@ -3,18 +3,18 @@ package main
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
-	Nickname string `json:"username"`
+	Username string `json:"username"`
 	FullName string `json:"fullName"`
 }
 
 type responseUserLinks struct {
 	Status    int    `json:"status"`
-	Nickname  string `json:"username"`
+	Username  string `json:"username"`
 	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
 	Github    string `json:"github"`
 	Bitbucket string `json:"bitbucket"`
-	Vk        string `json:"vk"`
+	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
 }
 
@@ -41,17 +41,17 @@ func (c responseError) Error() string {
 func (response *responseUser) WriteResponse(user User) {
 	response.Status = 200
 	response.Email = user.Email
-	response.Nickname = user.Nickname
+	response.Username = user.Username
 	response.FullName = user.FullName
 }
 
-func (response *responseUserLinks) WriteResponse(nickname string, links UserLinks) {
+func (response *responseUserLinks) WriteResponse(username string, links UserLinks) {
 	response.Status = 200
-	response.Nickname = nickname
+	response.Username = username
 	response.Telegram = links.Telegram
 	response.Instagram = links.Instagram
 	response.Github = links.Github
 	response.Bitbucket = links.Bitbucket
-	response.Vk = links.Bitbucket
+	response.Vk = links.Vk
 	response.Facebook = links.Facebook
 }
