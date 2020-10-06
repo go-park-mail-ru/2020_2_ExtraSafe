@@ -2,13 +2,11 @@ package main
 
 import (
 	"github.com/labstack/echo"
-	"sync"
 )
 
 type Handlers struct {
 	echo.Context
 	users    *[]User
-	mu       *sync.Mutex
 	sessions *map[string]uint64 //map[sessionID]userID
 }
 
@@ -41,9 +39,6 @@ type User struct {
 	Password string `json:"password"`
 	FullName string `json:"fullname"`
 	Links    *UserLinks
-}
-
-type response interface {
 }
 
 type responseUser struct {

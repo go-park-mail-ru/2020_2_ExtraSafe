@@ -31,11 +31,11 @@ func getAvatar(c echo.Context) error {
 	sessionID := session.Value
 
 	userID := (*cc.sessions)[sessionID]
-	filename := "./avatars" + strconv.FormatUint(userID, 10)
+	filename := "./avatars/" + strconv.FormatUint(userID, 10)
 
 	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
-		return c.File("./avatars/default_avatar")
+		return c.File("./avatars/default_avatar.png")
 	}
 	return c.File(filename)
 }
@@ -260,8 +260,6 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		}
 	}
 
-	h.mu.Lock()
-
 	var id uint64 = 0
 	if len(*h.users) > 0 {
 		id = (*h.users)[len(*h.users)-1].ID + 1
@@ -276,7 +274,6 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 	}
 
 	*h.users = append(*h.users, newUser)
-	h.mu.Unlock()
 
 	response := new(responseUser)
 	response.WriteResponse(newUser)
@@ -294,13 +291,9 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 		}
 	}
 
-	h.mu.Lock()
-
 	userExist.Nickname = userInput.Nickname
 	userExist.Email = userInput.Email
 	userExist.FullName = userInput.FullName
-
-	h.mu.Unlock()
 
 	response.WriteResponse(*userExist)
 	fmt.Println(h.users)
@@ -308,15 +301,11 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 }
 
 func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (responseUserLinks, error) {
-	h.mu.Lock()
-
 	userExist.Links.Bitbucket = userInput.Bitbucket
 	userExist.Links.Github = userInput.Github
 	userExist.Links.Instagram = userInput.Instagram
 	userExist.Links.Telegram = userInput.Telegram
 	userExist.Links.Facebook = userInput.Facebook
-
-	h.mu.Unlock()
 
 	response := new(responseUserLinks)
 	response.WriteResponse(userExist.Nickname, *userExist.Links)
@@ -329,11 +318,7 @@ func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *U
 		return responseUser{}, errors.New("Invalid password ")
 	}
 
-	h.mu.Lock()
-
 	userExist.Password = userInput.Password
-
-	h.mu.Unlock()
 
 	response := new(responseUser)
 	response.WriteResponse(*userExist)
