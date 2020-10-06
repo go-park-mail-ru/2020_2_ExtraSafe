@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func router(e *echo.Echo) {
 	e.Any("/", root)
 	e.POST("/login/", login)
+	e.GET("/logout/", logout)
 	e.POST("/reg/", registration)
 	e.GET("/profile/", profile)
 	e.GET("/accounts/", accounts)
@@ -52,6 +54,21 @@ func login(c echo.Context) error {
 
 	setCookie(c, userID)
 	return c.JSON(http.StatusOK, response)
+}
+
+func logout(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, err := c.Cookie("tabutask_id")
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, responseUser{})
+	}
+	sessionID := session.Value
+
+	delete(*cc.sessions, sessionID)
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	c.SetCookie(session)
+	return c.JSON(http.StatusOK, responseUser{})
 }
 
 func registration(c echo.Context) error {
