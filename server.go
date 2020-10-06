@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"sync"
 )
 
 func main() {
@@ -22,14 +21,13 @@ func main() {
 		return func(c echo.Context) error {
 			cc := &Handlers{c,
 				&someUsers,
-				&sync.Mutex{},
 				&sessions,
 			}
 			return next(cc)
 		}
 	})
 
-	urls(e)
+	router(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
