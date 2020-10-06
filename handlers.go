@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 )
 
 func urls(e *echo.Echo) {
@@ -20,6 +21,23 @@ func urls(e *echo.Echo) {
 	e.POST("/profile/", profileChange)
 	e.POST("/accounts/", accountsChange)
 	e.POST("/password/", passwordChange)
+	e.GET("/avatars/", getAvatar)
+}
+
+func getAvatar(c echo.Context) error {
+	cc := c.(*Handlers)
+
+	session, _ := c.Cookie("tabutask_id")
+	sessionID := session.Value
+
+	userID := (*cc.sessions)[sessionID]
+	filename := "./avatars" + strconv.FormatUint(userID, 10)
+
+	_, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return c.File("./avatars/default_avatar")
+	}
+	return c.File(filename)
 }
 
 func getFormParams(params url.Values) (userInput *UserInputProfile) {
@@ -31,7 +49,7 @@ func getFormParams(params url.Values) (userInput *UserInputProfile) {
 	return
 }
 
-func uploadAvatar(file *multipart.FileHeader) error {
+func uploadAvatar(file *multipart.FileHeader, userID uint64) error {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -39,19 +57,19 @@ func uploadAvatar(file *multipart.FileHeader) error {
 	}
 	defer src.Close()
 
-	// Destination
-	dst, err := os.Create(file.Filename)
+	filename := strconv.FormatUint(userID, 10)
+	dst, err := os.Create("./avatars/" + filename)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 	defer dst.Close()
 
-	// Copy
 	if _, err = io.Copy(dst, src); err != nil {
 		fmt.Println(err)
 		return err
 	}
+
 	return err
 }
 
@@ -123,7 +141,7 @@ func profileChange(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		err = uploadAvatar(file)
+		err = uploadAvatar(file, userID)
 		if err != nil {
 			fmt.Println(err)
 		}

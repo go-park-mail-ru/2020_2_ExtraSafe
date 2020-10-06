@@ -69,8 +69,6 @@ type responseError struct {
 	Message string `json:"message"`
 }
 
-//TODO подумать, как организовать структуры так, чтобы удобно было изменять данные (в том числе пароль, логин, почту)
-
 type UserLinks struct {
 	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
