@@ -43,6 +43,9 @@ type User struct {
 	Links    *UserLinks
 }
 
+type response interface {
+}
+
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
@@ -59,6 +62,11 @@ type responseUserLinks struct {
 	Bitbucket string `json:"bitbucket"`
 	Vk        string `json:"vk"`
 	Facebook  string `json:"facebook"`
+}
+
+type responseError struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 //TODO подумать, как организовать структуры так, чтобы удобно было изменять данные (в том числе пароль, логин, почту)

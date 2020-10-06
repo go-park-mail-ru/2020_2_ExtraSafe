@@ -4,7 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
+	"os"
 )
 
 func urls(e *echo.Echo) {
@@ -16,6 +20,39 @@ func urls(e *echo.Echo) {
 	e.POST("/profile/", profileChange)
 	e.POST("/accounts/", accountsChange)
 	e.POST("/password/", passwordChange)
+}
+
+func getFormParams(params url.Values) (userInput *UserInputProfile) {
+	userInput = new(UserInputProfile)
+	userInput.Nickname = params.Get("username")
+	userInput.Email = params.Get("email")
+	userInput.FullName = params.Get("fullName")
+
+	return
+}
+
+func uploadAvatar(file *multipart.FileHeader) error {
+	src, err := file.Open()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer src.Close()
+
+	// Destination
+	dst, err := os.Create(file.Filename)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer dst.Close()
+
+	// Copy
+	if _, err = io.Copy(dst, src); err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return err
 }
 
 func passwordChange(c echo.Context) error {
@@ -77,10 +114,22 @@ func profileChange(c echo.Context) error {
 
 	userID := (*cc.sessions)[sessionID]
 
-	userInput := new(UserInputProfile)
-	if err := c.Bind(userInput); err != nil {
+	formParams, err := c.FormParams()
+	if err != nil {
 		return err
 	}
+
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		err = uploadAvatar(file)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	userInput := getFormParams(formParams)
 
 	var response responseUser
 	for i, user := range *cc.users {
@@ -272,6 +321,11 @@ func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *U
 	response.WriteResponse(*userExist)
 
 	return *response, nil
+}
+
+func (response *responseError) WriteResponse(message string) {
+	response.Status = 500
+	response.Message = message
 }
 
 func (response *responseUser) WriteResponse(user User) {
