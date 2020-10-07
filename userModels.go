@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"time"
 )
 
 type Handlers struct {
@@ -164,6 +163,7 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 	userExist.Username = userInput.Username
 	userExist.Email = userInput.Email
 	userExist.FullName = userInput.FullName
+	//userExist.Avatar = userInput.
 
 	response.WriteResponse(*userExist)
 	return *response, nil
@@ -206,34 +206,33 @@ func getFormParams(params url.Values) (userInput *UserInputProfile) {
 	return
 }
 
-func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) error {
+func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return err, ""
 	}
 	defer src.Close()
 
 
 	hash := sha256.New()
-	filename := string(hash.Sum([]byte(strconv.FormatUint(userID, 10) + time.Now().String())))
-
+	//filename = string(hash.Sum([]byte(strconv.FormatUint(userID, 10) + time.Now().String())))
+	//filename = string(hash.Sum([]byte(strconv.FormatUint(userID, 10))))
+	name := fmt.Sprintf("%x",  hash.Sum([]byte(strconv.FormatUint(userID, 10))))
+	filename = name + ".jpeg"
 	dst, err := os.Create("./avatars/" + filename)
-/*
-	filename := strconv.FormatUint(userID, 10)
-	dst, err := os.Create("./avatars/" + filename + ".png")*/
 
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return err, ""
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
 		fmt.Println(err)
-		return err
+		return err, ""
 	}
 
 	(*h.users)[userID].Avatar = filename
-	return err
+	return nil, filename
 }

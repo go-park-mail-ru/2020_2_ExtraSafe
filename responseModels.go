@@ -17,6 +17,7 @@ type responseUserLinks struct {
 	Bitbucket string `json:"bitbucket"`
 	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
+	Avatar string `json:"avatar"`
 }
 
 type responseError struct {
@@ -34,16 +35,12 @@ func (c responseError) Error() string {
 	return c.OriginalError.Error()
 }
 
-/*func (c *responseError) WriteResponse(message string) {
-	c.Status = 500
-	c.Message = message
-}*/
-
 func (response *responseUser) WriteResponse(user User) {
 	response.Status = 200
 	response.Email = user.Email
 	response.Username = user.Username
 	response.FullName = user.FullName
+	response.Avatar = user.Avatar
 }
 
 func (response *responseUserLinks) WriteResponse(username string, links UserLinks) {

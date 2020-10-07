@@ -179,7 +179,7 @@ func profileChange(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		err = cc.uploadAvatar(file, userID)
+		err, _ := cc.uploadAvatar(file, userID)
 		if err != nil {
 			fmt.Println(err)
 		}
