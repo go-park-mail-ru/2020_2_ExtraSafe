@@ -118,7 +118,7 @@ func accounts(c echo.Context) error {
 	response := new(responseUserLinks)
 	for _, user := range *cc.users {
 		if user.ID == userID {
-			response.WriteResponse(user.Username, *user.Links)
+			response.WriteResponse(user.Username, *user.Links, user.Avatar)
 		}
 	}
 	return c.JSON(http.StatusOK, response)
