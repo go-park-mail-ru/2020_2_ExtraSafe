@@ -220,7 +220,6 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
 	formattedID := strconv.FormatUint(userID, 10)
 
-	//filename = string(hash.Sum([]byte(strconv.FormatUint(userID, 10))))
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 	filename = name + ".jpeg"
 	dst, err := os.Create("./avatars/" + filename)

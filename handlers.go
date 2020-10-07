@@ -95,8 +95,7 @@ func profile(c echo.Context) error {
 	cc := c.(*Handlers)
 
 	session, _ := c.Cookie("tabutask_id")
-	sessionID := session.Value // не может быть nil, тк мы на руте проверяем авторизованность,
-	// а на авторизации/регистрации выдаем куки
+	sessionID := session.Value
 	userID := (*cc.sessions)[sessionID]
 
 	response := new(responseUser)
@@ -126,14 +125,8 @@ func accounts(c echo.Context) error {
 }
 
 func avatar(c echo.Context) error {
-	//cc := c.(*Handlers)
 	filename := c.Param("name")
 
-	/*session, _ := c.Cookie("tabutask_id")
-	sessionID := session.Value
-
-	userID := (*cc.sessions)[sessionID]
-	filename := (*cc.users)[userID].Avatar*/
 	if filename == "default_avatar.png" {
 		return c.File("./default/default_avatar.png")
 	}
