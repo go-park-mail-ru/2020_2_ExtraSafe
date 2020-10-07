@@ -43,7 +43,7 @@ func (response *responseUser) WriteResponse(user User) {
 	response.Avatar = user.Avatar
 }
 
-func (response *responseUserLinks) WriteResponse(username string, links UserLinks) {
+func (response *responseUserLinks) WriteResponse(username string, links UserLinks, avatar string) {
 	response.Status = 200
 	response.Username = username
 	response.Telegram = links.Telegram
@@ -52,4 +52,5 @@ func (response *responseUserLinks) WriteResponse(username string, links UserLink
 	response.Bitbucket = links.Bitbucket
 	response.Vk = links.Vk
 	response.Facebook = links.Facebook
+	response.Avatar = avatar
 }

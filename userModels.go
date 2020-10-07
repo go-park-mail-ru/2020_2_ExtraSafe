@@ -180,7 +180,7 @@ func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (re
 	userExist.Links.Vk = userInput.Vk
 
 	response := new(responseUserLinks)
-	response.WriteResponse(userExist.Username, *userExist.Links)
+	response.WriteResponse(userExist.Username, *userExist.Links, userExist.Avatar)
 
 	return *response, nil
 }
