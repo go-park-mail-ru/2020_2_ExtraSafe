@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"github.com/labstack/echo"
@@ -9,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Handlers struct {
@@ -24,6 +26,7 @@ type User struct {
 	Password string `json:"password"`
 	FullName string `json:"fullname"`
 	Links    *UserLinks
+	Avatar string `json:"avatar"`
 }
 
 type UserLinks struct {
@@ -172,7 +175,7 @@ func getFormParams(params url.Values) (userInput *UserInputProfile) {
 	return
 }
 
-func uploadAvatar(file *multipart.FileHeader, userID uint64) error {
+func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) error {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -180,7 +183,9 @@ func uploadAvatar(file *multipart.FileHeader, userID uint64) error {
 	}
 	defer src.Close()
 
-	filename := strconv.FormatUint(userID, 10)
+	hash := sha256.New()
+	filename := string(hash.Sum([]byte(strconv.FormatUint(userID, 10) + time.Now().String())))
+
 	dst, err := os.Create("./avatars/" + filename)
 	if err != nil {
 		fmt.Println(err)
@@ -193,5 +198,6 @@ func uploadAvatar(file *multipart.FileHeader, userID uint64) error {
 		return err
 	}
 
+	(*h.users)[userID].Avatar = filename
 	return err
 }

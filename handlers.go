@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -135,13 +133,11 @@ func avatar(c echo.Context) error {
 	sessionID := session.Value
 
 	userID := (*cc.sessions)[sessionID]
-	filename := "./avatars/" + strconv.FormatUint(userID, 10) + ".png"
-
-	_, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return c.File("./avatars/default_avatar.png")
+	filename := (*cc.users)[userID].Avatar
+	if filename != "" {
+		return c.File("./avatars/" + filename)
 	}
-	return c.File(filename)
+	return c.File("./default/default_avatar.png")
 }
 
 func accountsChange(c echo.Context) error {
@@ -184,7 +180,7 @@ func profileChange(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		err = uploadAvatar(file, userID)
+		err = cc.uploadAvatar(file, userID)
 		if err != nil {
 			fmt.Println(err)
 		}

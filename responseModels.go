@@ -5,6 +5,7 @@ type responseUser struct {
 	Email    string `json:"email"`
 	Nickname string `json:"nickname"`
 	FullName string `json:"fullname"`
+	Avatar string `json:"avatar"`
 }
 
 type responseUserLinks struct {
