@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type Handlers struct {
@@ -23,9 +25,9 @@ type User struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	FullName string `json:"fullname"`
+	FullName string `json:"fullName"`
 	Links    *UserLinks
-	Avatar string `json:"avatar"`
+	Avatar   string `json:"avatar"`
 }
 
 type UserLinks struct {
@@ -51,7 +53,7 @@ type UserInputReg struct {
 type UserInputProfile struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
-	FullName string `json:"fullname"`
+	FullName string `json:"fullName"`
 }
 
 type UserInputPassword struct {
@@ -126,6 +128,7 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		Email:    userInput.Email,
 		Password: userInput.Password,
 		Links:    &UserLinks{},
+		Avatar:   "default_avatar.png",
 	}
 
 	*h.users = append(*h.users, newUser)
@@ -163,7 +166,6 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 	userExist.Username = userInput.Username
 	userExist.Email = userInput.Email
 	userExist.FullName = userInput.FullName
-	//userExist.Avatar = userInput.
 
 	response.WriteResponse(*userExist)
 	return *response, nil
@@ -214,11 +216,12 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	}
 	defer src.Close()
 
-
 	hash := sha256.New()
-	//filename = string(hash.Sum([]byte(strconv.FormatUint(userID, 10) + time.Now().String())))
+	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
+	formattedID := strconv.FormatUint(userID, 10)
+
 	//filename = string(hash.Sum([]byte(strconv.FormatUint(userID, 10))))
-	name := fmt.Sprintf("%x",  hash.Sum([]byte(strconv.FormatUint(userID, 10))))
+	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 	filename = name + ".jpeg"
 	dst, err := os.Create("./avatars/" + filename)
 

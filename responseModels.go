@@ -3,9 +3,9 @@ package main
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
-	Username string `json:"nickname"`
-	FullName string `json:"fullname"`
-	Avatar string `json:"avatar"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Avatar   string `json:"avatar"`
 }
 
 type responseUserLinks struct {
@@ -17,7 +17,7 @@ type responseUserLinks struct {
 	Bitbucket string `json:"bitbucket"`
 	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
-	Avatar string `json:"avatar"`
+	Avatar    string `json:"avatar"`
 }
 
 type responseError struct {

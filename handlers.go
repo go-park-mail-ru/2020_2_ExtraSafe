@@ -14,7 +14,7 @@ func router(e *echo.Echo) {
 	e.POST("/reg/", registration)
 	e.GET("/profile/", profile)
 	e.GET("/accounts/", accounts)
-	e.GET("/avatar/", avatar)
+	e.GET("/avatar/:name", avatar)
 	e.POST("/profile/", profileChange)
 	e.POST("/accounts/", accountsChange)
 	e.POST("/password/", passwordChange)
@@ -126,17 +126,18 @@ func accounts(c echo.Context) error {
 }
 
 func avatar(c echo.Context) error {
-	cc := c.(*Handlers)
+	//cc := c.(*Handlers)
+	filename := c.Param("name")
 
-	session, _ := c.Cookie("tabutask_id")
+	/*session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
 
 	userID := (*cc.sessions)[sessionID]
-	filename := (*cc.users)[userID].Avatar
-	if filename != "" {
-		return c.File("./avatars/" + filename)
+	filename := (*cc.users)[userID].Avatar*/
+	if filename == "default_avatar.png" {
+		return c.File("./default/default_avatar.png")
 	}
-	return c.File("./default/default_avatar.png")
+	return c.File("./avatars/" + filename)
 }
 
 func accountsChange(c echo.Context) error {
