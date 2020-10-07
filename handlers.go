@@ -22,7 +22,6 @@ func router(e *echo.Echo) {
 
 func root(c echo.Context) error {
 	cc := c.(*Handlers)
-	fmt.Println("root")
 
 	response, err := cc.checkUserAuthorized(c)
 	if err == nil {
@@ -47,7 +46,7 @@ func login(c echo.Context) error {
 	var userID uint64
 	response, userID, err = cc.checkUser(*userInput)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, response)
+		return c.JSON(http.StatusUnauthorized, err)
 	}
 
 	setCookie(c, userID)
@@ -85,7 +84,7 @@ func registration(c echo.Context) error {
 	var userID uint64
 	response, userID, err = cc.createUser(*userInput)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, response)
+		return c.JSON(http.StatusUnauthorized, err)
 	}
 
 	setCookie(c, userID)
@@ -120,7 +119,7 @@ func accounts(c echo.Context) error {
 	response := new(responseUserLinks)
 	for _, user := range *cc.users {
 		if user.ID == userID {
-			response.WriteResponse(user.Nickname, *user.Links)
+			response.WriteResponse(user.Username, *user.Links)
 		}
 	}
 	return c.JSON(http.StatusOK, response)
@@ -191,8 +190,12 @@ func profileChange(c echo.Context) error {
 	var response responseUser
 	for i, user := range *cc.users {
 		if user.ID == userID {
-			response, _ = cc.changeUserProfile(userInput, &(*cc.users)[i])
+			response, err = cc.changeUserProfile(userInput, &(*cc.users)[i])
+			break
 		}
+	}
+	if err != nil {
+		return c.JSON(http.StatusOK, err)
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -220,7 +223,7 @@ func passwordChange(c echo.Context) error {
 	}
 
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, response)
+		return c.JSON(http.StatusUnauthorized, err)
 	}
 
 	return c.JSON(http.StatusOK, response)

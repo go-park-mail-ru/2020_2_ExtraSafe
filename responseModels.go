@@ -3,46 +3,56 @@ package main
 type responseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	Username string `json:"nickname"`
 	FullName string `json:"fullname"`
 	Avatar string `json:"avatar"`
 }
 
 type responseUserLinks struct {
 	Status    int    `json:"status"`
-	Nickname  string `json:"nickname"`
+	Username  string `json:"username"`
 	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
 	Github    string `json:"github"`
 	Bitbucket string `json:"bitbucket"`
-	Vk        string `json:"vk"`
+	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
 }
 
 type responseError struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+	OriginalError error      `json:"-"`
+	Status        int        `json:"status"`
+	Messages      []Messages `json:"messages"`
 }
 
-func (response *responseError) WriteResponse(message string) {
-	response.Status = 500
-	response.Message = message
+type Messages struct {
+	ErrorName string `json:"errorName"`
+	Message   string `json:"message"`
 }
+
+func (c responseError) Error() string {
+	return c.OriginalError.Error()
+}
+
+/*func (c *responseError) WriteResponse(message string) {
+	c.Status = 500
+	c.Message = message
+}*/
 
 func (response *responseUser) WriteResponse(user User) {
 	response.Status = 200
 	response.Email = user.Email
-	response.Nickname = user.Nickname
+	response.Username = user.Username
 	response.FullName = user.FullName
 }
 
-func (response *responseUserLinks) WriteResponse(nickname string, links UserLinks) {
+func (response *responseUserLinks) WriteResponse(username string, links UserLinks) {
 	response.Status = 200
-	response.Nickname = nickname
+	response.Username = username
 	response.Telegram = links.Telegram
 	response.Instagram = links.Instagram
 	response.Github = links.Github
 	response.Bitbucket = links.Bitbucket
-	response.Vk = links.Bitbucket
+	response.Vk = links.Vk
 	response.Facebook = links.Facebook
 }
