@@ -216,12 +216,15 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	}
 	defer src.Close()
 
+	oldAvatar := (*h.users)[userID].Avatar
+
 	hash := sha256.New()
+
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
 	formattedID := strconv.FormatUint(userID, 10)
-
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 	filename = name + ".jpeg"
+
 	dst, err := os.Create("./avatars/" + filename)
 
 	if err != nil {
@@ -236,5 +239,10 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	}
 
 	(*h.users)[userID].Avatar = "avatars/" + filename
+
+	if oldAvatar != "default_avatar.png" {
+		os.Remove("./" + oldAvatar)
+	}
+
 	return nil, filename
 }
