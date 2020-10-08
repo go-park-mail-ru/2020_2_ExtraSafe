@@ -18,7 +18,11 @@ func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://95.163.213.142:80", "http://95.163.213.142", "http://127.0.0.1:3033"},
+		AllowOrigins: []string{
+			"http://95.163.213.142:80",
+			"http://95.163.213.142",
+			"http://127.0.0.1:3033",
+			"http://tabutask.ru"},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowCredentials: true,
 	}))
