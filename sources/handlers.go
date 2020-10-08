@@ -1,4 +1,4 @@
-package src
+package sources
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func router(e *echo.Echo) {
+func Router(e *echo.Echo) {
 	e.Any("/", root)
 	e.POST("/login/", login)
 	e.GET("/logout/", logout)

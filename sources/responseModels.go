@@ -1,4 +1,4 @@
-package src
+package sources
 
 type ResponseUser struct {
 	Status   int    `json:"status"`

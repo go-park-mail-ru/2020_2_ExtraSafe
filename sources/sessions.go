@@ -1,4 +1,4 @@
-package src
+package sources
 
 import (
 	"github.com/labstack/echo"

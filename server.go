@@ -1,6 +1,7 @@
-package src
+package main
 
 import (
+	"./sources"
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -11,7 +12,7 @@ import (
 func main() {
 	clearDataStore()
 
-	someUsers := make([]User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
 	e := echo.New()
@@ -24,19 +25,17 @@ func main() {
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &Handlers{c,
-				&someUsers,
-				&sessions,
+			cc := &sources.Handlers{Context: c,
+				Users:    &someUsers,
+				Sessions: &sessions,
 			}
 			return next(cc)
 		}
 	})
 
-	router(e)
+	sources.Router(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
-
-	//defer clearDataStore()
 }
 
 func clearDataStore() {
