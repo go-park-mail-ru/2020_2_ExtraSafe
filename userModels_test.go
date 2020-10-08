@@ -22,7 +22,7 @@ func TestCreateUserSuccess(t *testing.T) {
 	assert.Equal(t, nil, err)
 }
 
-func TestCreateUserFault(t *testing.T) {
+func TestCreateUserFail(t *testing.T) {
 	someUsers := make([]User, 0)
 	someUsers = append(someUsers, User{
 		ID:       0,
@@ -49,6 +49,17 @@ func TestCreateUserFault(t *testing.T) {
 
 func TestCheckUserSuccess(t *testing.T) {
 	someUsers := make([]User, 0)
+
+	someUsers = append(someUsers, User{
+		ID:       0,
+		Username: "someUsername",
+		Email:    "someEmail@gmail.com",
+		Password: "somePassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+		FullName: "Petr",
+	})
+
 	sessions := make(map[string]uint64, 10)
 
 	var c echo.Context
@@ -59,10 +70,17 @@ func TestCheckUserSuccess(t *testing.T) {
 
 	testUser := UserInputLogin{"someEmail@gmail.com", "somePassword"}
 
-	response, _, err := cc.checkUser(testUser)
+	expectResponse := responseUser{
+		Status:   200,
+		Email:    "someEmail@gmail.com",
+		Username: "someUsername",
+		FullName: "Petr",
+		Avatar:   "default/default_avatar.png",
+	}
 
-	assert.Error(t, err)
-	assert.Equal(t, responseUser{}, response)
+	response, _, _ := cc.checkUser(testUser)
+
+	assert.Equal(t, expectResponse, response)
 }
 
 func TestCheckUserFault(t *testing.T) {
@@ -84,201 +102,182 @@ func TestCheckUserFault(t *testing.T) {
 		&sessions,
 	}
 
-	testUser := UserInputLogin{"someEmail@gmail.com", "somePassword"}
-	testResponse := responseUser{Email: "someEmail@gmail.com"}
-	response, _, err := cc.checkUser(testUser)
+	testUser := UserInputLogin{"someEmail@gmail.com", "Password"}
 
-	assert.Equal(t, nil, err)
-	assert.Equal(t, testResponse.Email, response.Email)
+	errorMessage := []Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
+
+	testResponse := responseError{
+		Status:        500,
+		Messages:      errorMessage,
+	}
+
+	_, _, err := cc.checkUser(testUser)
+
+	assert.Equal(t, testResponse, err)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+func TestChangeUserProfileSuccess(t *testing.T) {
+	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
+
+	someUsers = append(someUsers, User{
+		ID:       0,
+		Username: "someUsername",
+		Email:    "someEmail@gmail.com",
+		Password: "somePassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	var c echo.Context
+	cc := &Handlers{c,
+		&someUsers,
+		&sessions,
+	}
+
+	testUser := UserInputProfile{"someEmail@gmail.com", "someUsername", "someFullName"}
+	testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
+
+	userExist := someUsers[0]
+	response, _ := cc.changeUserProfile(&testUser, &userExist)
+
+	assert.Equal(t, testResponse, response)
+}
+
+func TestChangeUserProfileFault(t *testing.T) {
+	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
+
+	someUsers = append(someUsers, User{
+		ID:       0,
+		Username: "someUsername",
+		Email:    "someEmail@gmail.com",
+		Password: "somePassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	someUsers = append(someUsers, User{
+		ID:       1,
+		Username: "anotherUsername",
+		Email:    "anotherEmail@gmail.com",
+		Password: "anotherPassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	var c echo.Context
+	cc := &Handlers{c,
+		&someUsers,
+		&sessions,
+	}
+
+	testUser := UserInputProfile{"anotherEmail@gmail.com", "someUsername", "someFullName"}
+	//testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
+
+	messages := make([]Messages, 0)
+	messages = append(messages, Messages{"email",  "Такой адрес электронной почты уже зарегистрирован"})
+
+	expectedResponseError := responseError{
+		Status:        500,
+		Messages: messages,
+	}
+
+	userExist := someUsers[0]
+	_, err := cc.changeUserProfile(&testUser, &userExist)
+
+	assert.Equal(t, expectedResponseError, err)
+}
+
+func TestChangeUserProfileFault2(t *testing.T) {
+	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
+
+	someUsers = append(someUsers, User{
+		ID:       0,
+		Username: "someUsername",
+		Email:    "someEmail@gmail.com",
+		Password: "somePassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	someUsers = append(someUsers, User{
+		ID:       1,
+		Username: "anotherUsername",
+		Email:    "anotherEmail@gmail.com",
+		Password: "anotherPassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	var c echo.Context
+	cc := &Handlers{c,
+		&someUsers,
+		&sessions,
+	}
+
+	testUser := UserInputProfile{"someEmail@gmail.com", "anotherUsername", "someFullName"}
+
+	messages := make([]Messages, 0)
+	messages = append(messages, Messages{"username",  "Такое имя пользователя уже существует"})
+
+	expectedResponseError := responseError{
+		Status:        500,
+		Messages: messages,
+	}
+
+	userExist := someUsers[0]
+	_, err := cc.changeUserProfile(&testUser, &userExist)
+
+	assert.Equal(t, expectedResponseError, err)
+}
+
+func TestChangeUserAccountsSuccess(t *testing.T)  {
+	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
+
+	someUsers = append(someUsers, User{
+		ID:       0,
+		Username: "someUsername",
+		Email:    "someEmail@gmail.com",
+		Password: "somePassword",
+		Links:    &UserLinks{},
+		Avatar:   "default/default_avatar.png",
+	})
+
+	var c echo.Context
+	cc := &Handlers{c,
+		&someUsers,
+		&sessions,
+	}
+
+	testUser := UserLinks{
+		Telegram:  "@telegram",
+		Instagram: "@keith",
+		Github:    "github/bab",
+		Bitbucket: "bitbucket/ket",
+		Vk:        "",
+		Facebook:  "facebook",
+	}
+
+	expectedResponse := responseUserLinks{
+		Status:    200,
+		Username:  "someUsername",
+		Telegram:  "@telegram",
+		Instagram: "@keith",
+		Github:    "github/bab",
+		Bitbucket: "bitbucket/ket",
+		Vk:        "",
+		Facebook:  "facebook",
+		Avatar:    "default/default_avatar.png",
+	}
+
+	userExist := someUsers[0]
+	response, _ := cc.changeUserAccounts(&testUser, &userExist)
+
+	assert.Equal(t, expectedResponse, response)
+}
 
 func TestUploadAvatarFault(t *testing.T) {
 	someUsers := make([]User, 0)
