@@ -14,7 +14,7 @@ func router(e *echo.Echo) {
 	e.POST("/reg/", registration)
 	e.GET("/profile/", profile)
 	e.GET("/accounts/", accounts)
-	e.GET("/avatar/:name", avatar)
+	e.Static("/avatar", "")
 	e.POST("/profile/", profileChange)
 	e.POST("/accounts/", accountsChange)
 	e.POST("/password/", passwordChange)
@@ -122,15 +122,6 @@ func accounts(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, response)
-}
-
-func avatar(c echo.Context) error {
-	filename := c.Param("name")
-
-	if filename == "default_avatar.png" {
-		return c.File("./default/default_avatar.png")
-	}
-	return c.File("./avatars/" + filename)
 }
 
 func accountsChange(c echo.Context) error {

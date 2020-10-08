@@ -128,7 +128,7 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		Email:    userInput.Email,
 		Password: userInput.Password,
 		Links:    &UserLinks{},
-		Avatar:   "default_avatar.png",
+		Avatar:   "default/default_avatar.png",
 	}
 
 	*h.users = append(*h.users, newUser)
@@ -235,6 +235,6 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 		return err, ""
 	}
 
-	(*h.users)[userID].Avatar = filename
+	(*h.users)[userID].Avatar = "avatars/" + filename
 	return nil, filename
 }

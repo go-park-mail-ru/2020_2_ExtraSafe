@@ -22,6 +22,7 @@ func setCookie(c echo.Context, userID uint64) {
 	cookie.Value = SID
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	cookie.Path = "/"
+	cookie.HttpOnly = true
 	c.SetCookie(cookie)
 }
 
