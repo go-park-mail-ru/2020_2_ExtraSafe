@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"../sources"
+	"2020_2_ExtraSafe/sources"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
@@ -280,22 +280,6 @@ func TestChangeUserAccountsSuccess(t *testing.T)  {
 	assert.Equal(t, expectedResponse, response)
 }
 
-func TestUploadAvatarFault(t *testing.T) {
-	someUsers := make([]sources.User, 0)
-	sessions := make(map[string]uint64, 10)
-	var c echo.Context
-
-	cc := &sources.Handlers{Context: c,
-		Users:    &someUsers,
-		Sessions: &sessions,
-	}
-
-	file := multipart.FileHeader{}
-
-	err, _ := cc.UploadAvatar(&file, 0)
-	assert.Error(t, err)
-}
-
 func TestUserPasswordSuccess(t *testing.T) {
 	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
@@ -359,3 +343,19 @@ func TestUserPasswordFault(t *testing.T) {
 	assert.Equal(t, testResponse, err)
 }
 
+
+func TestUploadAvatarFault(t *testing.T) {
+	someUsers := make([]sources.User, 0)
+	sessions := make(map[string]uint64, 10)
+	var c echo.Context
+
+	cc := &sources.Handlers{Context: c,
+		Users:    &someUsers,
+		Sessions: &sessions,
+	}
+
+	file := multipart.FileHeader{}
+
+	err, _ := cc.UploadAvatar(&file, 0)
+	assert.Error(t, err)
+}

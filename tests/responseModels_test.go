@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"../sources"
+	"2020_2_ExtraSafe/sources"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

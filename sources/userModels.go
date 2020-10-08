@@ -240,7 +240,7 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 
 	(*h.Users)[userID].Avatar = "avatars/" + filename
 
-	if oldAvatar != "default_avatar.png" {
+	if oldAvatar != "default/default_avatar.png" {
 		os.Remove("./" + oldAvatar)
 	}
 
