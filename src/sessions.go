@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"github.com/labstack/echo"
@@ -16,7 +16,7 @@ func setCookie(c echo.Context, userID uint64) {
 	SID := RandStringRunes(32)
 	cc := c.(*Handlers)
 
-	(*cc.sessions)[SID] = userID
+	(*cc.Sessions)[SID] = userID
 
 	cookie.Name = "tabutask_id"
 	cookie.Value = SID

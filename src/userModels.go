@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"crypto/sha256"
@@ -16,8 +16,8 @@ import (
 
 type Handlers struct {
 	echo.Context
-	users    *[]User
-	sessions *map[string]uint64 //map[sessionID]userID
+	Users    *[]User
+	Sessions *map[string]uint64 //map[sessionID]userID
 }
 
 type User struct {
@@ -61,30 +61,30 @@ type UserInputPassword struct {
 	Password    string `json:"password"`
 }
 
-func (h *Handlers) checkUserAuthorized(c echo.Context) (responseUser, error) {
+func (h *Handlers) checkUserAuthorized(c echo.Context) (ResponseUser, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
 		fmt.Println(err)
-		return responseUser{}, err
+		return ResponseUser{}, err
 	}
 	sessionID := session.Value
-	userID, authorized := (*h.sessions)[sessionID]
+	userID, authorized := (*h.Sessions)[sessionID]
 
 	if authorized {
-		for _, user := range *h.users {
+		for _, user := range *h.Users {
 			if user.ID == userID {
-				response := new(responseUser)
+				response := new(ResponseUser)
 				response.WriteResponse(user)
 				return *response, nil
 			}
 		}
 	}
-	return responseUser{}, errors.New("No such session ")
+	return ResponseUser{}, errors.New("No such session ")
 }
 
-func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, error) {
-	response := new(responseUser)
-	for _, user := range *h.users {
+func (h *Handlers) CheckUser(userInput UserInputLogin) (ResponseUser, uint64, error) {
+	response := new(ResponseUser)
+	for _, user := range *h.Users {
 		if userInput.Email == user.Email && userInput.Password == user.Password {
 			response.WriteResponse(user)
 			return *response, user.ID, nil
@@ -92,12 +92,12 @@ func (h *Handlers) checkUser(userInput UserInputLogin) (responseUser, uint64, er
 	}
 
 	errorMessage := []Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
-	return responseUser{}, 0, responseError{Messages: errorMessage, Status: 500}
+	return ResponseUser{}, 0, ResponseError{Messages: errorMessage, Status: 500}
 }
 
-func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, error) {
+func (h *Handlers) CreateUser(userInput UserInputReg) (ResponseUser, uint64, error) {
 	errorMessage := make([]Messages, 0)
-	for _, user := range *h.users {
+	for _, user := range *h.Users {
 		if userInput.Email == user.Email {
 			msg := Messages{
 				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
@@ -114,12 +114,12 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 	}
 
 	if len(errorMessage) != 0 {
-		return responseUser{}, 0, responseError{Messages: errorMessage, Status: 500}
+		return ResponseUser{}, 0, ResponseError{Messages: errorMessage, Status: 500}
 	}
 
 	var id uint64 = 0
-	if len(*h.users) > 0 {
-		id = (*h.users)[len(*h.users)-1].ID + 1
+	if len(*h.Users) > 0 {
+		id = (*h.Users)[len(*h.Users)-1].ID + 1
 	}
 
 	newUser := User{
@@ -131,17 +131,17 @@ func (h *Handlers) createUser(userInput UserInputReg) (responseUser, uint64, err
 		Avatar:   "default/default_avatar.png",
 	}
 
-	*h.users = append(*h.users, newUser)
+	*h.Users = append(*h.Users, newUser)
 
-	response := new(responseUser)
+	response := new(ResponseUser)
 	response.WriteResponse(newUser)
 
 	return *response, id, nil
 }
 
-func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *User) (responseUser, error) {
+func (h *Handlers) ChangeUserProfile(userInput *UserInputProfile, userExist *User) (ResponseUser, error) {
 	errorMessage := make([]Messages, 0)
-	for _, user := range *h.users {
+	for _, user := range *h.Users {
 		if (userInput.Email == user.Email) && (user.ID != userExist.ID) {
 			msg := Messages{
 				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
@@ -158,10 +158,10 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 	}
 
 	if len(errorMessage) != 0 {
-		return responseUser{}, responseError{Messages: errorMessage, Status: 500}
+		return ResponseUser{}, ResponseError{Messages: errorMessage, Status: 500}
 	}
 
-	response := new(responseUser)
+	response := new(ResponseUser)
 
 	userExist.Username = userInput.Username
 	userExist.Email = userInput.Email
@@ -171,7 +171,7 @@ func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *Use
 	return *response, nil
 }
 
-func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (responseUserLinks, error) {
+func (h *Handlers) ChangeUserAccounts(userInput *UserLinks, userExist *User) (ResponseUserLinks, error) {
 	userExist.Links.Bitbucket = userInput.Bitbucket
 	userExist.Links.Github = userInput.Github
 	userExist.Links.Instagram = userInput.Instagram
@@ -179,21 +179,21 @@ func (h *Handlers) changeUserAccounts(userInput *UserLinks, userExist *User) (re
 	userExist.Links.Facebook = userInput.Facebook
 	userExist.Links.Vk = userInput.Vk
 
-	response := new(responseUserLinks)
+	response := new(ResponseUserLinks)
 	response.WriteResponse(userExist.Username, *userExist.Links, userExist.Avatar)
 
 	return *response, nil
 }
 
-func (h *Handlers) changeUserPassword(userInput *UserInputPassword, userExist *User) (responseUser, error) {
+func (h *Handlers) ChangeUserPassword(userInput *UserInputPassword, userExist *User) (ResponseUser, error) {
 	if userInput.OldPassword != userExist.Password {
 		errorMessage := []Messages{{Message: "Неверный пароль", ErrorName: "oldPassword"}}
-		return responseUser{}, responseError{Messages: errorMessage, Status: 500}
+		return ResponseUser{}, ResponseError{Messages: errorMessage, Status: 500}
 	}
 
 	userExist.Password = userInput.Password
 
-	response := new(responseUser)
+	response := new(ResponseUser)
 	response.WriteResponse(*userExist)
 
 	return *response, nil
@@ -208,7 +208,7 @@ func getFormParams(params url.Values) (userInput *UserInputProfile) {
 	return
 }
 
-func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
+func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -216,7 +216,7 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	}
 	defer src.Close()
 
-	oldAvatar := (*h.users)[userID].Avatar
+	oldAvatar := (*h.Users)[userID].Avatar
 
 	hash := sha256.New()
 
@@ -238,7 +238,7 @@ func (h *Handlers) uploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 		return err, ""
 	}
 
-	(*h.users)[userID].Avatar = "avatars/" + filename
+	(*h.Users)[userID].Avatar = "avatars/" + filename
 
 	if oldAvatar != "default_avatar.png" {
 		os.Remove("./" + oldAvatar)

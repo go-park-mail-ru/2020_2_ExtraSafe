@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"fmt"
@@ -44,7 +44,7 @@ func login(c echo.Context) error {
 	}
 
 	var userID uint64
-	response, userID, err = cc.checkUser(*userInput)
+	response, userID, err = cc.CheckUser(*userInput)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}
@@ -58,14 +58,14 @@ func logout(c echo.Context) error {
 
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, responseUser{})
+		return c.JSON(http.StatusUnauthorized, ResponseUser{})
 	}
 	sessionID := session.Value
 
-	delete(*cc.sessions, sessionID)
+	delete(*cc.Sessions, sessionID)
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	c.SetCookie(session)
-	return c.JSON(http.StatusOK, responseUser{})
+	return c.JSON(http.StatusOK, ResponseUser{})
 }
 
 func registration(c echo.Context) error {
@@ -82,7 +82,7 @@ func registration(c echo.Context) error {
 	}
 
 	var userID uint64
-	response, userID, err = cc.createUser(*userInput)
+	response, userID, err = cc.CreateUser(*userInput)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}
@@ -96,10 +96,10 @@ func profile(c echo.Context) error {
 
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
-	userID := (*cc.sessions)[sessionID]
+	userID := (*cc.Sessions)[sessionID]
 
-	response := new(responseUser)
-	for _, user := range *cc.users {
+	response := new(ResponseUser)
+	for _, user := range *cc.Users {
 		if user.ID == userID {
 			response.WriteResponse(user)
 		}
@@ -113,10 +113,10 @@ func accounts(c echo.Context) error {
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
 
-	userID := (*cc.sessions)[sessionID]
+	userID := (*cc.Sessions)[sessionID]
 
-	response := new(responseUserLinks)
-	for _, user := range *cc.users {
+	response := new(ResponseUserLinks)
+	for _, user := range *cc.Users {
 		if user.ID == userID {
 			response.WriteResponse(user.Username, *user.Links, user.Avatar)
 		}
@@ -130,17 +130,17 @@ func accountsChange(c echo.Context) error {
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
 
-	userID := (*cc.sessions)[sessionID]
+	userID := (*cc.Sessions)[sessionID]
 
 	userInput := new(UserLinks)
 	if err := c.Bind(userInput); err != nil {
 		return err
 	}
 
-	var response responseUserLinks
-	for i, user := range *cc.users {
+	var response ResponseUserLinks
+	for i, user := range *cc.Users {
 		if user.ID == userID {
-			response, _ = cc.changeUserAccounts(userInput, &(*cc.users)[i])
+			response, _ = cc.ChangeUserAccounts(userInput, &(*cc.Users)[i])
 		}
 	}
 
@@ -153,7 +153,7 @@ func profileChange(c echo.Context) error {
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
 
-	userID := (*cc.sessions)[sessionID]
+	userID := (*cc.Sessions)[sessionID]
 
 	formParams, err := c.FormParams()
 	if err != nil {
@@ -164,7 +164,7 @@ func profileChange(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		err, _ := cc.uploadAvatar(file, userID)
+		err, _ := cc.UploadAvatar(file, userID)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -172,10 +172,10 @@ func profileChange(c echo.Context) error {
 
 	userInput := getFormParams(formParams)
 
-	var response responseUser
-	for i, user := range *cc.users {
+	var response ResponseUser
+	for i, user := range *cc.Users {
 		if user.ID == userID {
-			response, err = cc.changeUserProfile(userInput, &(*cc.users)[i])
+			response, err = cc.ChangeUserProfile(userInput, &(*cc.Users)[i])
 			break
 		}
 	}
@@ -192,18 +192,18 @@ func passwordChange(c echo.Context) error {
 	session, _ := c.Cookie("tabutask_id")
 	sessionID := session.Value
 
-	userID := (*cc.sessions)[sessionID]
+	userID := (*cc.Sessions)[sessionID]
 
 	userInput := new(UserInputPassword)
 	if err := c.Bind(userInput); err != nil {
 		return err
 	}
 
-	var response responseUser
+	var response ResponseUser
 	var err error
-	for i, user := range *cc.users {
+	for i, user := range *cc.Users {
 		if user.ID == userID {
-			response, err = cc.changeUserPassword(userInput, &(*cc.users)[i])
+			response, err = cc.ChangeUserPassword(userInput, &(*cc.Users)[i])
 		}
 	}
 

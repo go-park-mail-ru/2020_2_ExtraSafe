@@ -1,6 +1,6 @@
-package main
+package src
 
-type responseUser struct {
+type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
@@ -8,7 +8,7 @@ type responseUser struct {
 	Avatar   string `json:"avatar"`
 }
 
-type responseUserLinks struct {
+type ResponseUserLinks struct {
 	Status    int    `json:"status"`
 	Username  string `json:"username"`
 	Telegram  string `json:"telegram"`
@@ -20,7 +20,7 @@ type responseUserLinks struct {
 	Avatar    string `json:"avatar"`
 }
 
-type responseError struct {
+type ResponseError struct {
 	OriginalError error      `json:"-"`
 	Status        int        `json:"status"`
 	Messages      []Messages `json:"messages"`
@@ -31,11 +31,11 @@ type Messages struct {
 	Message   string `json:"message"`
 }
 
-func (c responseError) Error() string {
+func (c ResponseError) Error() string {
 	return c.OriginalError.Error()
 }
 
-func (response *responseUser) WriteResponse(user User) {
+func (response *ResponseUser) WriteResponse(user User) {
 	response.Status = 200
 	response.Email = user.Email
 	response.Username = user.Username
@@ -43,7 +43,7 @@ func (response *responseUser) WriteResponse(user User) {
 	response.Avatar = user.Avatar
 }
 
-func (response *responseUserLinks) WriteResponse(username string, links UserLinks, avatar string) {
+func (response *ResponseUserLinks) WriteResponse(username string, links UserLinks, avatar string) {
 	response.Status = 200
 	response.Username = username
 	response.Telegram = links.Telegram
