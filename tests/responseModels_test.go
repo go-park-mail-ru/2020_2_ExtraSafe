@@ -1,15 +1,15 @@
 package tests
 
 import (
-	"2020_2_ExtraSafe/src"
+	"../sources"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestWriteResponse(t *testing.T) {
-	response := new(src.ResponseUser)
+	response := new(sources.ResponseUser)
 
-	user := src.User{
+	user := sources.User{
 		ID:       12,
 		Email:    "sas@mail.ru",
 		Username: "some",
@@ -21,7 +21,7 @@ func TestWriteResponse(t *testing.T) {
 
 	response.WriteResponse(user)
 
-	expectResponse := src.ResponseUser{
+	expectResponse := sources.ResponseUser{
 		Status:   200,
 		Email:    "sas@mail.ru",
 		Username: "some",
@@ -34,9 +34,9 @@ func TestWriteResponse(t *testing.T) {
 
 
 func TestWriteResponseLinks(t *testing.T) {
-	response := new(src.ResponseUserLinks)
+	response := new(sources.ResponseUserLinks)
 
-	userLinks := src.UserLinks{
+	userLinks := sources.UserLinks{
 		Telegram:  "@telegram",
 		Instagram: "@instagram",
 		Github:    "github/bab",
@@ -47,7 +47,7 @@ func TestWriteResponseLinks(t *testing.T) {
 
 	response.WriteResponse("some", userLinks, "default")
 
-	expectResponse := src.ResponseUserLinks{
+	expectResponse := sources.ResponseUserLinks{
 		Status:    200,
 		Username:  "some",
 		Telegram:  "@telegram",

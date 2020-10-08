@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"2020_2_ExtraSafe/src"
+	"../sources"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
@@ -9,54 +9,54 @@ import (
 )
 
 func TestCreateUserSuccess(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputReg{Email: "someEmail@gmail.com", Username: "someUsername", Password: "somePassword"}
+	testUser := sources.UserInputReg{Email: "someEmail@gmail.com", Username: "someUsername", Password: "somePassword"}
 	_, _, err := cc.CreateUser(testUser)
 	assert.Equal(t, nil, err)
 }
 
 func TestCreateUserFail(t *testing.T) {
-	someUsers := make([]src.User, 0)
-	someUsers = append(someUsers, src.User{
+	someUsers := make([]sources.User, 0)
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	sessions := make(map[string]uint64, 10)
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputReg{Email: "someEmail@gmail.com", Username: "someUsername", Password: "somePassword"}
+	testUser := sources.UserInputReg{Email: "someEmail@gmail.com", Username: "someUsername", Password: "somePassword"}
 	_, _, err := cc.CreateUser(testUser)
 
 	assert.Error(t, err)
 }
 
 func TestCheckUserSuccess(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 		FullName: "Petr",
 	})
@@ -64,14 +64,14 @@ func TestCheckUserSuccess(t *testing.T) {
 	sessions := make(map[string]uint64, 10)
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputLogin{Email: "someEmail@gmail.com", Password: "somePassword"}
+	testUser := sources.UserInputLogin{Email: "someEmail@gmail.com", Password: "somePassword"}
 
-	expectResponse := src.ResponseUser{
+	expectResponse := sources.ResponseUser{
 		Status:   200,
 		Email:    "someEmail@gmail.com",
 		Username: "someUsername",
@@ -85,29 +85,29 @@ func TestCheckUserSuccess(t *testing.T) {
 }
 
 func TestCheckUserFault(t *testing.T) {
-	someUsers := make([]src.User, 0)
-	someUsers = append(someUsers, src.User{
+	someUsers := make([]sources.User, 0)
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	sessions := make(map[string]uint64, 10)
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputLogin{Email: "someEmail@gmail.com", Password: "Password"}
+	testUser := sources.UserInputLogin{Email: "someEmail@gmail.com", Password: "Password"}
 
-	errorMessage := []src.Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
+	errorMessage := []sources.Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
 
-	testResponse := src.ResponseError{
+	testResponse := sources.ResponseError{
 		Status:        500,
 		Messages:      errorMessage,
 	}
@@ -118,26 +118,26 @@ func TestCheckUserFault(t *testing.T) {
 }
 
 func TestChangeUserProfileSuccess(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputProfile{Email: "someEmail@gmail.com", Username: "someUsername", FullName: "someFullName"}
-	testResponse := src.ResponseUser{Status: 200, Email: "someEmail@gmail.com", Username: "someUsername", FullName: "someFullName",  Avatar: "default/default_avatar.png"}
+	testUser := sources.UserInputProfile{Email: "someEmail@gmail.com", Username: "someUsername", FullName: "someFullName"}
+	testResponse := sources.ResponseUser{Status: 200, Email: "someEmail@gmail.com", Username: "someUsername", FullName: "someFullName",  Avatar: "default/default_avatar.png"}
 
 	userExist := someUsers[0]
 	response, _ := cc.ChangeUserProfile(&testUser, &userExist)
@@ -146,40 +146,40 @@ func TestChangeUserProfileSuccess(t *testing.T) {
 }
 
 func TestChangeUserProfileFault(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       1,
 		Username: "anotherUsername",
 		Email:    "anotherEmail@gmail.com",
 		Password: "anotherPassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputProfile{Email: "anotherEmail@gmail.com", Username: "someUsername", FullName: "someFullName"}
+	testUser := sources.UserInputProfile{Email: "anotherEmail@gmail.com", Username: "someUsername", FullName: "someFullName"}
 	//testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
 
-	messages := make([]src.Messages, 0)
-	messages = append(messages, src.Messages{ErrorName: "email",  Message: "Такой адрес электронной почты уже зарегистрирован"})
+	messages := make([]sources.Messages, 0)
+	messages = append(messages, sources.Messages{ErrorName: "email",  Message: "Такой адрес электронной почты уже зарегистрирован"})
 
-	expectedResponseError := src.ResponseError{
+	expectedResponseError := sources.ResponseError{
 		Status:        500,
 		Messages: messages,
 	}
@@ -191,39 +191,39 @@ func TestChangeUserProfileFault(t *testing.T) {
 }
 
 func TestChangeUserProfileFault2(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       1,
 		Username: "anotherUsername",
 		Email:    "anotherEmail@gmail.com",
 		Password: "anotherPassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputProfile{Email: "someEmail@gmail.com", Username: "anotherUsername", FullName: "someFullName"}
+	testUser := sources.UserInputProfile{Email: "someEmail@gmail.com", Username: "anotherUsername", FullName: "someFullName"}
 
-	messages := make([]src.Messages, 0)
-	messages = append(messages, src.Messages{ErrorName: "username",  Message: "Такое имя пользователя уже существует"})
+	messages := make([]sources.Messages, 0)
+	messages = append(messages, sources.Messages{ErrorName: "username",  Message: "Такое имя пользователя уже существует"})
 
-	expectedResponseError := src.ResponseError{
+	expectedResponseError := sources.ResponseError{
 		Status:        500,
 		Messages: messages,
 	}
@@ -235,25 +235,25 @@ func TestChangeUserProfileFault2(t *testing.T) {
 }
 
 func TestChangeUserAccountsSuccess(t *testing.T)  {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserLinks{
+	testUser := sources.UserLinks{
 		Telegram:  "@telegram",
 		Instagram: "@keith",
 		Github:    "github/bab",
@@ -262,7 +262,7 @@ func TestChangeUserAccountsSuccess(t *testing.T)  {
 		Facebook:  "facebook",
 	}
 
-	expectedResponse := src.ResponseUserLinks{
+	expectedResponse := sources.ResponseUserLinks{
 		Status:    200,
 		Username:  "someUsername",
 		Telegram:  "@telegram",
@@ -281,11 +281,11 @@ func TestChangeUserAccountsSuccess(t *testing.T)  {
 }
 
 func TestUploadAvatarFault(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 	var c echo.Context
 
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
@@ -297,26 +297,26 @@ func TestUploadAvatarFault(t *testing.T) {
 }
 
 func TestUserPasswordSuccess(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputPassword{OldPassword: "somePassword", Password: "newPassword"}
-	testResponse := src.ResponseUser{Status: 200, Email: "someEmail@gmail.com", Username: "someUsername",  Avatar: "default/default_avatar.png"}
+	testUser := sources.UserInputPassword{OldPassword: "somePassword", Password: "newPassword"}
+	testResponse := sources.ResponseUser{Status: 200, Email: "someEmail@gmail.com", Username: "someUsername",  Avatar: "default/default_avatar.png"}
 
 	userExist := someUsers[0]
 	response, _ := cc.ChangeUserPassword(&testUser, &userExist)
@@ -325,29 +325,29 @@ func TestUserPasswordSuccess(t *testing.T) {
 }
 
 func TestUserPasswordFault(t *testing.T) {
-	someUsers := make([]src.User, 0)
+	someUsers := make([]sources.User, 0)
 	sessions := make(map[string]uint64, 10)
 
-	someUsers = append(someUsers, src.User{
+	someUsers = append(someUsers, sources.User{
 		ID:       0,
 		Username: "someUsername",
 		Email:    "someEmail@gmail.com",
 		Password: "somePassword",
-		Links:    &src.UserLinks{},
+		Links:    &sources.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	})
 
 	var c echo.Context
-	cc := &src.Handlers{Context: c,
+	cc := &sources.Handlers{Context: c,
 		Users:    &someUsers,
 		Sessions: &sessions,
 	}
 
-	testUser := src.UserInputPassword{OldPassword: "wrongPassword", Password: "newPassword"}
+	testUser := sources.UserInputPassword{OldPassword: "wrongPassword", Password: "newPassword"}
 
-	messages := []src.Messages{{"oldPassword",  "Неверный пароль"}}
+	messages := []sources.Messages{{"oldPassword",  "Неверный пароль"}}
 
-	testResponse := src.ResponseError{
+	testResponse := sources.ResponseError{
 		OriginalError: nil,
 		Status:        500,
 		Messages:      messages,
