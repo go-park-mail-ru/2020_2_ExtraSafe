@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
+	"mime/multipart"
 	"testing"
 )
 
@@ -91,9 +92,23 @@ func TestCheckUserFault(t *testing.T) {
 	assert.Equal(t, testResponse.Email, response.Email)
 }
 
-//func (h *Handlers) checkUserAuthorized(c echo.Context) (responseUser, error) {
-//func (h *Handlers) changeUserProfile(userInput *UserInputProfile, userExist *User) (responseUser, error) {
-func TestChangeUserProfileSuccess(t *testing.T) {
+func TestUploadAvatarFault(t *testing.T) {
+	someUsers := make([]User, 0)
+	sessions := make(map[string]uint64, 10)
+	var c echo.Context
+
+	cc := &Handlers{c,
+		&someUsers,
+		&sessions,
+	}
+
+	file := multipart.FileHeader{}
+
+	err, _ := cc.uploadAvatar(&file, 0)
+	assert.Error(t, err)
+}
+
+func TestUserPasswordSuccess(t *testing.T) {
 	someUsers := make([]User, 0)
 	sessions := make(map[string]uint64, 10)
 
@@ -112,17 +127,16 @@ func TestChangeUserProfileSuccess(t *testing.T) {
 		&sessions,
 	}
 
-	testUser := UserInputProfile{"someEmail@gmail.com", "someUsername", "someFullName"}
-	testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
+	testUser := UserInputPassword{"somePassword", "newPassword"}
+	testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "",  "default/default_avatar.png"}
 
 	userExist := someUsers[0]
-	response, err := cc.changeUserProfile(&testUser, &userExist)
+	response, _ := cc.changeUserPassword(&testUser, &userExist)
 
-	assert.Equal(t, nil, err)
 	assert.Equal(t, testResponse, response)
 }
 
-func TestChangeUserProfileFault(t *testing.T) {
+func TestUserPasswordFault(t *testing.T) {
 	someUsers := make([]User, 0)
 	sessions := make(map[string]uint64, 10)
 
@@ -135,74 +149,25 @@ func TestChangeUserProfileFault(t *testing.T) {
 		Avatar:   "default/default_avatar.png",
 	})
 
-	someUsers = append(someUsers, User{
-		ID:       0,
-		Username: "anotherUsername",
-		Email:    "anotherEmail@gmail.com",
-		Password: "anotherPassword",
-		Links:    &UserLinks{},
-		Avatar:   "default/default_avatar.png",
-	})
-
 	var c echo.Context
 	cc := &Handlers{c,
 		&someUsers,
 		&sessions,
 	}
 
-	testUser := UserInputProfile{"anotherEmail@gmail.com", "someUsername", "someFullName"}
-	//testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
+	testUser := UserInputPassword{"wrongPassword", "newPassword"}
 
-	userExist := someUsers[0]
-	_, err := cc.changeUserProfile(&testUser, &userExist)
+	messages := []Messages{{"oldPassword",  "Неверный пароль"}}
 
-	assert.Error(t, err)
-	//assert.Equal(t, testResponse, response)
-}
-
-func TestChangeUserProfileFault2(t *testing.T) {
-	someUsers := make([]User, 0)
-	sessions := make(map[string]uint64, 10)
-
-	someUsers = append(someUsers, User{
-		ID:       0,
-		Username: "someUsername",
-		Email:    "someEmail@gmail.com",
-		Password: "somePassword",
-		Links:    &UserLinks{},
-		Avatar:   "default/default_avatar.png",
-	})
-
-	someUsers = append(someUsers, User{
-		ID:       0,
-		Username: "anotherUsername",
-		Email:    "anotherEmail@gmail.com",
-		Password: "anotherPassword",
-		Links:    &UserLinks{},
-		Avatar:   "default/default_avatar.png",
-	})
-
-	var c echo.Context
-	cc := &Handlers{c,
-		&someUsers,
-		&sessions,
-	}
-
-	testUser := UserInputProfile{"someEmail@gmail.com", "anotherUsername", "someFullName"}
-	//testResponse := responseUser{200, "someEmail@gmail.com", "someUsername", "someFullName",  "default/default_avatar.png"}
-
-	messages := make([]Messages, 0)
-	messages = append(messages, Messages{"email",  "Такой адрес электронной почты уже зарегистрирован"})
-
-	expectedResponseError := responseError{
+	testResponse := responseError{
+		OriginalError: nil,
 		Status:        500,
-		Messages: messages,
+		Messages:      messages,
 	}
 
 	userExist := someUsers[0]
-	_, err := cc.changeUserProfile(&testUser, &userExist)
+	_, err := cc.changeUserPassword(&testUser, &userExist)
 
-	assert.Equal(t, expectedResponseError, err)
-	//assert.Error(t, err)
-	//assert.Equal(t, testResponse, response)
+	assert.Equal(t, testResponse, err)
 }
+
