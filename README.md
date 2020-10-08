@@ -3,7 +3,7 @@ Backend репозиторий команды ExtraSafe
 
 ## Деплой
 
-http://95.163.213.142/
+http://tabutask.ru/
 
 ## Авторы
 
