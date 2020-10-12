@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo"
-	"io"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"mime/multipart"
 	"net/url"
 	"os"
@@ -226,14 +228,14 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	filename = name + ".jpeg"
 
 	dst, err := os.Create("./avatars/" + filename)
-
 	if err != nil {
 		fmt.Println(err)
 		return err, ""
 	}
 	defer dst.Close()
 
-	if _, err = io.Copy(dst, src); err != nil {
+	err = saveImage(&src, dst)
+	if err != nil {
 		fmt.Println(err)
 		return err, ""
 	}
@@ -245,4 +247,40 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	}
 
 	return nil, filename
+}
+
+func saveImage(src *multipart.File, dst *os.File) error {
+	img, fmtName, err := image.Decode(*src)
+	if err != nil {
+		return err
+	}
+	fmt.Println(fmtName)
+
+	switch fmtName {
+	case "png":
+		{
+			fmt.Println("png")
+
+			enc := png.Encoder{
+				CompressionLevel: png.BestSpeed,
+			}
+			err := enc.Encode(dst, img)
+			if err != nil {
+				return err
+			}
+		}
+	case "jpeg":
+		{
+			fmt.Println("jpeg")
+			opt := jpeg.Options{
+				Quality: 20,
+			}
+
+			err = jpeg.Encode(dst, img, &opt)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
