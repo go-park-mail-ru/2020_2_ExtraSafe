@@ -21,15 +21,15 @@ type ResponseUserLinks struct {
 }
 
 type ResponseError struct {
-	OriginalError error      `json:"-"`
-	Status        int        `json:"status"`
-	Messages      []Messages `json:"messages"`
+	OriginalError error    `json:"-"`
+	Status        int      `json:"status"`
+	Codes         []string `json:"codes"`
 }
 
-type Messages struct {
+/*type Messages struct {
 	ErrorName string `json:"errorName"`
 	Message   string `json:"message"`
-}
+}*/
 
 func (c ResponseError) Error() string {
 	return c.OriginalError.Error()

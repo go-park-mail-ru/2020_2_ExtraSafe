@@ -160,12 +160,16 @@ func profileChange(c echo.Context) error {
 		return err
 	}
 
+	var errAvatar, errProfile error
+	errorCodes := make([]string, 0)
+
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		err, _ := cc.UploadAvatar(file, userID)
-		if err != nil {
+		errAvatar, _ = cc.UploadAvatar(file, userID)
+		if errAvatar != nil {
+			errorCodes = append(errorCodes, errAvatar.(ResponseError).Codes...)
 			fmt.Println(err)
 		}
 	}
@@ -175,13 +179,19 @@ func profileChange(c echo.Context) error {
 	var response ResponseUser
 	for i, user := range *cc.Users {
 		if user.ID == userID {
-			response, err = cc.ChangeUserProfile(userInput, &(*cc.Users)[i])
+			response, errProfile = cc.ChangeUserProfile(userInput, &(*cc.Users)[i])
+			if errProfile != nil {
+				errorCodes = append(errorCodes, errProfile.(ResponseError).Codes...)
+			}
 			break
 		}
 	}
-	if err != nil {
-		return c.JSON(http.StatusOK, err)
+	if len(errorCodes) != 0 {
+		return c.JSON(http.StatusOK, ResponseError{Codes: errorCodes, Status: 500})
 	}
+	/*if err != nil {
+		return c.JSON(http.StatusOK, err)
+	}*/
 
 	return c.JSON(http.StatusOK, response)
 }

@@ -93,30 +93,24 @@ func (h *Handlers) CheckUser(userInput UserInputLogin) (ResponseUser, uint64, er
 		}
 	}
 
-	errorMessage := []Messages{{Message: "Неверная электронная почта или пароль", ErrorName: "password"}}
-	return ResponseUser{}, 0, ResponseError{Messages: errorMessage, Status: 500}
+	errorCodes := []string{"101"}
+	return ResponseUser{}, 0, ResponseError{Codes: errorCodes, Status: 500}
 }
 
 func (h *Handlers) CreateUser(userInput UserInputReg) (ResponseUser, uint64, error) {
-	errorMessage := make([]Messages, 0)
+	errorCodes := make([]string, 0)
 	for _, user := range *h.Users {
 		if userInput.Email == user.Email {
-			msg := Messages{
-				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
-			}
-			errorMessage = append(errorMessage, msg)
+			errorCodes = append(errorCodes, "201")
 		}
 
 		if userInput.Username == user.Username {
-			msg := Messages{
-				Message: "Такое имя пользователя уже существует", ErrorName: "username",
-			}
-			errorMessage = append(errorMessage, msg)
+			errorCodes = append(errorCodes, "202")
 		}
 	}
 
-	if len(errorMessage) != 0 {
-		return ResponseUser{}, 0, ResponseError{Messages: errorMessage, Status: 500}
+	if len(errorCodes) != 0 {
+		return ResponseUser{}, 0, ResponseError{Codes: errorCodes, Status: 500}
 	}
 
 	var id uint64 = 0
@@ -142,25 +136,19 @@ func (h *Handlers) CreateUser(userInput UserInputReg) (ResponseUser, uint64, err
 }
 
 func (h *Handlers) ChangeUserProfile(userInput *UserInputProfile, userExist *User) (ResponseUser, error) {
-	errorMessage := make([]Messages, 0)
+	errorCodes := make([]string, 0)
 	for _, user := range *h.Users {
 		if (userInput.Email == user.Email) && (user.ID != userExist.ID) {
-			msg := Messages{
-				Message: "Такой адрес электронной почты уже зарегистрирован", ErrorName: "email",
-			}
-			errorMessage = append(errorMessage, msg)
+			errorCodes = append(errorCodes, "301")
 		}
 
 		if (userInput.Username == user.Username) && (user.ID != userExist.ID) {
-			msg := Messages{
-				Message: "Такое имя пользователя уже существует", ErrorName: "username",
-			}
-			errorMessage = append(errorMessage, msg)
+			errorCodes = append(errorCodes, "302")
 		}
 	}
 
-	if len(errorMessage) != 0 {
-		return ResponseUser{}, ResponseError{Messages: errorMessage, Status: 500}
+	if len(errorCodes) != 0 {
+		return ResponseUser{}, ResponseError{Codes: errorCodes, Status: 500}
 	}
 
 	response := new(ResponseUser)
@@ -189,8 +177,8 @@ func (h *Handlers) ChangeUserAccounts(userInput *UserLinks, userExist *User) (Re
 
 func (h *Handlers) ChangeUserPassword(userInput *UserInputPassword, userExist *User) (ResponseUser, error) {
 	if userInput.OldPassword != userExist.Password {
-		errorMessage := []Messages{{Message: "Неверный пароль", ErrorName: "oldPassword"}}
-		return ResponseUser{}, ResponseError{Messages: errorMessage, Status: 500}
+		errorCodes := []string{"501"}
+		return ResponseUser{}, ResponseError{Codes: errorCodes, Status: 500}
 	}
 
 	userExist.Password = userInput.Password
@@ -214,7 +202,7 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return err, ""
+		return ResponseError{Codes: []string{"401"}, Status: 500}, ""
 	}
 	defer src.Close()
 
@@ -229,7 +217,7 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	filename, err = saveImage(&src, name)
 	if err != nil {
 		fmt.Println(err)
-		return err, ""
+		return ResponseError{Codes: []string{"402"}, Status: 500}, ""
 	}
 
 	(*h.Users)[userID].Avatar = "avatars/" + filename
