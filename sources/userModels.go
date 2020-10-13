@@ -225,16 +225,8 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
 	formattedID := strconv.FormatUint(userID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
-	filename = name + ".jpeg"
 
-	dst, err := os.Create("./avatars/" + filename)
-	if err != nil {
-		fmt.Println(err)
-		return err, ""
-	}
-	defer dst.Close()
-
-	err = saveImage(&src, dst)
+	filename, err = saveImage(&src, name)
 	if err != nil {
 		fmt.Println(err)
 		return err, ""
@@ -249,38 +241,44 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 	return nil, filename
 }
 
-func saveImage(src *multipart.File, dst *os.File) error {
+func saveImage(src *multipart.File, name string) (string, error) {
 	img, fmtName, err := image.Decode(*src)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println(fmtName)
+
+	filename := name + "." + fmtName
+
+	dst, err := os.Create("./avatars/" + filename)
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
 
 	switch fmtName {
 	case "png":
 		{
-			fmt.Println("png")
-
 			enc := png.Encoder{
-				CompressionLevel: png.BestSpeed,
+				CompressionLevel: png.BestCompression, //еще не реализовано
 			}
 			err := enc.Encode(dst, img)
 			if err != nil {
-				return err
+				return "", err
 			}
 		}
 	case "jpeg":
 		{
-			fmt.Println("jpeg")
 			opt := jpeg.Options{
-				Quality: 20,
+				Quality: 60,
 			}
 
 			err = jpeg.Encode(dst, img, &opt)
 			if err != nil {
-				return err
+				return "", err
 			}
 		}
+	default:
+		return "", errors.New("Неверный формат файла ")
 	}
-	return nil
+	return filename, nil
 }
