@@ -67,7 +67,7 @@ func (h *Handlers) checkUserAuthorized(c echo.Context) (ResponseUser, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
 		fmt.Println(err)
-		return ResponseUser{}, err
+		return ResponseUser{}, ResponseError{Status: 500, Codes: nil}
 	}
 	sessionID := session.Value
 	userID, authorized := (*h.Sessions)[sessionID]
@@ -81,7 +81,7 @@ func (h *Handlers) checkUserAuthorized(c echo.Context) (ResponseUser, error) {
 			}
 		}
 	}
-	return ResponseUser{}, errors.New("No such session ")
+	return ResponseUser{}, ResponseError{Status: 500, Codes: nil}
 }
 
 func (h *Handlers) CheckUser(userInput UserInputLogin) (ResponseUser, uint64, error) {

@@ -26,7 +26,7 @@ func root(c echo.Context) error {
 	if err == nil {
 		return c.JSON(http.StatusOK, response)
 	}
-	return c.JSON(http.StatusUnauthorized, response)
+	return c.JSON(http.StatusUnauthorized, err)
 }
 
 func login(c echo.Context) error {
