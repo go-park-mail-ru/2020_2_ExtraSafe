@@ -201,7 +201,6 @@ func getFormParams(params url.Values) (userInput *UserInputProfile) {
 func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
-		fmt.Println(err)
 		return ResponseError{Codes: []string{"401"}, Status: 500}, ""
 	}
 	defer src.Close()
@@ -216,7 +215,6 @@ func (h *Handlers) UploadAvatar(file *multipart.FileHeader, userID uint64) (err 
 
 	filename, err = saveImage(&src, name)
 	if err != nil {
-		fmt.Println(err)
 		return ResponseError{Codes: []string{"402"}, Status: 500}, ""
 	}
 

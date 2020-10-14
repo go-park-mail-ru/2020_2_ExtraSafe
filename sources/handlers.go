@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
@@ -164,13 +163,10 @@ func profileChange(c echo.Context) error {
 	errorCodes := make([]string, 0)
 
 	file, err := c.FormFile("avatar")
-	if err != nil {
-		fmt.Println(err)
-	} else {
+	if err == nil {
 		errAvatar, _ = cc.UploadAvatar(file, userID)
 		if errAvatar != nil {
 			errorCodes = append(errorCodes, errAvatar.(ResponseError).Codes...)
-			fmt.Println(err)
 		}
 	}
 
@@ -189,9 +185,6 @@ func profileChange(c echo.Context) error {
 	if len(errorCodes) != 0 {
 		return c.JSON(http.StatusOK, ResponseError{Codes: errorCodes, Status: 500})
 	}
-	/*if err != nil {
-		return c.JSON(http.StatusOK, err)
-	}*/
 
 	return c.JSON(http.StatusOK, response)
 }
