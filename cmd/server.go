@@ -31,9 +31,9 @@ func main() {
 	someUsers := make([]models.User, 0)
 	userSessions := make(map[string]uint64, 10)
 
-	usersStorage := userStorage.NewStorage(someUsers, userSessions)
-	sessionStorage := sessionsStorage.NewStorage(userSessions)
-	avatarStorage := imgStorage.NewStorage(someUsers, userSessions)
+	usersStorage := userStorage.NewStorage(&someUsers, &userSessions)
+	sessionStorage := sessionsStorage.NewStorage(&userSessions)
+	avatarStorage := imgStorage.NewStorage(&someUsers, &userSessions)
 
 	sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(usersStorage)

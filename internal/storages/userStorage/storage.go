@@ -24,10 +24,10 @@ type storage struct {
 	Users    *[]models.User
 }
 
-func NewStorage(someUsers []models.User, sessions map[string]uint64) Storage {
+func NewStorage(someUsers *[]models.User, sessions *map[string]uint64) Storage {
 	return &storage{
-		Sessions: &sessions,
-		Users: &someUsers,
+		Sessions: sessions,
+		Users: someUsers,
 	}
 }
 

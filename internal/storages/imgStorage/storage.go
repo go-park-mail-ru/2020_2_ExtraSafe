@@ -25,16 +25,17 @@ type storage struct {
 	Users    *[]models.User
 }
 
-func NewStorage(someUsers []models.User, sessions map[string]uint64) Storage {
+func NewStorage(someUsers *[]models.User, sessions *map[string]uint64) Storage {
 	return &storage{
-		Sessions: &sessions,
-		Users: &someUsers,
+		Sessions: sessions,
+		Users: someUsers,
 	}
 }
 
 func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
+		fmt.Println(err)
 		return errorWorker.ResponseError{Codes: []string{"401"}, Status: 500}, ""
 	}
 	defer src.Close()
@@ -49,6 +50,7 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 
 	filename, err = saveImage(&src, name)
 	if err != nil {
+		fmt.Println(err)
 		return errorWorker.ResponseError{Codes: []string{"402"}, Status: 500}, ""
 	}
 
@@ -69,7 +71,8 @@ func saveImage(src *multipart.File, name string) (string, error) {
 
 	filename := name + "." + fmtName
 
-	dst, err := os.Create("./avatars/" + filename)
+	//TODO - нормальный путь
+	dst, err := os.Create("/home/keith/tehnopark/go/2020_2_ExtraSafe/avatars/" + filename)
 	if err != nil {
 		return "", err
 	}

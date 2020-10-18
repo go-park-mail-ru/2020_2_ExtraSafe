@@ -30,23 +30,48 @@ func NewHandler(authService authService, authTransport authTransport, authSessio
 }
 
 func (h *handler) Auth(c echo.Context) error {
-	return nil
+	userId, err := h.authSessions.CheckCookie(c)
+	if err == nil {
+		userInput := new(models.UserInput)
+		userInput.ID = userId
+
+		user, _ := h.authService.Auth(*userInput)
+
+		response, err := h.authTransport.AuthWrite(user)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err)
+		}
+		return c.JSON(http.StatusOK, response)
+	}
+	return c.JSON(http.StatusUnauthorized, err)
 }
 
 func (h *handler) Login(c echo.Context) error {
 	cc := c.(*models.CustomContext)
 
-	/*response, err := cc.checkUserAuthorized(c)
+	userId, err := h.authSessions.CheckCookie(c)
 	if err == nil {
+		userInput := new(models.UserInput)
+		userInput.ID = userId
+		user, _ := h.authService.Auth(*userInput)
+		response, err := h.authTransport.AuthWrite(user)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err)
+		}
 		return c.JSON(http.StatusOK, response)
-	}*/
+	}
 
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}
 
-	response, err := h.authService.Login(userInput)
+	user, err := h.authService.Login(userInput)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, err)
+	}
+
+	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}
@@ -64,17 +89,29 @@ func (h *handler) Logout(c echo.Context) error {
 func (h *handler) Registration(c echo.Context) error{
 	cc := c.(*models.CustomContext)
 
-	/*response, err := cc.checkUserAuthorized(c)
+	userId, err := h.authSessions.CheckCookie(c)
 	if err == nil {
+		userInput := new(models.UserInput)
+		userInput.ID = userId
+		user, _ := h.authService.Auth(*userInput)
+		response, err := h.authTransport.AuthWrite(user)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err)
+		}
 		return c.JSON(http.StatusOK, response)
-	}*/
+	}
 
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}
 
-	response, err := h.authService.Registration(userInput)
+	user, err := h.authService.Registration(userInput)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, err)
+	}
+
+	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err)
 	}

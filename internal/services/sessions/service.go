@@ -1,6 +1,8 @@
 package sessions
 
 import (
+	"errors"
+	"fmt"
 	"github.com/labstack/echo"
 	"math/rand"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 type Service interface {
 	SetCookie(c echo.Context, userID uint64)
 	DeleteCookie(c echo.Context) error
+	CheckCookie(c echo.Context) (uint64, error)
 }
 
 type service struct {
@@ -52,6 +55,21 @@ func (s *service)DeleteCookie(c echo.Context) error {
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	c.SetCookie(session)
 	return nil
+}
+
+func (s *service)CheckCookie(c echo.Context) (uint64, error) {
+	session, err := c.Cookie("tabutask_id")
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+	sessionID := session.Value
+
+	userId, authorized := s.sessionsStorage.CheckUserSession(sessionID)
+	if authorized {
+		return userId, nil
+	}
+	return 0, errors.New("Not auth ")
 }
 
 func RandStringRunes(n int) string {
