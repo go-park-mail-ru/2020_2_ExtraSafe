@@ -26,7 +26,7 @@ type authSessions interface {
 	CheckCookie(c echo.Context) (uint64, error)
 }
 
-/*type errorWorker interface {
-	ServeJSONError(ctx *fasthttp.RequestCtx, serveError error) (err error)
-	ServeFatalError(ctx *fasthttp.RequestCtx)
-}*/
+type errorWorker interface {
+	RespError(c echo.Context, serveError error) (err error)
+	TransportError(c echo.Context) (err error)
+}

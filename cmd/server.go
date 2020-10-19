@@ -2,6 +2,7 @@ package main
 
 import (
 	"../internal/models"
+	"../internal/errorWorker"
 	"../internal/services/auth"
 	"../internal/services/profile"
 	"../internal/services/sessions"
@@ -31,6 +32,8 @@ func main() {
 	someUsers := make([]models.User, 0)
 	userSessions := make(map[string]uint64, 10)
 
+	errWorker := errorWorker.NewErrorWorker()
+
 	usersStorage := userStorage.NewStorage(&someUsers, &userSessions)
 	sessionStorage := sessionsStorage.NewStorage(&userSessions)
 	avatarStorage := imgStorage.NewStorage(&someUsers, &userSessions)
@@ -43,8 +46,8 @@ func main() {
 
 	middlewaresService := middlewares.NewMiddleware(sessionService)
 
-	aHandler := authHandler.NewHandler(authService, authTransport, sessionService)
-	profHandler := profileHandler.NewHandler(profileService, profileTransport)
+	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
+	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
 
 	e := echo.New()
 

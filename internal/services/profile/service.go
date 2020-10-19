@@ -43,13 +43,22 @@ func (s *service) Accounts(request models.UserInput) (user models.User, err erro
 }
 
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.User, err error) {
+	errorCodes := make([]string, 0)
+
 	if request.Avatar != nil {
-		err, _ = s.avatarStorage.UploadAvatar(request.Avatar, request.ID)
+		errAvatar, _ := s.avatarStorage.UploadAvatar(request.Avatar, request.ID)
+		if errAvatar != nil {
+			errorCodes = append(errorCodes, errAvatar.(models.ServeError).Codes...)
+		}
 	}
 
-	user, err = s.userStorage.ChangeUserProfile(request)
-	if err != nil {
-		return models.User{}, err
+	user, errProfile := s.userStorage.ChangeUserProfile(request)
+	if errProfile != nil {
+		errorCodes = append(errorCodes, errProfile.(models.ServeError).Codes...)
+	}
+
+	if len(errorCodes) != 0 {
+		return models.User{}, models.ServeError{Codes: errorCodes}
 	}
 
 	return user, err

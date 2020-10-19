@@ -17,15 +17,15 @@ type handler struct {
 	authService   authService
 	authTransport authTransport
 	authSessions authSessions
-	//errorWorker     errorWorker
+	errorWorker     errorWorker
 }
 
-func NewHandler(authService authService, authTransport authTransport, authSessions authSessions) *handler {
+func NewHandler(authService authService, authTransport authTransport, authSessions authSessions, errorWorker errorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
 		authSessions: authSessions,
-		//errorWorker:     errorWorker,
+		errorWorker:     errorWorker,
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *handler) Auth(c echo.Context) error {
 
 		response, err := h.authTransport.AuthWrite(user)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, err)
+			return h.errorWorker.TransportError(c)
 		}
 		return c.JSON(http.StatusOK, response)
 	}
@@ -56,24 +56,24 @@ func (h *handler) Login(c echo.Context) error {
 		user, _ := h.authService.Auth(*userInput)
 		response, err := h.authTransport.AuthWrite(user)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, err)
+			return h.errorWorker.TransportError(c)
 		}
 		return c.JSON(http.StatusOK, response)
 	}
 
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Login(userInput)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.RespError(c, err)
 	}
 
 	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.TransportError(c)
 	}
 
 	h.authSessions.SetCookie(c, cc.UserId)
@@ -96,24 +96,24 @@ func (h *handler) Registration(c echo.Context) error{
 		user, _ := h.authService.Auth(*userInput)
 		response, err := h.authTransport.AuthWrite(user)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, err)
+			return h.errorWorker.TransportError(c)
 		}
 		return c.JSON(http.StatusOK, response)
 	}
 
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Registration(userInput)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.RespError(c, err)
 	}
 
 	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return h.errorWorker.TransportError(c)
 	}
 
 	h.authSessions.SetCookie(c, cc.UserId)

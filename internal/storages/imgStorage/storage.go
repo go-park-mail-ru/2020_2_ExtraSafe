@@ -2,7 +2,6 @@ package imgStorage
 
 import (
 	"../../../internal/models"
-	"../../../internal/errorWorker"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -36,7 +35,7 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return errorWorker.ResponseError{Codes: []string{"401"}, Status: 500}, ""
+		return models.ServeError{Codes: []string{"401"}}, ""
 	}
 	defer src.Close()
 
@@ -51,7 +50,7 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 	filename, err = saveImage(&src, name)
 	if err != nil {
 		fmt.Println(err)
-		return errorWorker.ResponseError{Codes: []string{"402"}, Status: 500}, ""
+		return models.ServeError{Codes: []string{"402"}}, ""
 	}
 
 	(*s.Users)[userID].Avatar = "avatars/" + filename

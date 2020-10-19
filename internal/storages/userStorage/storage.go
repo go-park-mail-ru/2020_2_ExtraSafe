@@ -1,7 +1,6 @@
 package userStorage
 
 import (
-	"../../../internal/errorWorker"
 	"../../../internal/models"
 	"fmt"
 	"github.com/labstack/echo"
@@ -35,7 +34,7 @@ func (s *storage) checkUserAuthorized(c echo.Context) (models.User, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
 		fmt.Println(err)
-		return models.User{}, errorWorker.ResponseError{Status: 500, Codes: nil}
+		return models.User{}, models.ServeError{Codes: nil}
 	}
 	sessionID := session.Value
 	userID, authorized := (*s.Sessions)[sessionID]
@@ -47,7 +46,7 @@ func (s *storage) checkUserAuthorized(c echo.Context) (models.User, error) {
 			}
 		}
 	}
-	return models.User{}, errorWorker.ResponseError{Status: 500, Codes: nil}
+	return models.User{}, models.ServeError{Codes: nil}
 }
 
 func (s *storage) CheckUser(userInput models.UserInputLogin) (models.User, error) {
@@ -58,7 +57,7 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (models.User, error
 	}
 
 	errorCodes := []string{"101"}
-	return models.User{}, errorWorker.ResponseError{Codes: errorCodes, Status: 500}
+	return models.User{}, models.ServeError{Codes: errorCodes}
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (models.User, error) {
@@ -74,7 +73,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (models.User, error)
 	}
 
 	if len(errorCodes) != 0 {
-		return models.User{}, errorWorker.ResponseError{Codes: errorCodes, Status: 500}
+		return models.User{}, models.ServeError{Codes: errorCodes}
 	}
 
 	var id uint64 = 0
@@ -140,7 +139,7 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile) (models.U
 	}
 
 	if len(errorCodes) != 0 {
-		return models.User{}, errorWorker.ResponseError{Codes: errorCodes, Status: 500}
+		return models.User{}, models.ServeError{Codes: errorCodes}
 	}
 
 	userExist.Username = userInput.Username
@@ -180,7 +179,7 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 
 	if userInput.OldPassword != userExist.Password {
 		errorCodes := []string{"501"}
-		return models.User{}, errorWorker.ResponseError{Codes: errorCodes, Status: 500}
+		return models.User{}, models.ServeError{Codes: errorCodes}
 	}
 
 	userExist.Password = userInput.Password
