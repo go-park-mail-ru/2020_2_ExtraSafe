@@ -1,8 +1,8 @@
 package main
 
 import (
-	"../internal/models"
 	"../internal/errorWorker"
+	"../internal/models"
 	"../internal/services/auth"
 	"../internal/services/profile"
 	"../internal/services/sessions"
@@ -44,7 +44,7 @@ func main() {
 	profileService := profile.NewService(usersStorage, avatarStorage)
 	profileTransport := profile.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService)
+	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
@@ -62,7 +62,7 @@ func main() {
 		}
 	})
 
-	handlers.Router(e, profHandler, aHandler)
+	handlers.Router(e, profHandler, aHandler, middlewaresService)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

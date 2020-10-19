@@ -30,25 +30,25 @@ func NewHandler(authService authService, authTransport authTransport, authSessio
 }
 
 func (h *handler) Auth(c echo.Context) error {
-	userId, err := h.authSessions.CheckCookie(c)
-	if err == nil {
-		userInput := new(models.UserInput)
-		userInput.ID = userId
-
-		user, _ := h.authService.Auth(*userInput)
-
-		response, err := h.authTransport.AuthWrite(user)
-		if err != nil {
-			return h.errorWorker.TransportError(c)
-		}
-		return c.JSON(http.StatusOK, response)
+	userInput, err := h.authTransport.AuthRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
 	}
-	return c.JSON(http.StatusUnauthorized, err)
+
+	user, err := h.authService.Auth(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.authTransport.AuthWrite(user)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Login(c echo.Context) error {
-	cc := c.(*models.CustomContext)
-
 	userId, err := h.authSessions.CheckCookie(c)
 	if err == nil {
 		userInput := new(models.UserInput)
@@ -76,7 +76,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	h.authSessions.SetCookie(c, cc.UserId)
+	h.authSessions.SetCookie(c, user.ID)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -87,8 +87,6 @@ func (h *handler) Logout(c echo.Context) error {
 }
 
 func (h *handler) Registration(c echo.Context) error{
-	cc := c.(*models.CustomContext)
-
 	userId, err := h.authSessions.CheckCookie(c)
 	if err == nil {
 		userInput := new(models.UserInput)
@@ -116,7 +114,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return h.errorWorker.TransportError(c)
 	}
 
-	h.authSessions.SetCookie(c, cc.UserId)
+	h.authSessions.SetCookie(c, user.ID)
 
 	return c.JSON(http.StatusOK, response)
 }

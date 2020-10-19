@@ -21,7 +21,10 @@ func NewTransport() Transport {
 }
 
 func (t transport)AuthRead(c echo.Context) (request models.UserInput, err error)  {
-	return models.UserInput{}, nil
+	cc := c.(*models.CustomContext)
+	userInput := new(models.UserInput)
+	userInput.ID = cc.UserId
+	return *userInput, nil
 }
 
 func (t transport)RegRead(c echo.Context) (request models.UserInputReg, err error)  {
