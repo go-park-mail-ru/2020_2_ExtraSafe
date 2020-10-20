@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	authHandler "./auth"
-	profileHandler "./profile"
+	authHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/middlewares"
+	profileHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/profile"
 	"github.com/labstack/echo"
-	"./middlewares"
 )
 
 func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handler, middle middlewares.Middleware) {

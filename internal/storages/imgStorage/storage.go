@@ -1,10 +1,10 @@
 package imgStorage
 
 import (
-	"../../../internal/models"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"image"
 	"image/jpeg"
 	"image/png"

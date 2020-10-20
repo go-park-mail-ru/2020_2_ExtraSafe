@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"../../../internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 )
 

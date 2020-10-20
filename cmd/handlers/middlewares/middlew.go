@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"../../../internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
