@@ -49,18 +49,6 @@ func (h *handler) Auth(c echo.Context) error {
 }
 
 func (h *handler) Login(c echo.Context) error {
-	userId, err := h.authSessions.CheckCookie(c)
-	if err == nil {
-		userInput := new(models.UserInput)
-		userInput.ID = userId
-		user, _ := h.authService.Auth(*userInput)
-		response, err := h.authTransport.AuthWrite(user)
-		if err != nil {
-			return h.errorWorker.TransportError(c)
-		}
-		return c.JSON(http.StatusOK, response)
-	}
-
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
 		return h.errorWorker.TransportError(c)
@@ -81,24 +69,13 @@ func (h *handler) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+//TODO - сделать нормальный логаут
 func (h *handler) Logout(c echo.Context) error {
 	h.authSessions.DeleteCookie(c)
 	return c.JSON(http.StatusOK, models.ResponseUser{})
 }
 
 func (h *handler) Registration(c echo.Context) error{
-	userId, err := h.authSessions.CheckCookie(c)
-	if err == nil {
-		userInput := new(models.UserInput)
-		userInput.ID = userId
-		user, _ := h.authService.Auth(*userInput)
-		response, err := h.authTransport.AuthWrite(user)
-		if err != nil {
-			return h.errorWorker.TransportError(c)
-		}
-		return c.JSON(http.StatusOK, response)
-	}
-
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
 		return h.errorWorker.TransportError(c)

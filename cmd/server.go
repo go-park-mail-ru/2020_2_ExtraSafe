@@ -44,7 +44,7 @@ func main() {
 	profileService := profile.NewService(usersStorage, avatarStorage)
 	profileTransport := profile.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker)
+	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
@@ -68,7 +68,7 @@ func main() {
 }
 
 func clearDataStore() {
-	dir := "avatars"
+	dir := "../avatars"
 	d, err := os.Open(dir)
 	if err != nil {
 		fmt.Println("Cannot clear avatars datatore")

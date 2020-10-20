@@ -56,7 +56,7 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 	(*s.Users)[userID].Avatar = "avatars/" + filename
 
 	if oldAvatar != "default/default_avatar.png" {
-		os.Remove("./" + oldAvatar)
+		os.Remove("../" + oldAvatar)
 	}
 
 	return nil, filename
@@ -70,8 +70,7 @@ func saveImage(src *multipart.File, name string) (string, error) {
 
 	filename := name + "." + fmtName
 
-	//TODO - нормальный путь
-	dst, err := os.Create("/home/keith/tehnopark/go/2020_2_ExtraSafe/avatars/" + filename)
+	dst, err := os.Create("../avatars/" + filename)
 	if err != nil {
 		return "", err
 	}

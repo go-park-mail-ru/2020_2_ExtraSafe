@@ -119,32 +119,3 @@ func (h *handler) PasswordChange(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
-
-/*func (h *handler) Photo(ctx *fasthttp.RequestCtx) {
-	request, err := h.uploadTransport.PhotoDecode(ctx)
-	if err != nil {
-		err = h.errorWorker.ServeJSONError(ctx, err)
-		if err != nil {
-			h.errorWorker.ServeFatalError(ctx)
-		}
-		return
-	}
-
-	response, err := h.uploadService.Photo(request)
-	if err != nil {
-		err = h.errorWorker.ServeJSONError(ctx, err)
-		if err != nil {
-			h.errorWorker.ServeFatalError(ctx)
-		}
-		return
-	}
-
-	err = h.uploadTransport.PhotoEncode(response, ctx)
-	if err != nil {
-		err = h.errorWorker.ServeJSONError(ctx, err)
-		if err != nil {
-			h.errorWorker.ServeFatalError(ctx)
-		}
-		return
-	}
-}*/
