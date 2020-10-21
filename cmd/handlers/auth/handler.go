@@ -69,9 +69,11 @@ func (h *handler) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-//TODO - сделать нормальный логаут
 func (h *handler) Logout(c echo.Context) error {
-	h.authSessions.DeleteCookie(c)
+	err := h.authSessions.DeleteCookie(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.ResponseUser{})
+	}
 	return c.JSON(http.StatusOK, models.ResponseUser{})
 }
 

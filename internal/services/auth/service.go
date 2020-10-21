@@ -7,7 +7,6 @@ import (
 type Service interface {
 	Auth(request models.UserInput) (response models.User, err error)
 	Login(request models.UserInputLogin) (response models.User, err error)
-	Logout(request models.UserInput) (err error)
 	Registration(request models.UserInputReg) (response models.User, err error)
 }
 
@@ -34,10 +33,6 @@ func (s *service)Login(request models.UserInputLogin) (response models.User, err
 	}
 
 	return user, err
-}
-
-func (s *service)Logout(request models.UserInput) (err error) {
-	return nil
 }
 
 func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
