@@ -59,7 +59,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
+	response, err := h.authTransport.RegWrite()
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}
@@ -88,7 +88,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
+	response, err := h.authTransport.RegWrite()
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}
