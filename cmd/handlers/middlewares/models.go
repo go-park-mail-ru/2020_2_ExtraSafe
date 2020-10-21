@@ -21,5 +21,5 @@ type authService interface {
 }
 
 type authTransport interface {
-	AuthWrite(user models.User) (response models.ResponseUser, err error)
+	AuthWrite(user models.User) (response models.ResponseUserAuth, err error)
 }
