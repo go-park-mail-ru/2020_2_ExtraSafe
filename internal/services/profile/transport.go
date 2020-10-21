@@ -24,15 +24,12 @@ func NewTransport() Transport {
 }
 
 func (t transport) ProfileRead(c echo.Context) (request models.UserInput, err error) {
-	cc := c.(*models.CustomContext)
 	userInput := new(models.UserInput)
-	userInput.ID = cc.UserId
+	userInput.ID = c.Get("userId").(uint64)
 	return *userInput, nil
 }
 
 func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputProfile, err error) {
-	cc := c.(*models.CustomContext)
-
 	formParams, err := c.FormParams()
 	if err != nil {
 		return models.UserInputProfile{}, err
@@ -48,33 +45,29 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 		userInput.Avatar = file
 	}
 
-	userInput.ID = cc.UserId
+	userInput.ID = c.Get("userId").(uint64)
 
 	return *userInput, nil
 }
 
 func (t transport)AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error) {
-	cc := c.(*models.CustomContext)
-
 	userInput := new(models.UserInputLinks)
 	if err := c.Bind(userInput); err != nil {
 		return models.UserInputLinks{}, err
 	}
 
-	userInput.ID = cc.UserId
+	userInput.ID = c.Get("userId").(uint64)
 
 	return *userInput, nil
 }
 
 func (t transport)PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error) {
-	cc := c.(*models.CustomContext)
-
 	userInput := new(models.UserInputPassword)
 	if err := c.Bind(userInput); err != nil {
 		return models.UserInputPassword{}, err
 	}
 
-	userInput.ID = cc.UserId
+	userInput.ID = c.Get("userId").(uint64)
 
 	return *userInput, nil
 }

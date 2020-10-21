@@ -21,9 +21,8 @@ func NewTransport() Transport {
 }
 
 func (t transport)AuthRead(c echo.Context) (request models.UserInput, err error)  {
-	cc := c.(*models.CustomContext)
 	userInput := new(models.UserInput)
-	userInput.ID = cc.UserId
+	userInput.ID = c.Get("userId").(uint64)
 	return *userInput, nil
 }
 

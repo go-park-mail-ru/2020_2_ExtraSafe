@@ -53,15 +53,6 @@ func main() {
 
 	e.Use(middlewaresService.CORS())
 
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			cc := &models.CustomContext{
-				Context: c,
-			}
-			return next(cc)
-		}
-	})
-
 	handlers.Router(e, profHandler, aHandler, middlewaresService)
 
 	e.Logger.Fatal(e.Start(":8080"))

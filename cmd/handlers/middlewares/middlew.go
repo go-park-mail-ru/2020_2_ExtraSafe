@@ -43,13 +43,11 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 
 func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cc := c.(*models.CustomContext)
-
 		userId, err := m.sessionsService.CheckCookie(c)
 		if err != nil {
 			return m.errorWorker.TransportError(c)
 		}
-		cc.UserId = userId
+		c.Set("userId", userId)
 		return next(c)
 	}
 }
