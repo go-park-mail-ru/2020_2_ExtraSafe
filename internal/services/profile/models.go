@@ -17,3 +17,8 @@ type userStorage interface {
 type avatarStorage interface {
 	UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string)
 }
+
+type validator interface {
+	ValidateProfile(request models.UserInputProfile) (err error)
+	ValidateChangePassword(request models.UserInputPassword) (err error)
+}

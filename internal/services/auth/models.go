@@ -9,3 +9,8 @@ type userStorage interface {
 	CreateUser(userInput models.UserInputReg) (models.User, error)
 	GetUserProfile(userInput models.UserInput) (models.User, error)
 }
+
+type validator interface {
+	ValidateLogin(request models.UserInputLogin) (err error)
+	ValidateRegistration(request models.UserInputReg) (err error)
+}
