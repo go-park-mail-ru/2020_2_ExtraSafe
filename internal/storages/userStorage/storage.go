@@ -1,13 +1,10 @@
 package userStorage
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/labstack/echo"
 )
 
 type Storage interface {
-	checkUserAuthorized(c echo.Context) (models.User, error)
 	CheckUser(userInput models.UserInputLogin) (models.User, error)
 	CreateUser(userInput models.UserInputReg) (models.User, error)
 
@@ -19,34 +16,13 @@ type Storage interface {
 }
 
 type storage struct {
-	Sessions *map[string]uint64
 	Users    *[]models.User
 }
 
-func NewStorage(someUsers *[]models.User, sessions *map[string]uint64) Storage {
+func NewStorage(someUsers *[]models.User) Storage {
 	return &storage{
-		Sessions: sessions,
 		Users: someUsers,
 	}
-}
-
-func (s *storage) checkUserAuthorized(c echo.Context) (models.User, error) {
-	session, err := c.Cookie("tabutask_id")
-	if err != nil {
-		fmt.Println(err)
-		return models.User{}, models.ServeError{Codes: nil}
-	}
-	sessionID := session.Value
-	userID, authorized := (*s.Sessions)[sessionID]
-
-	if authorized {
-		for _, user := range *s.Users {
-			if user.ID == userID {
-				return user, nil
-			}
-		}
-	}
-	return models.User{}, models.ServeError{Codes: nil}
 }
 
 func (s *storage) CheckUser(userInput models.UserInputLogin) (models.User, error) {

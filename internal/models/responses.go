@@ -1,5 +1,9 @@
 package models
 
+type ResponseStatus struct {
+	Status   int    `json:"status"`
+}
+
 type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`

@@ -59,7 +59,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
+	response, err := h.authTransport.RegWrite()
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}
@@ -69,9 +69,11 @@ func (h *handler) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-//TODO - сделать нормальный логаут
 func (h *handler) Logout(c echo.Context) error {
-	h.authSessions.DeleteCookie(c)
+	err := h.authSessions.DeleteCookie(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.ResponseUser{})
+	}
 	return c.JSON(http.StatusOK, models.ResponseUser{})
 }
 
@@ -86,7 +88,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
+	response, err := h.authTransport.RegWrite()
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}

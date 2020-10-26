@@ -20,13 +20,11 @@ type Storage interface {
 }
 
 type storage struct {
-	Sessions *map[string]uint64
 	Users    *[]models.User
 }
 
-func NewStorage(someUsers *[]models.User, sessions *map[string]uint64) Storage {
+func NewStorage(someUsers *[]models.User) Storage {
 	return &storage{
-		Sessions: sessions,
 		Users: someUsers,
 	}
 }

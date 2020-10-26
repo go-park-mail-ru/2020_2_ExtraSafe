@@ -35,9 +35,9 @@ func main() {
 
 	errWorker := errorWorker.NewErrorWorker()
 
-	usersStorage := userStorage.NewStorage(&someUsers, &userSessions)
+	usersStorage := userStorage.NewStorage(&someUsers)
 	sessionStorage := sessionsStorage.NewStorage(&userSessions)
-	avatarStorage := imgStorage.NewStorage(&someUsers, &userSessions)
+	avatarStorage := imgStorage.NewStorage(&someUsers)
 
 	validationService := validaton.NewService()
 	sessionService := sessions.NewService(sessionStorage)

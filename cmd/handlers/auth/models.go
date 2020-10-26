@@ -8,7 +8,6 @@ import (
 type authService interface {
 	Auth(request models.UserInput) (response models.User, err error)
 	Login(request models.UserInputLogin) (response models.User, err error)
-	Logout(request models.UserInput) (err error)
 	Registration(request models.UserInputReg) (response models.User, err error)
 }
 
@@ -18,6 +17,8 @@ type authTransport interface {
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
 	AuthWrite(user models.User) (response models.ResponseUserAuth, err error)
+	LoginWrite() (response models.ResponseStatus, err error)
+	RegWrite() (response models.ResponseStatus, err error)
 }
 
 type authSessions interface {

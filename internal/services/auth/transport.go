@@ -11,6 +11,8 @@ type Transport interface {
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
 	AuthWrite(user models.User) (response models.ResponseUserAuth, err error)
+	LoginWrite() (response models.ResponseStatus, err error)
+	RegWrite() (response models.ResponseStatus, err error)
 }
 
 type transport struct {
@@ -56,5 +58,15 @@ func (t transport)AuthWrite(user models.User) (response models.ResponseUserAuth,
 	response.Bitbucket = user.Links.Bitbucket
 	response.Vk = user.Links.Vk
 	response.Facebook = user.Links.Facebook
+	return response, err
+}
+
+func (t transport)LoginWrite() (response models.ResponseStatus, err error)  {
+	response.Status = 200
+	return response, err
+}
+
+func (t transport)RegWrite() (response models.ResponseStatus, err error)  {
+	response.Status = 200
 	return response, err
 }
