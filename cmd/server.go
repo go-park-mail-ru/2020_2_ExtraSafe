@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers"
 	authHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth"
@@ -17,6 +18,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
+	_ "github.com/lib/pq"
 	"os"
 	"path/filepath"
 )
@@ -30,12 +32,28 @@ func main() {
 		return
 	}
 
+	//TODO строку подключения в конфиг
+
+	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
+	if err != nil {
+		//log.Fatal().Msg(err.Error())
+		return
+	}
+
+	db.SetMaxIdleConns(3)
+	db.SetMaxOpenConns(10)
+
+	err = db.Ping() // вот тут будет первое подключение к базе
+	if err != nil {
+		panic(err)
+	}
+
 	someUsers := make([]models.User, 0)
 	userSessions := make(map[string]uint64, 10)
 
 	errWorker := errorWorker.NewErrorWorker()
 
-	usersStorage := userStorage.NewStorage(&someUsers)
+	usersStorage := userStorage.NewStorage(db, &someUsers)
 	sessionStorage := sessionsStorage.NewStorage(&userSessions)
 	avatarStorage := imgStorage.NewStorage(&someUsers)
 

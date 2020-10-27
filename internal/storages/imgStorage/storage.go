@@ -16,7 +16,8 @@ import (
 )
 
 type Storage interface {
-	UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string)
+	//UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string)
+	UploadAvatar(file *multipart.FileHeader, user *models.User) (err error, filename string)
 }
 
 type storage struct {
@@ -29,7 +30,9 @@ func NewStorage(someUsers *[]models.User) Storage {
 	}
 }
 
-func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
+//FIXME зачем тут возвращать filename с пустыми строками?
+func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.User) (err error, filename string) {
+//func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -37,12 +40,13 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 	}
 	defer src.Close()
 
-	oldAvatar := (*s.Users)[userID].Avatar
+	//oldAvatar := (*s.Users)[userID].Avatar
 
+	oldAvatar := user.Avatar
 	hash := sha256.New()
 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
-	formattedID := strconv.FormatUint(userID, 10)
+	formattedID := strconv.FormatUint(user.ID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 
 	filename, err = saveImage(&src, name)
@@ -51,8 +55,9 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err e
 		return models.ServeError{Codes: []string{"402"}}, ""
 	}
 
-	(*s.Users)[userID].Avatar = "avatars/" + filename
+	//(*s.Users)[userID].Avatar = "avatars/" + filename
 
+	user.Avatar = "avatars/" + filename
 	if oldAvatar != "default/default_avatar.png" {
 		os.Remove("../" + oldAvatar)
 	}

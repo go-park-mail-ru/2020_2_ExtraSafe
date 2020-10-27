@@ -59,7 +59,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.RegWrite()
+	response, err := h.authTransport.LoginWrite()
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}

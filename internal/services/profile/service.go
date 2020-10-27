@@ -52,14 +52,24 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 		return models.User{}, err
 	}
 
+
+	//TODO здесь должны быть return по ошибкам
+
+	user, errGetProfile := s.userStorage.GetUserProfile(models.UserInput{ID: request.ID})
+	if errGetProfile != nil {
+		errorCodes = append(errorCodes, errGetProfile.(models.ServeError).Codes...)
+		return user, models.ServeError{Codes: errorCodes}
+		//TODO сделать изменение аватара в таблице
+	}
+
 	if request.Avatar != nil {
-		errAvatar, _ := s.avatarStorage.UploadAvatar(request.Avatar, request.ID)
+		errAvatar, _ := s.avatarStorage.UploadAvatar(request.Avatar, &user)
 		if errAvatar != nil {
 			errorCodes = append(errorCodes, errAvatar.(models.ServeError).Codes...)
 		}
 	}
 
-	user, errProfile := s.userStorage.ChangeUserProfile(request)
+	errProfile := s.userStorage.ChangeUserProfile(&user, request)
 	if errProfile != nil {
 		errorCodes = append(errorCodes, errProfile.(models.ServeError).Codes...)
 	}
