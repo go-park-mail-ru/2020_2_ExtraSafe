@@ -37,6 +37,7 @@ func (s *service)Login(request models.UserInputLogin) (response models.User, err
 
 func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
 	var user models.User
+
 	user, err = s.userStorage.CreateUser(request)
 	if err != nil {
 		return models.User{}, err
