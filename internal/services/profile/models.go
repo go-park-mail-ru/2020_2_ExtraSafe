@@ -21,4 +21,5 @@ type avatarStorage interface {
 type validator interface {
 	ValidateProfile(request models.UserInputProfile) (err error)
 	ValidateChangePassword(request models.UserInputPassword) (err error)
+	ValidateLinks(request models.UserInputLinks) (err error)
 }

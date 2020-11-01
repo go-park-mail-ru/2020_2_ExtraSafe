@@ -72,6 +72,11 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.User, err error) {
+	err = s.validator.ValidateLinks(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err = s.userStorage.ChangeUserAccounts(request)
 	if err != nil {
 		return models.User{}, err

@@ -31,11 +31,6 @@ func (s *service)Auth(request models.UserInput) (response models.User, err error
 func (s *service)Login(request models.UserInputLogin) (response models.User, err error) {
 	var user models.User
 
-	/*_, err = govalidator.ValidateStruct(request)
-	if err != nil {
-		return models.User{}, models.ServeError{Codes: []string{"103"}}
-	}
-*/
 	err = s.validator.ValidateLogin(request)
 	if err != nil {
 		return models.User{}, err
@@ -56,12 +51,10 @@ func (s *service)Logout(request models.UserInput) (err error) {
 func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
 	var user models.User
 
-	/*_, err = govalidator.ValidateStruct(request)
-	if err != nil {
-		return models.User{}, models.ServeError{Codes: []string{"103"}}
-	}*/
-
 	err = s.validator.ValidateRegistration(request)
+	if err != nil {
+		return models.User{}, err
+	}
 
 	user, err = s.userStorage.CreateUser(request)
 	if err != nil {

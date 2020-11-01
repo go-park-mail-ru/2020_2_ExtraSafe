@@ -13,17 +13,6 @@ type User struct {
 }
 
 type UserLinks struct {
-	Telegram  string `json:"telegram" valid:"alphanum"`
-	Instagram string `json:"instagram" valid:"alphanum"`
-	Github    string `json:"github" valid:"alphanum"`
-	Bitbucket string `json:"bitbucket" valid:"alphanum"`
-	Vk        string `json:"vkontakte" valid:"alphanum"`
-	Facebook  string `json:"facebook" valid:"alphanum"`
-}
-
-//TODO links validation
-type UserInputLinks struct {
-	ID        uint64 `json:"-"`
 	Telegram  string `json:"telegram"`
 	Instagram string `json:"instagram"`
 	Github    string `json:"github"`
@@ -32,31 +21,41 @@ type UserInputLinks struct {
 	Facebook  string `json:"facebook"`
 }
 
+type UserInputLinks struct {
+	ID        uint64 `json:"-"`
+	Telegram  string `json:"telegram" valid:"telegramValid~611"`
+	Instagram string `json:"instagram" valid:"instagramValid~612"`
+	Github    string `json:"github" valid:"githubValid~613"`
+	Bitbucket string `json:"bitbucket" valid:"bitbucketValid~614"`
+	Vk        string `json:"vkontakte" valid:"vkValid~615"`
+	Facebook  string `json:"facebook" valid:"facebookValid~616"`
+}
+
 type UserInput struct {
 	ID uint64 `json:"id"`
 }
 
 type UserInputLogin struct {
-	Email    string `json:"email" valid:"email"`
-	Password string `json:"password" valid:"passwordValid"`
+	Email    string `json:"email" valid:"required~100, emailValid~110"`
+	Password string `json:"password" valid:"required~100, passwordValid~110"`
 }
 
 type UserInputReg struct {
-	Email    string `json:"email" valid:"email"`
-	Username string `json:"username" valid:"userNameValid"`
-	Password string `json:"password" valid:"passwordValid"`
+	Email    string `json:"email" valid:"required~211, emailValid~211"`
+	Username string `json:"username" valid:"required~212, userNameValid~212"`
+	Password string `json:"password" valid:"required~213, passwordValid~213"`
 }
 
 type UserInputProfile struct {
 	ID       uint64 `json:"-"`
-	Email    string `json:"email" valid:"email"`
-	Username string `json:"username" valid:"userNameValid"`
-	FullName string `json:"fullName" valid:"fullNameValid"`
+	Email    string `json:"email" valid:"required~311, emailValid~311"`
+	Username string `json:"username" valid:"required~312, userNameValid~312"`
+	FullName string `json:"fullName" valid:"fullNameValid~314"`
 	Avatar   *multipart.FileHeader `json:"-"`
 }
 
 type UserInputPassword struct {
 	ID          uint64 `json:"-"`
-	OldPassword string `json:"oldpassword" valid:"passwordValid"`
-	Password    string `json:"password" valid:"passwordValid"`
+	OldPassword string `json:"oldpassword" valid:"required~511, passwordValid~511"`
+	Password    string `json:"password" valid:"required~512, passwordValid~512"`
 }
