@@ -15,12 +15,14 @@ type Service interface {
 type service struct {
 	userStorage userStorage
 	avatarStorage avatarStorage
+	validator validator
 }
 
-func NewService(userStorage userStorage, avatarStorage avatarStorage) Service {
+func NewService(userStorage userStorage, avatarStorage avatarStorage, validator validator) Service {
 	return &service{
 		userStorage: userStorage,
 		avatarStorage: avatarStorage,
+		validator: validator,
 	}
 }
 
@@ -45,6 +47,11 @@ func (s *service) Accounts(request models.UserInput) (user models.User, err erro
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.User, err error) {
 	errorCodes := make([]string, 0)
 
+	err = s.validator.ValidateProfile(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	if request.Avatar != nil {
 		errAvatar, _ := s.avatarStorage.UploadAvatar(request.Avatar, request.ID)
 		if errAvatar != nil {
@@ -65,6 +72,11 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.User, err error) {
+	err = s.validator.ValidateLinks(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err = s.userStorage.ChangeUserAccounts(request)
 	if err != nil {
 		return models.User{}, err
@@ -74,6 +86,11 @@ func (s *service) AccountsChange(request models.UserInputLinks) (user models.Use
 }
 
 func (s *service) PasswordChange(request models.UserInputPassword) (user models.User, err error) {
+	err = s.validator.ValidateChangePassword(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err = s.userStorage.ChangeUserPassword(request)
 	if err != nil {
 		return models.User{}, err

@@ -11,6 +11,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/sessions"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/validaton"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/imgStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
@@ -38,10 +39,11 @@ func main() {
 	sessionStorage := sessionsStorage.NewStorage(&userSessions)
 	avatarStorage := imgStorage.NewStorage(&someUsers)
 
+	validationService := validaton.NewService()
 	sessionService := sessions.NewService(sessionStorage)
-	authService := auth.NewService(usersStorage)
+	authService := auth.NewService(usersStorage, validationService)
 	authTransport := auth.NewTransport()
-	profileService := profile.NewService(usersStorage, avatarStorage)
+	profileService := profile.NewService(usersStorage, avatarStorage, validationService)
 	profileTransport := profile.NewTransport()
 
 	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport)
