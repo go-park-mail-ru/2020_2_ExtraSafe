@@ -10,7 +10,7 @@ type Transport interface {
 	LoginRead(c echo.Context) (request models.UserInputLogin, err error)
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
-	AuthWrite(user models.UserOutside) (response models.ResponseUserAuth, err error)
+	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
 	LoginWrite() (response models.ResponseStatus, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }
@@ -46,18 +46,14 @@ func (t transport)LoginRead(c echo.Context) (request models.UserInputLogin, err 
 	return *userInput, nil
 }
 
-func (t transport)AuthWrite(user models.UserOutside) (response models.ResponseUserAuth, err error)  {
+func (t transport)AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)  {
 	response.Status = 200
 	response.Email = user.Email
 	response.Username = user.Username
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
-	response.Telegram = user.Links.Telegram
-	response.Instagram = user.Links.Instagram
-	response.Github = user.Links.Github
-	response.Bitbucket = user.Links.Bitbucket
-	response.Vk = user.Links.Vk
-	response.Facebook = user.Links.Facebook
+	response.Links = *user.Links
+	response.Boards = user.Boards
 	return response, err
 }
 

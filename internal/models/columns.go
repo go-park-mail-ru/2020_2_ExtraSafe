@@ -8,10 +8,10 @@ type Column struct {
 }
 
 type ColumnOutside struct {
-	ColumnID uint64 `json:"columnID"`
-	Name     string `json:"name"`
-	Order    uint8  `json:"order"`
-	Tasks    []Task `json:"tasks"`
+	ColumnID uint64        `json:"columnID"`
+	Name     string        `json:"name"`
+	Order    uint8         `json:"order"`
+	Tasks    []TaskOutside `json:"tasks"`
 }
 
 type ColumnInput struct {

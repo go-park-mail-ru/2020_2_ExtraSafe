@@ -5,25 +5,42 @@ import (
 )
 
 type Service interface {
-	Auth(request models.UserInput) (response models.UserOutside, err error)
+	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
 	Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error)
 	Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error)
 }
 
 type service struct {
 	userStorage userStorage
+	boardStorage boardStorage
 	validator validator
 }
 
-func NewService(userStorage userStorage, validator validator) Service {
+func NewService(userStorage userStorage, boardStorage boardStorage, validator validator) Service {
 	return &service{
+		boardStorage: boardStorage,
 		userStorage: userStorage,
 		validator: validator,
 	}
 }
 
-func (s *service)Auth(request models.UserInput) (response models.UserOutside, err error) {
-	response, err = s.userStorage.GetUserProfile(request)
+func (s *service)Auth(request models.UserInput) (response models.UserBoardsOutside, err error) {
+	user, err := s.userStorage.GetUserProfile(request)
+	if err != nil {
+		return models.UserBoardsOutside{}, err
+	}
+
+	boards, err := s.boardStorage.GetBoards(request)
+	if err != nil {
+		return models.UserBoardsOutside{}, err
+	}
+
+	response.Boards = boards
+	response.Links = user.Links
+	response.Avatar = user.Avatar
+	response.FullName = user.FullName
+	response.Email = user.Email
+
 	return response, err
 }
 
