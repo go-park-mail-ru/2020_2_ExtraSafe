@@ -52,24 +52,20 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 		return models.UserOutside{}, err
 	}
 
-
-	//TODO здесь должны быть return по ошибкам
-
-	user, errGetProfile := s.userStorage.GetUserProfile(models.UserInput{ID: request.ID})
-	if errGetProfile != nil {
-		errorCodes = append(errorCodes, errGetProfile.(models.ServeError).Codes...)
+	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: request.ID})
+	if errGetAvatar != nil {
+		errorCodes = append(errorCodes, errGetAvatar.(models.ServeError).Codes...)
 		return user, models.ServeError{Codes: errorCodes}
-		//TODO сделать изменение аватара в таблице
 	}
 
 	if request.Avatar != nil {
-		errAvatar, _ := s.avatarStorage.UploadAvatar(request.Avatar, &user)
+		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar)
 		if errAvatar != nil {
 			errorCodes = append(errorCodes, errAvatar.(models.ServeError).Codes...)
 		}
 	}
 
-	errProfile := s.userStorage.ChangeUserProfile(&user, request)
+	user, errProfile := s.userStorage.ChangeUserProfile(request, userAvatar)
 	if errProfile != nil {
 		errorCodes = append(errorCodes, errProfile.(models.ServeError).Codes...)
 	}
@@ -79,6 +75,7 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 	}
 
 	return user, err
+	//TODO здесь должны быть return по ошибкам
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {

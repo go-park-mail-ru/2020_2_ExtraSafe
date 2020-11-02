@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"net/http"
 	"reflect"
 )
 /* users table
@@ -21,19 +22,19 @@ import (
 	link TEXT
 */
 type Storage interface {
-	LoginUser(userInput models.UserInputLogin) (models.User, error)
-	RegisterUser(userInput models.UserInputReg) (models.User, error)
+	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
 
-	GetUserProfile(userInput models.UserInput) (models.User, error)
-	GetUserAccounts(userInput models.UserInput) (models.User, error)
+	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
+	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
+	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
 
-	ChangeUserProfile(user *models.User, userInput models.UserInputProfile) error
+	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
+	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
+	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
-	ChangeUserAccounts(userInput models.UserInputLinks) (models.User, error)
-	ChangeUserPassword(userInput models.UserInputPassword) (models.User, error)
-
-	CheckExistingUser(email string, username string) (errorCodes []string)
-	CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string)
+	checkExistingUser(email string, username string) (errorCodes []string)
+	checkExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string)
 }
 
 type storage struct {
@@ -48,29 +49,30 @@ func NewStorage(db *sql.DB, someUsers *[]models.User) Storage {
 	}
 }
 
-func (s *storage) LoginUser(userInput models.UserInputLogin) (models.User, error) {
-	user := models.User{}
+func (s *storage) CheckUser(userInput models.UserInputLogin) (models.UserOutside, error) {
+	user := models.UserOutside{}
 
-	err := s.db.QueryRow("SELECT userID, username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
-				Scan(&user.ID, &user.Username, &user.FullName, &user.Avatar)
+	err := s.db.QueryRow("SELECT username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
+				Scan(&user.Username, &user.FullName, &user.Avatar)
 
 	//TODO сделать корректную обработку ошибок, приходящих из БД
 	if err != sql.ErrNoRows {
-		user.Password = userInput.Password
+		if err != nil {
+			fmt.Println(err)
+		}
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
-
-		fmt.Println(err)
+		//user.Boards = make(models.Board, 0)
 		return user, nil
 	}
 
-	return models.User{}, models.ServeError{Codes: []string{"101"}}
+	return models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
 }
 
-func (s *storage) RegisterUser(userInput models.UserInputReg) (models.User, error) {
-	errors := s.CheckExistingUser(userInput.Email, userInput.Username)
+func (s *storage) CreateUser(userInput models.UserInputReg) (models.UserOutside, error) {
+	errors := s.checkExistingUser(userInput.Email, userInput.Username)
 	if len(errors) != 0 {
-		return models.User{}, models.ServeError{Codes: errors}
+		return models.UserOutside{}, models.ServeError{Codes: errors}
 	}
 
 	//TODO посмотреть способ нахождения последнего индекса из лекций по СУБД
@@ -89,25 +91,22 @@ func (s *storage) RegisterUser(userInput models.UserInputReg) (models.User, erro
 	if err != nil {
 		//TODO разработать код ошибок на стороне БД
 		fmt.Println(err)
-		return models.User{}, models.ServeError{Codes: []string{"500"}}
+		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
 
-	user := models.User{
-		ID:       ID,
-		Username: userInput.Username,
+	user := models.UserOutside{
 		Email:    userInput.Email,
-		Password: userInput.Password,
+		Username: userInput.Username,
+		FullName: "",
 		Links:    &models.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	}
-
-	*s.Users = append(*s.Users, user)
 
 	return user, nil
 }
 
 //TODO подумать, как сделать эту проверку компактнее
-func (s *storage) CheckExistingUser(email string, username string) (errorCodes []string){
+func (s *storage) checkExistingUser(email string, username string) (errorCodes []string) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
 		errorCodes = append(errorCodes, "201")
@@ -123,7 +122,7 @@ func (s *storage) CheckExistingUser(email string, username string) (errorCodes [
 	return errorCodes
 }
 
-func (s *storage) CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string){
+func (s *storage) checkExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string){
 	var existingUserID uint64 = 0
 
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan(&existingUserID)
@@ -140,16 +139,17 @@ func (s *storage) CheckExistingUserOnUpdate(email string, username string, userI
 	return errorCodes
 }
 
-func (s *storage) GetUserProfile(userInput models.UserInput) (models.User, error) {
-	user := models.User{Links: &models.UserLinks{}}
+func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside, error) {
+	user := models.UserOutside{Links: &models.UserLinks{}}
 
-	err := s.db.QueryRow("SELECT email, password, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
-		Scan(&user.Email, &user.Password, &user.Username, &user.FullName, &user.Avatar)
+	err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
+		Scan(&user.Email, &user.Username, &user.FullName, &user.Avatar)
 
 	//TODO сделать корректную обработку ошибок, приходящих из БД
 	if err != sql.ErrNoRows {
-		user.ID = userInput.ID
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+		}
 		return user, nil
 	}
 
@@ -157,14 +157,15 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.User, error
 	return user, models.ServeError{Codes: []string{"101"}}
 }
 
-//TODO заполнить в модели username
-func (s *storage) GetUserAccounts(userInput models.UserInput) (models.User, error) {
-	user := models.User{Links: &models.UserLinks{}}
+func (s *storage)GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) {
+	user, err := s.GetUserProfile(userInput)
+	if err != nil {
+		return models.UserOutside{}, err
+	}
 
 	rows, err := s.db.Query("SELECT networkName, link FROM social_links WHERE userID = $1", userInput.ID)
 	if err != nil {
-		fmt.Println("in query", err)
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 	defer rows.Close()
 
@@ -173,47 +174,68 @@ func (s *storage) GetUserAccounts(userInput models.UserInput) (models.User, erro
 
 		err = rows.Scan(&networkName, &link)
 		if err != nil {
-			return models.User{}, err
+			return models.UserOutside{}, err
 		}
 
+		//TODO поиграться с рефлектами
 		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkName).SetString(link)
 	}
 
-	user.ID = userInput.ID
 	return user, nil
 }
 
-func (s *storage) ChangeUserProfile(user *models.User, userInput models.UserInputProfile) error {
-	errorCodes := s.CheckExistingUserOnUpdate(userInput.Email, userInput.Username, user.ID)
+
+func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error) {
+	user := models.UserAvatar{}
+
+	err := s.db.QueryRow("SELECT avatar FROM users WHERE userID = $1", userInput.ID).
+		Scan(&user.Avatar)
+
+	if err == nil {
+		return user, nil
+	}
+
+	//TODO сделать правильную ошибку
+	fmt.Println(err)
+	return user, models.ServeError{Codes: []string{string(http.StatusInternalServerError)}}
+
+}
+//TODO повозиться с моделью пользователя (в сервисе)
+func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error) {
+	errorCodes := s.checkExistingUserOnUpdate(userInput.Email, userInput.Username, userInput.ID)
 
 	if len(errorCodes) != 0 {
-		return models.ServeError{Codes: errorCodes}
+		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
 	}
 
 	_, err := s.db.Exec("UPDATE users SET email = $1, username = $2, fullname = $3, avatar = $4 WHERE userID = $5",
-						userInput.Email, userInput.Username, userInput.FullName, user.Avatar, user.ID)
+		userInput.Email, userInput.Username, userInput.FullName, userAvatar.Avatar, userInput.ID)
 	if err != nil {
 		//TODO разработать код ошибок на стороне БД
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
 
-	user.Username = userInput.Username
-	user.Email = userInput.Email
-	user.FullName = userInput.FullName
+	user := models.UserOutside {
+		Username : userInput.Username,
+		Email : userInput.Email,
+		FullName : userInput.FullName,
+	}
 
-	return nil
+
+	return user, nil
 }
 
-func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.User, error) {
+func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error) {
 	user, err := s.GetUserAccounts(models.UserInput{ ID : userInput.ID })
 	if err != nil {
 		fmt.Println(err)
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	networkNames := []string{"", "Telegram", "Instagram", "Github", "Bitbucket", "Vk", "Facebook"}
 
+	//TODO поиграться с рефлектами
 	input := reflect.ValueOf(userInput)
 	for i := 1; i < input.NumField(); i++ {
 		inputLink := input.Field(i).Interface().(string)
@@ -222,14 +244,12 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 		}
 
 		//curNetwork :=
-		//TODO исправить момент, при котором значение стирается (сделать удаление такой записи)
-
 		if reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() == "" {
-			_, err = s.db.Exec("INSERT INTO social_links (userID, networkName, link) VALUES ($1, $2, $3)", user.ID, networkNames[i], inputLink)
+			_, err = s.db.Exec("INSERT INTO social_links (userID, networkName, link) VALUES ($1, $2, $3)", userInput.ID, networkNames[i], inputLink)
 		} else if inputLink == "" {
-			_, err = s.db.Exec("DELETE FROM social_links WHERE userID = $1 AND networkName = $2", user.ID, networkNames[i])
+			_, err = s.db.Exec("DELETE FROM social_links WHERE userID = $1 AND networkName = $2", userInput.ID, networkNames[i])
 		} else {
-			_, err = s.db.Exec("UPDATE social_links SET link = $1 WHERE userID = $2 AND networkName = $3", inputLink, user.ID, networkNames[i])
+			_, err = s.db.Exec("UPDATE social_links SET link = $1 WHERE userID = $2 AND networkName = $3", inputLink, userInput.ID, networkNames[i])
 		}
 
 		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).SetString(inputLink)
@@ -238,25 +258,45 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 	return user, nil
 }
 
-func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models.User, error) {
-	user, err := s.GetUserProfile(models.UserInput{ ID : userInput.ID})
+func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error) {
+	user, password, err := s.getInternalUser(models.UserInput{ ID : userInput.ID})
 	if err != nil {
 		fmt.Println(err)
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
-	if userInput.OldPassword != user.Password {
+	if userInput.OldPassword != password {
 		errorCodes := []string{"501"}
-		return models.User{}, models.ServeError{Codes: errorCodes}
+		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
 	}
 
-	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userInput.Password, user.ID)
+	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userInput.Password, userInput.ID)
 	if err != nil {
 		//TODO разработать код ошибок на стороне БД
 		fmt.Println(err)
-		return  models.User{}, models.ServeError{Codes: []string{"500"}}
+		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
 
 	return user, nil
 }
 
+
+func (s *storage) getInternalUser(userInput models.UserInput) (models.UserOutside, string, error) {
+	user := models.UserOutside{Links: &models.UserLinks{}}
+	var password string
+
+	err := s.db.QueryRow("SELECT email, password, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
+		Scan(&user.Email, &password, &user.Username, &user.FullName, &user.Avatar)
+
+	if err == nil {
+		return user, password , nil
+
+	}
+	//TODO сделать корректную обработку ошибок, приходящих из БД
+	/*if err == sql.ErrNoRows {
+		return user, "", models.ServeError{Codes: []string{"101"}}
+	}*/
+
+	//могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
+	return user, "", models.ServeError{Codes: []string{string(http.StatusInternalServerError)}}
+}

@@ -33,6 +33,11 @@ type UserLinks struct {
 	Facebook  string `json:"facebook"`
 }
 
+type UserAvatar struct {
+	ID uint64
+	Avatar string
+}
+
 type UserInputLinks struct {
 	ID        uint64 `json:"-"`
 	Telegram  string `json:"telegram" valid:"telegramValid~611"`

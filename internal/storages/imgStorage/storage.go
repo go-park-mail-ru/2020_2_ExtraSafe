@@ -16,8 +16,7 @@ import (
 )
 
 type Storage interface {
-	//UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string)
-	UploadAvatar(file *multipart.FileHeader, user *models.User) (err error, filename string)
+	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
 }
 
 type storage struct {
@@ -30,17 +29,13 @@ func NewStorage(someUsers *[]models.User) Storage {
 	}
 }
 
-//FIXME зачем тут возвращать filename с пустыми строками?
-func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.User) (err error, filename string) {
-//func (s *storage) UploadAvatar(file *multipart.FileHeader, userID uint64) (err error, filename string) {
+func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"401"}}, ""
+		return models.ServeError{Codes: []string{"401"}}
 	}
 	defer src.Close()
-
-	//oldAvatar := (*s.Users)[userID].Avatar
 
 	oldAvatar := user.Avatar
 	hash := sha256.New()
@@ -49,20 +44,18 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.User) (e
 	formattedID := strconv.FormatUint(user.ID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 
-	filename, err = saveImage(&src, name)
+	filename, err := saveImage(&src, name)
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"402"}}, ""
+		return models.ServeError{Codes: []string{"402"}}
 	}
-
-	//(*s.Users)[userID].Avatar = "avatars/" + filename
 
 	user.Avatar = "avatars/" + filename
 	if oldAvatar != "default/default_avatar.png" {
 		os.Remove("../" + oldAvatar)
 	}
 
-	return nil, filename
+	return nil
 }
 
 func saveImage(src *multipart.File, name string) (string, error) {

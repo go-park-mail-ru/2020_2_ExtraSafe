@@ -35,7 +35,7 @@ func (s *service)Login(request models.UserInputLogin) (response models.UserOutsi
 		return models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.LoginUser(request)
+	user, err = s.userStorage.CheckUser(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
@@ -52,7 +52,7 @@ func (s *service)Registration(request models.UserInputReg) (response models.User
 		return models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.RegisterUser(request)
+	user, err = s.userStorage.CreateUser(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}

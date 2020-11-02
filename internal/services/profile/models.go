@@ -8,14 +8,15 @@ import (
 type userStorage interface {
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
+	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
 
-	ChangeUserProfile(userInput models.UserInputProfile) (models.UserOutside, error)
+	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 }
 
 type avatarStorage interface {
-	UploadAvatar(file *multipart.FileHeader, user *models.User) (err error, filename string)
+	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
 }
 
 type validator interface {
