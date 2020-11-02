@@ -51,9 +51,10 @@ func NewStorage(db *sql.DB, someUsers *[]models.User) Storage {
 
 func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error) {
 	user := models.UserOutside{}
+	var userID uint64
 
-	err := s.db.QueryRow("SELECT username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
-				Scan(&user.Username, &user.FullName, &user.Avatar)
+	err := s.db.QueryRow("SELECT userID, username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
+				Scan(&userID, &user.Username, &user.FullName, &user.Avatar)
 
 	//TODO сделать корректную обработку ошибок, приходящих из БД
 	if err != sql.ErrNoRows {
@@ -63,7 +64,7 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
 		//user.Boards = make(models.Board, 0)
-		return user, nil
+		return userID, user, nil
 	}
 
 	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
@@ -102,7 +103,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 		Avatar:   "default/default_avatar.png",
 	}
 
-	return user, nil
+	return ID, user, nil
 }
 
 //TODO подумать, как сделать эту проверку компактнее
