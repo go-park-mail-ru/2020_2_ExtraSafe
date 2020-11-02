@@ -2,6 +2,7 @@ package models
 
 import "mime/multipart"
 
+// для работы в бд
 type User struct {
 	ID       uint64 `json:"id"`
 	Email    string `json:"email"`
@@ -10,6 +11,17 @@ type User struct {
 	FullName string `json:"fullName"`
 	Links    *UserLinks
 	Avatar   string `json:"avatar"`
+	Boards   []Board
+}
+
+// для формирования ответа пользователю
+type UserOutside struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+	Boards   []Board `json:"boards"`
 }
 
 type UserLinks struct {

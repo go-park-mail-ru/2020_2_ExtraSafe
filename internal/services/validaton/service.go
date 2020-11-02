@@ -9,7 +9,7 @@ import (
 
 var fullnameMaxLen = 40
 var passwordMaxLen = 64
-var passwordMinLen = 64
+var passwordMinLen = 4
 var usernameMaxLen = 40
 var usernameMinLen = 2
 

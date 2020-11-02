@@ -5,11 +5,11 @@ import (
 )
 
 type Service interface {
-	Profile(request models.UserInput) (user models.User, err error)
-	Accounts(request models.UserInput) (user models.User, err error)
-	ProfileChange(request models.UserInputProfile) (user models.User, err error)
-	AccountsChange(request models.UserInputLinks) (user models.User, err error)
-	PasswordChange(request models.UserInputPassword) (user models.User, err error)
+	Profile(request models.UserInput) (user models.UserOutside, err error)
+	Accounts(request models.UserInput) (user models.UserOutside, err error)
+	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
+	AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error)
+	PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error)
 }
 
 type service struct {
@@ -26,30 +26,30 @@ func NewService(userStorage userStorage, avatarStorage avatarStorage, validator 
 	}
 }
 
-func (s *service) Profile(request models.UserInput) (user models.User, err error) {
+func (s *service) Profile(request models.UserInput) (user models.UserOutside, err error) {
 	user, err = s.userStorage.GetUserProfile(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err
 }
 
-func (s *service) Accounts(request models.UserInput) (user models.User, err error) {
+func (s *service) Accounts(request models.UserInput) (user models.UserOutside, err error) {
 	user, err = s.userStorage.GetUserAccounts(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err
 }
 
-func (s *service) ProfileChange(request models.UserInputProfile) (user models.User, err error) {
+func (s *service) ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error) {
 	errorCodes := make([]string, 0)
 
 	err = s.validator.ValidateProfile(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	if request.Avatar != nil {
@@ -65,35 +65,35 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 	}
 
 	if len(errorCodes) != 0 {
-		return models.User{}, models.ServeError{Codes: errorCodes}
+		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
 	}
 
 	return user, err
 }
 
-func (s *service) AccountsChange(request models.UserInputLinks) (user models.User, err error) {
+func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {
 	err = s.validator.ValidateLinks(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	user, err = s.userStorage.ChangeUserAccounts(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err
 }
 
-func (s *service) PasswordChange(request models.UserInputPassword) (user models.User, err error) {
+func (s *service) PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error) {
 	err = s.validator.ValidateChangePassword(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	user, err = s.userStorage.ChangeUserPassword(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err

@@ -24,6 +24,8 @@ type ResponseUserAuth struct {
 	Bitbucket string `json:"bitbucket"`
 	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
+	//Links ResponseUserLinks `json:"links"`
+	Boards []Board `json:"boards"`
 }
 
 type ResponseUserLinks struct {
@@ -36,4 +38,8 @@ type ResponseUserLinks struct {
 	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
 	Avatar    string `json:"avatar"`
+}
+
+type ResponseBoard struct {
+
 }
