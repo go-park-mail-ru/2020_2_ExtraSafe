@@ -22,8 +22,8 @@ import (
 	link TEXT
 */
 type Storage interface {
-	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
-	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
+	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
 
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
@@ -49,7 +49,7 @@ func NewStorage(db *sql.DB, someUsers *[]models.User) Storage {
 	}
 }
 
-func (s *storage) CheckUser(userInput models.UserInputLogin) (models.UserOutside, error) {
+func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error) {
 	user := models.UserOutside{}
 
 	err := s.db.QueryRow("SELECT username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
@@ -66,13 +66,13 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (models.UserOutside
 		return user, nil
 	}
 
-	return models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
+	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
 }
 
-func (s *storage) CreateUser(userInput models.UserInputReg) (models.UserOutside, error) {
+func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
 	errors := s.checkExistingUser(userInput.Email, userInput.Username)
 	if len(errors) != 0 {
-		return models.UserOutside{}, models.ServeError{Codes: errors}
+		return 0, models.UserOutside{}, models.ServeError{Codes: errors}
 	}
 
 	//TODO посмотреть способ нахождения последнего индекса из лекций по СУБД
@@ -91,7 +91,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (models.UserOutside,
 	if err != nil {
 		//TODO разработать код ошибок на стороне БД
 		fmt.Println(err)
-		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
 
 	user := models.UserOutside{

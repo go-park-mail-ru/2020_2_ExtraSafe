@@ -54,7 +54,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	user, err := h.authService.Login(userInput)
+	userID, _, err := h.authService.Login(userInput)
 	if err != nil {
 		return h.errorWorker.RespError(c, err)
 	}
@@ -64,7 +64,7 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	if err := h.authSessions.SetCookie(c, user.ID); err != nil {
+	if err := h.authSessions.SetCookie(c, userID); err != nil {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
@@ -85,7 +85,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return h.errorWorker.TransportError(c)
 	}
 
-	user, err := h.authService.Registration(userInput)
+	userID, _, err := h.authService.Registration(userInput)
 	if err != nil {
 		return h.errorWorker.RespError(c, err)
 	}
@@ -95,7 +95,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return h.errorWorker.TransportError(c)
 	}
 
-	h.authSessions.SetCookie(c, user.ID)
+	h.authSessions.SetCookie(c, userID)
 
 	return c.JSON(http.StatusOK, response)
 }

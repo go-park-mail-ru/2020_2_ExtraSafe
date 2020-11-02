@@ -12,8 +12,8 @@ type Transport interface {
 	AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error)
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
-	AccountsWrite(user models.User) (response models.ResponseUserLinks, err error)
-	ProfileWrite(user models.User) (response models.ResponseUser, err error)
+	AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error)
+	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
 
 type transport struct {
@@ -72,7 +72,7 @@ func (t transport)PasswordChangeRead(c echo.Context) (request models.UserInputPa
 	return *userInput, nil
 }
 
-func (t transport)AccountsWrite(user models.User) (response models.ResponseUserLinks, err error) {
+func (t transport)AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error) {
 	response.Status = 200
 	response.Username = user.Username
 	response.Telegram = user.Links.Telegram
@@ -85,7 +85,7 @@ func (t transport)AccountsWrite(user models.User) (response models.ResponseUserL
 	return response, nil
 }
 
-func (t transport)ProfileWrite(user models.User) (response models.ResponseUser, err error) {
+func (t transport)ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error) {
 	response.Status = 200
 	response.Email = user.Email
 	response.Username = user.Username

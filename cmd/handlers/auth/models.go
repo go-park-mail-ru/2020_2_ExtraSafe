@@ -6,9 +6,9 @@ import (
 )
 
 type authService interface {
-	Auth(request models.UserInput) (response models.User, err error)
-	Login(request models.UserInputLogin) (response models.User, err error)
-	Registration(request models.UserInputReg) (response models.User, err error)
+	Auth(request models.UserInput) (response models.UserOutside, err error)
+	Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error)
+	Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error)
 }
 
 type authTransport interface {
@@ -16,7 +16,7 @@ type authTransport interface {
 	LoginRead(c echo.Context) (request models.UserInputLogin, err error)
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
-	AuthWrite(user models.User) (response models.ResponseUserAuth, err error)
+	AuthWrite(user models.UserOutside) (response models.ResponseUserAuth, err error)
 	LoginWrite() (response models.ResponseStatus, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }

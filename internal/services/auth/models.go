@@ -5,8 +5,8 @@ import (
 )
 
 type userStorage interface {
-	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
-	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
+	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 }
 
