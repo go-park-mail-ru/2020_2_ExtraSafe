@@ -6,13 +6,12 @@ import (
 )
 
 type userStorage interface {
-	GetUserProfile(userInput models.UserInput) (models.User, error)
-	GetUserAccounts(userInput models.UserInput) (models.User, error)
+	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
+	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 
-	ChangeUserProfile(user *models.User, userInput models.UserInputProfile) error
-	//ChangeUserProfile(userInput models.UserInputProfile) (models.User, error)
-	ChangeUserAccounts(userInput models.UserInputLinks) (models.User, error)
-	ChangeUserPassword(userInput models.UserInputPassword) (models.User, error)
+	ChangeUserProfile(userInput models.UserInputProfile) (models.UserOutside, error)
+	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
+	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 }
 
 type avatarStorage interface {
@@ -22,4 +21,5 @@ type avatarStorage interface {
 type validator interface {
 	ValidateProfile(request models.UserInputProfile) (err error)
 	ValidateChangePassword(request models.UserInputPassword) (err error)
+	ValidateLinks(request models.UserInputLinks) (err error)
 }

@@ -5,9 +5,9 @@ import (
 )
 
 type Service interface {
-	Auth(request models.UserInput) (response models.User, err error)
-	Login(request models.UserInputLogin) (response models.User, err error)
-	Registration(request models.UserInputReg) (response models.User, err error)
+	Auth(request models.UserInput) (response models.UserOutside, err error)
+	Login(request models.UserInputLogin) (response models.UserOutside, err error)
+	Registration(request models.UserInputReg) (response models.UserOutside, err error)
 }
 
 type service struct {
@@ -22,35 +22,39 @@ func NewService(userStorage userStorage, validator validator) Service {
 	}
 }
 
-func (s *service)Auth(request models.UserInput) (response models.User, err error) {
+func (s *service)Auth(request models.UserInput) (response models.UserOutside, err error) {
 	response, err = s.userStorage.GetUserProfile(request)
 	return response, err
 }
 
-func (s *service)Login(request models.UserInputLogin) (response models.User, err error) {
-	var user models.User
+func (s *service)Login(request models.UserInputLogin) (response models.UserOutside, err error) {
+	var user models.UserOutside
 
 	err = s.validator.ValidateLogin(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	user, err = s.userStorage.LoginUser(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err
 }
 
-func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
-	var user models.User
+
+func (s *service)Registration(request models.UserInputReg) (response models.UserOutside, err error) {
+	var user models.UserOutside
 
 	err = s.validator.ValidateRegistration(request)
+	if err != nil {
+		return models.UserOutside{}, err
+	}
 
 	user, err = s.userStorage.RegisterUser(request)
 	if err != nil {
-		return models.User{}, err
+		return models.UserOutside{}, err
 	}
 
 	return user, err

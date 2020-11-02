@@ -5,9 +5,9 @@ import (
 )
 
 type userStorage interface {
-	LoginUser(userInput models.UserInputLogin) (models.User, error)
-	RegisterUser(userInput models.UserInputReg) (models.User, error)
-	GetUserProfile(userInput models.UserInput) (models.User, error)
+	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
+	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 }
 
 type validator interface {
