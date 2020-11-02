@@ -1,7 +1,7 @@
 package sessions
 
 type sessionsStorage interface {
-	DeleteUserSession(sessionId string)
-	CreateUserSession(userId uint64, SID string)
-	CheckUserSession(sessionId string) (uint64, bool)
+	DeleteUserSession(sessionId string) error
+	CreateUserSession(userId uint64, SID string) error
+	CheckUserSession(sessionId string) (uint64, error)
 }

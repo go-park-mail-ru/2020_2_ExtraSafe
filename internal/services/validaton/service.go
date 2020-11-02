@@ -24,15 +24,6 @@ func NewService() Service {
 //TODO корректную обработку ошибок
 //TODO вынести магические числа в константы
 
-// код из лекции
-/*if allErrs, ok := err.(govalidator.Errors); ok {
-	for _, fld := range allErrs.Errors() {
-		data := []byte(fmt.Sprintf("field: %#v\n\n", fld))
-		w.Write(data)
-	}
-}
-
-w.Write([]byte(fmt.Sprintf("error: %s\n\n", err)))*/
 
 //TODO сделать функцию, которая по непровалидированному полю будет формировать нужный код ошибки (использовать ошибки govalidator в полях структуры) (пока код 103)
 //https://github.com/asaskevich/govalidator#custom-error-messages

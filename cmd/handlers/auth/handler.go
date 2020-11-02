@@ -64,7 +64,9 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	h.authSessions.SetCookie(c, user.ID)
+	if err := h.authSessions.SetCookie(c, user.ID); err != nil {
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
 	return c.JSON(http.StatusOK, response)
 }

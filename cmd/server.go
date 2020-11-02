@@ -19,11 +19,13 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
+	"github.com/tarantool/go-tarantool"
 	"os"
 	"path/filepath"
 )
 
 func main() {
+	//TODO вынести в отдельный bash скрипт (в докере)
 	clearDataStore()
 
 	var cfg config
@@ -43,18 +45,29 @@ func main() {
 	db.SetMaxIdleConns(3)
 	db.SetMaxOpenConns(10)
 
-	err = db.Ping() // вот тут будет первое подключение к базе
+	err = db.Ping() // первое подключение к базе
 	if err != nil {
 		panic(err)
 	}
 
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{
+		User: "guest",
+	})
+
+	if err != nil {
+		fmt.Println("Connection refused")
+	}
+
+	defer tConn.Close()
+
 	someUsers := make([]models.User, 0)
-	userSessions := make(map[string]uint64, 10)
+//	userSessions := make(map[string]uint64, 10)
 
 	errWorker := errorWorker.NewErrorWorker()
 
 	usersStorage := userStorage.NewStorage(db, &someUsers)
-	sessionStorage := sessionsStorage.NewStorage(&userSessions)
+	//sessionStorage := sessionsStorage.NewStorage(&userSessions)
+	sessionStorage := sessionsStorage.NewStorage(tConn)
 	avatarStorage := imgStorage.NewStorage(&someUsers)
 
 	validationService := validaton.NewService()

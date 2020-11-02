@@ -19,3 +19,4 @@
 *.jpeg
 
 pg_configs
+tarantool_configs

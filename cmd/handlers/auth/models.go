@@ -22,7 +22,7 @@ type authTransport interface {
 }
 
 type authSessions interface {
-	SetCookie(c echo.Context, userID uint64)
+	SetCookie(c echo.Context, userID uint64) error
 	DeleteCookie(c echo.Context) error
 	CheckCookie(c echo.Context) (uint64, error)
 }
