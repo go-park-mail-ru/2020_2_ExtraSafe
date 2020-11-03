@@ -8,21 +8,23 @@ type userStorage interface {
 	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
 	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
+
+	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
 type boardStorage interface {
-	CreateBoard(userInput models.BoardChangeInput) (models.BoardOutside, error)
-	GetBoard(userInput models.BoardInput) (models.BoardOutside, error)
-	ChangeBoard(userInput models.BoardChangeInput) (models.BoardOutside, error)
-	DeleteBoard(userInput models.BoardInput) error
+	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
+	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
+	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
+	DeleteBoard(boardInput models.BoardInput) error
 
-	CreateColumn(userInput models.ColumnInput) (models.ColumnOutside, error)
-	ChangeColumn(userInput models.ColumnInput) (models.ColumnOutside, error)
-	DeleteColumn(userInput models.ColumnInput) error
+	CreateColumn(cardInput models.CardInput) (models.CardOutside, error)
+	ChangeColumn(cardInput models.CardInput) (models.CardOutside, error)
+	DeleteColumn(cardInput models.CardInput) error
 
-	CreateTask(userInput models.TaskInput) (models.TaskOutside, error)
-	ChangeTask(userInput models.TaskInput) (models.TaskOutside, error)
-	DeleteTask(userInput models.TaskInput) error
+	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	DeleteTask(taskInput models.TaskInput) error
 }
 
 type validator interface {

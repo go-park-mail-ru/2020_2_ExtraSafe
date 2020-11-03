@@ -30,7 +30,7 @@ func (s *service)Auth(request models.UserInput) (response models.UserBoardsOutsi
 		return models.UserBoardsOutside{}, err
 	}
 
-	boards, err := s.boardStorage.GetBoards(request)
+	boards, err := s.boardStorage.GetBoardsList(request)
 	if err != nil {
 		return models.UserBoardsOutside{}, err
 	}

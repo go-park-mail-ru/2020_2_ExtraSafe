@@ -6,17 +6,17 @@ import (
 )
 
 type boardsService interface {
-	CreateBoard(request models.BoardChangeInput) (board models.Board, err error)
-	GetBoard(request models.BoardInput) (board models.Board, err error)
-	ChangeBoard(request models.BoardChangeInput) (board models.Board, err error)
+	CreateBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
+	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
+	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
 
-	CreateColumn(request models.ColumnInput) (board models.Column, err error)
-	ChangeColumn(request models.ColumnInput) (board models.Column, err error)
-	DeleteColumn(request models.ColumnInput) (err error)
+	CreateCard(request models.CardInput) (card models.CardOutside, err error)
+	ChangeCard(request models.CardInput) (card models.CardOutside, err error)
+	DeleteCard(request models.CardInput) (err error)
 
-	CreateTask(request models.TaskInput) (board models.Tasks, err error)
-	ChangeTask(request models.TaskInput) (board models.Tasks, err error)
+	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
+	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
 }
 
@@ -24,7 +24,7 @@ type boardsTransport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
 
-	BoardWrite(board models.Board) (response models.ResponseBoard, err error)
+	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
 }
 
 type errorWorker interface {

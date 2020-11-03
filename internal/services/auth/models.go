@@ -11,7 +11,7 @@ type userStorage interface {
 }
 
 type boardStorage interface {
-	GetBoards(userInput models.UserInput) ([]models.BoardOutsideShort, error)
+	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 }
 
 type validator interface {

@@ -17,9 +17,9 @@ type errorWorker interface {
 }
 
 type authService interface {
-	Auth(request models.UserInput) (response models.UserOutside, err error)
+	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
 }
 
 type authTransport interface {
-	AuthWrite(user models.UserOutside) (response models.ResponseUserAuth, err error)
+	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
 }

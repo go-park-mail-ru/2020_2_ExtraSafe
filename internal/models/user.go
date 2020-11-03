@@ -11,7 +11,7 @@ type User struct {
 	FullName string `json:"fullName"`
 	Links    *UserLinks
 	Avatar   string `json:"avatar"`
-	Boards   []Board
+	Boards   []BoardInternal
 }
 
 // для формирования ответа пользователю
@@ -20,6 +20,13 @@ type UserOutside struct {
 	Username string `json:"username"`
 	FullName string `json:"fullName"`
 	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+}
+
+type UserOutsideShort struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
 	Avatar   string `json:"avatar"`
 }
 
