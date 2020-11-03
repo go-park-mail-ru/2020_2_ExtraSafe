@@ -10,9 +10,9 @@ type Service interface {
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
 
-	CreateColumn(request models.ColumnInput) (board models.ColumnOutside, err error)
-	ChangeColumn(request models.ColumnInput) (board models.ColumnOutside, err error)
-	DeleteColumn(request models.ColumnInput) (err error)
+	CreateColumn(request models.CardInput) (board models.CardOutside, err error)
+	ChangeColumn(request models.CardInput) (board models.CardOutside, err error)
+	DeleteColumn(request models.CardInput) (err error)
 
 	CreateTask(request models.TaskInput) (board models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (board models.TaskOutside, err error)
@@ -69,25 +69,25 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	return err
 }
 
-func (s *service) CreateColumn(request models.ColumnInput) (board models.ColumnOutside, err error) {
+func (s *service) CreateColumn(request models.CardInput) (board models.CardOutside, err error) {
 	board, err = s.boardStorage.CreateColumn(request)
 	if err != nil {
-		return models.ColumnOutside{}, err
+		return models.CardOutside{}, err
 	}
 
 	return board, err
 }
 
-func (s *service) ChangeColumn(request models.ColumnInput) (board models.ColumnOutside, err error) {
+func (s *service) ChangeColumn(request models.CardInput) (board models.CardOutside, err error) {
 	board, err = s.boardStorage.ChangeColumn(request)
 	if err != nil {
-		return models.ColumnOutside{}, err
+		return models.CardOutside{}, err
 	}
 
 	return board, err
 }
 
-func (s *service) DeleteColumn(request models.ColumnInput) (err error) {
+func (s *service) DeleteColumn(request models.CardInput) (err error) {
 	err = s.boardStorage.DeleteColumn(request)
 	if err != nil {
 		return err

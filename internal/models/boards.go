@@ -12,13 +12,13 @@ type Board struct {
 
 // для пользователя, отправившего запрос формируется эта структура
 type BoardOutside struct {
-	BoardID uint64          `json:"boardID"`
-	Admin   User            `json:"admin"` // структура владельца доски
-	Name    string          `json:"name"`  // название доски
-	Theme   string          `json:"theme"`
-	Star    bool            `json:"star"`
-	Users   []User          `json:"users"` // массив с пользователями этой доски
-	Columns []ColumnOutside `json:"columns"`
+	BoardID uint64        `json:"boardID"`
+	Admin   User          `json:"admin"` // структура владельца доски
+	Name    string        `json:"name"`  // название доски
+	Theme   string        `json:"theme"`
+	Star    bool          `json:"star"`
+	Users   []User        `json:"users"` // массив с пользователями этой доски
+	Columns []CardOutside `json:"columns"`
 }
 
 /*type BoardMembers struct {
