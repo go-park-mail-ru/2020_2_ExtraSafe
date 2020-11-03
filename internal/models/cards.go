@@ -11,7 +11,7 @@ type CardOutside struct {
 	ColumnID uint64 `json:"columnID"`
 	Name     string `json:"name"`
 	Order    uint8  `json:"order"`
-	Tasks    []Task `json:"tasks"`
+	Tasks    []TaskOutside `json:"tasks"`
 }
 
 type CardInput struct {

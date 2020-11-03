@@ -10,6 +10,10 @@ type userStorage interface {
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 }
 
+type boardStorage interface {
+	GetBoards(userInput models.UserInput) ([]models.BoardOutsideShort, error)
+}
+
 type validator interface {
 	ValidateLogin(request models.UserInputLogin) (err error)
 	ValidateRegistration(request models.UserInputReg) (err error)

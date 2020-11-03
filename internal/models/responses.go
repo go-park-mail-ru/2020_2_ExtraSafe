@@ -13,19 +13,13 @@ type ResponseUser struct {
 }
 
 type ResponseUserAuth struct {
-	Status    int    `json:"status"`
-	Email     string `json:"email"`
-	Username  string `json:"username"`
-	FullName  string `json:"fullName"`
-	Avatar    string `json:"avatar"`
-	Telegram  string `json:"telegram"`
-	Instagram string `json:"instagram"`
-	Github    string `json:"github"`
-	Bitbucket string `json:"bitbucket"`
-	Vk        string `json:"vkontakte"`
-	Facebook  string `json:"facebook"`
-	//Links ResponseUserLinks `json:"links"`
-	Boards []Board `json:"boards"`
+	Status   int                 `json:"status"`
+	Email    string              `json:"email"`
+	Username string              `json:"username"`
+	FullName string              `json:"fullName"`
+	Avatar   string              `json:"avatar"`
+	Links    UserLinks           `json:"links"`
+	Boards   []BoardOutsideShort `json:"boards"`
 }
 
 type ResponseUserLinks struct {

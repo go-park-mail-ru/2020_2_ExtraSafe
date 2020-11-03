@@ -21,7 +21,15 @@ type UserOutside struct {
 	FullName string `json:"fullName"`
 	Links    *UserLinks
 	Avatar   string `json:"avatar"`
-	Boards   []Board `json:"boards"`
+}
+
+type UserBoardsOutside struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+	Boards   []BoardOutsideShort `json:"boards"`
 }
 
 type UserLinks struct {

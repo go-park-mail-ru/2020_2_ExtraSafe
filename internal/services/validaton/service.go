@@ -1,7 +1,6 @@
 package validaton
 
 import (
-	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"regexp"
@@ -188,7 +187,6 @@ func IsBitbucketValid(i interface{}, o interface{}) bool {
 }
 
 func init() {
-	fmt.Println("init")
 	govalidator.CustomTypeTagMap.Set("passwordValid", govalidator.CustomTypeValidator(IsPasswordValid))
 	govalidator.CustomTypeTagMap.Set("fullNameValid", govalidator.CustomTypeValidator(IsFullNameValid))
 	govalidator.CustomTypeTagMap.Set("userNameValid", govalidator.CustomTypeValidator(IsUsernameValid))
