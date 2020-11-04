@@ -5,11 +5,7 @@ import (
 )
 
 type userStorage interface {
-	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
-	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
-	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
-
-	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	//GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
 type boardStorage interface {
@@ -18,9 +14,9 @@ type boardStorage interface {
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
-	CreateColumn(cardInput models.CardInput) (models.CardOutside, error)
-	ChangeColumn(cardInput models.CardInput) (models.CardOutside, error)
-	DeleteColumn(cardInput models.CardInput) error
+	CreateCard(cardsInput models.CardInput) (models.CardOutside, error)
+	ChangeCard(cardsInput models.CardInput) (models.CardOutside, error)
+	DeleteCard(cardsInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)

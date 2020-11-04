@@ -43,13 +43,15 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	membersIDs := make([]uint64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 
-	members, err := s.userStorage.GetBoardMembers(membersIDs)
+	var members []models.UserOutsideShort
+	//members, err := s.userStorage.GetBoardMembers(membersIDs)
 
 	writeBoardOutside(boardInternal, &board, members)
 	
 	return board, err
 }
 
+//TODO CHECK проверка то, что пользователь имеет доступ к данной таблице
 func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.GetBoard(request)
 	if err != nil {
@@ -60,16 +62,18 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	members, err := s.userStorage.GetBoardMembers(membersIDs)
+	var members []models.UserOutsideShort
+	/*members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
 		return models.BoardOutside{}, err
-	}
+	}*/
 
 	writeBoardOutside(boardInternal, &board, members)
 
 	return board, err
 }
 
+//TODO CHECK тут должна быть проверка на то, имеет ли пользователь право изменять данные доски (только админ!)
 func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.ChangeBoard(request)
 	if err != nil {
@@ -80,10 +84,11 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	members, err := s.userStorage.GetBoardMembers(membersIDs)
+	var members []models.UserOutsideShort
+	/*members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
 		return models.BoardOutside{}, err
-	}
+	}*/
 
 	writeBoardOutside(boardInternal, &board, members)
 
@@ -112,7 +117,7 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 }
 
 func (s *service) CreateCard(request models.CardInput) (card models.CardOutside, err error) {
-	card, err = s.boardStorage.CreateColumn(request)
+	card, err = s.boardStorage.CreateCard(request)
 	if err != nil {
 		return models.CardOutside{}, err
 	}
@@ -121,7 +126,7 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutside,
 }
 
 func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside, err error) {
-	card, err = s.boardStorage.ChangeColumn(request)
+	card, err = s.boardStorage.ChangeCard(request)
 	if err != nil {
 		return models.CardOutside{}, err
 	}
@@ -130,7 +135,7 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside,
 }
 
 func (s *service) DeleteCard(request models.CardInput) (err error) {
-	err = s.boardStorage.DeleteColumn(request)
+	err = s.boardStorage.DeleteCard(request)
 	if err != nil {
 		return err
 	}

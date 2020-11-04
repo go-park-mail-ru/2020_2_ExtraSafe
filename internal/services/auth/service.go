@@ -24,7 +24,7 @@ func NewService(userStorage userStorage, boardStorage boardStorage, validator va
 	}
 }
 
-func (s *service)Auth(request models.UserInput) (response models.UserBoardsOutside, err error) {
+func (s *service) Auth(request models.UserInput) (response models.UserBoardsOutside, err error) {
 	user, err := s.userStorage.GetUserProfile(request)
 	if err != nil {
 		return models.UserBoardsOutside{}, err
@@ -44,7 +44,7 @@ func (s *service)Auth(request models.UserInput) (response models.UserBoardsOutsi
 	return response, err
 }
 
-func (s *service)Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error) {
+func (s *service) Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error) {
 	var user models.UserOutside
 
 	err = s.validator.ValidateLogin(request)
@@ -61,7 +61,7 @@ func (s *service)Login(request models.UserInputLogin) (userID uint64, response m
 }
 
 
-func (s *service)Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error) {
+func (s *service) Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error) {
 	var user models.UserOutside
 
 	err = s.validator.ValidateRegistration(request)

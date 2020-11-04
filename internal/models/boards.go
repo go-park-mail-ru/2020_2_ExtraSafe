@@ -41,3 +41,13 @@ type BoardChangeInput struct {
 	Theme     string `json:"theme"`
 	Star      bool   `json:"star"`
 }
+
+// для работы в бд
+type Board struct {
+	BoardID  uint64   `json:"boardID"`
+	AdminID  uint64   `json:"adminID"`
+	Name     string   `json:"name"` // название доски
+	Theme    string   `json:"theme"`
+	Star     bool     `json:"star"`
+	UsersIDs []uint64 `json:"usersIDs"` // массив с пользователями этой доски
+}

@@ -158,7 +158,7 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 	return user, models.ServeError{Codes: []string{"101"}}
 }
 
-func (s *storage)GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) {
+func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) {
 	user, err := s.GetUserProfile(userInput)
 	if err != nil {
 		return models.UserOutside{}, err

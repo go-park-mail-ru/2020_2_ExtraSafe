@@ -1,10 +1,10 @@
 package models
 
 type Card struct {
-	CardID uint64 `json:"cardID"`
-	BoardID  uint64 `json:"boardID"`
-	Name     string `json:"name"`
-	Order    uint8  `json:"order"`
+	CardID  uint64 `json:"columnID"`
+	BoardID uint64 `json:"boardID"`
+	Name    string `json:"name"`
+	Order   uint8  `json:"order"`
 }
 
 type CardOutside struct {
@@ -15,9 +15,10 @@ type CardOutside struct {
 }
 
 type CardInput struct {
-	CardID  uint64 `json:"cardID"`
+	CardID  uint64 `json:"columnID"`
 	BoardID uint64 `json:"boardID"`
 	Name    string `json:"name"`
+	Order   uint8  `json:"order"`
 }
 
 
