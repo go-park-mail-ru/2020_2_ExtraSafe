@@ -35,5 +35,12 @@ type ResponseUserLinks struct {
 }
 
 type ResponseBoard struct {
-
+	Status  int                `json:"status"`
+	BoardID uint64             `json:"boardID"`
+	Admin   UserOutsideShort   `json:"admin"` // структура владельца доски
+	Name    string             `json:"name"`  // название доски
+	Theme   string             `json:"theme"`
+	Star    bool               `json:"star"`
+	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
+	Cards   []CardOutside      `json:"cards"`
 }

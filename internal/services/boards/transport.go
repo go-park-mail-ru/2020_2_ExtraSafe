@@ -47,5 +47,12 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 }
 
 func (t transport) BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error) {
+	response.BoardID = board.BoardID
+	response.Admin = board.Admin
+	response.Theme = board.Theme
+	response.Star = board.Star
+	response.Users = board.Users
+	response.Name = board.Name
+	response.Status = 200
 	return response, err
 }

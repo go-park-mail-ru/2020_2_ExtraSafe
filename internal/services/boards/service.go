@@ -43,8 +43,7 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	membersIDs := make([]uint64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 
-	var members []models.UserOutsideShort
-	//members, err := s.userStorage.GetBoardMembers(membersIDs)
+	members, err := s.userStorage.GetBoardMembers(membersIDs)
 
 	writeBoardOutside(boardInternal, &board, members)
 	
@@ -62,11 +61,10 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	var members []models.UserOutsideShort
-	/*members, err := s.userStorage.GetBoardMembers(membersIDs)
+	members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
 		return models.BoardOutside{}, err
-	}*/
+	}
 
 	writeBoardOutside(boardInternal, &board, members)
 
@@ -84,11 +82,10 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	var members []models.UserOutsideShort
-	/*members, err := s.userStorage.GetBoardMembers(membersIDs)
+	members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
 		return models.BoardOutside{}, err
-	}*/
+	}
 
 	writeBoardOutside(boardInternal, &board, members)
 

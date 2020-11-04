@@ -21,7 +21,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/profile/", middle.CookieSession(profile.ProfileChange))
 	e.POST("/accounts/", middle.CookieSession(profile.AccountsChange))
 	e.POST("/password/", middle.CookieSession(profile.PasswordChange))
-	e.GET("/board/:boardID", middle.CookieSession(board.Board))
+	e.GET("/board/:boardID/", middle.CookieSession(board.Board))
 	e.POST("/board-new/", middle.CookieSession(board.BoardCreate))
 	e.POST("/board/", middle.CookieSession(board.BoardChange))
 }

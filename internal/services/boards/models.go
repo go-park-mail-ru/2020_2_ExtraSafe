@@ -5,7 +5,7 @@ import (
 )
 
 type userStorage interface {
-	//GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
 type boardStorage interface {
