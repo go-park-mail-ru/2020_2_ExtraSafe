@@ -50,6 +50,7 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
+//TODO CHECK проверка то, что пользователь имеет доступ к данной таблице
 func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.GetBoard(request)
 	if err != nil {
@@ -70,6 +71,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	return board, err
 }
 
+//TODO CHECK тут должна быть проверка на то, имеет ли пользователь право изменять данные доски (только админ!)
 func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.ChangeBoard(request)
 	if err != nil {
@@ -112,7 +114,7 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 }
 
 func (s *service) CreateCard(request models.CardInput) (card models.CardOutside, err error) {
-	card, err = s.boardStorage.CreateColumn(request)
+	card, err = s.boardStorage.CreateCard(request)
 	if err != nil {
 		return models.CardOutside{}, err
 	}
@@ -121,7 +123,7 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutside,
 }
 
 func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside, err error) {
-	card, err = s.boardStorage.ChangeColumn(request)
+	card, err = s.boardStorage.ChangeCard(request)
 	if err != nil {
 		return models.CardOutside{}, err
 	}
@@ -130,7 +132,7 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside,
 }
 
 func (s *service) DeleteCard(request models.CardInput) (err error) {
-	err = s.boardStorage.DeleteColumn(request)
+	err = s.boardStorage.DeleteCard(request)
 	if err != nil {
 		return err
 	}

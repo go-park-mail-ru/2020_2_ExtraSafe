@@ -18,9 +18,9 @@ type boardStorage interface {
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
-	CreateColumn(userInput models.CardInput) (models.CardOutside, error)
-	ChangeColumn(userInput models.CardInput) (models.CardOutside, error)
-	DeleteColumn(userInput models.CardInput) error
+	CreateCard(cardsInput models.CardInput) (models.CardOutside, error)
+	ChangeCard(cardsInput models.CardInput) (models.CardOutside, error)
+	DeleteCard(cardsInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)

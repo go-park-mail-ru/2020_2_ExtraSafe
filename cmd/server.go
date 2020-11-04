@@ -13,6 +13,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/sessions"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/validaton"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/cardsStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/tasksStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/imgStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
@@ -53,12 +56,12 @@ func main() {
 	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{
 		User: "guest",
 	})
+	defer tConn.Close()
 
 	if err != nil {
 		fmt.Println("Connection refused")
 	}
 
-	defer tConn.Close()
 
 	someUsers := make([]models.User, 0)
 //	userSessions := make(map[string]uint64, 10)
@@ -69,6 +72,9 @@ func main() {
 	//sessionStorage := sessionsStorage.NewStorage(&userSessions)
 	sessionStorage := sessionsStorage.NewStorage(tConn)
 	avatarStorage := imgStorage.NewStorage(&someUsers)
+	cardStorage := cardsStorage.NewStorage(db)
+	taskStorage := tasksStorage.NewStorage(db)
+	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)
 
 	validationService := validaton.NewService()
 	sessionService := sessions.NewService(sessionStorage)

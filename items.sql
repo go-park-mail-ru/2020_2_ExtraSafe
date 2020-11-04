@@ -17,14 +17,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE social_links (
-  userID      BIGSERIAL REFERENCES users(userID),
+  userID      BIGSERIAL REFERENCES users(userID) ON DELETE CASCADE,
   networkName TEXT,
   link TEXT
 );
 
 CREATE TABLE boards (
   boardID      BIGSERIAL PRIMARY KEY,
-  adminID      BIGSERIAL REFERENCES users(userID),
+  adminID      BIGSERIAL REFERENCES users(userID) ON DELETE CASCADE,
   boardName    TEXT,
   theme        TEXT,
   star         BOOLEAN
@@ -32,14 +32,14 @@ CREATE TABLE boards (
 
 CREATE TABLE cards (
   cardID    SMALLSERIAL PRIMARY KEY,
-  boardID     BIGSERIAL REFERENCES boards(boardID),
-  columnName    TEXT,
-  columnOrder SMALLSERIAL
+  boardID     BIGSERIAL REFERENCES boards(boardID) ON DELETE CASCADE,
+  cardName    TEXT,
+  cardOrder SMALLSERIAL
 );
 
 CREATE TABLE tasks (
   taskID    SMALLSERIAL PRIMARY KEY,
-  cardID    SMALLSERIAL REFERENCES cards(cardID),
+  cardID    SMALLSERIAL REFERENCES cards(cardID) ON DELETE CASCADE,
   taskName    TEXT,
   description TEXT,
   tasksOrder SMALLSERIAL,
@@ -47,8 +47,8 @@ CREATE TABLE tasks (
 );
 
 CREATE TABLE board_members (
-    boardID  BIGSERIAL REFERENCES boards(boardID),
-    userID  BIGSERIAL REFERENCES users(userID)
+    boardID  BIGSERIAL REFERENCES boards(boardID) ON DELETE CASCADE,
+    userID  BIGSERIAL REFERENCES users(userID) ON DELETE CASCADE
 );
 
 /*CREATE TABLE board_admins (
