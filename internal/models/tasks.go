@@ -18,8 +18,9 @@ type TaskOutside struct {
 }
 
 type TaskInput struct {
-	TaskID      uint64 `json:"task_id"`
-	CardID      uint64 `json:"column_id"`
+	UserID      uint64 `json:"-"`
+	TaskID      uint64 `json:"taskID"`
+	CardID      uint64 `json:"columnID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Order       uint8  `json:"order"`

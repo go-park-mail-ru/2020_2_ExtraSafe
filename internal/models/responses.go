@@ -44,3 +44,19 @@ type ResponseBoard struct {
 	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
 	Cards   []CardOutside      `json:"cards"`
 }
+
+type ResponseCard struct {
+	Status  int          `json:"status"`
+	CardID uint64        `json:"cardID"`
+	Name   string        `json:"name"`
+	Order  uint8         `json:"order"`
+	//Tasks  []TaskOutside `json:"tasks"`
+}
+
+type ResponseTask struct {
+	Status int `json:"status"`
+	TaskID      uint64 `json:"task_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Order       uint8  `json:"order"`
+}

@@ -15,7 +15,8 @@ type CardOutside struct {
 }
 
 type CardInput struct {
-	CardID  uint64 `json:"columnID"`
+	UserID  uint64 `json:"-"`
+	CardID  uint64 `json:"cardID"`
 	BoardID uint64 `json:"boardID"`
 	Name    string `json:"name"`
 	Order   uint8  `json:"order"`
