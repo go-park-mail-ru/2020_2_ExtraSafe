@@ -61,7 +61,7 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([] models.BoardOuts
 		}
 
 		//TODO заполнить все поля структуры ?
-		//TODO найти admins ?
+		//TODO переделать на BoardsOutputShort
 		currentBoard := models.BoardOutside{
 			BoardID: boardID,
 			Admin:   models.User{},
@@ -133,7 +133,7 @@ func (s *storage) CreateBoard(userInput models.BoardChangeInput) (models.BoardOu
 		Name:    userInput.BoardName,
 		Theme:   userInput.Theme,
 		Star:    userInput.Star,
-		Users:   []models.User{},
+		Users:   []models.UserOutside{},
 		Columns: []models.CardOutside{},
 	}
 
@@ -149,7 +149,7 @@ func (s *storage) GetBoard(userInput models.BoardInput) (models.BoardOutside, er
 	}
 	defer rows.Close()
 
-		Scan(&adminID, &board.Name, &board.Theme, &board.Star)
+		//Scan(&adminID, &board.Name, &board.Theme, &board.Star)
 
 
 	for rows.Next() {

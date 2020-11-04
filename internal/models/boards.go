@@ -1,15 +1,5 @@
 package models
 
-// для работы в бд
-type Board struct {
-	BoardID  uint64   `json:"boardID"`
-	AdminID  uint64   `json:"adminID"`
-	Name     string   `json:"name"` // название доски
-	Theme    string   `json:"theme"`
-	Star     bool     `json:"star"`
-	UsersIDs []uint64 `json:"usersIDs"` // массив с пользователями этой доски
-}
-
 // для пользователя, отправившего запрос формируется эта структура
 type BoardOutside struct {
 	BoardID uint64          `json:"boardID"`
@@ -44,4 +34,14 @@ type BoardChangeInput struct {
 	BoardName string `json:"boardName"`
 	Theme     string `json:"theme"`
 	Star      bool   `json:"star"`
+}
+
+// для работы в бд
+type Board struct {
+	BoardID  uint64   `json:"boardID"`
+	AdminID  uint64   `json:"adminID"`
+	Name     string   `json:"name"` // название доски
+	Theme    string   `json:"theme"`
+	Star     bool     `json:"star"`
+	UsersIDs []uint64 `json:"usersIDs"` // массив с пользователями этой доски
 }
