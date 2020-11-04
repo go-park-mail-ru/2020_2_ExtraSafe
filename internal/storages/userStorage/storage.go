@@ -28,6 +28,7 @@ type Storage interface {
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
+	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
@@ -300,4 +301,24 @@ func (s *storage) getInternalUser(userInput models.UserInput) (models.UserOutsid
 
 	//могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
 	return user, "", models.ServeError{Codes: []string{string(http.StatusInternalServerError)}}
+}
+
+func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) {
+	members := make([]models.UserOutsideShort, 0)
+
+
+	for _, userID := range userIDs {
+		user := models.UserOutsideShort{}
+		err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userID).
+			Scan(&user.Email, &user.Username, &user.FullName, &user.Avatar)
+
+		if err != nil {
+			fmt.Println(err)
+			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}}
+		}
+
+		members = append(members, user)
+		}
+
+	return members, nil
 }
