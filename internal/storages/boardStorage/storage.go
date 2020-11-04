@@ -172,7 +172,7 @@ func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error
 func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
 	board := models.BoardInternal{}
 
-	err := s.db.QueryRow("UPDATE boards SET boardName = $1, theme = $2, star = $3 WHERE boardID = $5 RETURNING adminID",
+	err := s.db.QueryRow("UPDATE boards SET boardName = $1, theme = $2, star = $3 WHERE boardID = $4 RETURNING adminID",
 								boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
 	if err != nil {
 		fmt.Println(err)
