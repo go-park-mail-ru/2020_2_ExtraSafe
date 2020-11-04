@@ -19,3 +19,4 @@ CREATE TABLE cards (
                        cardOrder SMALLSERIAL
 );
 */
+

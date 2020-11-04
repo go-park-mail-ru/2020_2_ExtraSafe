@@ -55,7 +55,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, error) {
-	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order)
+	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order, cardInput.CardID)
 	if err != nil {
 		fmt.Println(err)
 		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
