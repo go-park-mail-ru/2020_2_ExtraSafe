@@ -3,6 +3,7 @@ package boards
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
+	"strconv"
 )
 
 type Transport interface {
@@ -22,9 +23,14 @@ func NewTransport() Transport {
 func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err error) {
 	userInput := new(models.BoardInput)
 
-	if err := c.Bind(userInput); err != nil {
+	boardID := c.Param("boardID")
+	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
+	if err != nil {
 		return models.BoardInput{}, err
 	}
+
+	userInput.UserID = c.Get("userId").(uint64)
+
 	return *userInput, nil
 }
 
@@ -34,6 +40,9 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, err
 	}
+
+	userInput.UserID = c.Get("userId").(uint64)
+
 	return *userInput, nil
 }
 

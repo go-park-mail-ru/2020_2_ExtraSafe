@@ -9,9 +9,9 @@ type Card struct {
 
 type CardOutside struct {
 	CardID uint64        `json:"cardID"`
-	Name     string        `json:"name"`
-	Order    uint8         `json:"order"`
-	Tasks    []TaskOutside `json:"tasks"`
+	Name   string        `json:"name"`
+	Order  uint8         `json:"order"`
+	Tasks  []TaskOutside `json:"tasks"`
 }
 
 type CardInput struct {
