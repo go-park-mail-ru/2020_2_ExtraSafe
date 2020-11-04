@@ -57,8 +57,8 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 }
 
 func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2, tasksOrder = $3 WHERE  = $4",
-								taskInput.Name, taskInput.Description, taskInput.Order)
+	_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2, tasksOrder = $3 WHERE taskID = $4",
+								taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID)
 	if err != nil {
 		fmt.Println(err)
 		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
