@@ -9,7 +9,7 @@ type Transport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
 
-	BoardWrite(board models.Board) (response models.ResponseBoard, err error)
+	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
 }
 
 type transport struct {
@@ -37,6 +37,6 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	return *userInput, nil
 }
 
-func (t transport) BoardWrite(board models.Board) (response models.ResponseBoard, err error) {
+func (t transport) BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error) {
 	return response, err
 }
