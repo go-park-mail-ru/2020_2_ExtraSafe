@@ -20,7 +20,7 @@ type TaskOutside struct {
 type TaskInput struct {
 	UserID      uint64 `json:"-"`
 	TaskID      uint64 `json:"taskID"`
-	CardID      uint64 `json:"columnID"`
+	CardID      uint64 `json:"cardID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Order       uint8  `json:"order"`
