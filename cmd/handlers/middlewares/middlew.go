@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -101,9 +100,7 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 
 func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		fmt.Println(c.Path())
 		bid := c.Param("ID")
-		fmt.Println(bid)
 		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
