@@ -28,7 +28,7 @@ func NewTransport() Transport {
 func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err error) {
 	userInput := new(models.BoardInput)
 
-	boardID := c.Param("boardID")
+	boardID := c.Param("ID")
 	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
 	if err != nil {
 		return models.BoardInput{}, err
@@ -42,7 +42,7 @@ func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err err
 func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error) {
 	userInput := new(models.BoardChangeInput)
 
-	boardID := c.Param("boardID")
+	boardID := c.Param("ID")
 	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
 
 	if err := c.Bind(userInput); err != nil {
@@ -73,7 +73,7 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 		return models.CardInput{}, err
 	}
 
-	cardID := c.Param("cardID")
+	cardID := c.Param("ID")
 	userInput.CardID, err = strconv.ParseUint(cardID, 10, 64)
 
 	userInput.UserID = c.Get("userId").(uint64)
@@ -97,7 +97,7 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 		return models.TaskInput{}, err
 	}
 
-	taskID := c.Param("taskID")
+	taskID := c.Param("ID")
 	userInput.TaskID, err = strconv.ParseUint(taskID, 10, 64)
 
 	userInput.UserID = c.Get("userId").(uint64)

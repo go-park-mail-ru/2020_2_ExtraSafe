@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -13,6 +14,7 @@ type Middleware interface {
 	CookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 }
@@ -26,12 +28,13 @@ type middlew struct {
 }
 
 func NewMiddleware(sessionsService sessionsService, errorWorker errorWorker, authService authService,
-	authTransport authTransport) Middleware {
+	authTransport authTransport, boardStorage boardStorage) Middleware {
 	return middlew{
 		sessionsService: sessionsService,
 		errorWorker: errorWorker,
 		authService: authService,
 		authTransport: authTransport,
+		boardStorage: boardStorage,
 	}
 }
 
@@ -77,7 +80,7 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		bid := c.Param("boardID")
+		bid := c.Param("ID")
 		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
@@ -98,7 +101,9 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 
 func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		bid := c.Param("boardID")
+		fmt.Println(c.Path())
+		bid := c.Param("ID")
+		fmt.Println(bid)
 		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
@@ -119,7 +124,7 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 
 func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cid := c.Param("cardID")
+		cid := c.Param("ID")
 		cardID, err := strconv.ParseUint(cid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
@@ -132,7 +137,7 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 			return c.NoContent(http.StatusForbidden)
 		}
 
-		c.Set("boardID", cid)
+		//c.Set("boardID", cid)
 
 		return next(c)
 	}
@@ -140,7 +145,7 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tid := c.Param("taskID")
+		tid := c.Param("ID")
 		taskID, err := strconv.ParseUint(tid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
@@ -148,12 +153,12 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		userID := c.Get("userId").(uint64)
 
-		err = m.boardStorage.CheckCardPermission(userID, taskID)
+		err = m.boardStorage.CheckTaskPermission(userID, taskID)
 		if err != nil {
 			return c.NoContent(http.StatusForbidden)
 		}
 
-		c.Set("boardID", tid)
+		//c.Set("boardID", tid)
 
 		return next(c)
 	}

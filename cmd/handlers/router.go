@@ -24,18 +24,18 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 
 	e.Static("/avatar", "../")
 
-	e.GET("/board/:boardID/", middle.CookieSession(board.Board))
+	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.Board)))
 	e.POST("/board/", middle.CookieSession(board.BoardCreate))
-	e.PUT("/board/:boardID/", middle.CookieSession(board.BoardChange))
-	e.DELETE("/board/:boardID/", middle.CookieSession(board.BoardDelete))
+	e.PUT("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.BoardChange)))
+	e.DELETE("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.BoardDelete)))
 
-	e.GET("/card/:cardID/", middle.CookieSession(board.Board))
-	e.POST("/card/", middle.CookieSession(board.CardCreate))
-	e.PUT("/card/:cardID/", middle.CookieSession(board.CardChange))
-	e.DELETE("/card/:cardID/", middle.CookieSession(board.CardDelete))
+	e.GET("/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.Board)))
+	e.POST("/card/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.CardCreate)))
+	e.PUT("/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.CardChange)))
+	e.DELETE("/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.CardDelete)))
 
-	e.GET("/task/:taskID/", middle.CookieSession(board.Board))
-	e.POST("/task/", middle.CookieSession(board.TaskCreate))
-	e.PUT("/task/:taskID/", middle.CookieSession(board.TaskChange))
-	e.DELETE("/task/:taskID/", middle.CookieSession(board.TaskDelete))
+	e.GET("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.Board)))
+	e.POST("/task/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.TaskCreate)))
+	e.PUT("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskChange)))
+	e.DELETE("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskDelete)))
 }
