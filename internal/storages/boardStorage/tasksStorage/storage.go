@@ -29,7 +29,7 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 	var quantityTasks uint64 = 0
 
 	//FIXME сделать по-другому поиск последнего ID
-	err := s.db.QueryRow("SELECT COUNT(*) FROM tasks WHERE cardID = $1", taskInput.CardID).Scan(&quantityTasks)
+	err := s.db.QueryRow("SELECT COUNT(*) FROM tasks").Scan(&quantityTasks)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
 		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}

@@ -29,7 +29,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 	var quantityCards uint64 = 0
 
 	//FIXME сделать по-другому поиск последнего ID
-	err := s.db.QueryRow("SELECT COUNT(*) FROM cards WHERE boardID = $1", cardInput.BoardID).Scan(&quantityCards)
+	err := s.db.QueryRow("SELECT COUNT(*) FROM cards").Scan(&quantityCards)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
 		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
