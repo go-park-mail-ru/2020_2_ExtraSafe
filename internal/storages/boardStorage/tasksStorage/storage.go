@@ -12,6 +12,9 @@ type Storage interface {
 	DeleteTask(taskInput models.TaskInput) error
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
+	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
+
+	CheckTaskAccessory(taskID uint64) (cardID uint64, err error)
 }
 
 type storage struct {
@@ -105,4 +108,28 @@ func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutsi
 	}
 
 	return tasks, nil
+}
+
+func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error) {
+	task := models.TaskOutside{}
+	task.TaskID = taskInput.TaskID
+
+	err := s.db.QueryRow("SELECT taskName, description, tasksOrder FROM tasks WHERE taskID = $1", taskInput.TaskID).
+				Scan(&task.Name, &task.Description, &task.Order)
+
+	if err != nil {
+		fmt.Println(err)
+		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
+	}
+
+	return task, nil
+}
+
+func (s *storage) CheckTaskAccessory(taskID uint64) (cardID uint64, err error) {
+	err = s.db.QueryRow("SELECT cardID FROM tasks WHERE taskID = $1", taskID).Scan(&cardID)
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+	return cardID, nil
 }

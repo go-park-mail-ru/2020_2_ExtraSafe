@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"net/http"
 )
 
 type Storage interface {
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
-	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
@@ -22,6 +22,16 @@ type Storage interface {
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	DeleteTask(taskInput models.TaskInput) error
 
+	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
+	GetCard(cardInput models.CardInput) (models.CardOutside, error)
+	GetTask(taskInput models.TaskInput) (models.TaskOutside, error)
+
+	CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error)
+	CheckCardPermission(userID uint64, cardID uint64) (err error)
+	CheckTaskPermission(userID uint64, taskID uint64) (err error)
+
+	checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error)
+	checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error)
 	getBoardMembers(boardInput models.BoardInput) ([]uint64, error)
 }
 
@@ -108,6 +118,7 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 				Scan(&board.AdminID, &board.Name, &board.Theme, &board.Star)
 
 	if err != nil {
+		fmt.Println(err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
 	}
 
@@ -280,4 +291,109 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) error {
 	}
 
 	return nil
+}
+
+func (s *storage) GetCard(cardInput models.CardInput) (models.CardOutside, error) {
+	card, err := s.cardsStorage.GetCardByID(cardInput)
+	if err != nil {
+		return models.CardOutside{}, err
+	}
+
+	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
+	if err != nil {
+		return models.CardOutside{}, err
+	}
+
+	card.Tasks = append(card.Tasks, tasks...)
+	return card, nil
+}
+
+func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskOutside, error) {
+	task, err := s.tasksStorage.GetTaskByID(taskInput)
+	if err != nil {
+		return models.TaskOutside{}, err
+	}
+
+	return task, nil
+}
+
+func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error) {
+	var ok bool
+
+	if ifAdmin {
+		ok, err = s.checkBoardAdminPermission(userID, boardID)
+	} else {
+		ok, err = s.checkBoardUserPermission(userID, boardID)
+	}
+
+	if err != nil {
+		fmt.Println(err)	//log
+		return models.ServeError{Codes: []string{"500"}}
+	}
+
+	if !ok {
+		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+	}
+
+	return nil
+}
+
+func (s *storage) checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error) {
+	var ID uint64
+	err = s.db.QueryRow("SELECT boardID FROM boards WHERE boardID = $1 AND adminID = $2", boardID, userID).Scan(&ID)
+	if err != nil && err != sql.ErrNoRows {
+		fmt.Println(err)
+		return false, err
+	}
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *storage) checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error) {
+	var ID uint64
+	err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
+	if err != nil && err != sql.ErrNoRows {
+		fmt.Println(err)
+		return false, err
+	}
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) {
+	boardID, err := s.cardsStorage.CheckCardAccessory(cardID)
+	if err != nil {
+		fmt.Println(err)	//log
+		return models.ServeError{Codes: []string{"500"}}
+	}
+
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE (B.adminID = $1 OR  M.userID = $1) AND boardID = $2;", userID, boardID).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		fmt.Println(err)
+		return models.ServeError{Codes: []string{"500"}}
+	}
+
+	if err == sql.ErrNoRows {
+		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+	}
+
+	return nil
+}
+
+func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) {
+	cardID, err := s.tasksStorage.CheckTaskAccessory(taskID)
+	if err != nil {
+		fmt.Println(err)	//log
+		return models.ServeError{Codes: []string{"500"}}
+	}
+
+	return s.CheckCardPermission(userID, cardID)
 }
