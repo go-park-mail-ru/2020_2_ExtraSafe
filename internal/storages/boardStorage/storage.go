@@ -375,7 +375,7 @@ func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) 
 		return models.ServeError{Codes: []string{"500"}}
 	}
 
-	err = s.db.QueryRow("SELECT B.boardID FROM boards B LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE (B.adminID = $1 OR  M.userID = $1) AND B.boardID = $2;", userID, boardID).Scan()
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE (B.adminID = $1 OR  M.userID = $1) AND B.boardID = $2;", userID, boardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}}
