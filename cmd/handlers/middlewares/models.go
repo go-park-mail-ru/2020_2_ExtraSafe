@@ -25,5 +25,7 @@ type authTransport interface {
 }
 
 type boardStorage interface {
-	CheckIfUserInBoard(userID uint64, boardID uint64) (err error)
+	CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error)
+	CheckCardPermission(userID uint64, cardID uint64) (err error)
+	CheckTaskPermission(userID uint64, taskID uint64) (err error)
 }

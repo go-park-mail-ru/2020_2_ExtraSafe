@@ -12,7 +12,9 @@ type Middleware interface {
 	CORS() echo.MiddlewareFunc
 	CookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc
-	//CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type middlew struct {
@@ -83,12 +85,75 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 
 		userID := c.Get("userId").(uint64)
 
-		err = m.boardStorage.CheckIfUserInBoard(userID, boardID)
+		err = m.boardStorage.CheckBoardPermission(userID, boardID, false)
+		if err != nil {
+			return c.NoContent(http.StatusForbidden)
+		}
+
+		c.Set("boardID", bid)
+
+		return next(c)
+	}
+}
+
+func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		bid := c.Param("boardID")
+		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
 		}
 
+		userID := c.Get("userId").(uint64)
+
+		err = m.boardStorage.CheckBoardPermission(userID, boardID, true)
+		if err != nil {
+			return c.NoContent(http.StatusForbidden)
+		}
+
 		c.Set("boardID", bid)
+
+		return next(c)
+	}
+}
+
+func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		cid := c.Param("cardID")
+		cardID, err := strconv.ParseUint(cid, 10, 64)
+		if err != nil {
+			return c.NoContent(http.StatusBadRequest)
+		}
+
+		userID := c.Get("userId").(uint64)
+
+		err = m.boardStorage.CheckCardPermission(userID, cardID)
+		if err != nil {
+			return c.NoContent(http.StatusForbidden)
+		}
+
+		c.Set("boardID", cid)
+
+		return next(c)
+	}
+}
+
+func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		tid := c.Param("taskID")
+		taskID, err := strconv.ParseUint(tid, 10, 64)
+		if err != nil {
+			return c.NoContent(http.StatusBadRequest)
+		}
+
+		userID := c.Get("userId").(uint64)
+
+		err = m.boardStorage.CheckCardPermission(userID, taskID)
+		if err != nil {
+			return c.NoContent(http.StatusForbidden)
+		}
+
+		c.Set("boardID", tid)
 
 		return next(c)
 	}
