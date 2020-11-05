@@ -12,6 +12,9 @@ type Storage interface {
 	DeleteCard(cardInput models.CardInput) error
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
+	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
+
+	CheckCardAccessory(cardID uint64) (boardID uint64, err error)
 }
 
 type storage struct {
@@ -100,3 +103,28 @@ func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOu
 	}
 	return cards, nil
 }
+
+func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, error) {
+	card := models.CardOutside{}
+	card.CardID = cardInput.CardID
+
+	err := s.db.QueryRow("SELECT cardName, cardOrder FROM cards WHERE cardID = $1", cardInput.CardID).
+					Scan(&card.Name, &card.Order)
+
+	if err != nil {
+		fmt.Println(err)
+		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
+	}
+
+	return card, nil
+}
+
+func (s *storage) CheckCardAccessory(cardID uint64) (boardID uint64, err error) {
+	err = s.db.QueryRow("SELECT boardID FROM cards WHERE cardID = $1", cardID).Scan(&boardID)
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+	return boardID, nil
+}
+
