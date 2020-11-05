@@ -15,10 +15,12 @@ type boardStorage interface {
 	DeleteBoard(boardInput models.BoardInput) error
 
 	CreateCard(cardsInput models.CardInput) (models.CardOutside, error)
+	//GetCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(cardsInput models.CardInput) (models.CardOutside, error)
 	DeleteCard(cardsInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	//GetTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	DeleteTask(taskInput models.TaskInput) error
 }

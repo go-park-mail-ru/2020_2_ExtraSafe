@@ -73,6 +73,9 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 		return models.CardInput{}, err
 	}
 
+	cardID := c.Param("cardID")
+	userInput.CardID, err = strconv.ParseUint(cardID, 10, 64)
+
 	userInput.UserID = c.Get("userId").(uint64)
 
 	return *userInput, nil
@@ -93,6 +96,9 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 	if err := c.Bind(userInput); err != nil {
 		return models.TaskInput{}, err
 	}
+
+	taskID := c.Param("taskID")
+	userInput.TaskID, err = strconv.ParseUint(taskID, 10, 64)
 
 	userInput.UserID = c.Get("userId").(uint64)
 

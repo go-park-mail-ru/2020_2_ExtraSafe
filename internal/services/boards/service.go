@@ -11,10 +11,12 @@ type Service interface {
 	DeleteBoard(request models.BoardInput) (err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutside, err error)
+	GetCard(request models.CardInput) (board models.CardOutside, err error)
 	ChangeCard(request models.CardInput) (card models.CardOutside, err error)
 	DeleteCard(request models.CardInput) (err error)
 
 	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
+	GetTask(request models.TaskInput) (board models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
 }
@@ -122,6 +124,15 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutside,
 	return card, err
 }
 
+func (s *service) GetCard(request models.CardInput) (card models.CardOutside, err error) {
+	//card, err = s.boardStorage.GetCard(request)
+	if err != nil {
+		return models.CardOutside{}, err
+	}
+
+	return card, err
+}
+
 func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside, err error) {
 	card, err = s.boardStorage.ChangeCard(request)
 	if err != nil {
@@ -142,6 +153,15 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 
 func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside, err error) {
 	task, err = s.boardStorage.CreateTask(request)
+	if err != nil {
+		return models.TaskOutside{}, err
+	}
+
+	return task, err
+}
+
+func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
+	//task, err = s.boardStorage.GetTask(request)
 	if err != nil {
 		return models.TaskOutside{}, err
 	}
