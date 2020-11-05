@@ -20,3 +20,4 @@ CREATE TABLE cards (
 );
 */
 
+SELECT DISTINCT * FROM boards B LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = 1 OR  M.userID = 1;
