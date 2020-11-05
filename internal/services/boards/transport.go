@@ -42,6 +42,9 @@ func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err err
 func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error) {
 	userInput := new(models.BoardChangeInput)
 
+	boardID := c.Param("boardID")
+	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
+
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, err
 	}

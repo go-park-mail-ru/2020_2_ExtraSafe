@@ -23,3 +23,7 @@ type authService interface {
 type authTransport interface {
 	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
 }
+
+type boardStorage interface {
+	CheckIfUserInBoard(userID uint64, boardID uint64) (err error)
+}

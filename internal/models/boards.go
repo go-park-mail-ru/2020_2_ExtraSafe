@@ -29,7 +29,7 @@ type BoardOutsideShort struct {
 }
 
 type BoardInput struct {
-	UserID   uint64 `json:"-"`
+	UserID  uint64 `json:"-"`
 	BoardID uint64 `json:"boardID"`
 }
 
