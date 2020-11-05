@@ -1,6 +1,7 @@
 package boards
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -56,6 +57,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	if err != nil {
 		return models.BoardOutside{}, err
 	}
+	fmt.Printf("After getBoard in board/service = %v\n", boardInternal)
 
 	membersIDs := make([]uint64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)

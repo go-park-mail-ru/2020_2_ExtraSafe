@@ -124,8 +124,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		return models.BoardInternal{}, err
 	}
 
-	board.Cards = append(board.Cards, cards...)
-
 	for _, card := range cards {
 		cardInput := models.CardInput{CardID: card.CardID}
 
@@ -135,6 +133,7 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
+		board.Cards = append(board.Cards, card)
 	}
 
 	return board, nil

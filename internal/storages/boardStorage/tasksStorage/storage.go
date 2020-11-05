@@ -103,5 +103,6 @@ func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutsi
 
 		tasks = append(tasks, task)
 	}
+
 	return tasks, nil
 }
