@@ -1,6 +1,5 @@
 package models
 
-// для работы в бд
 type BoardInternal struct {
 	BoardID  uint64        `json:"boardID"`
 	AdminID  uint64        `json:"adminID"`

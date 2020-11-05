@@ -50,7 +50,7 @@ type ResponseCard struct {
 	CardID uint64        `json:"cardID"`
 	Name   string        `json:"name"`
 	Order  uint8         `json:"order"`
-	//Tasks  []TaskOutside `json:"tasks"`
+	Tasks  []TaskOutside `json:"tasks"`
 }
 
 type ResponseTask struct {

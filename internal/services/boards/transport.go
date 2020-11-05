@@ -58,6 +58,7 @@ func (t transport) BoardWrite(board models.BoardOutside) (response models.Respon
 	response.Star = board.Star
 	response.Users = board.Users
 	response.Name = board.Name
+	response.Cards = board.Cards
 	response.Status = 200
 	return response, err
 }
@@ -78,6 +79,7 @@ func (t transport) CardWrite(card models.CardOutside) (response models.ResponseC
 	response.CardID = card.CardID
 	response.Order = card.Order
 	response.Name = card.Name
+	response.Tasks = card.Tasks
 	response.Status = 200
 	return response, err
 }
