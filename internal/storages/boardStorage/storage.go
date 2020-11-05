@@ -42,8 +42,9 @@ func NewStorage(db *sql.DB, cardsStorage cardsStorage, tasksStorage tasksStorage
 func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error) {
 	boards := make([]models.BoardOutsideShort, 0)
 
+
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
-									"JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
+									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
 	if err != nil {
 		return []models.BoardOutsideShort{}, err
 	}
