@@ -11,9 +11,9 @@ type Handler interface {
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
 
-	ColumnCreate(c echo.Context) error
-	ColumnChange(c echo.Context) error
-	ColumnDelete(c echo.Context) error
+	CardCreate(c echo.Context) error
+	CardChange(c echo.Context) error
+	CardDelete(c echo.Context) error
 
 	TaskCreate(c echo.Context) error
 	TaskChange(c echo.Context) error
@@ -105,26 +105,104 @@ func (h *handler) BoardDelete(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *handler) ColumnCreate(c echo.Context) error {
-	return nil
+func (h *handler) CardCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.CardChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	card, err := h.boardsService.CreateCard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.CardWrite(card)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
-func (h *handler) ColumnChange(c echo.Context) error {
-	return nil
+func (h *handler) CardChange(c echo.Context) error {
+	userInput, err := h.boardsTransport.CardChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	card, err := h.boardsService.ChangeCard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.CardWrite(card)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
-func (h *handler) ColumnDelete(c echo.Context) error {
-	return nil
+func (h *handler) CardDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.CardChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	err = h.boardsService.DeleteCard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *handler) TaskCreate(c echo.Context) error {
-	return nil
-}
+	userInput, err := h.boardsTransport.TaskChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	task, err := h.boardsService.CreateTask(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.TaskWrite(task)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)}
 
 func (h *handler) TaskChange(c echo.Context) error {
-	return nil
+	userInput, err := h.boardsTransport.TaskChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	task, err := h.boardsService.ChangeTask(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.TaskWrite(task)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TaskDelete(c echo.Context) error {
-	return nil
-}
+	userInput, err := h.boardsTransport.TaskChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	err = h.boardsService.DeleteTask(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	return c.NoContent(http.StatusOK)}

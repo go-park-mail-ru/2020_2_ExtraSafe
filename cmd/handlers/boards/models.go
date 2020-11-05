@@ -23,8 +23,13 @@ type boardsService interface {
 type boardsTransport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
-
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
+
+	CardChangeRead(c echo.Context) (request models.CardInput, err error)
+	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
+
+	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
+	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
 }
 
 type errorWorker interface {

@@ -5,10 +5,6 @@ import (
 )
 
 type userStorage interface {
-	CheckUser(userInput models.UserInputLogin) (models.UserOutside, error)
-	CreateUser(userInput models.UserInputReg) (models.UserOutside, error)
-	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
-
 	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
