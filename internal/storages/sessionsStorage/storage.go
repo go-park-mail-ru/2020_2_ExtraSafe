@@ -30,7 +30,7 @@ func (s *storage) DeleteUserSession(sessionId string)  error {
 	return nil
 }
 
-//TODO сделать возврат ошибок
+//TODO error
 func (s *storage) CreateUserSession(userId uint64, SID string) error {
 	_, err := s.Sessions.Insert("sessions", []interface{}{SID, userId})
 	if err != nil {

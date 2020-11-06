@@ -36,7 +36,7 @@ func (s *service)SetCookie(c echo.Context, userID uint64) error {
 	if err := s.sessionsStorage.CreateUserSession(userID, SID); err != nil {
 		fmt.Println(err)
 		return err
-		//TODO лог таких ошибок
+		//TODO error
 	}
 
 	cookie.Name = "tabutask_id"

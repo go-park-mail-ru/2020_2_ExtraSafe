@@ -53,7 +53,6 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
-//TODO CHECK проверка то, что пользователь имеет доступ к данной таблице
 func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.GetBoard(request)
 	if err != nil {
@@ -75,7 +74,6 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	return board, err
 }
 
-//TODO CHECK тут должна быть проверка на то, имеет ли пользователь право изменять данные доски (только админ!)
 func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.ChangeBoard(request)
 	if err != nil {

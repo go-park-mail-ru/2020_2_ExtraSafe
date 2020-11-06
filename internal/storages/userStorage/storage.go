@@ -57,7 +57,7 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 	err := s.db.QueryRow("SELECT userID, username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
 				Scan(&userID, &user.Username, &user.FullName, &user.Avatar)
 
-	//TODO сделать корректную обработку ошибок, приходящих из БД
+	//TODO error
 	if err != sql.ErrNoRows {
 		if err != nil {
 			fmt.Println(err)
@@ -77,7 +77,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 		return 0, models.UserOutside{}, models.ServeError{Codes: errors}
 	}
 
-	//TODO посмотреть способ нахождения последнего индекса из лекций по СУБД
+	//FIXME сделать исправление ID
 	var ID uint64 = 0
 	var quantityUsers uint64 = 0
 	err := s.db.QueryRow("SELECT COUNT(*) FROM users").Scan(&quantityUsers)
@@ -91,7 +91,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 						"",
 						"default/default_avatar.png")
 	if err != nil {
-		//TODO разработать код ошибок на стороне БД
+		//TODO error
 		fmt.Println(err)
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
@@ -107,14 +107,14 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 	return ID, user, nil
 }
 
-//TODO подумать, как сделать эту проверку компактнее
+//FIXME подумать, как сделать эту проверку компактнее
+//TODO разобраться с pq.Error (какая информация, как логировать)
 func (s *storage) checkExistingUser(email string, username string) (errorCodes []string) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
 		errorCodes = append(errorCodes, "201")
 	}
 
-	//TODO другие ошибки БД
 	err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan()
 	if err != sql.ErrNoRows {
 		errorCodes = append(errorCodes, "202")
@@ -147,7 +147,6 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 	err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
 		Scan(&user.Email, &user.Username, &user.FullName, &user.Avatar)
 
-	//TODO сделать корректную обработку ошибок, приходящих из БД
 	if err != sql.ErrNoRows {
 		if err != nil {
 			fmt.Println(err)
@@ -155,7 +154,7 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 		return user, nil
 	}
 
-	//TODO сделать правильную ошибку
+	//TODO error
 	return user, models.ServeError{Codes: []string{"101"}}
 }
 
@@ -179,7 +178,7 @@ func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutsid
 			return models.UserOutside{}, err
 		}
 
-		//TODO поиграться с рефлектами
+		//FIXME поиграться с рефлектами
 		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkName).SetString(link)
 	}
 
@@ -197,12 +196,12 @@ func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, 
 		return user, nil
 	}
 
-	//TODO сделать правильную ошибку
+	//TODO error
 	fmt.Println(err)
 	return user, models.ServeError{Codes: []string{string(http.StatusInternalServerError)}}
 
 }
-//TODO повозиться с моделью пользователя (в сервисе)
+
 func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error) {
 	errorCodes := s.checkExistingUserOnUpdate(userInput.Email, userInput.Username, userInput.ID)
 
@@ -213,7 +212,7 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 	_, err := s.db.Exec("UPDATE users SET email = $1, username = $2, fullname = $3, avatar = $4 WHERE userID = $5",
 		userInput.Email, userInput.Username, userInput.FullName, userAvatar.Avatar, userInput.ID)
 	if err != nil {
-		//TODO разработать код ошибок на стороне БД
+		//TODO error
 		fmt.Println(err)
 		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
@@ -237,7 +236,7 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 
 	networkNames := []string{"", "Telegram", "Instagram", "Github", "Bitbucket", "Vk", "Facebook"}
 
-	//TODO поиграться с рефлектами
+	//FIXME поиграться с рефлектами
 	input := reflect.ValueOf(userInput)
 	for i := 1; i < input.NumField(); i++ {
 		inputLink := input.Field(i).Interface().(string)
@@ -274,7 +273,7 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 
 	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userInput.Password, userInput.ID)
 	if err != nil {
-		//TODO разработать код ошибок на стороне БД
+		//TODO error
 		fmt.Println(err)
 		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
 	}
@@ -294,7 +293,7 @@ func (s *storage) getInternalUser(userInput models.UserInput) (models.UserOutsid
 		return user, password , nil
 
 	}
-	//TODO сделать корректную обработку ошибок, приходящих из БД
+	//TODO error
 	/*if err == sql.ErrNoRows {
 		return user, "", models.ServeError{Codes: []string{"101"}}
 	}*/

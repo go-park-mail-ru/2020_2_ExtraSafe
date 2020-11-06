@@ -31,7 +31,14 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 	var cardID uint64 = 0
 	var quantityCards uint64 = 0
 
-	//FIXME сделать по-другому поиск последнего ID
+
+	//FIXME сделать исправление ID :
+	// - запустить заново скрипт по созданию таблиц
+	// - убрать селекты по поиску последних ID
+	// - убрать из запросов вставку ID!!!
+	// - сделать Returning ID для заполнения выходной структуры
+	// - НИ В КОЕМ СЛУЧАЕ не вставлять вручную ID - автоинкремент сломается
+
 	err := s.db.QueryRow("SELECT COUNT(*) FROM cards").Scan(&quantityCards)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
@@ -43,7 +50,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 	_, err = s.db.Exec("INSERT INTO cards (cardID, boardID, cardName, cardOrder) VALUES ($1, $2, $3, $4)", cardID, cardInput.BoardID, cardInput.Name, cardInput.Order)
 
 	if err != nil {
-		//TODO в таких местах надо возвращать internal error (или как-то так), и записывать ошибку в лог
+		//TODO error
 		fmt.Println(err) 
 		return models.CardOutside{} ,models.ServeError{Codes: []string{"500"}}
 	}

@@ -31,7 +31,7 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 	var taskID uint64 = 0
 	var quantityTasks uint64 = 0
 
-	//FIXME сделать по-другому поиск последнего ID
+	//FIXME сделать исправление ID
 	err := s.db.QueryRow("SELECT COUNT(*) FROM tasks").Scan(&quantityTasks)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
@@ -44,7 +44,7 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 								taskID, taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order)
 
 	if err != nil {
-		//TODO в таких местах надо возвращать internal error (или как-то так), и записывать ошибку в лог
+		//TODO error
 		fmt.Println(err)
 		return models.TaskOutside{} ,models.ServeError{Codes: []string{"500"}}
 	}

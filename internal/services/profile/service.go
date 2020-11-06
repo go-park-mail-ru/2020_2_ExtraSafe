@@ -75,7 +75,7 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 	}
 
 	return user, err
-	//TODO здесь должны быть return по ошибкам
+	//TODO error
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {

@@ -77,7 +77,7 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 	var boardID uint64 = 0
 	var quantityBoards uint64 = 0
 
-	//FIXME сделать по-другому поиск последнего ID
+	//FIXME сделать исправление ID
 	err := s.db.QueryRow("SELECT COUNT(*) FROM boards").Scan(&quantityBoards)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
@@ -94,7 +94,7 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		boardInput.Star)
 
 	if err != nil {
-		fmt.Println(err) //TODO в таких местах надо возвращать internal error (или как-то так), и записывать ошибку в лог
+		fmt.Println(err) //TODO error
 		return models.BoardInternal{} ,models.ServeError{Codes: []string{"500"}}
 	}
 
@@ -222,8 +222,6 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 }
 
 func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
-	//TODO подумать, что делать с удалившимися айдишниками (они освобождаются)
-
 	_, err := s.db.Exec("DELETE FROM boards WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
 		fmt.Println(err)
