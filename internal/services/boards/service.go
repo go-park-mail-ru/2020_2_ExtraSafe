@@ -127,7 +127,7 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutside,
 }
 
 func (s *service) GetCard(request models.CardInput) (card models.CardOutside, err error) {
-	//card, err = s.boardStorage.GetCard(request)
+	card, err = s.boardStorage.GetCard(request)
 	if err != nil {
 		return models.CardOutside{}, err
 	}

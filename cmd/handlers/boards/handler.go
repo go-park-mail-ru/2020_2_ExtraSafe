@@ -12,10 +12,12 @@ type Handler interface {
 	BoardDelete(c echo.Context) error
 
 	CardCreate(c echo.Context) error
+	Card(c echo.Context) error
 	CardChange(c echo.Context) error
 	CardDelete(c echo.Context) error
 
 	TaskCreate(c echo.Context) error
+	Task(c echo.Context) error
 	TaskChange(c echo.Context) error
 	TaskDelete(c echo.Context) error
 }
@@ -124,6 +126,25 @@ func (h *handler) CardCreate(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+func (h *handler) Card(c echo.Context) error {
+	userInput, err := h.boardsTransport.CardChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	card, err := h.boardsService.GetCard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.CardWrite(card)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 func (h *handler) CardChange(c echo.Context) error {
 	userInput, err := h.boardsTransport.CardChangeRead(c)
 	if err != nil {
@@ -173,7 +194,27 @@ func (h *handler) TaskCreate(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	return c.JSON(http.StatusOK, response)}
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) Task(c echo.Context) error {
+	userInput, err := h.boardsTransport.TaskChangeRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	task, err := h.boardsService.GetTask(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.TaskWrite(task)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
 
 func (h *handler) TaskChange(c echo.Context) error {
 	userInput, err := h.boardsTransport.TaskChangeRead(c)

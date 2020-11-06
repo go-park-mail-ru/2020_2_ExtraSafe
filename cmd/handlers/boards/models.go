@@ -12,10 +12,12 @@ type boardsService interface {
 	DeleteBoard(request models.BoardInput) (err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutside, err error)
+	GetCard(request models.CardInput) (card models.CardOutside, err error)
 	ChangeCard(request models.CardInput) (card models.CardOutside, err error)
 	DeleteCard(request models.CardInput) (err error)
 
 	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
+	GetTask(request models.TaskInput) (task models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
 }
