@@ -55,7 +55,7 @@ type ResponseCard struct {
 
 type ResponseTask struct {
 	Status int `json:"status"`
-	TaskID      uint64 `json:"task_id"`
+	TaskID      uint64 `json:"taskID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Order       uint8  `json:"order"`
