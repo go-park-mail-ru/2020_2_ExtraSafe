@@ -77,7 +77,6 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 		return 0, models.UserOutside{}, models.ServeError{Codes: errors}
 	}
 
-	//FIXME сделать исправление ID
 	var ID uint64
 
 	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
