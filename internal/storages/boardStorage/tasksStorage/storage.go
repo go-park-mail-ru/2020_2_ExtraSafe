@@ -28,20 +28,10 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	var taskID uint64 = 0
-	var quantityTasks uint64 = 0
+	var taskID uint64
 
-	//FIXME сделать исправление ID
-	err := s.db.QueryRow("SELECT COUNT(*) FROM tasks").Scan(&quantityTasks)
-	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
-		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
-	}
-
-	taskID = quantityTasks + 1
-
-	_, err = s.db.Exec("INSERT INTO tasks (taskID, cardID, taskName, description, tasksOrder) VALUES ($1, $2, $3, $4, $5)",
-								taskID, taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order)
+	err := s.db.QueryRow("INSERT INTO tasks (cardID, taskName, description, tasksOrder) VALUES ($1, $2, $3, $4) RETURNING taskID",
+								taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).Scan(&taskID)
 
 	if err != nil {
 		//TODO error

@@ -78,18 +78,14 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 	}
 
 	//FIXME сделать исправление ID
-	var ID uint64 = 0
-	var quantityUsers uint64 = 0
-	err := s.db.QueryRow("SELECT COUNT(*) FROM users").Scan(&quantityUsers)
-	ID = quantityUsers + 1
+	var ID uint64
 
-	_, err = s.db.Exec("INSERT INTO users (userID, email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5, $6)",
-						ID,
+	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
 						userInput.Email,
 						userInput.Password,
 						userInput.Username,
 						"",
-						"default/default_avatar.png")
+						"default/default_avatar.png").Scan(&ID)
 	if err != nil {
 		//TODO error
 		fmt.Println(err)

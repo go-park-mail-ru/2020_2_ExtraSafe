@@ -74,24 +74,13 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 }
 
 func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
-	var boardID uint64 = 0
-	var quantityBoards uint64 = 0
+	var boardID uint64
 
-	//FIXME сделать исправление ID
-	err := s.db.QueryRow("SELECT COUNT(*) FROM boards").Scan(&quantityBoards)
-	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
-		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
-	}
-
-	boardID = quantityBoards + 1
-
-	_, err = s.db.Exec("INSERT INTO boards (boardID, adminID, boardName, theme, star) VALUES ($1, $2, $3, $4, $5)",
-		boardID,
+	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
 		boardInput.UserID,
 		boardInput.BoardName,
 		boardInput.Theme,
-		boardInput.Star)
+		boardInput.Star).Scan(&boardID)
 
 	if err != nil {
 		fmt.Println(err) //TODO error

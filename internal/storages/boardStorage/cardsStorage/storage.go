@@ -28,26 +28,10 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
-	var cardID uint64 = 0
-	var quantityCards uint64 = 0
+	var cardID uint64
 
-
-	//FIXME сделать исправление ID :
-	// - запустить заново скрипт по созданию таблиц
-	// - убрать селекты по поиску последних ID
-	// - убрать из запросов вставку ID!!!
-	// - сделать Returning ID для заполнения выходной структуры
-	// - НИ В КОЕМ СЛУЧАЕ не вставлять вручную ID - автоинкремент сломается
-
-	err := s.db.QueryRow("SELECT COUNT(*) FROM cards").Scan(&quantityCards)
-	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
-		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
-	}
-
-	cardID = quantityCards + 1
-
-	_, err = s.db.Exec("INSERT INTO cards (cardID, boardID, cardName, cardOrder) VALUES ($1, $2, $3, $4)", cardID, cardInput.BoardID, cardInput.Name, cardInput.Order)
+	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
+								cardInput.BoardID, cardInput.Name, cardInput.Order).Scan(&cardID)
 
 	if err != nil {
 		//TODO error
