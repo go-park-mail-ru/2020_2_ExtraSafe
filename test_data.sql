@@ -8,3 +8,4 @@ INSERT INTO boards values (1, 1, 'board_1', 'dark', false),
 INSERT INTO board_members values (1, 2), (1, 3), (2, 1),(2, 3);
 
 --INSERT INTO users values (2, 'epridius@yandex.ru', 'pkaterina', 'Lalala', '', 'default/default_avatar.png');
+INSERT INTO users (email, password, username, fullname, avatar) values ('epridius@yandex.ru', 'pkaterina', 'Lalala', '', 'default/default_avatar.png');

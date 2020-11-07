@@ -356,13 +356,12 @@ func (s *storage) checkBoardUserPermission(userID uint64, boardID uint64) (flag 
 }
 
 func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) {
-	boardID, err := s.cardsStorage.CheckCardAccessory(cardID)
-	if err != nil {
-		fmt.Println(err)	//log
-		return models.ServeError{Codes: []string{"500"}}
-	}
+	var boardID uint64
 
-	err = s.db.QueryRow("SELECT B.boardID FROM boards B LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE (B.adminID = $1 OR  M.userID = $1) AND B.boardID = $2;", userID, boardID).Scan(&boardID)
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
+								"JOIN cards C on C.boardID = B.boardID " +
+								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
+								"WHERE (B.adminID = $1 OR  M.userID = $1) AND cardID = $2;", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}}
@@ -376,11 +375,21 @@ func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) 
 }
 
 func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) {
-	cardID, err := s.tasksStorage.CheckTaskAccessory(taskID)
-	if err != nil {
-		fmt.Println(err)	//log
+	var boardID uint64
+
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
+							"JOIN cards C on C.boardID = B.boardID " +
+							"JOIN tasks T on T.cardID = C.cardID" +
+							"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
+							"WHERE (B.adminID = $1 OR  M.userID = $1) AND taskID = $2;", userID, taskID).Scan(&boardID)
+	if err != nil && err != sql.ErrNoRows {
+		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}}
 	}
 
-	return s.CheckCardPermission(userID, cardID)
+	if err == sql.ErrNoRows {
+		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+	}
+
+	return nil
 }
