@@ -1,7 +1,6 @@
 package boards
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -65,7 +64,6 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 
 	members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
-		fmt.Println("lll")
 		return models.BoardOutside{}, err
 	}
 
@@ -161,7 +159,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside,
 }
 
 func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
-	//task, err = s.boardStorage.GetTask(request)
+	task, err = s.boardStorage.GetTask(request)
 	if err != nil {
 		return models.TaskOutside{}, err
 	}
