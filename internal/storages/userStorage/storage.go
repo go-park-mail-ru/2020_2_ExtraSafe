@@ -216,6 +216,7 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 		Username : userInput.Username,
 		Email : userInput.Email,
 		FullName : userInput.FullName,
+		Avatar : userAvatar.Avatar,
 	}
 
 
