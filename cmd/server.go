@@ -31,7 +31,7 @@ import (
 
 func main() {
 	//TODO вынести в отдельный bash скрипт (в докере)
-	clearDataStore()
+	//clearDataStore()
 
 	var cfg config
 	err := envconfig.Process("", &cfg)
@@ -82,7 +82,7 @@ func main() {
 	sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(usersStorage, boardsStorage, validationService)
 	authTransport := auth.NewTransport()
-	profileService := profile.NewService(usersStorage, avatarStorage, validationService)
+	profileService := profile.NewService(usersStorage, avatarStorage, boardsStorage, validationService)
 	profileTransport := profile.NewTransport()
 	boardsService := boards.NewService(usersStorage, boardsStorage, validationService)
 	boardsTransport := boards.NewTransport()

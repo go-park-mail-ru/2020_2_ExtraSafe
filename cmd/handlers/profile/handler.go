@@ -8,6 +8,7 @@ import (
 type Handler interface {
 	Profile(c echo.Context) error
 	Accounts(c echo.Context) error
+	Boards(c echo.Context) error
 	ProfileChange(c echo.Context) error
 	AccountsChange(c echo.Context) error
 	PasswordChange(c echo.Context) error
@@ -57,6 +58,24 @@ func (h *handler) Accounts(c echo.Context) error {
 	}
 
 	response, err := h.profileTransport.AccountsWrite(user)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) Boards(c echo.Context) error {
+	userInput, err := h.profileTransport.ProfileRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	boards, err := h.profileService.Boards(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.profileTransport.BoardsWrite(boards)
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}

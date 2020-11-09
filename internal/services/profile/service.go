@@ -7,6 +7,7 @@ import (
 type Service interface {
 	Profile(request models.UserInput) (user models.UserOutside, err error)
 	Accounts(request models.UserInput) (user models.UserOutside, err error)
+	Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error)
 	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
 	AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error)
 	PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error)
@@ -15,13 +16,16 @@ type Service interface {
 type service struct {
 	userStorage userStorage
 	avatarStorage avatarStorage
+	boardStorage boardStorage
 	validator validator
 }
 
-func NewService(userStorage userStorage, avatarStorage avatarStorage, validator validator) Service {
+func NewService(userStorage userStorage, avatarStorage avatarStorage, boardStorage boardStorage,
+	validator validator) Service {
 	return &service{
 		userStorage: userStorage,
 		avatarStorage: avatarStorage,
+		boardStorage: boardStorage,
 		validator: validator,
 	}
 }
@@ -42,6 +46,15 @@ func (s *service) Accounts(request models.UserInput) (user models.UserOutside, e
 	}
 
 	return user, err
+}
+
+func (s *service) Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error) {
+	boards, err = s.boardStorage.GetBoardsList(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return boards, err
 }
 
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error) {

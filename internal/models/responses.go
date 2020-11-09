@@ -45,6 +45,11 @@ type ResponseBoard struct {
 	Cards   []CardOutside      `json:"cards"`
 }
 
+type ResponseBoards struct {
+	Status int                 `json:"status"`
+	Boards []BoardOutsideShort `json:"boards"`
+}
+
 type ResponseCard struct {
 	Status  int          `json:"status"`
 	CardID uint64        `json:"cardID"`

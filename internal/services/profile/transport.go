@@ -13,6 +13,7 @@ type Transport interface {
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
 	AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error)
+	BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error)
 	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
 
@@ -82,6 +83,12 @@ func (t transport)AccountsWrite(user models.UserOutside) (response models.Respon
 	response.Vk = user.Links.Vk
 	response.Facebook = user.Links.Facebook
 	response.Avatar = user.Avatar
+	return response, nil
+}
+
+func (t transport)BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error) {
+	response.Status = 200
+	response.Boards = boards
 	return response, nil
 }
 
