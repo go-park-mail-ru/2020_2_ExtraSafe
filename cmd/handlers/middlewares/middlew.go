@@ -1,7 +1,9 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"net/http"
@@ -12,6 +14,7 @@ type Middleware interface {
 	CORS() echo.MiddlewareFunc
 	CookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc
+	CSRFToken(next echo.HandlerFunc) echo.HandlerFunc
 	CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
@@ -76,6 +79,44 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Request().Header.Get("X-CSRF-Token")
+		fmt.Println(token)
+		userID := c.Get("userId").(uint64)
+
+		err := csrf.CheckToken(userID, token)
+		if err != nil {
+			newToken, _ := csrf.GenerateToken(userID)
+			return m.errorWorker.TokenError(c, newToken)
+		}
+
+		return next(c)
+	}
+}
+
+/*func (m middlew) RequestLogger(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		start := time.Now()
+		result := next(c)
+		if result != nil {
+			logger.Error("%s %s %d %s",
+				c.Request().Method,
+				c.Request().RequestURI,
+				c.Response().Status,
+				time.Since(start))
+		} else {
+			logger.Infof("%s %s %d %s",
+				c.Request().Method,
+				c.Request().RequestURI,
+				c.Response().Status,
+				time.Since(start))
+		}
+		return result
+	}
+}*/
+
 
 func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {

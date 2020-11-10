@@ -2,6 +2,7 @@ package authHandler
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -59,7 +60,9 @@ func (h *handler) Login(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.LoginWrite()
+	token, _ := csrf.GenerateToken(userID)
+
+	response, err := h.authTransport.LoginWrite(token)
 	if err != nil {
 		return h.errorWorker.TransportError(c)
 	}

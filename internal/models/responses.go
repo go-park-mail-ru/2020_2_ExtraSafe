@@ -4,6 +4,11 @@ type ResponseStatus struct {
 	Status   int    `json:"status"`
 }
 
+type ResponseToken struct {
+	Status int    `json:"status"`
+	Token  string `json:"token"`
+}
+
 type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`

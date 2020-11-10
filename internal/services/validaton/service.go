@@ -1,5 +1,5 @@
 package validaton
-
+//TODO - вынести валидацию в тулсы
 import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"

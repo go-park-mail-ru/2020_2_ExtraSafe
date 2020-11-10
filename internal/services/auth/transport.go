@@ -11,7 +11,7 @@ type Transport interface {
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
 	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
-	LoginWrite() (response models.ResponseStatus, err error)
+	LoginWrite(token string) (response models.ResponseToken, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }
 
@@ -57,8 +57,9 @@ func (t transport)AuthWrite(user models.UserBoardsOutside) (response models.Resp
 	return response, err
 }
 
-func (t transport)LoginWrite() (response models.ResponseStatus, err error)  {
+func (t transport)LoginWrite(token string) (response models.ResponseToken, err error)  {
 	response.Status = 200
+	response.Token = token
 	return response, err
 }
 

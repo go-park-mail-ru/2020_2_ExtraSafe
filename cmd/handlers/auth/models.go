@@ -17,7 +17,7 @@ type authTransport interface {
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
 	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
-	LoginWrite() (response models.ResponseStatus, err error)
+	LoginWrite(token string) (response models.ResponseToken, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }
 
