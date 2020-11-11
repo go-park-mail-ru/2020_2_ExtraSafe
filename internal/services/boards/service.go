@@ -23,12 +23,12 @@ type Service interface {
 }
 
 type service struct {
-	userStorage userStorage
-	boardStorage boardStorage
-	validator validator
+	userStorage  UserStorage
+	boardStorage BoardStorage
+	validator    Validator
 }
 
-func NewService(userStorage userStorage, boardStorage boardStorage, validator validator) Service {
+func NewService(userStorage UserStorage, boardStorage BoardStorage, validator Validator) Service {
 	return &service{
 		userStorage: userStorage,
 		boardStorage: boardStorage,
@@ -161,7 +161,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside,
 }
 
 func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
-	//task, err = s.boardStorage.GetTask(request)
+	//task, err = s.BoardStorage.GetTask(request)
 	if err != nil {
 		return models.TaskOutside{}, err
 	}

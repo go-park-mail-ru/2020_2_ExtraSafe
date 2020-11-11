@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"net/http"
 )
 
 type Storage interface {
@@ -36,12 +35,12 @@ type Storage interface {
 }
 
 type storage struct {
-	db *sql.DB
-	cardsStorage cardsStorage
-	tasksStorage tasksStorage
+	db           *sql.DB
+	cardsStorage CardsStorage
+	tasksStorage TasksStorage
 }
 
-func NewStorage(db *sql.DB, cardsStorage cardsStorage, tasksStorage tasksStorage) Storage {
+func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage) Storage {
 	return &storage{
 		db: db,
 		cardsStorage: cardsStorage,
@@ -51,7 +50,6 @@ func NewStorage(db *sql.DB, cardsStorage cardsStorage, tasksStorage tasksStorage
 
 func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error) {
 	boards := make([]models.BoardOutsideShort, 0)
-
 
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
 									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
@@ -133,9 +131,10 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
-		board.Cards = append(board.Cards, card)
+
 	}
 
+	board.Cards = append(board.Cards, cards...)
 	return board, nil
 	/*if err != nil && err != sql.ErrNoRows {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
@@ -319,7 +318,7 @@ func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bo
 	}
 
 	if !ok {
-		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+		return models.ServeError{Codes: []string{"403"}}
 	}
 
 	return nil
@@ -368,7 +367,7 @@ func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) 
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+		return models.ServeError{Codes: []string{"403"}}
 	}
 
 	return nil
@@ -389,7 +388,7 @@ func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) 
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{string(http.StatusForbidden)}}
+		return models.ServeError{Codes: []string{"403"}}
 	}
 
 	return nil

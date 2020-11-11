@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>userStorage: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage/storage.go (51.8%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package userStorage
+
+import (
+        "bytes"
+        "crypto/rand"
+        "database/sql"
+        "fmt"
+        "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+        "golang.org/x/crypto/argon2"
+        "reflect"
+)
+/* users table
+        userID      BIGSERIAL PRIMARY KEY,
+        email       TEXT,
+        password    TEXT,
+        username    TEXT,
+        fullname    TEXT,
+        avatar      TEXT
+*/
+
+/* social_links table
+        userID      BIGSERIAL,
+        networkName TEXT,
+        link TEXT
+*/
+type Storage interface {
+        CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
+        CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
+
+        GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
+        GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
+        GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
+        GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+
+        ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
+        ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
+        ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
+
+        CheckExistingUser(email string, username string) (errorCodes []string)
+        CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string)
+        GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
+}
+
+type storage struct {
+        Users    *[]models.User
+        db *sql.DB
+}
+
+func NewStorage(db *sql.DB, someUsers *[]models.User) Storage <span class="cov0" title="0">{
+        return &amp;storage{
+                db: db,
+                Users: someUsers,
+        }
+}</span>
+
+func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error) <span class="cov0" title="0">{
+        user := models.UserOutside{}
+        var userID uint64
+
+        pass := make([]byte, 0)
+        err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
+                                Scan(&amp;userID, &amp;pass, &amp;user.Username, &amp;user.FullName, &amp;user.Avatar)
+
+        //TODO error
+        switch err </span>{
+        case sql.ErrNoRows:<span class="cov0" title="0">
+                return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}</span>
+        case nil:<span class="cov0" title="0">
+                /*passValid := checkPass(pass, userInput.Password)
+                fmt.Printf("passValid: %v, pass: %x\n", passValid, pass)
+                user.Email = userInput.Email
+                user.Links = &amp;models.UserLinks{}
+                return userID, user, nil*/
+                break</span>
+        default:<span class="cov0" title="0">
+                fmt.Println(err)
+                return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}</span>
+        }
+
+        <span class="cov0" title="0">passValid := checkPass(pass, userInput.Password)
+        if !passValid </span><span class="cov0" title="0">{
+                return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
+        }</span>
+        <span class="cov0" title="0">fmt.Printf("passValid: %v\n", passValid)
+        user.Email = userInput.Email
+        user.Links = &amp;models.UserLinks{}
+        return userID, user, nil</span>
+}
+
+func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) <span class="cov0" title="0">{
+        errors := s.CheckExistingUser(userInput.Email, userInput.Username)
+        if len(errors) != 0 </span><span class="cov0" title="0">{
+                return 0, models.UserOutside{}, models.ServeError{Codes: errors}
+        }</span>
+
+        <span class="cov0" title="0">var ID uint64
+
+
+        salt := make([]byte, 8)
+        rand.Read(salt)
+        fmt.Printf("salt: %x\n", salt)
+        hashedPass := hashPass(salt, userInput.Password)
+
+        err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
+                                                userInput.Email,
+                                                hashedPass,
+                                                userInput.Username,
+                                                "",
+                                                "default/default_avatar.png").Scan(&amp;ID)
+        if err != nil </span><span class="cov0" title="0">{
+                //TODO error
+                fmt.Println(err)
+                return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+        }</span>
+
+        <span class="cov0" title="0">user := models.UserOutside{
+                Email:    userInput.Email,
+                Username: userInput.Username,
+                FullName: "",
+                Links:    &amp;models.UserLinks{},
+                Avatar:   "default/default_avatar.png",
+        }
+
+        return ID, user, nil</span>
+}
+
+//FIXME подумать, как сделать эту проверку компактнее
+//TODO разобраться с pq.Error (какая информация, как логировать)
+func (s *storage) CheckExistingUser(email string, username string) (errorCodes []string) <span class="cov8" title="1">{
+        err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
+        if err != sql.ErrNoRows </span><span class="cov0" title="0">{
+                errorCodes = append(errorCodes, "201")
+        }</span>
+
+        <span class="cov8" title="1">err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan()
+        if err != sql.ErrNoRows </span><span class="cov0" title="0">{
+                errorCodes = append(errorCodes, "202")
+        }</span>
+
+        <span class="cov8" title="1">fmt.Println(err)
+        return errorCodes</span>
+}
+
+func (s *storage) CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string)<span class="cov8" title="1">{
+        var existingUserID uint64 = 0
+
+        err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan(&amp;existingUserID)
+        if err != sql.ErrNoRows &amp;&amp; existingUserID != userID </span><span class="cov0" title="0">{
+                errorCodes = append(errorCodes, "301")
+        }</span>
+
+        <span class="cov8" title="1">err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan(&amp;existingUserID)
+        if err != sql.ErrNoRows &amp;&amp; existingUserID != userID  </span><span class="cov0" title="0">{
+                errorCodes = append(errorCodes, "302")
+        }</span>
+
+        <span class="cov8" title="1">fmt.Println(err)
+        return errorCodes</span>
+}
+
+func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside, error) <span class="cov8" title="1">{
+        user := models.UserOutside{Links: &amp;models.UserLinks{}}
+
+        err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
+                Scan(&amp;user.Email, &amp;user.Username, &amp;user.FullName, &amp;user.Avatar)
+
+        if err != sql.ErrNoRows </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov8" title="1">{
+                        fmt.Println(err)
+                        return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+                }</span>
+                <span class="cov8" title="1">return user, nil</span>
+        }
+
+        //TODO error
+        <span class="cov8" title="1">return user, models.ServeError{Codes: []string{"101"}}</span>
+}
+
+func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) <span class="cov8" title="1">{
+        user, err := s.GetUserProfile(userInput)
+        if err != nil </span><span class="cov0" title="0">{
+                return models.UserOutside{}, err
+        }</span>
+
+        <span class="cov8" title="1">rows, err := s.db.Query("SELECT networkName, link FROM social_links WHERE userID = $1", userInput.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return models.UserOutside{}, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        for rows.Next() </span><span class="cov8" title="1">{
+                var networkName, link string
+
+                err = rows.Scan(&amp;networkName, &amp;link)
+                if err != nil </span><span class="cov0" title="0">{
+                        return models.UserOutside{}, err
+                }</span>
+
+                //FIXME поиграться с рефлектами
+                <span class="cov8" title="1">reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkName).SetString(link)</span>
+        }
+
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+
+func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error) <span class="cov8" title="1">{
+        user := models.UserAvatar{}
+
+        err := s.db.QueryRow("SELECT avatar FROM users WHERE userID = $1", userInput.ID).
+                Scan(&amp;user.Avatar)
+
+        if err == nil </span><span class="cov8" title="1">{
+                user.ID = userInput.ID
+                return user, nil
+        }</span>
+
+        //TODO error
+        <span class="cov8" title="1">fmt.Println(err)
+        return user, models.ServeError{Codes: []string{"500"}}</span>
+
+}
+
+func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error) <span class="cov8" title="1">{
+        errorCodes := s.CheckExistingUserOnUpdate(userInput.Email, userInput.Username, userInput.ID)
+
+        if len(errorCodes) != 0 </span><span class="cov0" title="0">{
+                return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+        }</span>
+
+        <span class="cov8" title="1">_, err := s.db.Exec("UPDATE users SET email = $1, username = $2, fullname = $3, avatar = $4 WHERE userID = $5",
+                userInput.Email, userInput.Username, userInput.FullName, userAvatar.Avatar, userInput.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                //TODO error
+                fmt.Println(err)
+                return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+        }</span>
+
+        <span class="cov8" title="1">user := models.UserOutside {
+                Username : userInput.Username,
+                Email : userInput.Email,
+                FullName : userInput.FullName,
+                Avatar : userAvatar.Avatar,
+        }
+
+
+        return user, nil</span>
+}
+
+func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error) <span class="cov8" title="1">{
+        user, err := s.GetUserAccounts(models.UserInput{ ID : userInput.ID })
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+                return models.UserOutside{}, err
+        }</span>
+
+        <span class="cov8" title="1">networkNames := []string{"", "Telegram", "Instagram", "Github", "Bitbucket", "Vk", "Facebook"}
+
+        //FIXME поиграться с рефлектами
+        input := reflect.ValueOf(userInput)
+        for i := 1; i &lt; input.NumField(); i++ </span><span class="cov8" title="1">{
+                inputLink := input.Field(i).Interface().(string)
+                if  inputLink == reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+
+                //curNetwork :=
+                <span class="cov8" title="1">if reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() == "" </span><span class="cov8" title="1">{
+                        _, err = s.db.Exec("INSERT INTO social_links (userID, networkName, link) VALUES ($1, $2, $3)", userInput.ID, networkNames[i], inputLink)
+                }</span> else<span class="cov8" title="1"> if inputLink == "" </span><span class="cov8" title="1">{
+                        _, err = s.db.Exec("DELETE FROM social_links WHERE userID = $1 AND networkName = $2", userInput.ID, networkNames[i])
+                }</span> else<span class="cov8" title="1"> {
+                        _, err = s.db.Exec("UPDATE social_links SET link = $1 WHERE userID = $2 AND networkName = $3", inputLink, userInput.ID, networkNames[i])
+                }</span>
+
+                <span class="cov8" title="1">reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).SetString(inputLink)</span>
+        }
+
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error) <span class="cov0" title="0">{
+        user, password, err := s.GetInternalUser(models.UserInput{ ID : userInput.ID})
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+                return models.UserOutside{}, err
+        }</span>
+
+        <span class="cov0" title="0">if !checkPass(password, userInput.OldPassword) </span><span class="cov0" title="0">{
+                errorCodes := []string{"501"}
+                return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+        }</span>
+        /*if userInput.OldPassword != password {
+                errorCodes := []string{"501"}
+                return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+        }
+*/
+        <span class="cov0" title="0">salt := make([]byte, 8)
+        rand.Read(salt)
+        userPassHash := hashPass(salt, userInput.Password)
+        _, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userPassHash, userInput.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                //TODO error
+
+                fmt.Println(err)
+                return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+        }</span>
+
+        <span class="cov0" title="0">return user, nil</span>
+}
+
+func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error) <span class="cov8" title="1">{
+        user := models.UserOutside{Links: &amp;models.UserLinks{}}
+        var password []byte
+
+        err := s.db.QueryRow("SELECT email, password, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
+                Scan(&amp;user.Email, &amp;password, &amp;user.Username, &amp;user.FullName, &amp;user.Avatar)
+
+        if err == nil </span><span class="cov8" title="1">{
+                return user, password , nil
+        }</span>
+        //TODO error
+        /*if err == sql.ErrNoRows {
+                return user, "", models.ServeError{Codes: []string{"101"}}
+        }*/
+
+        //могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
+        <span class="cov0" title="0">return user, nil, models.ServeError{Codes: []string{"500"}}</span>
+}
+
+func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) <span class="cov8" title="1">{
+        members := make([]models.UserOutsideShort, 0)
+
+        for _, userID := range userIDs </span><span class="cov8" title="1">{
+                user := models.UserOutsideShort{}
+                err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userID).
+                        Scan(&amp;user.Email, &amp;user.Username, &amp;user.FullName, &amp;user.Avatar)
+
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println(err)
+                        return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}}
+                }</span>
+
+                <span class="cov8" title="1">members = append(members, user)</span>
+                }
+
+        <span class="cov8" title="1">return members, nil</span>
+}
+
+func hashPass(salt []byte, plainPassword string) []byte <span class="cov0" title="0">{
+        hashedPass := argon2.IDKey([]byte(plainPassword), salt, 1, 64*1024, 4, 32)
+        return append(salt, hashedPass...)
+}</span>
+
+func checkPass(passHash []byte, plainPassword string) bool <span class="cov0" title="0">{
+        salt := make([]byte, 8)
+        copy(salt, passHash)
+        userPassHash := hashPass(salt, plainPassword)
+        return bytes.Equal(userPassHash, passHash)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

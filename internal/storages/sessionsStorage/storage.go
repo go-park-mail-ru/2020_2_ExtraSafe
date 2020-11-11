@@ -6,6 +6,8 @@ import (
 	"github.com/tarantool/go-tarantool"
 )
 
+//go:generate mockgen -destination=./mock/mock_sessionsStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage Storage
+
 type Storage interface {
 	DeleteUserSession(sessionId string) error
 	CreateUserSession(userId uint64, SID string) error

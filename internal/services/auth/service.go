@@ -11,12 +11,12 @@ type Service interface {
 }
 
 type service struct {
-	userStorage userStorage
-	boardStorage boardStorage
-	validator validator
+	userStorage  UserStorage
+	boardStorage BoardStorage
+	validator    Validator
 }
 
-func NewService(userStorage userStorage, boardStorage boardStorage, validator validator) Service {
+func NewService(userStorage UserStorage, boardStorage BoardStorage, validator Validator) Service {
 	return &service{
 		boardStorage: boardStorage,
 		userStorage: userStorage,
@@ -40,6 +40,7 @@ func (s *service) Auth(request models.UserInput) (response models.UserBoardsOuts
 	response.Avatar = user.Avatar
 	response.FullName = user.FullName
 	response.Email = user.Email
+	response.Username = user.Username
 
 	return response, err
 }
