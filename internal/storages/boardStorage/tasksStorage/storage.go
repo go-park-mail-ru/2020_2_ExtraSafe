@@ -13,8 +13,6 @@ type Storage interface {
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
-
-	CheckTaskAccessory(taskID uint64) (cardID uint64, err error)
 }
 
 type storage struct {
@@ -117,13 +115,4 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, e
 	}
 
 	return task, nil
-}
-
-func (s *storage) CheckTaskAccessory(taskID uint64) (cardID uint64, err error) {
-	err = s.db.QueryRow("SELECT cardID FROM tasks WHERE taskID = $1", taskID).Scan(&cardID)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-	return cardID, nil
 }

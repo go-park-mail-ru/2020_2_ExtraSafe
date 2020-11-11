@@ -79,10 +79,10 @@ type UserInputReg struct {
 }
 
 type UserInputProfile struct {
-	ID       uint64 `json:"-"`
-	Email    string `json:"email" valid:"required~311, emailValid~311"`
-	Username string `json:"username" valid:"required~312, userNameValid~312"`
-	FullName string `json:"fullName" valid:"fullNameValid~314"`
+	ID       uint64                `json:"-"`
+	Email    string                `json:"email" valid:"required~311, emailValid~311"`
+	Username string                `json:"username" valid:"required~312, userNameValid~312"`
+	FullName string                `json:"fullName" valid:"fullNameValid~314"`
 	Avatar   *multipart.FileHeader `json:"-"`
 }
 

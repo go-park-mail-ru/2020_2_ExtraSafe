@@ -4,11 +4,15 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
-type userStorage interface {
+//go:generate mockgen -destination=./mock/mock_userStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards UserStorage
+//go:generate mockgen -destination=./mock/mock_boardStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards BoardStorage
+//go:generate mockgen -destination=./mock/mock_validator.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards Validator
+
+type UserStorage interface {
 	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
-type boardStorage interface {
+type BoardStorage interface {
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
@@ -26,7 +30,7 @@ type boardStorage interface {
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 
-type validator interface {
+type Validator interface {
 	ValidateLogin(request models.UserInputLogin) (err error)
 	ValidateRegistration(request models.UserInputReg) (err error)
 }
