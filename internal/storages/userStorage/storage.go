@@ -63,8 +63,7 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
 		//user.Boards = make(models.Board, 0)
-		return userID, user, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-			MethodName: "CheckUser"}
+		return userID, user, nil
 	}
 
 	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
@@ -115,7 +114,7 @@ func (s *storage) checkExistingUser(email string, username string) (multiErrors 
 	err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan()
 	if err != sql.ErrNoRows {
 		multiErrors.Codes = append(multiErrors.Codes, "202")
-		multiErrors.Descriptions = append(multiErrors.Descriptions, "Email is already exist")
+		multiErrors.Descriptions = append(multiErrors.Descriptions, "Username is already exist")
 	}
 
 	fmt.Println(err)

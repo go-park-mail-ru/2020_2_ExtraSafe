@@ -5,8 +5,10 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/rs/zerolog"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Middleware interface {
@@ -14,6 +16,7 @@ type Middleware interface {
 	CookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc
 	CSRFToken(next echo.HandlerFunc) echo.HandlerFunc
+	Logger(next echo.HandlerFunc) echo.HandlerFunc
 	CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
@@ -26,16 +29,18 @@ type middlew struct {
 	authService authService
 	authTransport authTransport
 	boardStorage boardStorage
+	logger *zerolog.Logger
 }
 
 func NewMiddleware(sessionsService sessionsService, errorWorker errorWorker, authService authService,
-	authTransport authTransport, boardStorage boardStorage) Middleware {
+	authTransport authTransport, boardStorage boardStorage, logger *zerolog.Logger) Middleware {
 	return middlew{
 		sessionsService: sessionsService,
 		errorWorker: errorWorker,
 		authService: authService,
 		authTransport: authTransport,
 		boardStorage: boardStorage,
+		logger: logger,
 	}
 }
 
@@ -94,19 +99,59 @@ func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func (m middlew) Logger(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := next(c)
+
+		if err == nil {
+			infoLog := m.logger.Info()
+			infoLog.
+				Time("Request time",time.Now()).
+				Str("URL", c.Request().RequestURI).
+				Int("Status", c.Response().Status)
+			infoLog.Send()
+			return err
+		}
+
+		for i, code := range err.(models.ServeError).Codes {
+			errLog := m.logger.Error()
+			if code == models.ServerError {
+				errLog.
+					Time("Request time",time.Now()).
+					Str("URL", c.Request().RequestURI).
+					Int("Status", c.Response().Status).
+					Str("Error code", code).
+					Err(err).
+					Str("In function", err.(models.ServeError).MethodName)
+				errLog.Send()
+			} else {
+				errLog.
+					Time("Request time", time.Now()).
+					Str("URL", c.Request().RequestURI).
+					Int("Status", c.Response().Status).
+					Str("Error code", code).
+					Str("Error ", err.(models.ServeError).Descriptions[i]).
+					Str("In function", err.(models.ServeError).MethodName)
+				errLog.Send()
+			}
+		}
+		return m.errorWorker.RespError(c, err)
+	}
+}
+
 func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		bid := c.Param("ID")
 		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
-			return c.NoContent(http.StatusBadRequest)
+			return err
 		}
 
 		userID := c.Get("userId").(uint64)
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, false)
 		if err != nil {
-			return c.NoContent(http.StatusForbidden)
+			return err
 		}
 
 		c.Set("boardID", bid)
@@ -127,7 +172,7 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, true)
 		if err != nil {
-			return c.NoContent(http.StatusForbidden)
+			return err
 		}
 
 		c.Set("boardID", bid)
@@ -148,10 +193,8 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		err = m.boardStorage.CheckCardPermission(userID, cardID)
 		if err != nil {
-			return c.NoContent(http.StatusForbidden)
+			return err
 		}
-
-		//c.Set("boardID", cid)
 
 		return next(c)
 	}
@@ -169,10 +212,8 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		err = m.boardStorage.CheckTaskPermission(userID, taskID)
 		if err != nil {
-			return c.NoContent(http.StatusForbidden)
+			return err
 		}
-
-		//c.Set("boardID", tid)
 
 		return next(c)
 	}

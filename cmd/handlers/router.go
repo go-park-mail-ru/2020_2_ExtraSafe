@@ -11,6 +11,8 @@ import (
 func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handler, board boardsHandler.Handler,
 	middle middlewares.Middleware) {
 
+	e.Use(middle.Logger)
+
 	e.Any("/", middle.CookieSession(auth.Auth))
 	e.POST("/login/", middle.AuthCookieSession(auth.Login))
 	e.GET("/logout/", auth.Logout)

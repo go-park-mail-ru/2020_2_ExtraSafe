@@ -32,7 +32,8 @@ func (t transport)RegRead(c echo.Context) (request models.UserInputReg, err erro
 	userInput := new(models.UserInputReg)
 
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputReg{}, err
+		return models.UserInputReg{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "RegRead"}
 	}
 	return *userInput, nil
 }
@@ -41,7 +42,8 @@ func (t transport)LoginRead(c echo.Context) (request models.UserInputLogin, err 
 	userInput := new(models.UserInputLogin)
 
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputLogin{}, err
+		return models.UserInputLogin{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "LoginRead"}
 	}
 	return *userInput, nil
 }

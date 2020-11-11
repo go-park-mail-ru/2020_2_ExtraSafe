@@ -9,6 +9,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/lib/pq v1.8.0
+	github.com/rs/zerolog v1.20.0
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/tarantool/go-tarantool v0.0.0-20200816172506-a535b8e0224a
 	github.com/valyala/fasttemplate v1.2.1 // indirect

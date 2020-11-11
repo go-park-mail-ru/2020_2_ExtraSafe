@@ -24,6 +24,8 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog"
+	_ "github.com/rs/zerolog/log"
 	"github.com/tarantool/go-tarantool"
 	"os"
 	"path/filepath"
@@ -64,6 +66,7 @@ func main() {
 		fmt.Println("Connection refused")
 	}
 
+	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	someUsers := make([]models.User, 0)
 //	userSessions := make(map[string]uint64, 10)
@@ -87,7 +90,8 @@ func main() {
 	boardsService := boards.NewService(usersStorage, boardsStorage, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport, boardsStorage)
+	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport,
+		boardsStorage, &log)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
