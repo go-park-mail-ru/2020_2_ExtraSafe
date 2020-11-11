@@ -20,8 +20,8 @@ func NewErrorWorker() ErrorWorker {
 }
 
 type ResponseError struct {
-	Status        int      `json:"status"`
-	Codes         []string `json:"codes"`
+	Status int      `json:"status"`
+	Codes  []string `json:"codes"`
 }
 
 type ResponseTokenError struct {
@@ -50,4 +50,9 @@ func (e errorWorker) TokenError(c echo.Context, token string) (err error) {
 	responseErr.Status = 600
 	responseErr.Token = token
 	return c.JSON(http.StatusBadRequest, responseErr)
+}
+
+func (e errorWorker) LoggingErrors(serveError error) {
+
+
 }

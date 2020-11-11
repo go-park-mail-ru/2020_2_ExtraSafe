@@ -1,6 +1,7 @@
 package profileHandler
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -128,6 +129,7 @@ func (h *handler) PasswordChange(c echo.Context) error {
 
 	user, err := h.profileService.PasswordChange(userInput)
 	if err != nil {
+		fmt.Println(err.Error())
 		return h.errorWorker.RespError(c, err)
 	}
 

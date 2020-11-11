@@ -14,13 +14,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/sessions"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/validaton"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/cardsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/tasksStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/imgStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
@@ -78,7 +78,7 @@ func main() {
 	taskStorage := tasksStorage.NewStorage(db)
 	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)
 
-	validationService := validaton.NewService()
+	validationService := validation.NewService()
 	sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(usersStorage, boardsStorage, validationService)
 	authTransport := auth.NewTransport()

@@ -34,9 +34,9 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 								taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).Scan(&taskID)
 
 	if err != nil {
-		//TODO error
 		fmt.Println(err)
-		return models.TaskOutside{} ,models.ServeError{Codes: []string{"500"}}
+		return models.TaskOutside{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateTask"}
 	}
 
 	task := models.TaskOutside{
@@ -54,7 +54,8 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, er
 								taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID)
 	if err != nil {
 		fmt.Println(err)
-		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
+		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChangeTask"}
 	}
 
 	task := models.TaskOutside{
@@ -71,7 +72,7 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) error {
 	_, err := s.db.Exec("DELETE FROM tasks WHERE taskID = $1", taskInput.TaskID)
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteTask"}
 	}
 
 	return nil
@@ -82,7 +83,8 @@ func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutsi
 
 	rows, err := s.db.Query("SELECT taskID, taskName, description, tasksOrder FROM tasks WHERE cardID = $1", cardInput.CardID)
 	if err != nil {
-		return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
+		return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTasksByCard"}
 	}
 	defer rows.Close()
 
@@ -91,7 +93,8 @@ func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutsi
 
 		err = rows.Scan(&task.TaskID, &task.Name, &task.Description, &task.Order)
 		if err != nil {
-			return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
+			return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetTasksByCard"}
 		}
 
 		tasks = append(tasks, task)
@@ -109,7 +112,8 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, e
 
 	if err != nil {
 		fmt.Println(err)
-		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}}
+		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTaskByID"}
 	}
 
 	return task, nil

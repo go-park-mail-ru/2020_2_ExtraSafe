@@ -92,6 +92,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
+//TODO избавиться от указателя
 func writeBoardOutside(boardInternal models.BoardInternal, board *models.BoardOutside, members []models.UserOutsideShort)  {
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name

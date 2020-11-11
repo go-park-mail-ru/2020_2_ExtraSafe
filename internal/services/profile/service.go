@@ -58,7 +58,7 @@ func (s *service) Boards(request models.UserInput) (boards []models.BoardOutside
 }
 
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error) {
-	errorCodes := make([]string, 0)
+	multiErrors := new(models.MultiErrors)
 
 	err = s.validator.ValidateProfile(request)
 	if err != nil {
@@ -67,28 +67,32 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 
 	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: request.ID})
 	if errGetAvatar != nil {
-		errorCodes = append(errorCodes, errGetAvatar.(models.ServeError).Codes...)
-		return user, models.ServeError{Codes: errorCodes}
+		return user, errGetAvatar
 	}
 
 	if request.Avatar != nil {
 		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar)
 		if errAvatar != nil {
-			errorCodes = append(errorCodes, errAvatar.(models.ServeError).Codes...)
+			multiErrors.Codes = append(multiErrors.Codes, errAvatar.(models.ServeError).Codes...)
+			multiErrors.Descriptions = append(multiErrors.Descriptions, errAvatar.(models.ServeError).Descriptions...)
 		}
 	}
 
 	user, errProfile := s.userStorage.ChangeUserProfile(request, userAvatar)
 	if errProfile != nil {
-		errorCodes = append(errorCodes, errProfile.(models.ServeError).Codes...)
+		if errProfile.(models.ServeError).Codes[0] == models.ServerError {
+			return user, errProfile
+		}
+		multiErrors.Codes = append(multiErrors.Codes, errProfile.(models.ServeError).Codes...)
+		multiErrors.Descriptions = append(multiErrors.Descriptions, errProfile.(models.ServeError).Descriptions...)
 	}
 
-	if len(errorCodes) != 0 {
-		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+	if len(multiErrors.Codes) != 0 {
+		return models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions,
+			MethodName: "ProfileChange"}
 	}
 
 	return user, err
-	//TODO error
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {

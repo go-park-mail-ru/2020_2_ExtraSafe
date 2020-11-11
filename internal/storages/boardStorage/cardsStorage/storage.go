@@ -34,9 +34,9 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 								cardInput.BoardID, cardInput.Name, cardInput.Order).Scan(&cardID)
 
 	if err != nil {
-		//TODO error
-		fmt.Println(err) 
-		return models.CardOutside{} ,models.ServeError{Codes: []string{"500"}}
+		fmt.Println(err)
+		return models.CardOutside{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateCard"}
 	}
 	
 	card := models.CardOutside{
@@ -52,7 +52,8 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, er
 	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order, cardInput.CardID)
 	if err != nil {
 		fmt.Println(err)
-		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
+		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChangeCard"}
 	}
 
 	card := models.CardOutside{
@@ -67,7 +68,7 @@ func (s *storage) DeleteCard(cardInput models.CardInput) error {
 	_, err := s.db.Exec("DELETE FROM cards WHERE cardID = $1", cardInput.CardID)
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteCard"}
 	}
 
 	return nil
@@ -78,7 +79,8 @@ func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOu
 
 	rows, err := s.db.Query("SELECT cardID, cardName, cardOrder FROM cards WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
+		return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetCardsByBoard"}
 	}
 	defer rows.Close()
 
@@ -87,7 +89,8 @@ func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOu
 
 		err = rows.Scan(&card.CardID, &card.Name, &card.Order)
 		if err != nil {
-			return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
+			return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetCardsByBoard"}
 		}
 
 		cards = append(cards, card)
@@ -104,7 +107,8 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, e
 
 	if err != nil {
 		fmt.Println(err)
-		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}}
+		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetCardByID"}
 	}
 
 	return card, nil
