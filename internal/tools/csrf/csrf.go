@@ -30,6 +30,7 @@ func CheckToken(userID uint64, tokenString string) (err error) {
 		return mySigningKey, nil
 	})
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -37,12 +38,11 @@ func CheckToken(userID uint64, tokenString string) (err error) {
 	if !ok || !token.Valid {
 		return errors.New("Token is not valid ")
 	}
+
 	UID := strconv.FormatUint(userID, 10)
 	tokenUID := strconv.FormatFloat(claims["uid"].(float64), 'f', 0, 64)
-	fmt.Printf("%T\n", tokenUID)
-	fmt.Println(tokenUID)
+
 	if tokenUID != UID {
-		fmt.Println(1111111)
 		return errors.New("Invalid user in token ")
 	}
 	return nil
