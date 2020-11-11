@@ -19,6 +19,7 @@ type Service interface {
 	GetTask(request models.TaskInput) (board models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
+	TasksOrderChange(request models.TasksOrderInput) (err error)
 }
 
 type service struct {
@@ -179,6 +180,15 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside,
 
 func (s *service) DeleteTask(request models.TaskInput) (err error) {
 	err = s.boardStorage.DeleteTask(request)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
+	err = s.boardStorage.ChangeTaskOrder(request)
 	if err != nil {
 		return err
 	}

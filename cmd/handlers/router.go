@@ -41,4 +41,6 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/task/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.TaskCreate)))
 	e.PUT("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskChange)))
 	e.DELETE("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskDelete)))
+
+	//e.POST("/task-order/:ID/", )
 }

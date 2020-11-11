@@ -246,4 +246,19 @@ func (h *handler) TaskDelete(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)}
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TaskOrder(c echo.Context) error {
+	userInput, err := h.boardsTransport.TasksOrderRead(c)
+	if err != nil {
+		return err
+	}
+
+	err = h.boardsService.TasksOrderChange(userInput)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
