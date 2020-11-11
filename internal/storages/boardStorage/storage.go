@@ -19,6 +19,7 @@ type Storage interface {
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 	DeleteTask(taskInput models.TaskInput) error
 
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
@@ -274,6 +275,11 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, er
 		return models.TaskOutside{}, nil
 	}
 	return task, nil
+}
+
+//FIXME IMPLEMENT
+func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
+	return nil
 }
 
 func (s *storage) DeleteTask(taskInput models.TaskInput) error {
