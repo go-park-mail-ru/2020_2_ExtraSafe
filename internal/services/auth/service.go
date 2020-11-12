@@ -30,13 +30,15 @@ func (s *service) Auth(request models.UserInput) (response models.UserBoardsOuts
 		return models.UserBoardsOutside{}, err
 	}
 
+	links, _ := s.userStorage.GetUserAccounts(request)
+
 	boards, err := s.boardStorage.GetBoardsList(request)
 	if err != nil {
 		return models.UserBoardsOutside{}, err
 	}
 
 	response.Boards = boards
-	response.Links = user.Links
+	response.Links = links.Links
 	response.Avatar = user.Avatar
 	response.FullName = user.FullName
 	response.Username = user.Username

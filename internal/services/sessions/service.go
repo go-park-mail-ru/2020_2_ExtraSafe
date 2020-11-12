@@ -1,8 +1,8 @@
 package sessions
 
 import (
-	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"math/rand"
 	"net/http"
@@ -69,13 +69,13 @@ func (s *service)CheckCookie(c echo.Context) (uint64, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
 		fmt.Println(err)
-		return 0, err
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCookie"}
 	}
 	sessionID := session.Value
 
 	userId, err := s.sessionsStorage.CheckUserSession(sessionID)
 	if err != nil {
-		return 0, errors.New("Not auth ")
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCookie"}
 
 	}
 	return userId, nil

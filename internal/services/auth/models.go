@@ -8,6 +8,7 @@ type userStorage interface {
 	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
 	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
+	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 }
 
 type boardStorage interface {

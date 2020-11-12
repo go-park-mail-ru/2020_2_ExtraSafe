@@ -123,7 +123,7 @@ func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	for _, card := range taskInput.Cards {
 		for _, task := range card.Tasks {
 			_, err := s.db.Exec("UPDATE tasks SET cardID = $1, tasksOrder = $2 WHERE taskID = $3",
-				card.CardID, task.Order, task.Order)
+				card.CardID, task.Order, task.TaskID)
 
 			if err != nil {
 				fmt.Println(err)

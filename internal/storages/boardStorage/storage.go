@@ -33,8 +33,6 @@ type Storage interface {
 	checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error)
 	checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error)
 	getBoardMembers(boardInput models.BoardInput) ([]uint64, error)
-
-	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 
 type storage struct {
@@ -412,9 +410,5 @@ func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) 
 			MethodName: "CheckTaskPermission"}
 	}
 
-	return nil
-}
-
-func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	return nil
 }
