@@ -132,10 +132,10 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
-
+		board.Cards = append(board.Cards, card)
 	}
 
-	board.Cards = append(board.Cards, cards...)
+	//board.Cards = append(board.Cards, cards...)
 	return board, nil
 }
 
