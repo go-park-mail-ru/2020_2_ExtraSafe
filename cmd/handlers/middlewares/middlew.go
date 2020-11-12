@@ -51,7 +51,7 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 			"http://95.163.213.142",
 			"http://127.0.0.1:3033",
 			"http://tabutask.ru"},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-CSRF-Token"},
 		AllowCredentials: true,
 	})
 }
@@ -77,7 +77,8 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 			userInput := new(models.UserInput)
 			userInput.ID = userId
 			user, _ := m.authService.Auth(*userInput)
-			response, err := m.authTransport.AuthWrite(user)
+			token, _ := csrf.GenerateToken(userId)
+			response, err := m.authTransport.AuthWrite(user, token)
 			if err != nil {
 				if err := m.errorWorker.RespError(c, err); err != nil {
 					return err

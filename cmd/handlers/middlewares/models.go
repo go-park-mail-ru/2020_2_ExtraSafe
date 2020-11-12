@@ -22,7 +22,7 @@ type authService interface {
 }
 
 type authTransport interface {
-	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
+	AuthWrite(user models.UserBoardsOutside, token string) (response models.ResponseUserAuth, err error)
 }
 
 type boardStorage interface {

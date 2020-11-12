@@ -46,7 +46,9 @@ func (h *handler) Auth(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
+	token, _ := csrf.GenerateToken(userInput.ID)
+
+	response, err := h.authTransport.AuthWrite(user, token)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
