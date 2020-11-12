@@ -1,7 +1,6 @@
 package boards
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -20,6 +19,7 @@ type Service interface {
 	GetTask(request models.TaskInput) (board models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
+	TasksOrderChange(request models.TasksOrderInput) (err error)
 }
 
 type service struct {
@@ -65,7 +65,6 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 
 	members, err := s.userStorage.GetBoardMembers(membersIDs)
 	if err != nil {
-		fmt.Println("lll")
 		return models.BoardOutside{}, err
 	}
 
@@ -94,6 +93,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
+//TODO избавиться от указателя
 func writeBoardOutside(boardInternal models.BoardInternal, board *models.BoardOutside, members []models.UserOutsideShort)  {
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name
@@ -180,6 +180,15 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside,
 
 func (s *service) DeleteTask(request models.TaskInput) (err error) {
 	err = s.boardStorage.DeleteTask(request)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
+	err = s.boardStorage.ChangeTaskOrder(request)
 	if err != nil {
 		return err
 	}

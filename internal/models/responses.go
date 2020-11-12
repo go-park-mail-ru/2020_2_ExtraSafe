@@ -4,6 +4,11 @@ type ResponseStatus struct {
 	Status   int    `json:"status"`
 }
 
+type ResponseToken struct {
+	Status int    `json:"status"`
+	Token  string `json:"token"`
+}
+
 type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
@@ -43,6 +48,11 @@ type ResponseBoard struct {
 	Star    bool               `json:"star"`
 	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
 	Cards   []CardOutside      `json:"cards"`
+}
+
+type ResponseBoards struct {
+	Status int                 `json:"status"`
+	Boards []BoardOutsideShort `json:"boards"`
 }
 
 type ResponseCard struct {

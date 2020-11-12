@@ -54,7 +54,8 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
 									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
 	if err != nil {
-		return []models.BoardOutsideShort{}, err
+		return []models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoardsList"}
 	}
 	defer rows.Close()
 
@@ -63,7 +64,8 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 
 		err = rows.Scan(&board.BoardID, &board.Name, &board.Theme, &board.Star)
 		if err != nil {
-			return []models.BoardOutsideShort{}, err
+			return []models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetBoardsList"}
 		}
 
 		boards = append(boards, board)
@@ -81,8 +83,9 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		boardInput.Star).Scan(&boardID)
 
 	if err != nil {
-		fmt.Println(err) //TODO error
-		return models.BoardInternal{} ,models.ServeError{Codes: []string{"500"}}
+		fmt.Println(err)
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateBoard"}
 	}
 
 	board := models.BoardInternal{
@@ -106,7 +109,8 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 
 	if err != nil {
 		fmt.Println(err)
-		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoard"}
 	}
 
 	members, err := s.getBoardMembers(boardInput)
@@ -150,7 +154,7 @@ func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error
 
 	rows, err := s.db.Query("SELECT userID from board_members WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		return []uint64{}, models.ServeError{Codes: []string{"500"}}
+		return []uint64{}, models.ServeError{Codes: []string{"500"}, MethodName: "getBoardMembers"}
 	}
 	defer rows.Close()
 
@@ -159,7 +163,8 @@ func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error
 
 		err = rows.Scan(&userID)
 		if err != nil {
-			return []uint64{}, models.ServeError{Codes: []string{"500"}}
+			return []uint64{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "getBoardMembers"}
 		}
 
 		members = append(members, userID)
@@ -175,7 +180,8 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 								boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
 	if err != nil {
 		fmt.Println(err)
-		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChangeBoard"}
 	}
 
 	members, err := s.getBoardMembers(models.BoardInput{ BoardID: boardInput.BoardID })
@@ -213,7 +219,7 @@ func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
 	_, err := s.db.Exec("DELETE FROM boards WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteBoard"}
 	}
 
 	return nil
@@ -314,11 +320,12 @@ func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bo
 
 	if err != nil {
 		fmt.Println(err)	//log
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckBoardPermission"}
 	}
 
 	if !ok {
-		return models.ServeError{Codes: []string{"403"}}
+		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+			MethodName: "CheckBoardPermission"}
 	}
 
 	return nil
@@ -363,11 +370,12 @@ func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) 
 								"WHERE (B.adminID = $1 OR  M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}}
+		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+			MethodName: "CheckCardPermission"}
 	}
 
 	return nil
@@ -384,11 +392,12 @@ func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) 
 
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"500"}}
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}}
+		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+			MethodName: "CheckTaskPermission"}
 	}
 
 	return nil

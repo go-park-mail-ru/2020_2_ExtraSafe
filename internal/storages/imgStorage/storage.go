@@ -33,7 +33,8 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvat
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"401"}}
+		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
+			MethodName: "UploadAvatar"}
 	}
 	defer src.Close()
 
@@ -47,7 +48,8 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvat
 	filename, err := saveImage(&src, name)
 	if err != nil {
 		fmt.Println(err)
-		return models.ServeError{Codes: []string{"402"}}
+		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
+			MethodName: "UploadAvatar"}
 	}
 
 	user.Avatar = "avatars/" + filename

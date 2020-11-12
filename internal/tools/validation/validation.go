@@ -1,4 +1,4 @@
-package validaton
+package validation
 
 import (
 	"github.com/asaskevich/govalidator"
@@ -27,19 +27,20 @@ func NewService() Service {
 	return &service{}
 }
 
-func collectErrors(err error) error {
+/*func collectErrors(err error) error {
 	errorsCodes := make([]string, 0)
 	errs := err.(govalidator.Errors).Errors()
 	for _, e := range errs {
 		errorsCodes = append(errorsCodes, e.Error())
 	}
 	return models.ServeError{Codes: errorsCodes}
-}
+}*/
 
 func (s *service) ValidateLogin(request models.UserInputLogin) (err error) {
 	_, err = govalidator.ValidateStruct(request)
 	if err != nil {
-		return collectErrors(err)
+		return models.ServeError{Codes: []string{"900"}, Descriptions: []string{"Validation error"},
+			MethodName: "ValidateLogin"}
 	}
 	return nil
 }
@@ -47,7 +48,8 @@ func (s *service) ValidateLogin(request models.UserInputLogin) (err error) {
 func (s *service) ValidateRegistration(request models.UserInputReg) (err error) {
 	_, err = govalidator.ValidateStruct(request)
 	if err != nil {
-		return collectErrors(err)
+		return models.ServeError{Codes: []string{"900"}, Descriptions: []string{"Validation error"},
+			MethodName: "ValidateRegistration"}
 	}
 	return nil
 }
@@ -55,7 +57,8 @@ func (s *service) ValidateRegistration(request models.UserInputReg) (err error) 
 func (s *service) ValidateProfile(request models.UserInputProfile) (err error) {
 	_, err = govalidator.ValidateStruct(request)
 	if err != nil {
-		return collectErrors(err)
+		return models.ServeError{Codes: []string{"900"}, Descriptions: []string{"Validation error"},
+			MethodName: "ValidateProfile"}
 	}
 	return nil
 }
@@ -63,7 +66,8 @@ func (s *service) ValidateProfile(request models.UserInputProfile) (err error) {
 func (s *service) ValidateChangePassword(request models.UserInputPassword) (err error) {
 	_, err = govalidator.ValidateStruct(request)
 	if err != nil {
-		return collectErrors(err)
+		return models.ServeError{Codes: []string{"900"}, Descriptions: []string{"Validation error"},
+			MethodName: "ValidateChangePassword"}
 	}
 	return nil
 }
@@ -71,7 +75,8 @@ func (s *service) ValidateChangePassword(request models.UserInputPassword) (err 
 func (s *service) ValidateLinks(request models.UserInputLinks) (err error) {
 	_, err = govalidator.ValidateStruct(request)
 	if err != nil {
-		return collectErrors(err)
+		return models.ServeError{Codes: []string{"900"}, Descriptions: []string{"Validation error"},
+			MethodName: "ValidateLinks"}
 	}
 	return nil
 }

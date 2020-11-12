@@ -36,8 +36,8 @@ type Storage interface {
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
-	CheckExistingUser(email string, username string) (errorCodes []string)
-	CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string)
+	checkExistingUser(email string, username string) (errors models.MultiErrors)
+	checkExistingUserOnUpdate(email string, username string, userID uint64) (errors models.MultiErrors)
 	GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
 }
 
@@ -61,36 +61,42 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 	err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
 				Scan(&userID, &pass, &user.Username, &user.FullName, &user.Avatar)
 
-	//TODO error
-	switch err {
-	case sql.ErrNoRows:
-		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
-	case nil:
-		/*passValid := checkPass(pass, userInput.Password)
-		fmt.Printf("passValid: %v, pass: %x\n", passValid, pass)
+
+	if err != sql.ErrNoRows {
+		if err != nil {
+			fmt.Println(err)
+		}
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
-		return userID, user, nil*/
-		break
-	default:
-		fmt.Println(err)
-		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+		return userID, user, nil
 	}
 
-	passValid := checkPass(pass, userInput.Password)
-	if !passValid {
-		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
-	}
-	fmt.Printf("passValid: %v\n", passValid)
-	user.Email = userInput.Email
-	user.Links = &models.UserLinks{}
-	return userID, user, nil
+	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
+		"or password"}, MethodName: "CheckUser"}
+	//TODO error
+//	switch err {
+//	case sql.ErrNoRows:
+//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
+//	case nil:
+//		/*passValid := checkPass(pass, userInput.Password)
+//		fmt.Printf("passValid: %v, pass: %x\n", passValid, pass)
+//>>>>>>> 8d974589846a0a9b8ae49d500ad9131fc003166a
+//		user.Email = userInput.Email
+//		user.Links = &models.UserLinks{}
+//		return userID, user, nil*/
+//		break
+//	default:
+//		fmt.Println(err)
+//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+//	}
+
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
-	errors := s.CheckExistingUser(userInput.Email, userInput.Username)
-	if len(errors) != 0 {
-		return 0, models.UserOutside{}, models.ServeError{Codes: errors}
+	multiErrors := s.checkExistingUser(userInput.Email, userInput.Username)
+	if len(multiErrors.Codes) != 0 {
+		return 0, models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes,
+			Descriptions: multiErrors.Descriptions}
 	}
 
 	var ID uint64
@@ -108,9 +114,9 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 						"",
 						"default/default_avatar.png").Scan(&ID)
 	if err != nil {
-		//TODO error
 		fmt.Println(err)
-		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateUser"}
 	}
 
 	user := models.UserOutside{
@@ -126,36 +132,40 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 
 //FIXME подумать, как сделать эту проверку компактнее
 //TODO разобраться с pq.Error (какая информация, как логировать)
-func (s *storage) CheckExistingUser(email string, username string) (errorCodes []string) {
+func (s *storage) checkExistingUser(email string, username string) (multiErrors models.MultiErrors) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
-		errorCodes = append(errorCodes, "201")
+		multiErrors.Codes = append(multiErrors.Codes, "201")
+		multiErrors.Descriptions = append(multiErrors.Descriptions, "Email is already exist")
 	}
 
 	err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan()
 	if err != sql.ErrNoRows {
-		errorCodes = append(errorCodes, "202")
+		multiErrors.Codes = append(multiErrors.Codes, "202")
+		multiErrors.Descriptions = append(multiErrors.Descriptions, "Username is already exist")
 	}
 
 	fmt.Println(err)
-	return errorCodes
+	return multiErrors
 }
 
-func (s *storage) CheckExistingUserOnUpdate(email string, username string, userID uint64) (errorCodes []string){
+func (s *storage) checkExistingUserOnUpdate(email string, username string, userID uint64) (multiErrors models.MultiErrors){
 	var existingUserID uint64 = 0
 
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan(&existingUserID)
 	if err != sql.ErrNoRows && existingUserID != userID {
-		errorCodes = append(errorCodes, "301")
+		multiErrors.Codes = append(multiErrors.Codes, "301")
+		multiErrors.Descriptions = append(multiErrors.Descriptions, "Email is already exist")
 	}
 
 	err = s.db.QueryRow("SELECT userID FROM users WHERE username = $1", username).Scan(&existingUserID)
 	if err != sql.ErrNoRows && existingUserID != userID  {
-		errorCodes = append(errorCodes, "302")
+		multiErrors.Codes = append(multiErrors.Codes, "302")
+		multiErrors.Descriptions = append(multiErrors.Descriptions, "Username is already exist")
 	}
 
 	fmt.Println(err)
-	return errorCodes
+	return multiErrors
 }
 
 func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside, error) {
@@ -167,13 +177,13 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 	if err != sql.ErrNoRows {
 		if err != nil {
 			fmt.Println(err)
-			return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+			return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetUserProfile"}
 		}
 		return user, nil
 	}
 
-	//TODO error
-	return user, models.ServeError{Codes: []string{"101"}}
+	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserProfile"}
 }
 
 func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) {
@@ -184,7 +194,8 @@ func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutsid
 
 	rows, err := s.db.Query("SELECT networkName, link FROM social_links WHERE userID = $1", userInput.ID)
 	if err != nil {
-		return models.UserOutside{}, err
+		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetUserAccounts"}
 	}
 	defer rows.Close()
 
@@ -193,7 +204,8 @@ func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutsid
 
 		err = rows.Scan(&networkName, &link)
 		if err != nil {
-			return models.UserOutside{}, err
+			return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetUserAccounts"}
 		}
 
 		//FIXME поиграться с рефлектами
@@ -215,25 +227,24 @@ func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, 
 		return user, nil
 	}
 
-	//TODO error
 	fmt.Println(err)
-	return user, models.ServeError{Codes: []string{"500"}}
-
+	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserAvatar"}
 }
 
 func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error) {
-	errorCodes := s.CheckExistingUserOnUpdate(userInput.Email, userInput.Username, userInput.ID)
+	multiErrors := s.checkExistingUserOnUpdate(userInput.Email, userInput.Username, userInput.ID)
 
-	if len(errorCodes) != 0 {
-		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+	if len(multiErrors.Codes) != 0 {
+		return models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions,
+			MethodName: "ChangeUserProfile"}
 	}
 
 	_, err := s.db.Exec("UPDATE users SET email = $1, username = $2, fullname = $3, avatar = $4 WHERE userID = $5",
 		userInput.Email, userInput.Username, userInput.FullName, userAvatar.Avatar, userInput.ID)
 	if err != nil {
-		//TODO error
 		fmt.Println(err)
-		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChangeUserProfile"}
 	}
 
 	user := models.UserOutside {
@@ -287,23 +298,18 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 	}
 
 	if !checkPass(password, userInput.OldPassword) {
-		errorCodes := []string{"501"}
-		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
+		return models.UserOutside{}, models.ServeError{Codes: []string{"501"},
+			Descriptions: []string{"Passwords is not equal"}, MethodName: "ChangeUserPassword"}
 	}
-	/*if userInput.OldPassword != password {
-		errorCodes := []string{"501"}
-		return models.UserOutside{}, models.ServeError{Codes: errorCodes}
-	}
-*/
+
 	salt := make([]byte, 8)
 	rand.Read(salt)
 	userPassHash := hashPass(salt, userInput.Password)
 	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userPassHash, userInput.ID)
 	if err != nil {
-		//TODO error
-
 		fmt.Println(err)
-		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChangeUserPassword"}
 	}
 
 	return user, nil
@@ -325,7 +331,7 @@ func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutsid
 	}*/
 
 	//могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
-	return user, nil, models.ServeError{Codes: []string{"500"}}
+	return user, nil, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
 }
 
 func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) {
@@ -338,7 +344,8 @@ func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort,
 
 		if err != nil {
 			fmt.Println(err)
-			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}}
+			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetBoardMembers"}
 		}
 
 		members = append(members, user)

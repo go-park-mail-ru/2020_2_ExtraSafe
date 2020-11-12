@@ -13,6 +13,7 @@ type Transport interface {
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
 	AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error)
+	BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error)
 	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
 
@@ -32,7 +33,8 @@ func (t transport) ProfileRead(c echo.Context) (request models.UserInput, err er
 func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputProfile, err error) {
 	formParams, err := c.FormParams()
 	if err != nil {
-		return models.UserInputProfile{}, err
+		return models.UserInputProfile{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ProfileChangeRead"}
 	}
 
 	userInput := new(models.UserInputProfile)
@@ -50,10 +52,11 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 	return *userInput, nil
 }
 
-func (t transport)AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error) {
+func (t transport) AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error) {
 	userInput := new(models.UserInputLinks)
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputLinks{}, err
+		return models.UserInputLinks{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "AccountsChangeRead"}
 	}
 
 	userInput.ID = c.Get("userId").(uint64)
@@ -61,10 +64,11 @@ func (t transport)AccountsChangeRead(c echo.Context) (request models.UserInputLi
 	return *userInput, nil
 }
 
-func (t transport)PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error) {
+func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error) {
 	userInput := new(models.UserInputPassword)
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputPassword{}, err
+		return models.UserInputPassword{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "PasswordChangeRead"}
 	}
 
 	userInput.ID = c.Get("userId").(uint64)
@@ -85,7 +89,13 @@ func (t transport)AccountsWrite(user models.UserOutside) (response models.Respon
 	return response, nil
 }
 
-func (t transport)ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error) {
+func (t transport) BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error) {
+	response.Status = 200
+	response.Boards = boards
+	return response, nil
+}
+
+func (t transport) ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error) {
 	response.Status = 200
 	response.Email = user.Email
 	response.Username = user.Username

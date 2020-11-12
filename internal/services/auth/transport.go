@@ -11,7 +11,7 @@ type Transport interface {
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
 	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
-	LoginWrite() (response models.ResponseStatus, err error)
+	LoginWrite(token string) (response models.ResponseToken, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }
 
@@ -32,7 +32,8 @@ func (t transport) RegRead(c echo.Context) (request models.UserInputReg, err err
 	userInput := new(models.UserInputReg)
 
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputReg{}, err
+		return models.UserInputReg{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "RegRead"}
 	}
 	return *userInput, nil
 }
@@ -41,7 +42,8 @@ func (t transport) LoginRead(c echo.Context) (request models.UserInputLogin, err
 	userInput := new(models.UserInputLogin)
 
 	if err := c.Bind(userInput); err != nil {
-		return models.UserInputLogin{}, err
+		return models.UserInputLogin{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "LoginRead"}
 	}
 	return *userInput, nil
 }
@@ -57,8 +59,9 @@ func (t transport) AuthWrite(user models.UserBoardsOutside) (response models.Res
 	return response, err
 }
 
-func (t transport) LoginWrite() (response models.ResponseStatus, err error)  {
+func (t transport)LoginWrite(token string) (response models.ResponseToken, err error)  {
 	response.Status = 200
+	response.Token = token
 	return response, err
 }
 

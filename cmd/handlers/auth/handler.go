@@ -1,7 +1,7 @@
 package authHandler
 
 import (
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -32,17 +32,17 @@ func NewHandler(authService authService, authTransport authTransport, authSessio
 func (h *handler) Auth(c echo.Context) error {
 	userInput, err := h.authTransport.AuthRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	user, err := h.authService.Auth(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		return err
 	}
 
 	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -51,21 +51,23 @@ func (h *handler) Auth(c echo.Context) error {
 func (h *handler) Login(c echo.Context) error {
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	userID, _, err := h.authService.Login(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		return err
 	}
 
-	response, err := h.authTransport.LoginWrite()
+	token, _ := csrf.GenerateToken(userID)
+
+	response, err := h.authTransport.LoginWrite(token)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	if err := h.authSessions.SetCookie(c, userID); err != nil {
-		return c.JSON(http.StatusInternalServerError, response)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -74,25 +76,25 @@ func (h *handler) Login(c echo.Context) error {
 func (h *handler) Logout(c echo.Context) error {
 	err := h.authSessions.DeleteCookie(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ResponseUser{})
+		return err
 	}
-	return c.JSON(http.StatusOK, models.ResponseUser{})
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *handler) Registration(c echo.Context) error{
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	userID, _, err := h.authService.Registration(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		return err
 	}
 
 	response, err := h.authTransport.RegWrite()
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		return err
 	}
 
 	h.authSessions.SetCookie(c, userID)

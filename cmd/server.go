@@ -14,16 +14,18 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/sessions"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/validaton"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/cardsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/tasksStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/imgStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog"
+	_ "github.com/rs/zerolog/log"
 	"github.com/tarantool/go-tarantool"
 	"os"
 	"path/filepath"
@@ -31,7 +33,7 @@ import (
 
 func main() {
 	//TODO вынести в отдельный bash скрипт (в докере)
-	clearDataStore()
+	//clearDataStore()
 
 	var cfg config
 	err := envconfig.Process("", &cfg)
@@ -64,6 +66,7 @@ func main() {
 		fmt.Println("Connection refused")
 	}
 
+	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	someUsers := make([]models.User, 0)
 //	userSessions := make(map[string]uint64, 10)
@@ -78,16 +81,17 @@ func main() {
 	taskStorage := tasksStorage.NewStorage(db)
 	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)
 
-	validationService := validaton.NewService()
+	validationService := validation.NewService()
 	sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(usersStorage, boardsStorage, validationService)
 	authTransport := auth.NewTransport()
-	profileService := profile.NewService(usersStorage, avatarStorage, validationService)
+	profileService := profile.NewService(usersStorage, avatarStorage, boardsStorage, validationService)
 	profileTransport := profile.NewTransport()
 	boardsService := boards.NewService(usersStorage, boardsStorage, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport, boardsStorage)
+	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport,
+		boardsStorage, &log)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)

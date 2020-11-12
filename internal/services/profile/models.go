@@ -23,6 +23,10 @@ type AvatarStorage interface {
 	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
 }
 
+type boardStorage interface {
+	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
+}
+
 type Validator interface {
 	ValidateProfile(request models.UserInputProfile) (err error)
 	ValidateChangePassword(request models.UserInputPassword) (err error)

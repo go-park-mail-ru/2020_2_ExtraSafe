@@ -11,6 +11,8 @@ import (
 func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handler, board boardsHandler.Handler,
 	middle middlewares.Middleware) {
 
+	e.Use(middle.Logger)
+
 	e.Any("/", middle.CookieSession(auth.Auth))
 	e.POST("/login/", middle.AuthCookieSession(auth.Login))
 	e.GET("/logout/", auth.Logout)
@@ -18,6 +20,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 
 	e.GET("/profile/", middle.CookieSession(profile.Profile))
 	e.GET("/accounts/", middle.CookieSession(profile.Accounts))
+	e.GET("/boards/", middle.CookieSession(profile.Boards))
 	e.POST("/profile/", middle.CookieSession(profile.ProfileChange))
 	e.POST("/accounts/", middle.CookieSession(profile.AccountsChange))
 	e.POST("/password/", middle.CookieSession(profile.PasswordChange))
@@ -38,4 +41,6 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/task/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.TaskCreate)))
 	e.PUT("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskChange)))
 	e.DELETE("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskDelete)))
+
+	//e.POST("/task-order/:ID/", )
 }

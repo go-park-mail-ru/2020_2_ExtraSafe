@@ -27,6 +27,7 @@ type BoardStorage interface {
 	GetTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	DeleteTask(taskInput models.TaskInput) error
+	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 
 type Validator interface {

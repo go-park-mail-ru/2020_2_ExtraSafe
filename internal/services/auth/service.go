@@ -39,6 +39,7 @@ func (s *service) Auth(request models.UserInput) (response models.UserBoardsOuts
 	response.Links = user.Links
 	response.Avatar = user.Avatar
 	response.FullName = user.FullName
+	response.Username = user.Username
 	response.Email = user.Email
 	response.Username = user.Username
 

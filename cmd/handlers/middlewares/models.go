@@ -14,6 +14,7 @@ type sessionsService interface {
 type errorWorker interface {
 	RespError(c echo.Context, serveError error) (err error)
 	TransportError(c echo.Context) (err error)
+	TokenError(c echo.Context, token string) (err error)
 }
 
 type authService interface {

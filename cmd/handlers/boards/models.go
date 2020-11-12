@@ -20,6 +20,7 @@ type boardsService interface {
 	GetTask(request models.TaskInput) (task models.TaskOutside, err error)
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
+	TasksOrderChange(request models.TasksOrderInput) (err error)
 }
 
 type boardsTransport interface {
@@ -32,6 +33,7 @@ type boardsTransport interface {
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
 	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
+	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
 }
 
 type errorWorker interface {
