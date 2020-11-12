@@ -19,6 +19,7 @@ type ResponseUser struct {
 
 type ResponseUserAuth struct {
 	Status   int                 `json:"status"`
+	Token    string              `json:"token"`
 	Email    string              `json:"email"`
 	Username string              `json:"username"`
 	FullName string              `json:"fullName"`
