@@ -30,8 +30,8 @@ type TaskOrder struct {
 }
 
 type TasksOrder struct {
-	CardID uint64      `json:"firstCardID"`
-	Tasks       []TaskOrder `json:"tasks"`
+	CardID uint64      `json:"cardID"`
+	Tasks  []TaskOrder `json:"tasks"`
 }
 
 type TasksOrderInput struct {

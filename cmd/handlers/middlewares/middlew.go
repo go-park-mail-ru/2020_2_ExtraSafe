@@ -61,6 +61,9 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		userId, err := m.sessionsService.CheckCookie(c)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 		c.Set("userId", userId)
@@ -77,6 +80,9 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 			user, _ := m.authService.Auth(*userInput)
 			response, err := m.authTransport.AuthWrite(user)
 			if err != nil {
+				if err := m.errorWorker.RespError(c, err); err != nil {
+					return err
+				}
 				return err
 			}
 			return c.JSON(http.StatusOK, response)
