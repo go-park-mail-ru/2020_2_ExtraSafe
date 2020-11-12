@@ -164,3 +164,8 @@ func TestService_PasswordChange(t *testing.T) {
 		return
 	}
 }
+
+//FIXME IMPLEMENT
+func TestService_Boards(t *testing.T) {
+
+}
