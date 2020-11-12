@@ -65,6 +65,21 @@ func (mr *MockUserStorageMockRecorder) CreateUser(arg0 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserStorage)(nil).CreateUser), arg0)
 }
 
+// GetUserAccounts mocks base method
+func (m *MockUserStorage) GetUserAccounts(arg0 models.UserInput) (models.UserOutside, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserAccounts", arg0)
+	ret0, _ := ret[0].(models.UserOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserAccounts indicates an expected call of GetUserAccounts
+func (mr *MockUserStorageMockRecorder) GetUserAccounts(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAccounts", reflect.TypeOf((*MockUserStorage)(nil).GetUserAccounts), arg0)
+}
+
 // GetUserProfile mocks base method
 func (m *MockUserStorage) GetUserProfile(arg0 models.UserInput) (models.UserOutside, error) {
 	m.ctrl.T.Helper()

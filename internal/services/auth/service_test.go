@@ -24,6 +24,13 @@ func TestService_Auth(t *testing.T) {
 		Avatar:   "default/default_avatar.png",
 	}
 
+	expect := models.UserOutside {
+		Email:    "epridius@gmail.com",
+		Username: "pkaterinaa",
+		FullName: "",
+		Avatar:   "default/default_avatar.png",
+		//Links : &models.UserLinks{},
+	}
 	board1 := models.BoardOutsideShort{
 		BoardID: 1,
 		Name:    "board_1",
@@ -44,6 +51,7 @@ func TestService_Auth(t *testing.T) {
 	userInput := models.UserInput{ID: 1}
 
 	mockUserStorage.EXPECT().GetUserProfile(userInput).Return(expectedUser, nil)
+	mockUserStorage.EXPECT().GetUserAccounts(userInput).Return(expect, nil)
 	mockBoardStorage.EXPECT().GetBoardsList(userInput).Return(expectedBoards, nil)
 
 	service := &service{
