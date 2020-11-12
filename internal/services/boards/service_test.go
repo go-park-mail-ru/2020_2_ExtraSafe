@@ -351,7 +351,34 @@ func TestService_DeleteCard(t *testing.T) {
 }
 
 func TestService_GetCard(t *testing.T) {
+	ctrlBoards := gomock.NewController(t)
+	defer ctrlBoards.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoards)
 
+	service := &service{
+		boardStorage: mockBoardStorage,
+	}
+
+	cardInput := models.CardInput{ CardID: 1 }
+
+	expectedCardOutside := models.CardOutside{
+		CardID: cardInput.CardID,
+		Name:   cardInput.Name,
+		Order:  cardInput.Order,
+		Tasks:  []models.TaskOutside{},
+	}
+
+	mockBoardStorage.EXPECT().GetCard(cardInput).Return(expectedCardOutside, nil)
+
+	card, err := service.GetCard(cardInput)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(card, expectedCardOutside) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedCardOutside, card)
+		return
+	}
 }
 
 func TestService_CreateTask(t *testing.T) {
@@ -392,13 +419,89 @@ func TestService_CreateTask(t *testing.T) {
 }
 
 func TestService_ChangeTask(t *testing.T) {
+	ctrlBoards := gomock.NewController(t)
+	defer ctrlBoards.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoards)
 
+	service := &service{
+		boardStorage: mockBoardStorage,
+	}
+
+	taskInput := models.TaskInput{
+		UserID:  1,
+		CardID:  1,
+		TaskID: 1,
+		Name:    "task",
+		Order:   1,
+	}
+
+	expectedTaskOutside := models.TaskOutside{
+		TaskID: taskInput.TaskID,
+		Name:   taskInput.Name,
+		Order:  taskInput.Order,
+		Description: taskInput.Description,
+	}
+
+	mockBoardStorage.EXPECT().ChangeTask(taskInput).Return(expectedTaskOutside, nil)
+
+	task, err := service.ChangeTask(taskInput)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(task, expectedTaskOutside) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedTaskOutside, task)
+		return
+	}
 }
 
 func TestService_DeleteTask(t *testing.T) {
+	ctrlBoards := gomock.NewController(t)
+	defer ctrlBoards.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoards)
 
+	service := &service{
+		boardStorage: mockBoardStorage,
+	}
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	mockBoardStorage.EXPECT().DeleteTask(taskInput)
+
+	err := service.DeleteTask(taskInput)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
 }
 
 func TestService_GetTask(t *testing.T) {
+	ctrlBoards := gomock.NewController(t)
+	defer ctrlBoards.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoards)
 
+	service := &service{
+		boardStorage: mockBoardStorage,
+	}
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	expectedTaskOutside := models.TaskOutside{
+		TaskID: taskInput.TaskID,
+		Name:   "task",
+		Order:  1,
+		Description: "lalala",
+	}
+
+	mockBoardStorage.EXPECT().GetTask(taskInput).Return(expectedTaskOutside, nil)
+
+	task, err := service.GetTask(taskInput)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(task, expectedTaskOutside) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedTaskOutside, task)
+		return
+	}
 }

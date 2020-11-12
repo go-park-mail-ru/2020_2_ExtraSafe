@@ -13,12 +13,12 @@ type Service interface {
 }
 
 type service struct {
-	userStorage userStorage
-	avatarStorage avatarStorage
-	validator validator
+	userStorage   UserStorage
+	avatarStorage AvatarStorage
+	validator     Validator
 }
 
-func NewService(userStorage userStorage, avatarStorage avatarStorage, validator validator) Service {
+func NewService(userStorage UserStorage, avatarStorage AvatarStorage, validator Validator) Service {
 	return &service{
 		userStorage: userStorage,
 		avatarStorage: avatarStorage,

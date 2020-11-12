@@ -161,7 +161,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside,
 }
 
 func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
-	//task, err = s.BoardStorage.GetTask(request)
+	task, err = s.boardStorage.GetTask(request)
 	if err != nil {
 		return models.TaskOutside{}, err
 	}

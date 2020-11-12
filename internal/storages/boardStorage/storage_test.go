@@ -292,7 +292,6 @@ func TestStorage_GetBoard(t *testing.T) {
 
 }
 
-//FIXME implement
 func TestStorage_GetBoardsList(t *testing.T) {
 /*
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
@@ -351,7 +350,6 @@ func TestStorage_GetBoardsList(t *testing.T) {
 	}
 }
 
-//FIXME implement
 func TestStorage_CheckBoardPermissionAdmin(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
