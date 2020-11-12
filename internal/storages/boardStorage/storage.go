@@ -33,17 +33,15 @@ type Storage interface {
 	checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error)
 	checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error)
 	getBoardMembers(boardInput models.BoardInput) ([]uint64, error)
-
-	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 
 type storage struct {
-	db *sql.DB
-	cardsStorage cardsStorage
-	tasksStorage tasksStorage
+	db           *sql.DB
+	cardsStorage CardsStorage
+	tasksStorage TasksStorage
 }
 
-func NewStorage(db *sql.DB, cardsStorage cardsStorage, tasksStorage tasksStorage) Storage {
+func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage) Storage {
 	return &storage{
 		db: db,
 		cardsStorage: cardsStorage,
@@ -53,7 +51,6 @@ func NewStorage(db *sql.DB, cardsStorage cardsStorage, tasksStorage tasksStorage
 
 func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error) {
 	boards := make([]models.BoardOutsideShort, 0)
-
 
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
 									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
@@ -139,9 +136,10 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
-		board.Cards = append(board.Cards, card)
+
 	}
 
+	board.Cards = append(board.Cards, cards...)
 	return board, nil
 	/*if err != nil && err != sql.ErrNoRows {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
@@ -412,9 +410,5 @@ func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) 
 			MethodName: "CheckTaskPermission"}
 	}
 
-	return nil
-}
-
-func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	return nil
 }

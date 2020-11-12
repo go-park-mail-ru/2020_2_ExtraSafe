@@ -8,7 +8,8 @@ DROP TABLE IF EXISTS board_members;
 CREATE TABLE users (
   userID      SERIAL PRIMARY KEY,
   email       TEXT,
-  password    TEXT,
+ -- password    TEXT,
+  password    BYTEA,
   username    TEXT,
   fullname    TEXT,
   avatar      TEXT

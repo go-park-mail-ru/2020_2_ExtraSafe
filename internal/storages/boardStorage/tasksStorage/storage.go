@@ -13,7 +13,6 @@ type Storage interface {
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
-
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 

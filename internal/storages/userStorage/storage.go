@@ -1,9 +1,12 @@
 package userStorage
 
 import (
+	"bytes"
+	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"golang.org/x/crypto/argon2"
 	"reflect"
 )
 /* users table
@@ -33,8 +36,9 @@ type Storage interface {
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
-	checkExistingUser(email string, username string) (errors models.MultiErrors)
+	CheckExistingUser(email string, username string) (errors models.MultiErrors)
 	checkExistingUserOnUpdate(email string, username string, userID uint64) (errors models.MultiErrors)
+	GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
 }
 
 type storage struct {
@@ -53,8 +57,10 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 	user := models.UserOutside{}
 	var userID uint64
 
-	err := s.db.QueryRow("SELECT userID, username, fullname, avatar FROM users WHERE email = $1 AND password = $2", userInput.Email, userInput.Password).
-				Scan(&userID, &user.Username, &user.FullName, &user.Avatar)
+	pass := make([]byte, 0)
+	err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
+				Scan(&userID, &pass, &user.Username, &user.FullName, &user.Avatar)
+
 
 	if err != sql.ErrNoRows {
 		if err != nil {
@@ -62,16 +68,32 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 		}
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
-		//user.Boards = make(models.Board, 0)
 		return userID, user, nil
 	}
 
 	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
 		"or password"}, MethodName: "CheckUser"}
+	//TODO error
+//	switch err {
+//	case sql.ErrNoRows:
+//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
+//	case nil:
+//		/*passValid := checkPass(pass, userInput.Password)
+//		fmt.Printf("passValid: %v, pass: %x\n", passValid, pass)
+//>>>>>>> 8d974589846a0a9b8ae49d500ad9131fc003166a
+//		user.Email = userInput.Email
+//		user.Links = &models.UserLinks{}
+//		return userID, user, nil*/
+//		break
+//	default:
+//		fmt.Println(err)
+//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
+//	}
+
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
-	multiErrors := s.checkExistingUser(userInput.Email, userInput.Username)
+	multiErrors := s.CheckExistingUser(userInput.Email, userInput.Username)
 	if len(multiErrors.Codes) != 0 {
 		return 0, models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes,
 			Descriptions: multiErrors.Descriptions}
@@ -79,9 +101,15 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 
 	var ID uint64
 
+
+	salt := make([]byte, 8)
+	rand.Read(salt)
+	fmt.Printf("salt: %x\n", salt)
+	hashedPass := hashPass(salt, userInput.Password)
+
 	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
 						userInput.Email,
-						userInput.Password,
+						hashedPass,
 						userInput.Username,
 						"",
 						"default/default_avatar.png").Scan(&ID)
@@ -104,7 +132,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 
 //FIXME подумать, как сделать эту проверку компактнее
 //TODO разобраться с pq.Error (какая информация, как логировать)
-func (s *storage) checkExistingUser(email string, username string) (multiErrors models.MultiErrors) {
+func (s *storage) CheckExistingUser(email string, username string) (multiErrors models.MultiErrors) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
 		multiErrors.Codes = append(multiErrors.Codes, "201")
@@ -195,12 +223,12 @@ func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, 
 		Scan(&user.Avatar)
 
 	if err == nil {
+		user.ID = userInput.ID
 		return user, nil
 	}
 
 	fmt.Println(err)
 	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserAvatar"}
-
 }
 
 func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error) {
@@ -263,18 +291,21 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 }
 
 func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error) {
-	user, password, err := s.getInternalUser(models.UserInput{ ID : userInput.ID})
+	user, password, err := s.GetInternalUser(models.UserInput{ ID : userInput.ID})
 	if err != nil {
 		fmt.Println(err)
 		return models.UserOutside{}, err
 	}
 
-	if userInput.OldPassword != password {
+	if !checkPass(password, userInput.OldPassword) {
 		return models.UserOutside{}, models.ServeError{Codes: []string{"501"},
 			Descriptions: []string{"Passwords is not equal"}, MethodName: "ChangeUserPassword"}
 	}
 
-	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userInput.Password, userInput.ID)
+	salt := make([]byte, 8)
+	rand.Read(salt)
+	userPassHash := hashPass(salt, userInput.Password)
+	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userPassHash, userInput.ID)
 	if err != nil {
 		fmt.Println(err)
 		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -284,17 +315,15 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 	return user, nil
 }
 
-
-func (s *storage) getInternalUser(userInput models.UserInput) (models.UserOutside, string, error) {
+func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error) {
 	user := models.UserOutside{Links: &models.UserLinks{}}
-	var password string
+	var password []byte
 
 	err := s.db.QueryRow("SELECT email, password, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
 		Scan(&user.Email, &password, &user.Username, &user.FullName, &user.Avatar)
 
 	if err == nil {
 		return user, password , nil
-
 	}
 	//TODO error
 	/*if err == sql.ErrNoRows {
@@ -302,12 +331,11 @@ func (s *storage) getInternalUser(userInput models.UserInput) (models.UserOutsid
 	}*/
 
 	//могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
-	return user, "", models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
+	return user, nil, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
 }
 
 func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) {
 	members := make([]models.UserOutsideShort, 0)
-
 
 	for _, userID := range userIDs {
 		user := models.UserOutsideShort{}
@@ -324,4 +352,16 @@ func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort,
 		}
 
 	return members, nil
+}
+
+func hashPass(salt []byte, plainPassword string) []byte {
+	hashedPass := argon2.IDKey([]byte(plainPassword), salt, 1, 64*1024, 4, 32)
+	return append(salt, hashedPass...)
+}
+
+func checkPass(passHash []byte, plainPassword string) bool {
+	salt := make([]byte, 8)
+	copy(salt, passHash)
+	userPassHash := hashPass(salt, plainPassword)
+	return bytes.Equal(userPassHash, passHash)
 }

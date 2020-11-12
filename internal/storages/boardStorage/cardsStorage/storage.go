@@ -111,4 +111,3 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, e
 
 	return card, nil
 }
-

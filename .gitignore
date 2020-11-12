@@ -9,7 +9,8 @@
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+*.out*
+*.html
 
 /.idea
 /useful
@@ -20,3 +21,6 @@
 
 pg_configs
 tarantool_configs
+
+queries.sql
+test_data.sql

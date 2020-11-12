@@ -5,13 +5,19 @@ import (
 	"github.com/labstack/echo"
 )
 
-type authService interface {
+
+//go:generate mockgen -destination=./mock/mock_authService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth AuthService
+//go:generate mockgen -destination=./mock/mock_authTransport.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth AuthTransport
+//go:generate mockgen -destination=./mock/mock_authSessions.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth AuthSessions
+
+
+type AuthService interface {
 	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
 	Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error)
 	Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error)
 }
 
-type authTransport interface {
+type AuthTransport interface {
 	AuthRead(c echo.Context) (request models.UserInput, err error)
 	LoginRead(c echo.Context) (request models.UserInputLogin, err error)
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
@@ -21,13 +27,13 @@ type authTransport interface {
 	RegWrite() (response models.ResponseStatus, err error)
 }
 
-type authSessions interface {
+type AuthSessions interface {
 	SetCookie(c echo.Context, userID uint64) error
 	DeleteCookie(c echo.Context) error
 	CheckCookie(c echo.Context) (uint64, error)
 }
 
-type errorWorker interface {
+type ErrorWorker interface {
 	RespError(c echo.Context, serveError error) (err error)
 	TransportError(c echo.Context) (err error)
 }
