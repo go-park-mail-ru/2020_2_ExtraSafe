@@ -2,14 +2,29 @@ package models
 
 import "mime/multipart"
 
-type User struct {
-	ID       uint64 `json:"id"`
+// для формирования ответа пользователю
+type UserOutside struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
-	Password string `json:"password"`
 	FullName string `json:"fullName"`
 	Links    *UserLinks
 	Avatar   string `json:"avatar"`
+}
+
+type UserOutsideShort struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Avatar   string `json:"avatar"`
+}
+
+type UserBoardsOutside struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+	Boards   []BoardOutsideShort `json:"boards"`
 }
 
 type UserLinks struct {
@@ -19,6 +34,11 @@ type UserLinks struct {
 	Bitbucket string `json:"bitbucket"`
 	Vk        string `json:"vkontakte"`
 	Facebook  string `json:"facebook"`
+}
+
+type UserAvatar struct {
+	ID uint64
+	Avatar string
 }
 
 type UserInputLinks struct {
@@ -47,10 +67,10 @@ type UserInputReg struct {
 }
 
 type UserInputProfile struct {
-	ID       uint64 `json:"-"`
-	Email    string `json:"email" valid:"required~311, emailValid~311"`
-	Username string `json:"username" valid:"required~312, userNameValid~312"`
-	FullName string `json:"fullName" valid:"fullNameValid~314"`
+	ID       uint64                `json:"-"`
+	Email    string                `json:"email" valid:"required~311, emailValid~311"`
+	Username string                `json:"username" valid:"required~312, userNameValid~312"`
+	FullName string                `json:"fullName" valid:"fullNameValid~314"`
 	Avatar   *multipart.FileHeader `json:"-"`
 }
 
@@ -58,4 +78,16 @@ type UserInputPassword struct {
 	ID          uint64 `json:"-"`
 	OldPassword string `json:"oldpassword" valid:"required~511, passwordValid~511"`
 	Password    string `json:"password" valid:"required~512, passwordValid~512"`
+}
+
+// для работы в бд
+type User struct {
+	ID       uint64 `json:"id"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	FullName string `json:"fullName"`
+	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+	Boards   []BoardInternal
 }

@@ -4,13 +4,21 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
-type userStorage interface {
-	CheckUser(userInput models.UserInputLogin) (models.User, error)
-	CreateUser(userInput models.UserInputReg) (models.User, error)
-	GetUserProfile(userInput models.UserInput) (models.User, error)
+//go:generate mockgen -destination=./mock/mock_userStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth UserStorage
+//go:generate mockgen -destination=./mock/mock_boardStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth BoardStorage
+//go:generate mockgen -destination=./mock/mock_validator.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth Validator
+
+type UserStorage interface {
+	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
+	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 }
 
-type validator interface {
+type BoardStorage interface {
+	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
+}
+
+type Validator interface {
 	ValidateLogin(request models.UserInputLogin) (err error)
 	ValidateRegistration(request models.UserInputReg) (err error)
 }

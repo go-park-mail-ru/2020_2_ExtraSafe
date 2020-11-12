@@ -7,11 +7,12 @@ import (
 )
 
 type profileService interface {
-	Profile(request models.UserInput) (user models.User, err error)
-	Accounts(request models.UserInput) (user models.User, err error)
-	ProfileChange(request models.UserInputProfile) (user models.User, err error)
-	AccountsChange(request models.UserInputLinks) (user models.User, err error)
-	PasswordChange(request models.UserInputPassword) (user models.User, err error)
+	Profile(request models.UserInput) (user models.UserOutside, err error)
+	Accounts(request models.UserInput) (user models.UserOutside, err error)
+	Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error)
+	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
+	AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error)
+	PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error)
 }
 
 type profileTransport interface {
@@ -21,8 +22,9 @@ type profileTransport interface {
 	AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error)
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
-	AccountsWrite(user models.User) (response models.ResponseUserLinks, err error)
-	ProfileWrite(user models.User) (response models.ResponseUser, err error)
+	AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error)
+	BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error)
+	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
 
 type errorWorker interface {

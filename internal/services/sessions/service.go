@@ -10,7 +10,7 @@ import (
 )
 
 type Service interface {
-	SetCookie(c echo.Context, userID uint64)
+	SetCookie(c echo.Context, userID uint64) error
 	DeleteCookie(c echo.Context) error
 	CheckCookie(c echo.Context) (uint64, error)
 }
@@ -29,11 +29,14 @@ var (
 	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
-func (s *service)SetCookie(c echo.Context, userID uint64) {
+func (s *service)SetCookie(c echo.Context, userID uint64) error {
 	cookie := new(http.Cookie)
 	SID := RandStringRunes(32)
 
-	s.sessionsStorage.CreateUserSession(userID, SID)
+	if err := s.sessionsStorage.CreateUserSession(userID, SID); err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	cookie.Name = "tabutask_id"
 	cookie.Value = SID
@@ -41,6 +44,8 @@ func (s *service)SetCookie(c echo.Context, userID uint64) {
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 	c.SetCookie(cookie)
+
+	return nil
 }
 
 func (s *service)DeleteCookie(c echo.Context) error {
@@ -50,7 +55,10 @@ func (s *service)DeleteCookie(c echo.Context) error {
 	}
 	sessionID := session.Value
 
-	s.sessionsStorage.DeleteUserSession(sessionID)
+	if err := s.sessionsStorage.DeleteUserSession(sessionID); err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	c.SetCookie(session)
@@ -65,11 +73,12 @@ func (s *service)CheckCookie(c echo.Context) (uint64, error) {
 	}
 	sessionID := session.Value
 
-	userId, authorized := s.sessionsStorage.CheckUserSession(sessionID)
-	if authorized {
-		return userId, nil
+	userId, err := s.sessionsStorage.CheckUserSession(sessionID)
+	if err != nil {
+		return 0, errors.New("Not auth ")
+
 	}
-	return 0, errors.New("Not auth ")
+	return userId, nil
 }
 
 func RandStringRunes(n int) string {

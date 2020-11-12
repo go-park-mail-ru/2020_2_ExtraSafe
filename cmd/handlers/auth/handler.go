@@ -1,7 +1,7 @@
 package authHandler
 
 import (
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -14,13 +14,13 @@ type Handler interface {
 }
 
 type handler struct {
-	authService   authService
-	authTransport authTransport
-	authSessions authSessions
-	errorWorker     errorWorker
+	authService   AuthService
+	authTransport AuthTransport
+	authSessions  AuthSessions
+	errorWorker   ErrorWorker
 }
 
-func NewHandler(authService authService, authTransport authTransport, authSessions authSessions, errorWorker errorWorker) *handler {
+func NewHandler(authService AuthService, authTransport AuthTransport, authSessions AuthSessions, errorWorker ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
@@ -32,17 +32,26 @@ func NewHandler(authService authService, authTransport authTransport, authSessio
 func (h *handler) Auth(c echo.Context) error {
 	userInput, err := h.authTransport.AuthRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
 	user, err := h.authService.Auth(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
 	}
 
 	response, err := h.authTransport.AuthWrite(user)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -51,20 +60,36 @@ func (h *handler) Auth(c echo.Context) error {
 func (h *handler) Login(c echo.Context) error {
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
-	user, err := h.authService.Login(userInput)
+	userID, _, err := h.authService.Login(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
 	}
 
-	response, err := h.authTransport.RegWrite()
+	token, _ := csrf.GenerateToken(userID)
+
+	response, err := h.authTransport.LoginWrite(token)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
-	h.authSessions.SetCookie(c, user.ID)
+	if err := h.authSessions.SetCookie(c, userID); err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -72,28 +97,45 @@ func (h *handler) Login(c echo.Context) error {
 func (h *handler) Logout(c echo.Context) error {
 	err := h.authSessions.DeleteCookie(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ResponseUser{})
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
 	}
-	return c.JSON(http.StatusOK, models.ResponseUser{})
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *handler) Registration(c echo.Context) error{
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
-	user, err := h.authService.Registration(userInput)
+	userID, _, err := h.authService.Registration(userInput)
 	if err != nil {
-		return h.errorWorker.RespError(c, err)
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
 	}
 
 	response, err := h.authTransport.RegWrite()
 	if err != nil {
-		return h.errorWorker.TransportError(c)
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
 	}
 
-	h.authSessions.SetCookie(c, user.ID)
+	err = h.authSessions.SetCookie(c, userID)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+	}
 
 	return c.JSON(http.StatusOK, response)
 }

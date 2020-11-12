@@ -5,57 +5,77 @@ import (
 )
 
 type Service interface {
-	Auth(request models.UserInput) (response models.User, err error)
-	Login(request models.UserInputLogin) (response models.User, err error)
-	Registration(request models.UserInputReg) (response models.User, err error)
+	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
+	Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error)
+	Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error)
 }
 
 type service struct {
-	userStorage userStorage
-	validator validator
+	userStorage  UserStorage
+	boardStorage BoardStorage
+	validator    Validator
 }
 
-func NewService(userStorage userStorage, validator validator) Service {
+func NewService(userStorage UserStorage, boardStorage BoardStorage, validator Validator) Service {
 	return &service{
+		boardStorage: boardStorage,
 		userStorage: userStorage,
 		validator: validator,
 	}
 }
 
-func (s *service)Auth(request models.UserInput) (response models.User, err error) {
-	response, err = s.userStorage.GetUserProfile(request)
+func (s *service) Auth(request models.UserInput) (response models.UserBoardsOutside, err error) {
+	user, err := s.userStorage.GetUserProfile(request)
+	if err != nil {
+		return models.UserBoardsOutside{}, err
+	}
+
+	boards, err := s.boardStorage.GetBoardsList(request)
+	if err != nil {
+		return models.UserBoardsOutside{}, err
+	}
+
+	response.Boards = boards
+	response.Links = user.Links
+	response.Avatar = user.Avatar
+	response.FullName = user.FullName
+	response.Username = user.Username
+	response.Email = user.Email
+	response.Username = user.Username
+
 	return response, err
 }
 
-func (s *service)Login(request models.UserInputLogin) (response models.User, err error) {
-	var user models.User
+func (s *service) Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error) {
+	var user models.UserOutside
 
 	err = s.validator.ValidateLogin(request)
 	if err != nil {
-		return models.User{}, err
+		return 0, models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.CheckUser(request)
+	userID, user, err = s.userStorage.CheckUser(request)
 	if err != nil {
-		return models.User{}, err
+		return 0, models.UserOutside{}, err
 	}
 
-	return user, err
+	return userID, user, err
 }
 
-func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
-	var user models.User
+
+func (s *service) Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error) {
+	var user models.UserOutside
 
 	err = s.validator.ValidateRegistration(request)
 	if err != nil {
-		return models.User{}, err
+		return 0, models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.CreateUser(request)
+	userID, user, err = s.userStorage.CreateUser(request)
 	if err != nil {
-		return models.User{}, err
+		return 0, models.UserOutside{}, err
 	}
 
-	return user, err
+	return userID, user, err
 }
 
