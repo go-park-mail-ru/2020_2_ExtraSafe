@@ -1,0 +1,41 @@
+Установка докер:
+sudo snap install docker
+
+Проверка работоспособности тарантула:
+docker run hello-world
+
+В случае ошибки (docker: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:)
+sudo chmod 666 /var/run/docker.sock
+
+Скачивание докер-образа тарантул:
+docker pull tarantool/tarantool:2.4
+
+Создать директорию  /home/tabutask_sessions
+Запуск образа:
+docker run --name sessions_db -d -p 3301:3301 -v /home/tabutask_sessions:/var/lib/tarantool tarantool/tarantool:2.4
+
+Проверка процессов:
+docker ps --all
+
+Зайти в консоль запущенного тарантула:
+docker exec -i -t sessions_db console
+
+Создание спейса (таблицы):
+s = box.schema.space.create('sessions')
+
+Форматирование спейса:
+s:format({{name = 'session_id', type = 'string'}, {name = 'user_id', type = 'unsigned'}})
+
+Создание первичного индекса:
+s:create_index('primary', {type = 'hash', parts = {'session_id'}})
+
+---------------------------------------------------------------------------------------------------------------------
+
+Операции для проверки работы:
+s:select{} - выборка всех записей
+s:select{'123'} - выборка записей по ключу '123'
+box.space.sessions:truncate{} - очистка таблицы
+
+
+
+

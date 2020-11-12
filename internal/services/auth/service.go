@@ -12,11 +12,13 @@ type Service interface {
 
 type service struct {
 	userStorage userStorage
+	validator validator
 }
 
-func NewService(userStorage userStorage) Service {
+func NewService(userStorage userStorage, validator validator) Service {
 	return &service{
 		userStorage: userStorage,
+		validator: validator,
 	}
 }
 
@@ -27,6 +29,12 @@ func (s *service)Auth(request models.UserInput) (response models.User, err error
 
 func (s *service)Login(request models.UserInputLogin) (response models.User, err error) {
 	var user models.User
+
+	err = s.validator.ValidateLogin(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err = s.userStorage.CheckUser(request)
 	if err != nil {
 		return models.User{}, err
@@ -38,6 +46,11 @@ func (s *service)Login(request models.UserInputLogin) (response models.User, err
 func (s *service)Registration(request models.UserInputReg) (response models.User, err error) {
 	var user models.User
 
+	err = s.validator.ValidateRegistration(request)
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err = s.userStorage.CreateUser(request)
 	if err != nil {
 		return models.User{}, err
@@ -45,3 +58,4 @@ func (s *service)Registration(request models.UserInputReg) (response models.User
 
 	return user, err
 }
+
