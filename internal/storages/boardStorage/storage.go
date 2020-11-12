@@ -277,8 +277,12 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, er
 	return task, nil
 }
 
-//FIXME IMPLEMENT
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
+	err := s.tasksStorage.ChangeTaskOrder(taskInput)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

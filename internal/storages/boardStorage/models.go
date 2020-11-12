@@ -8,9 +8,7 @@ type cardsStorage interface {
 	DeleteCard(userInput models.CardInput) error
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
-	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
-	//CheckCardAccessory(cardID uint64) (boardID uint64, err error)
-}
+	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)}
 
 type tasksStorage interface {
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
@@ -19,5 +17,5 @@ type tasksStorage interface {
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
-	//CheckTaskAccessory(taskID uint64) (cardID uint64, err error)
+	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }

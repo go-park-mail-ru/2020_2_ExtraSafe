@@ -13,8 +13,6 @@ type Storage interface {
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
 	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
-
-	CheckCardAccessory(cardID uint64) (boardID uint64, err error)
 }
 
 type storage struct {
@@ -112,14 +110,5 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, e
 	}
 
 	return card, nil
-}
-
-func (s *storage) CheckCardAccessory(cardID uint64) (boardID uint64, err error) {
-	err = s.db.QueryRow("SELECT boardID FROM cards WHERE cardID = $1", cardID).Scan(&boardID)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-	return boardID, nil
 }
 
