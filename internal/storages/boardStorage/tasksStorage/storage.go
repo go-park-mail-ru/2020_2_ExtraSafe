@@ -14,7 +14,7 @@ type Storage interface {
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
 
-	CheckTaskAccessory(taskID uint64) (cardID uint64, err error)
+	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }
 
 type storage struct {
@@ -119,11 +119,18 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, e
 	return task, nil
 }
 
-func (s *storage) CheckTaskAccessory(taskID uint64) (cardID uint64, err error) {
-	err = s.db.QueryRow("SELECT cardID FROM tasks WHERE taskID = $1", taskID).Scan(&cardID)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
+func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
+	for _, card := range taskInput.Cards {
+		for _, task := range card.Tasks {
+			_, err := s.db.Exec("UPDATE tasks SET cardID = $1, tasksOrder = $2 WHERE taskID = $3",
+				card.CardID, task.Order, task.Order)
+
+			if err != nil {
+				fmt.Println(err)
+				return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "ChangeTaskOrder"}
+			}
+		}
 	}
-	return cardID, nil
+
+	return nil
 }
