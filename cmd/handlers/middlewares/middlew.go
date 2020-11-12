@@ -50,6 +50,7 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 			"http://95.163.213.142:80",
 			"http://95.163.213.142",
 			"http://127.0.0.1:3033",
+			"http://127.0.0.1",
 			"http://tabutask.ru"},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowCredentials: true,

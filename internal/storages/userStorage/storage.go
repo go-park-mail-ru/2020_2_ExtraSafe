@@ -68,11 +68,9 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 	}
 
 	var ID uint64
-
-
 	salt := make([]byte, 8)
+
 	rand.Read(salt)
-	fmt.Printf("salt: %x\n", salt)
 	hashedPass := hashPass(salt, userInput.Password)
 
 	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
