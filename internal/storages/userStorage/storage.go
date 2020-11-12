@@ -96,8 +96,6 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 	return ID, user, nil
 }
 
-//FIXME подумать, как сделать эту проверку компактнее
-//TODO разобраться с pq.Error (какая информация, как логировать)
 func (s *storage) CheckExistingUser(email string, username string) (multiErrors models.MultiErrors) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
@@ -232,7 +230,6 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 
 	networkNames := []string{"", "Telegram", "Instagram", "Github", "Bitbucket", "Vk", "Facebook"}
 
-	//FIXME поиграться с рефлектами
 	input := reflect.ValueOf(userInput)
 	for i := 1; i < input.NumField(); i++ {
 		inputLink := input.Field(i).Interface().(string)
@@ -267,8 +264,10 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 	}
 
 	salt := make([]byte, 8)
+
 	rand.Read(salt)
 	userPassHash := hashPass(salt, userInput.Password)
+
 	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userPassHash, userInput.ID)
 	if err != nil {
 		fmt.Println(err)
@@ -289,12 +288,7 @@ func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutsid
 	if err == nil {
 		return user, password , nil
 	}
-	//TODO error
-	/*if err == sql.ErrNoRows {
-		return user, "", models.ServeError{Codes: []string{"101"}}
-	}*/
 
-	//могут ли тут быть 2 рзных вида ошибок - обращение к БД и само отсутствие такой записи о пользователе?
 	return user, nil, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
 }
 
@@ -313,7 +307,7 @@ func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort,
 		}
 
 		members = append(members, user)
-		}
+	}
 
 	return members, nil
 }
@@ -326,6 +320,7 @@ func hashPass(salt []byte, plainPassword string) []byte {
 func checkPass(passHash []byte, plainPassword string) bool {
 	salt := make([]byte, 8)
 	copy(salt, passHash)
+
 	userPassHash := hashPass(salt, plainPassword)
 	return bytes.Equal(userPassHash, passHash)
 }
