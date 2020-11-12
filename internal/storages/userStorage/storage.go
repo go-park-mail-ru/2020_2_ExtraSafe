@@ -36,7 +36,7 @@ type Storage interface {
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
-	checkExistingUser(email string, username string) (errors models.MultiErrors)
+	CheckExistingUser(email string, username string) (errors models.MultiErrors)
 	checkExistingUserOnUpdate(email string, username string, userID uint64) (errors models.MultiErrors)
 	GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
 }
@@ -93,7 +93,7 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
-	multiErrors := s.checkExistingUser(userInput.Email, userInput.Username)
+	multiErrors := s.CheckExistingUser(userInput.Email, userInput.Username)
 	if len(multiErrors.Codes) != 0 {
 		return 0, models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes,
 			Descriptions: multiErrors.Descriptions}
@@ -132,7 +132,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.User
 
 //FIXME подумать, как сделать эту проверку компактнее
 //TODO разобраться с pq.Error (какая информация, как логировать)
-func (s *storage) checkExistingUser(email string, username string) (multiErrors models.MultiErrors) {
+func (s *storage) CheckExistingUser(email string, username string) (multiErrors models.MultiErrors) {
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan()
 	if err != sql.ErrNoRows {
 		multiErrors.Codes = append(multiErrors.Codes, "201")

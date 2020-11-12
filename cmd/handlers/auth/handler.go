@@ -14,13 +14,13 @@ type Handler interface {
 }
 
 type handler struct {
-	authService   authService
-	authTransport authTransport
-	authSessions authSessions
-	errorWorker     errorWorker
+	authService   AuthService
+	authTransport AuthTransport
+	authSessions  AuthSessions
+	errorWorker   ErrorWorker
 }
 
-func NewHandler(authService authService, authTransport authTransport, authSessions authSessions, errorWorker errorWorker) *handler {
+func NewHandler(authService AuthService, authTransport AuthTransport, authSessions AuthSessions, errorWorker ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,

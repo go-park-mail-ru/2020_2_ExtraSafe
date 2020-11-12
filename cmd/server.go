@@ -28,13 +28,9 @@ import (
 	_ "github.com/rs/zerolog/log"
 	"github.com/tarantool/go-tarantool"
 	"os"
-	"path/filepath"
 )
 
 func main() {
-	//TODO вынести в отдельный bash скрипт (в докере)
-	//clearDataStore()
-
 	var cfg config
 	err := envconfig.Process("", &cfg)
 	if err != nil {
@@ -105,26 +101,3 @@ func main() {
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
-
-func clearDataStore() {
-	dir := "../avatars"
-	d, err := os.Open(dir)
-	if err != nil {
-		fmt.Println("Cannot clear avatars datatore")
-		return
-	}
-	names, err := d.Readdirnames(-1)
-	if err != nil {
-		fmt.Println("Cannot clear avatars datatore")
-		return
-	}
-
-	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(dir, name))
-		if err != nil {
-			fmt.Println("Cannot clear avatars datatore")
-			return
-		}
-	}
-}
-
