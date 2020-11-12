@@ -9,7 +9,8 @@
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+*.out*
+*.html
 
 /.idea
 /useful
@@ -17,3 +18,9 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 *.jpeg
+
+pg_configs
+tarantool_configs
+
+queries.sql
+test_data.sql
