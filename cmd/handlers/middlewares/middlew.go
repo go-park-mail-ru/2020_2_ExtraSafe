@@ -60,7 +60,7 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		userId, err := m.sessionsService.CheckCookie(c)
 		if err != nil {
-			return m.errorWorker.TransportError(c)
+			return err
 		}
 		c.Set("userId", userId)
 		return next(c)
@@ -76,7 +76,7 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 			user, _ := m.authService.Auth(*userInput)
 			response, err := m.authTransport.AuthWrite(user)
 			if err != nil {
-				return m.errorWorker.TransportError(c)
+				return err
 			}
 			return c.JSON(http.StatusOK, response)
 		}
@@ -92,7 +92,10 @@ func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 		err := csrf.CheckToken(userID, token)
 		if err != nil {
 			newToken, _ := csrf.GenerateToken(userID)
-			return m.errorWorker.TokenError(c, newToken)
+			if err := m.errorWorker.TokenError(c, newToken); err != nil {
+				return err
+			}
+			return err
 		}
 
 		return next(c)
@@ -135,7 +138,7 @@ func (m middlew) Logger(next echo.HandlerFunc) echo.HandlerFunc {
 				errLog.Send()
 			}
 		}
-		return m.errorWorker.RespError(c, err)
+		return err
 	}
 }
 
@@ -144,6 +147,9 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 		bid := c.Param("ID")
 		boardID, err := strconv.ParseUint(bid, 10, 64)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 
@@ -151,6 +157,9 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, false)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 
@@ -172,6 +181,9 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, true)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 
@@ -193,6 +205,9 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		err = m.boardStorage.CheckCardPermission(userID, cardID)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 
@@ -212,6 +227,9 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		err = m.boardStorage.CheckTaskPermission(userID, taskID)
 		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
 			return err
 		}
 
