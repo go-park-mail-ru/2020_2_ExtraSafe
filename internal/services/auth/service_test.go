@@ -8,10 +8,6 @@ import (
 	"testing"
 )
 
-func TestNewService(t *testing.T) {
-
-}
-
 func TestService_Auth(t *testing.T) {
 	ctrlUser := gomock.NewController(t)
 	defer ctrlUser.Finish()

@@ -48,6 +48,20 @@ func (mr *MockTasksStorageMockRecorder) ChangeTask(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeTask", reflect.TypeOf((*MockTasksStorage)(nil).ChangeTask), arg0)
 }
 
+// ChangeTaskOrder mocks base method
+func (m *MockTasksStorage) ChangeTaskOrder(arg0 models.TasksOrderInput) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ChangeTaskOrder", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ChangeTaskOrder indicates an expected call of ChangeTaskOrder
+func (mr *MockTasksStorageMockRecorder) ChangeTaskOrder(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeTaskOrder", reflect.TypeOf((*MockTasksStorage)(nil).ChangeTaskOrder), arg0)
+}
+
 // CreateTask mocks base method
 func (m *MockTasksStorage) CreateTask(arg0 models.TaskInput) (models.TaskOutside, error) {
 	m.ctrl.T.Helper()

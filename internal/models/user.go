@@ -2,18 +2,6 @@ package models
 
 import "mime/multipart"
 
-// для работы в бд
-type User struct {
-	ID       uint64 `json:"id"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	FullName string `json:"fullName"`
-	Links    *UserLinks
-	Avatar   string `json:"avatar"`
-	Boards   []BoardInternal
-}
-
 // для формирования ответа пользователю
 type UserOutside struct {
 	Email    string `json:"email"`
@@ -90,4 +78,16 @@ type UserInputPassword struct {
 	ID          uint64 `json:"-"`
 	OldPassword string `json:"oldpassword" valid:"required~511, passwordValid~511"`
 	Password    string `json:"password" valid:"required~512, passwordValid~512"`
+}
+
+// для работы в бд
+type User struct {
+	ID       uint64 `json:"id"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	FullName string `json:"fullName"`
+	Links    *UserLinks
+	Avatar   string `json:"avatar"`
+	Boards   []BoardInternal
 }

@@ -9,8 +9,6 @@ import (
 	"testing"
 )
 
-//TODO TESTS сделать тесты на ошибки
-
 func TestStorage_GetUserProfile(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -26,7 +24,6 @@ func TestStorage_GetUserProfile(t *testing.T) {
 	rows.AddRow("epridius@yandex.ru", "pkaterinaa", "", "default/default_avatar.png")
 	expect := models.UserOutside{Email: "epridius@yandex.ru", Username: "pkaterinaa", Links: &models.UserLinks{}, Avatar: "default/default_avatar.png"}
 
-	//query success
 	mock.
 		ExpectQuery("SELECT").
 		WithArgs(userInput.ID).
@@ -46,7 +43,6 @@ func TestStorage_GetUserProfile(t *testing.T) {
 		return
 	}
 
-	//no rows in db
 	mock.
 		ExpectQuery("SELECT").
 		WithArgs(userInput.ID).
@@ -313,7 +309,6 @@ func TestStorage_GetInternalUser(t *testing.T) {
 	expect := models.UserOutside{Email: "epridius@yandex.ru", Username: "pkaterinaa", Links: &models.UserLinks{}, Avatar: "default/default_avatar.png"}
 	expectPass := []byte("lalala")
 
-	//query success
 	mock.
 		ExpectQuery("SELECT").
 		WithArgs(userInput.ID).
@@ -364,7 +359,7 @@ func TestStorage_CheckExistingUser(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
 	}
-	//FIXME
+
 	if len(errorCodes.Codes) != 0 {
 		t.Errorf("results not match, want %v, have %v", expect, errorCodes)
 		return
@@ -426,126 +421,3 @@ func TestStorage_GetBoardMembers(t *testing.T) {
 		return
 	}
 }
-
-/*func TestCreateUser(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-
-	storage := &storage{db: db}
-
-	userInput := models.UserInputReg{
-		Email:    "epridius@yandex.ru",
-		Password: "lalala",
-		Username: "pkaterinaa",
-	}
-
-	//rows := sqlmock.NewRows([]string{"userID"})
-	//expect := models.UserOutside{Email: "epridius@yandex.ru", Username: "pkaterinaa", Links: &models.UserLinks{}, Avatar: "default/default_avatar.png"}
-	//rows = rows.AddRow(1)
-
-	mock.ExpectQuery("SELECT").
-		WithArgs(userInput.Email).
-		WillReturnError(sql.ErrNoRows)
-
-
-	mock.ExpectQuery("SELECT").
-		WithArgs(userInput.Username).
-		WillReturnError(sql.ErrNoRows)
-
-	/////НЕ ПОЛУЧИТСЯ, ПОТОМУ ЧТО МЫ НЕ ЗНАЕМ СОЛЬ И НЕ МОЖЕМ ПРЕДОСТАВИТЬ ТОТ ЗАПРОС, КОТОРЫЙ УЙДЕТ В БД
-	////FUCK
-	mock.
-		ExpectQuery("INSERT").
-		WithArgs(userInput.Email, []byte(userInput.Password), userInput.Username, "", "default/default_avatar.png").
-		//WillReturnRows(rows)
-		WillReturnError(fmt.Errorf("db_error"))
-
-	_, _, err = storage.CreateUser(userInput)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-		return
-	}
-	if err == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}
-
-}
-
-*/
-
-/*
-func TestCheckUser(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-
-	storage := &storage{db: db}
-
-	userInput := models.UserInputLogin{
-		Email:    "epridius@yandex.ru",
-		Password: "lalala",
-	}
-
-	rows := sqlmock.NewRows([]string{"userID", "password", "username", "fullname", "avatar"})
-	expect := models.UserOutside{Email: "epridius@yandex.ru", Username: "pkaterinaa", Links: &models.UserLinks{}, Avatar: "default/default_avatar.png"}
-
-	rows = rows.AddRow(1, []byte{}, expect.Username, expect.FullName, expect.Avatar)
-	mock.
-		ExpectQuery("SELECT").
-		WithArgs(userInput.Email).WillReturnError(models.ServeError{Codes: []string{"101"}})
-
-	_, _, err2 := storage.CheckUser(userInput)
-	if err2 != nil {
-		t.Errorf("unexpected err: %s", err)
-		return
-	}
-	if err2 := mock.ExpectationsWereMet(); err2 != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-		return
-	}
-	if err2 == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}
-}*/
-	// query error
-	/*mock.
-		ExpectQuery("SELECT userID, password, username, fullname, avatar FROM users WHERE email").
-		WithArgs(userInput.Email).
-		WillReturnError(fmt.Errorf("db_error"))
-
-	_, user, err3 := storage.CheckUser(userInput)
-	if err3 := mock.ExpectationsWereMet(); err3 != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-		return
-	}
-	if err3 == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}*/
-
-	// row scan error
-/*	rows = sqlmock.NewRows([]string{"id", "title"}).
-		AddRow(1, "title")
-
-	mock.
-		ExpectQuery("SELECT id, title, updated, description FROM items WHERE").
-		WithArgs(elemID).
-		WillReturnRows(rows)
-
-	_, err = repo.GetByID(elemID)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-		return
-	}
-	if err == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}*/
-

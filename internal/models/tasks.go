@@ -6,7 +6,6 @@ type Task struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Order       uint8  `json:"order"`
-	//Deadline timestamp
 }
 
 type TaskOutside struct {
@@ -14,7 +13,6 @@ type TaskOutside struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Order       uint8  `json:"order"`
-	//Deadline timestamp
 }
 
 type TaskInput struct {

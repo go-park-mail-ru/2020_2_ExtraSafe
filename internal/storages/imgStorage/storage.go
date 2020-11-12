@@ -19,14 +19,10 @@ type Storage interface {
 	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
 }
 
-type storage struct {
-	Users    *[]models.User
-}
+type storage struct {}
 
-func NewStorage(someUsers *[]models.User) Storage {
-	return &storage{
-		Users: someUsers,
-	}
+func NewStorage() Storage {
+	return &storage{}
 }
 
 func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error {

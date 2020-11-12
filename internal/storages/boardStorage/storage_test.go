@@ -10,13 +10,6 @@ import (
 )
 
 func TestStorage_CreateBoard(t *testing.T) {
-/*	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
-		boardInput.UserID,
-		boardInput.BoardName,
-		boardInput.Theme,
-		boardInput.Star).Scan(&boardID)
-
-	*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -43,7 +36,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 		Cards:    []models.CardOutside{},
 		UsersIDs: []uint64{},
 	}
-	//ok query
+
 	mock.
 		ExpectQuery("INSERT INTO boards").
 		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star).
@@ -65,9 +58,6 @@ func TestStorage_CreateBoard(t *testing.T) {
 }
 
 func TestStorage_ChangeBoard(t *testing.T) {
-	/*	err := s.db.QueryRow("UPDATE boards SET boardName = $1, theme = $2, star = $3 WHERE boardID = $4 RETURNING adminID",
-		boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
-	*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -82,7 +72,6 @@ func TestStorage_ChangeBoard(t *testing.T) {
 		Star:      false,
 	}
 
-	//getCardsByBoard
 	expectedCards := make([]models.CardOutside, 0)
 	card1 := models.CardOutside{
 		CardID: 1,
@@ -164,8 +153,6 @@ func TestStorage_ChangeBoard(t *testing.T) {
 }
 
 func TestStorage_DeleteBoard(t *testing.T) {
-//	_, err := s.db.Exec("DELETE FROM boards WHERE boardID = $1", boardInput.BoardID)
-
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -193,9 +180,6 @@ func TestStorage_DeleteBoard(t *testing.T) {
 }
 
 func TestStorage_GetBoard(t *testing.T) {
-/*	err := s.db.QueryRow("SELECT adminID, boardName, theme, star FROM boards WHERE boardID = $1", boardInput.BoardID).
-		Scan(&board.AdminID, &board.Name, &board.Theme, &board.Star)
-*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -206,14 +190,12 @@ func TestStorage_GetBoard(t *testing.T) {
 		BoardID:   1,
 	}
 
-	//getCardsByBoard
 	expectedCards := make([]models.CardOutside, 0)
 	card1 := models.CardOutside{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
 	}
-	//expectedCards = append(expectedCards, card1)
 
 	expectedTasks := make([]models.TaskOutside, 0)
 	task1 := models.TaskOutside{
@@ -293,10 +275,6 @@ func TestStorage_GetBoard(t *testing.T) {
 }
 
 func TestStorage_GetBoardsList(t *testing.T) {
-/*
-	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
-		"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
-*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -365,9 +343,6 @@ func TestStorage_CheckBoardPermissionAdmin(t *testing.T) {
 	boardID := uint64(1)
 	userID := uint64(1)
 
-
-	// admin	err = s.db.QueryRow("SELECT boardID FROM boards WHERE boardID = $1 AND adminID = $2", boardID, userID).Scan(&ID)
-
 	mock.
 		ExpectQuery("SELECT boardID FROM boards").
 		WithArgs(boardID, userID).
@@ -381,7 +356,6 @@ func TestStorage_CheckBoardPermissionAdmin(t *testing.T) {
 }
 
 func TestStorage_CheckBoardPermissionUser(t *testing.T) {
-	// member	err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -512,11 +486,6 @@ func TestStorage_DeleteCard(t *testing.T) {
 }
 
 func TestStorage_GetCard(t *testing.T) {
-	/*
-	card, err := s.cardsStorage.GetCardByID(cardInput)
-	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
-	*/
-
 	cardInput := models.CardInput{ CardID: 1 }
 
 	expectedCard := models.CardOutside{

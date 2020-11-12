@@ -29,10 +29,6 @@ type Storage interface {
 	CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error)
 	CheckCardPermission(userID uint64, cardID uint64) (err error)
 	CheckTaskPermission(userID uint64, taskID uint64) (err error)
-
-	checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error)
-	checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error)
-	getBoardMembers(boardInput models.BoardInput) ([]uint64, error)
 }
 
 type storage struct {
@@ -141,13 +137,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 
 	board.Cards = append(board.Cards, cards...)
 	return board, nil
-	/*if err != nil && err != sql.ErrNoRows {
-		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}}
-	}
-
-	if err == sql.ErrNoRows {
-		return models.BoardInternal{}, models.ServeError{Codes: []string{"not existing board"}}
-	}*/
 }
 
 func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error) {

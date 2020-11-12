@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-//TODO TESTS сделать тесты на ошибки
 func TestStorage_CreateTask(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -32,10 +31,6 @@ func TestStorage_CreateTask(t *testing.T) {
 		Description: taskInput.Description,
 	}
 
-/*	err := s.db.QueryRow("INSERT INTO tasks (cardID, taskName, description, tasksOrder) VALUES ($1, $2, $3, $4) RETURNING taskID",
-		taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).Scan(&taskID)
-*/
-	//ok query
 	mock.
 		ExpectQuery("INSERT INTO tasks").
 		WithArgs(taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).
@@ -78,9 +73,6 @@ func TestStorage_ChangeTask(t *testing.T) {
 		Order:  taskInput.Order,
 		Description: taskInput.Description,
 	}
-
-	/*_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2, tasksOrder = $3 WHERE taskID = $4",
-		taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID)*/
 
 	mock.
 		ExpectExec("UPDATE tasks SET").
@@ -140,9 +132,6 @@ func TestStorage_GetTaskByID(t *testing.T) {
 
 	taskInput := models.TaskInput{ TaskID:  1}
 
-/*	err := s.db.QueryRow("SELECT taskName, description, tasksOrder FROM tasks WHERE taskID = $1", taskInput.TaskID).
-		Scan(&task.Name, &task.Description, &task.Order)*/
-
 	expectedTaskOutside := models.TaskOutside {
 		TaskID: 1,
 		Name:   "todo",
@@ -152,7 +141,7 @@ func TestStorage_GetTaskByID(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"taskName", "description", "tasksOrder"}).
 					AddRow(expectedTaskOutside.Name, expectedTaskOutside.Description, expectedTaskOutside.Order)
-	//ok query
+
 	mock.
 		ExpectQuery("SELECT taskName, description, tasksOrder FROM tasks WHERE taskID").
 		WithArgs(taskInput.TaskID).
@@ -174,8 +163,6 @@ func TestStorage_GetTaskByID(t *testing.T) {
 }
 
 func TestStorage_GetTasksByCard(t *testing.T) {
-	//rows, err := s.db.Query("SELECT taskID, taskName, description, tasksOrder FROM tasks WHERE cardID = $1", cardInput.CardID)
-
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)

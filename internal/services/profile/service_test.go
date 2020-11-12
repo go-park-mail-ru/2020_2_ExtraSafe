@@ -282,7 +282,6 @@ func TestService_PasswordChange(t *testing.T) {
 	}
 }
 
-//FIXME IMPLEMENT
 func TestService_Boards(t *testing.T) {
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
@@ -323,70 +322,3 @@ func TestService_Boards(t *testing.T) {
 		return
 	}
 }
-
-
-/*
-func TestService_ProfileChangeErrorChange(t *testing.T) {
-	ctrlValid := gomock.NewController(t)
-	defer ctrlValid.Finish()
-	mockValidator := mocks.NewMockValidator(ctrlValid)
-
-	ctrlUser := gomock.NewController(t)
-	defer ctrlUser.Finish()
-	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
-
-	ctrlAvatar := gomock.NewController(t)
-	defer ctrlAvatar.Finish()
-	mockAvatarStorage := mocks.NewMockAvatarStorage(ctrlAvatar)
-
-	service := &service{
-		userStorage: mockUserStorage,
-		avatarStorage: mockAvatarStorage,
-		validator: mockValidator,
-	}
-
-	request := models.UserInputProfile{
-		ID:       1,
-		Email:    "epridius",
-		Username: "pkaterinaa",
-		FullName: "",
-		Avatar:   &multipart.FileHeader{},
-	}
-
-	userAvatar := models.UserAvatar{
-		ID:     1,
-		Avatar: "default/default_avatar.png",
-	}
-
-	expectedUser := models.UserOutside{}
-
-//	errAvatar := models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"}, MethodName: "UploadAvatar"}
-
-	errDB := models.ServeError{Codes: []string{"500"}, MethodName: "ChangeUserProfile"}
-
-	multiErrors := new(models.MultiErrors)
-	multiErrors.Codes = append(multiErrors.Codes, errDB.Codes...)
-	multiErrors.Descriptions = append(multiErrors.Descriptions, errDB.Descriptions...)
-
-	expectedErr := models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions, MethodName: "ProfileChange"}
-
-	mockValidator.EXPECT().ValidateProfile(request).Return(nil)
-	mockUserStorage.EXPECT().GetUserAvatar(models.UserInput{ID: request.ID}).Return(userAvatar, nil)
-	mockAvatarStorage.EXPECT().UploadAvatar(request.Avatar, &userAvatar).Return(nil)
-	mockUserStorage.EXPECT().ChangeUserProfile(request, userAvatar).Return(expectedUser, errDB)
-
-	user, err := service.ProfileChange(request)
-	if !reflect.DeepEqual(err.(models.ServeError).Codes, expectedErr) {
-		t.Errorf("result errors not match, want \n%v, \nhave \n%v", expectedErr, err)
-		return
-	}
-	if !reflect.DeepEqual(user, expectedUser) {
-		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedUser, user)
-		return
-	}
-	if err == nil {
-		t.Errorf("wanted error, but have nil")
-		return
-	}
-}
-*/

@@ -7,10 +7,7 @@ import (
 	"testing"
 )
 
-//TODO TESTS сделать тесты на ошибки
 func TestStorage_CreateCard(t *testing.T) {
-	/*err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
-	cardInput.BoardID, cardInput.Name, cardInput.Order).Scan(&cardID)*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -33,7 +30,7 @@ func TestStorage_CreateCard(t *testing.T) {
 		Order:  cardInput.Order,
 		Tasks:  []models.TaskOutside{},
 	}
-	//ok query
+
 	mock.
 		ExpectQuery("INSERT INTO cards").
 		WithArgs(cardInput.BoardID, cardInput.Name, cardInput.Order).
@@ -53,35 +50,6 @@ func TestStorage_CreateCard(t *testing.T) {
 		return
 	}
 }
-	/*// query error
-	mock.
-		ExpectExec(`INSERT INTO items`).
-		WithArgs(title, descr).
-		WillReturnError(fmt.Errorf("bad query"))
-
-	_, err = repo.Add(testItem)
-	if err == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
-
-	// result error
-	mock.
-		ExpectExec(`INSERT INTO items`).
-		WithArgs(title, descr).
-		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("bad_result")))
-
-	_, err = repo.Add(testItem)
-	if err == nil {
-		t.Errorf("expected error, got nil")
-		return
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}*/
 
 func TestStorage_ChangeCard(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -106,9 +74,6 @@ func TestStorage_ChangeCard(t *testing.T) {
 		Order:  cardInput.Order,
 	}
 
-	//_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3",
-	//						cardInput.Name, cardInput.Order, cardInput.CardID)
-
 	mock.
 		ExpectExec("UPDATE cards SET").
 		WithArgs(cardInput.Name, cardInput.Order, cardInput.CardID).
@@ -130,8 +95,6 @@ func TestStorage_ChangeCard(t *testing.T) {
 }
 
 func TestStorage_DeleteCard(t *testing.T) {
-	//_, err := s.db.Exec("DELETE FROM cards WHERE cardID = $1", cardInput.CardID)
-
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -159,9 +122,6 @@ func TestStorage_DeleteCard(t *testing.T) {
 }
 
 func TestStorage_GetCardByID(t *testing.T) {
-	/* err := s.db.QueryRow("SELECT cardName, cardOrder FROM cards WHERE cardID = $1", cardInput.CardID).
-		Scan(&card.Name, &card.Order)
-	*/
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -179,7 +139,7 @@ func TestStorage_GetCardByID(t *testing.T) {
 	}
 
 	rows := sqlmock.NewRows([]string{"cardName", "cardOrder"}).AddRow("todo", 1)
-	//ok query
+
 	mock.
 		ExpectQuery("SELECT cardName, cardOrder FROM cards WHERE cardID").
 		WithArgs(cardInput.CardID).
@@ -201,7 +161,6 @@ func TestStorage_GetCardByID(t *testing.T) {
 }
 
 func TestStorage_GetCardsByBoard(t *testing.T) {
-	// rows, err := s.db.Query("SELECT cardID, cardName, cardOrder FROM cards WHERE boardID = $1", boardInput.BoardID)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)

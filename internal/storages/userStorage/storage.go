@@ -9,20 +9,7 @@ import (
 	"golang.org/x/crypto/argon2"
 	"reflect"
 )
-/* users table
-	userID      BIGSERIAL PRIMARY KEY,
-	email       TEXT,
-	password    TEXT,
-	username    TEXT,
-	fullname    TEXT,
-	avatar      TEXT
-*/
 
-/* social_links table
-	userID      BIGSERIAL,
-	networkName TEXT,
-	link TEXT
-*/
 type Storage interface {
 	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
 	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
@@ -42,14 +29,12 @@ type Storage interface {
 }
 
 type storage struct {
-	Users    *[]models.User
 	db *sql.DB
 }
 
-func NewStorage(db *sql.DB, someUsers *[]models.User) Storage {
+func NewStorage(db *sql.DB) Storage {
 	return &storage{
 		db: db,
-		Users: someUsers,
 	}
 }
 
@@ -73,23 +58,6 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 
 	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
 		"or password"}, MethodName: "CheckUser"}
-	//TODO error
-//	switch err {
-//	case sql.ErrNoRows:
-//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}}
-//	case nil:
-//		/*passValid := checkPass(pass, userInput.Password)
-//		fmt.Printf("passValid: %v, pass: %x\n", passValid, pass)
-//>>>>>>> 8d974589846a0a9b8ae49d500ad9131fc003166a
-//		user.Email = userInput.Email
-//		user.Links = &models.UserLinks{}
-//		return userID, user, nil*/
-//		break
-//	default:
-//		fmt.Println(err)
-//		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}}
-//	}
-
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
@@ -208,7 +176,6 @@ func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutsid
 				MethodName: "GetUserAccounts"}
 		}
 
-		//FIXME поиграться с рефлектами
 		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkName).SetString(link)
 	}
 
@@ -275,7 +242,6 @@ func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.Us
 			continue
 		}
 
-		//curNetwork :=
 		if reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() == "" {
 			_, err = s.db.Exec("INSERT INTO social_links (userID, networkName, link) VALUES ($1, $2, $3)", userInput.ID, networkNames[i], inputLink)
 		} else if inputLink == "" {

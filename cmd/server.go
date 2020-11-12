@@ -9,7 +9,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/middlewares"
 	profileHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/profile"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
@@ -41,21 +40,20 @@ func main() {
 
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
 	if err != nil {
-		//log.Fatal().Msg(err.Error())
+		fmt.Println(err)
 		return
 	}
 
 	db.SetMaxIdleConns(3)
 	db.SetMaxOpenConns(10)
 
-	err = db.Ping() // первое подключение к базе
+	err = db.Ping()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{
-		User: "guest",
-	})
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {
@@ -64,15 +62,11 @@ func main() {
 
 	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
-	someUsers := make([]models.User, 0)
-//	userSessions := make(map[string]uint64, 10)
-
 	errWorker := errorWorker.NewErrorWorker()
 
-	usersStorage := userStorage.NewStorage(db, &someUsers)
-	//sessionStorage := sessionsStorage.NewStorage(&userSessions)
+	usersStorage := userStorage.NewStorage(db)
 	sessionStorage := sessionsStorage.NewStorage(tConn)
-	avatarStorage := imgStorage.NewStorage(&someUsers)
+	avatarStorage := imgStorage.NewStorage()
 	cardStorage := cardsStorage.NewStorage(db)
 	taskStorage := tasksStorage.NewStorage(db)
 	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)
@@ -86,8 +80,7 @@ func main() {
 	boardsService := boards.NewService(usersStorage, boardsStorage, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport,
-		boardsStorage, &log)
+	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport, boardsStorage, &log)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
