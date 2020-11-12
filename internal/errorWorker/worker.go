@@ -47,12 +47,7 @@ func (e errorWorker) TransportError(c echo.Context) (err error) {
 func (e errorWorker) TokenError(c echo.Context, token string) (err error) {
 	responseErr := new(ResponseTokenError)
 	responseErr.Codes = nil
-	responseErr.Status = 600
+	responseErr.Status = 777
 	responseErr.Token = token
 	return c.JSON(http.StatusBadRequest, responseErr)
-}
-
-func (e errorWorker) LoggingErrors(serveError error) {
-
-
 }

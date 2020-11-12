@@ -1,9 +1,9 @@
 package csrf
 
 import (
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"strconv"
 	"time"
 )
@@ -31,19 +31,22 @@ func CheckToken(userID uint64, tokenString string) (err error) {
 	})
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return models.ServeError{Codes: []string{"777"}, Descriptions: []string{"Token is not valid"},
+			MethodName: "CheckToken"}
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return errors.New("Token is not valid ")
+		return models.ServeError{Codes: []string{"777"}, Descriptions: []string{"Token is not valid"},
+			MethodName: "CheckToken"}
 	}
 
 	UID := strconv.FormatUint(userID, 10)
 	tokenUID := strconv.FormatFloat(claims["uid"].(float64), 'f', 0, 64)
 
 	if tokenUID != UID {
-		return errors.New("Invalid user in token ")
+		return models.ServeError{Codes: []string{"777"}, Descriptions: []string{"Invalid user in token"},
+			MethodName: "CheckToken"}
 	}
 	return nil
 }
