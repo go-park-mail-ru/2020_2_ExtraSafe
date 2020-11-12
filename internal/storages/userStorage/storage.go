@@ -217,7 +217,6 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 		Avatar : userAvatar.Avatar,
 	}
 
-
 	return user, nil
 }
 

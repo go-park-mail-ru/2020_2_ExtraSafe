@@ -36,7 +36,6 @@ func NewService(userStorage UserStorage, boardStorage BoardStorage, validator Va
 	}
 }
 
-//TODO - подумать, данные ведь уже есть
 func (s *service) CreateBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
 	boardInternal, err := s.boardStorage.CreateBoard(request)
 	if err != nil {
@@ -93,7 +92,6 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
-//TODO избавиться от указателя
 func writeBoardOutside(boardInternal models.BoardInternal, board *models.BoardOutside, members []models.UserOutsideShort)  {
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name
