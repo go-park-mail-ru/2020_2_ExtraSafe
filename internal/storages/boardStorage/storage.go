@@ -15,6 +15,7 @@ type Storage interface {
 
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardOutside, error)
+	ChangeCardOrder(cardInput models.CardsOrderInput) error
 	DeleteCard(userInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
@@ -238,6 +239,15 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, er
 
 	card.Tasks = append(card.Tasks, tasks...)
 	return card, nil
+}
+
+func (s *storage) ChangeCardOrder(cardInput models.CardsOrderInput) error {
+	err := s.cardsStorage.ChangeCardOrder(cardInput)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *storage) DeleteCard(cardInput models.CardInput) error {

@@ -15,6 +15,7 @@ type Handler interface {
 	Card(c echo.Context) error
 	CardChange(c echo.Context) error
 	CardDelete(c echo.Context) error
+	CardOrder(c echo.Context) error
 
 	TaskCreate(c echo.Context) error
 	Task(c echo.Context) error
@@ -235,6 +236,26 @@ func (h *handler) CardDelete(c echo.Context) error {
 	}
 
 	err = h.boardsService.DeleteCard(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) CardOrder(c echo.Context) error {
+	userInput, err := h.boardsTransport.CardOrderRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.CardOrderChange(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err

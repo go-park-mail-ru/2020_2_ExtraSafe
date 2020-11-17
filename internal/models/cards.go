@@ -22,4 +22,12 @@ type CardInput struct {
 	Order   uint8  `json:"order"`
 }
 
+type CardOrder struct {
+	CardID uint64 `json:"cardID"`
+	Order  uint8  `json:"order"`
+}
 
+type CardsOrderInput struct {
+	UserID uint64      `json:"-"`
+	Cards  []CardOrder `json:"cards"`
+}

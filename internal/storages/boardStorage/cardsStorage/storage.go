@@ -13,6 +13,7 @@ type Storage interface {
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
 	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
+	ChangeCardOrder(taskInput models.CardsOrderInput) error
 }
 
 type storage struct {
@@ -110,4 +111,18 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, e
 	}
 
 	return card, nil
+}
+
+func (s *storage) ChangeCardOrder(cardInput models.CardsOrderInput) error {
+	for _, card := range cardInput.Cards {
+			_, err := s.db.Exec("UPDATE cards SET cardOrder = $1 WHERE cardID = $2",
+				card.Order, card.CardID)
+
+			if err != nil {
+				fmt.Println(err)
+				return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "ChangeCardOrder"}
+		}
+	}
+
+	return nil
 }

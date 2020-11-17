@@ -13,6 +13,7 @@ type Transport interface {
 
 	CardChangeRead(c echo.Context) (request models.CardInput, err error)
 	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
+	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
 	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
@@ -82,6 +83,19 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 	if err != nil {
 		return models.CardInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CardChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(uint64)
+
+	return *userInput, nil
+}
+
+func (t transport) CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error) {
+	userInput := new(models.CardsOrderInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.CardsOrderInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CardOrderRead"}
 	}
 
 	userInput.UserID = c.Get("userId").(uint64)
