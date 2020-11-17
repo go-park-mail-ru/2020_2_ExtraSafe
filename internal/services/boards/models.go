@@ -20,8 +20,9 @@ type BoardStorage interface {
 
 	CreateCard(cardsInput models.CardInput) (models.CardOutside, error)
 	GetCard(cardInput models.CardInput) (models.CardOutside, error)
-	ChangeCard(cardsInput models.CardInput) (models.CardOutside, error)
-	DeleteCard(cardsInput models.CardInput) error
+	ChangeCard(cardInput models.CardInput) (models.CardOutside, error)
+	DeleteCard(cardInput models.CardInput) error
+	ChangeCardOrder(cardInput models.CardsOrderInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
 	GetTask(taskInput models.TaskInput) (models.TaskOutside, error)

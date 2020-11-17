@@ -13,6 +13,7 @@ type CardsStorage interface {
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
 	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
+	ChangeCardOrder(taskInput models.CardsOrderInput) error
 }
 
 type TasksStorage interface {
