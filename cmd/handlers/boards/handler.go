@@ -1,6 +1,7 @@
 package boardsHandler
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -139,7 +140,7 @@ func (h *handler) BoardDelete(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
 
 func (h *handler) CardCreate(c echo.Context) error {
@@ -243,7 +244,7 @@ func (h *handler) CardDelete(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
 
 func (h *handler) CardOrder(c echo.Context) error {
@@ -367,7 +368,7 @@ func (h *handler) TaskDelete(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
 
 func (h *handler) TaskOrder(c echo.Context) error {
