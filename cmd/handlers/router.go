@@ -30,17 +30,17 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.Board)))
 	e.POST("/board/", middle.CookieSession(middle.CSRFToken(board.BoardCreate)))
 	e.PUT("/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardChange))))
-	e.DELETE("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.BoardDelete)))
+	e.DELETE("/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardDelete))))
 
 	e.GET("/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.Card)))
 	e.POST("/card/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.CardCreate))))
 	e.PUT("/card/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckCardUserPermission(board.CardChange))))
-	e.DELETE("/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.CardDelete)))
+	e.DELETE("/card/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckCardUserPermission(board.CardDelete))))
 
 	e.GET("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.Task)))
 	e.POST("/task/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.TaskCreate))))
 	e.PUT("/task/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TaskChange))))
-	e.DELETE("/task/:ID/", middle.CookieSession(middle.CheckTaskUserPermission(board.TaskDelete)))
+	e.DELETE("/task/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TaskDelete))))
 
 	e.POST("/task-order/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.TaskOrder)))
 	e.POST("/card-order/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.CardOrder)))
