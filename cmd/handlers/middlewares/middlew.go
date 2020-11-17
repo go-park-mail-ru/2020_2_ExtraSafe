@@ -94,7 +94,7 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token := c.Request().Header.Get("X-CSRF-Token")
+		/*token := c.Request().Header.Get("X-CSRF-Token")
 		userID := c.Get("userId").(uint64)
 
 		err := csrf.CheckToken(userID, token)
@@ -104,7 +104,7 @@ func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 				return err
 			}
 			return err
-		}
+		}*/
 
 		return next(c)
 	}
