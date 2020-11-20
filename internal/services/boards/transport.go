@@ -10,6 +10,7 @@ type Transport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
+	BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error)
 
 	CardChangeRead(c echo.Context) (request models.CardInput, err error)
 	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
@@ -66,6 +67,15 @@ func (t transport) BoardWrite(board models.BoardOutside) (response models.Respon
 	response.Users = board.Users
 	response.Name = board.Name
 	response.Cards = board.Cards
+	response.Status = 200
+	return response, err
+}
+
+func (t transport) BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error) {
+	response.BoardID = board.BoardID
+	response.Theme = board.Theme
+	response.Star = board.Star
+	response.Name = board.Name
 	response.Status = 200
 	return response, err
 }

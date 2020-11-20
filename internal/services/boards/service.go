@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	CreateBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
+	CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
@@ -37,18 +37,13 @@ func NewService(userStorage UserStorage, boardStorage BoardStorage, validator Va
 	}
 }
 
-func (s *service) CreateBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
+func (s *service) CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error) {
 	boardInternal, err := s.boardStorage.CreateBoard(request)
 	if err != nil {
-		return models.BoardOutside{}, err
+		return models.BoardOutsideShort{}, err
 	}
 
-	membersIDs := make([]uint64, 0)
-	membersIDs = append(membersIDs, boardInternal.AdminID)
-
-	members, err := s.userStorage.GetBoardMembers(membersIDs)
-
-	writeBoardOutside(boardInternal, &board, members)
+	board = writeBoardOutsideShort(boardInternal)
 	
 	return board, err
 }
@@ -68,7 +63,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 		return models.BoardOutside{}, err
 	}
 
-	writeBoardOutside(boardInternal, &board, members)
+	board = writeBoardOutside(boardInternal, members)
 
 	return board, err
 }
@@ -88,12 +83,20 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 		return models.BoardOutside{}, err
 	}
 
-	writeBoardOutside(boardInternal, &board, members)
+	board = writeBoardOutside(boardInternal, members)
 
 	return board, err
 }
 
-func writeBoardOutside(boardInternal models.BoardInternal, board *models.BoardOutside, members []models.UserOutsideShort)  {
+func writeBoardOutsideShort(boardInternal models.BoardInternal) (board models.BoardOutsideShort) {
+	board.BoardID = boardInternal.BoardID
+	board.Name = boardInternal.Name
+	board.Star = boardInternal.Star
+	board.Theme = boardInternal.Theme
+	return
+}
+
+func writeBoardOutside(boardInternal models.BoardInternal, members []models.UserOutsideShort) (board models.BoardOutside) {
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name
 	board.Star = boardInternal.Star
@@ -103,6 +106,7 @@ func writeBoardOutside(boardInternal models.BoardInternal, board *models.BoardOu
 	if len(members) > 1 {
 		board.Users = members[0:]
 	}
+	return
 }
 
 func (s *service) DeleteBoard(request models.BoardInput) (err error) {

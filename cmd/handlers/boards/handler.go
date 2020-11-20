@@ -56,7 +56,7 @@ func (h *handler) BoardCreate(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.BoardWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err

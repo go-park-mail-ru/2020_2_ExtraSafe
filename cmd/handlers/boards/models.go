@@ -6,7 +6,7 @@ import (
 )
 
 type boardsService interface {
-	CreateBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
+	CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
@@ -28,6 +28,7 @@ type boardsTransport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
+	BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error)
 
 	CardChangeRead(c echo.Context) (request models.CardInput, err error)
 	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
