@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package protoProfile;
+
+message UserOutside {
+  string Email = 1;
+  string Username =  2;
+  string FullName = 3;
+  UserLinks Links = 4;
+  string Avatar = 5;
+}
+
+message UserLinks {
+  string Instagram = 1;
+  string Github = 2;
+  string Bitbucket = 3;
+  string Vk = 4;
+  string Facebook = 5;
+}
+
+message UserInputLinks {
+  uint64 ID = 1;
+  string Instagram = 2;
+  string Github = 3;
+  string Bitbucket = 4;
+  string Vk = 5;
+  string Facebook = 6;
+  string Telegram = 7;
+}
+
+message UserInputProfile {
+  uint64 ID = 1;
+  string Email = 2;
+  string Username = 3;
+  string FullName = 4;
+  //*multipart.FileHeader Avatar = 5;
+}
+
+message BoardOutsideShort {
+  uint64 BoardID = 1;
+  string Name = 2;
+  string Theme = 3;
+  bool Star = 4;
+}
+
+message UserInputPassword {
+  uint64 ID = 1;
+  string OldPassword = 2;
+  string Password = 3;
+}
+
+message BoardsOutsideShort {
+  repeated BoardOutsideShort boards = 1;
+}
+
+message UserInputLogin {
+  string Email = 1;
+  string Password = 2;
+}
+
+message UserInputReg {
+  string Email = 1;
+  string Username = 2;
+  string Password = 3;
+}
+
+message UserID {
+  uint64 ID = 1;
+}
+
+message UserBoardsOutside {
+  string Email = 1;
+  string Username = 2;
+  string FullName = 3;
+  protoProfile.UserLinks Links = 4;
+  string Avatar = 5;
+  repeated BoardOutsideShort Boards = 6;
+}
+
+message UserOutsideShort {
+  string Email = 1;
+  string Username = 2;
+  string FullName = 3;
+  string Avatar = 4;
+}
+
+service Profile {
+  rpc CheckUser (UserInputLogin) returns (UserID);
+  rpc CreateUser (UserInputReg) returns (UserID);
+  rpc Profile (UserID) returns (UserOutside);
+  rpc Accounts (UserID) returns (UserOutside);
+  rpc Boards (UserID) returns (BoardsOutsideShort);
+  rpc ProfileChange (UserInputProfile) returns (UserOutside);
+  rpc AccountsChange (UserInputLinks) returns (UserOutside);
+  rpc PasswordChange (UserInputPassword) returns (UserOutside);
+}

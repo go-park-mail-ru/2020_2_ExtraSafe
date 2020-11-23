@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package protoAuth;
+
+//option go_package = "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto";
+import "profile/profile.proto";
+
+/*message UserLinks {
+  string Instagram = 1;
+  string Github = 2;
+  string Bitbucket = 3;
+  string Vk = 4;
+  string Facebook = 5;
+}*/
+
+
+service Auth {
+  rpc Auth (protoProfile.UserID) returns (protoProfile.UserBoardsOutside) {}
+  rpc Login (protoProfile.UserInputLogin) returns (protoProfile.UserID) {}
+  rpc Registration (protoProfile.UserInputReg) returns (protoProfile.UserID) {}
+}

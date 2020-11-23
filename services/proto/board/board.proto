@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package protoBoard;
+import "profile/profile.proto";
+
+message BoardChangeInput {
+  uint64 UserID = 1;
+  uint64 BoardID = 2;
+  string BoardName = 3;
+  string Theme = 4;
+  bool Star = 5;
+}
+
+message BoardInput {
+  uint64 UserID = 1;
+  uint64 BoardID = 2;
+}
+
+message BoardOutside {
+  uint64 BoardID = 1;
+  protoProfile.UserOutsideShort Admin = 2;
+  string Name = 3;
+  string Theme = 4;
+  bool Star = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated CardOutside Cards = 7;
+}
+
+message CardInput {
+  uint64 UserID = 1;
+  uint64 CardID = 2;
+  uint64 BoardID = 3;
+  string Name = 4;
+  uint32 Order = 5;
+}
+
+message CardOrder {
+  uint64 CardID = 1;
+  uint32 Order = 2;
+}
+
+message CardsOrderInput {
+  uint64 UserID = 1;
+  repeated CardOrder Cards = 2;
+}
+
+message CardOutside {
+  uint64 CardID = 1;
+  string Name = 2;
+  uint32 Order = 3;
+  repeated TaskOutside Tasks = 4;
+}
+
+message TaskInput {
+  uint64 UserID = 1;
+  uint64 TaskID = 2;
+  uint64 CardID = 3;
+  string Name = 4;
+  string Description = 5;
+  uint32 Order = 6;
+}
+
+message TaskOrder {
+  uint64 TaskID = 1;
+  uint32 Order = 2;
+}
+
+message TasksOrder {
+  uint64 CardID = 1;
+  repeated TaskOrder Tasks = 2;
+}
+
+message TasksOrderInput {
+  uint64 UserID = 1;
+  repeated TasksOrder Cards = 2;
+}
+
+message TaskOutside {
+  uint64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  uint32 Order = 4;
+}
+
+message Nothing {
+  bool dummy = 1;
+}
+
+service Board {
+  rpc GetBoardsList(protoProfile.UserID) returns (protoProfile.BoardsOutsideShort);
+
+  rpc CreateBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort);
+  rpc GetBoard (BoardInput) returns (BoardOutside);
+  rpc ChangeBoard (BoardChangeInput) returns (BoardOutside);
+  rpc DeleteBoard (BoardInput) returns (Nothing);
+
+  rpc CreateCard (CardInput) returns (CardOutside);
+  rpc GetCard (CardInput) returns (CardOutside);
+  rpc ChangeCard (CardInput) returns (CardOutside);
+  rpc DeleteCard (CardInput) returns (Nothing);
+  rpc CardOrderChange (CardsOrderInput) returns (Nothing);
+
+  rpc CreateTask (TaskInput) returns (TaskOutside);
+  rpc GetTask (TaskInput) returns (TaskOutside);
+  rpc ChangeTask (TaskInput) returns (TaskOutside);
+  rpc DeleteTask (TaskInput) returns (Nothing);
+  rpc TasksOrderChange (TasksOrderInput) returns (Nothing);
+}
