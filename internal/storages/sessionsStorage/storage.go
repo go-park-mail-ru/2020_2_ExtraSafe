@@ -2,12 +2,9 @@ package sessionsStorage
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/tarantool/go-tarantool"
 )
-
-//go:generate mockgen -destination=./mock/mock_sessionsStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/sessionsStorage Storage
 
 type Storage interface {
 	DeleteUserSession(sessionId string) error
@@ -55,19 +52,8 @@ func (s *storage) CheckUserSession(sessionId string) (uint64, error) {
 	}
 
 	data := resp.Data[0]
-	sessionDataSlice, ok := data.([]interface{})
-	if !ok {
-		return 0, models.ServeError{Codes: []string{"500"},
-			OriginalError: fmt.Errorf("cannot cast data: %v", sessionDataSlice),
-			MethodName: "CheckUserSession"}
-	}
-
-	userData, ok := sessionDataSlice[1].(uint64)
-	if !ok {
-		return 0, models.ServeError{Codes: []string{"500"},
-			OriginalError: fmt.Errorf("cannot cast data: %v", sessionDataSlice[1]),
-			MethodName: "CheckUserSession"}
-	}
+	sessionDataSlice, _ := data.([]interface{})
+	userData, _ := sessionDataSlice[1].(uint64)
 
 	return userData, nil
 }

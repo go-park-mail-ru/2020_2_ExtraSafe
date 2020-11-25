@@ -115,7 +115,7 @@ func TestService_ProfileChange(t *testing.T) {
 
 	mockValidator.EXPECT().ValidateProfile(request).Return(nil)
 	mockUserStorage.EXPECT().GetUserAvatar(models.UserInput{ID: request.ID}).Return(userAvatar, nil)
-	mockAvatarStorage.EXPECT().UploadAvatar(request.Avatar, &userAvatar).Return(nil)
+	mockAvatarStorage.EXPECT().UploadAvatar(request.Avatar, &userAvatar, false).Return(nil)
 	mockUserStorage.EXPECT().ChangeUserProfile(request, userAvatar).Return(expectedUser, nil)
 
 	user, err := service.ProfileChange(request)
@@ -176,7 +176,7 @@ func TestService_ProfileChangeError(t *testing.T) {
 	mockUserStorage.EXPECT().GetUserAvatar(models.UserInput{ID: request.ID}).Return(userAvatar, nil)
 	mockAvatarStorage.
 		EXPECT().
-		UploadAvatar(request.Avatar, &userAvatar).
+		UploadAvatar(request.Avatar, &userAvatar, false).
 		Return(errAvatar)
 	mockUserStorage.EXPECT().ChangeUserProfile(request, userAvatar).Return(expectedUser, nil)
 

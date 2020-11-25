@@ -123,7 +123,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 	if err != nil {
 		return models.BoardInternal{}, err
 	}
-
 	for _, card := range cards {
 		cardInput := models.CardInput{CardID: card.CardID}
 
@@ -136,7 +135,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		board.Cards = append(board.Cards, card)
 	}
 
-	//board.Cards = append(board.Cards, cards...)
 	return board, nil
 }
 
@@ -217,13 +215,9 @@ func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
 }
 
 func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
-	card, err := s.cardsStorage.CreateCard(cardInput)
-	if err != nil {
-		return models.CardOutside{}, err
-	}
-
+	//card, err :=
 	//не ищем таски, потому что при создании доски они пустые
-	return card, nil
+	return s.cardsStorage.CreateCard(cardInput)
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, error) {
@@ -242,56 +236,27 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, er
 }
 
 func (s *storage) ChangeCardOrder(cardInput models.CardsOrderInput) error {
-	err := s.cardsStorage.ChangeCardOrder(cardInput)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.cardsStorage.ChangeCardOrder(cardInput)
 }
 
 func (s *storage) DeleteCard(cardInput models.CardInput) error {
-	err := s.cardsStorage.DeleteCard(cardInput)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.cardsStorage.DeleteCard(cardInput)
 }
 
 func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	task, err := s.tasksStorage.CreateTask(taskInput)
-	if err != nil {
-		return models.TaskOutside{}, err
-	}
-
-	return task, nil
+	return s.tasksStorage.CreateTask(taskInput)
 }
 
 func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	task, err := s.tasksStorage.ChangeTask(taskInput)
-	if err != nil {
-		return models.TaskOutside{}, nil
-	}
-	return task, nil
+	return s.tasksStorage.ChangeTask(taskInput)
 }
 
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
-	err := s.tasksStorage.ChangeTaskOrder(taskInput)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.tasksStorage.ChangeTaskOrder(taskInput)
 }
 
 func (s *storage) DeleteTask(taskInput models.TaskInput) error {
-	err := s.tasksStorage.DeleteTask(taskInput)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.tasksStorage.DeleteTask(taskInput)
 }
 
 func (s *storage) GetCard(cardInput models.CardInput) (models.CardOutside, error) {
@@ -310,12 +275,7 @@ func (s *storage) GetCard(cardInput models.CardInput) (models.CardOutside, error
 }
 
 func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	task, err := s.tasksStorage.GetTaskByID(taskInput)
-	if err != nil {
-		return models.TaskOutside{}, err
-	}
-
-	return task, nil
+	return s.tasksStorage.GetTaskByID(taskInput)
 }
 
 func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error) {

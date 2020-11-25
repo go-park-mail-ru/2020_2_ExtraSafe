@@ -54,11 +54,11 @@ func main() {
 	}
 
 	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
 
 	if err != nil {
 		fmt.Println("Connection refused")
 	}
+	defer tConn.Close()
 
 	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 

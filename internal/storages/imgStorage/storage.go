@@ -16,7 +16,7 @@ import (
 )
 
 type Storage interface {
-	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
+	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error
 }
 
 type storage struct {}
@@ -25,7 +25,7 @@ func NewStorage() Storage {
 	return &storage{}
 }
 
-func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error {
+func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -41,22 +41,25 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvat
 	formattedID := strconv.FormatUint(user.ID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 
-	filename, err := saveImage(&src, name)
+	filename, err := saveImage(&src, name, isTest)
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
 			MethodName: "UploadAvatar"}
 	}
 
 	user.Avatar = "avatars/" + filename
 	if oldAvatar != "default/default_avatar.png" {
-		os.Remove("../" + oldAvatar)
+		if isTest {
+			os.Remove("../../../" + oldAvatar)
+		} else {
+			os.Remove("../" + oldAvatar)
+		}
 	}
 
 	return nil
 }
 
-func saveImage(src *multipart.File, name string) (string, error) {
+func saveImage(src *multipart.File, name string, isTest bool) (string, error) {
 	img, fmtName, err := image.Decode(*src)
 	if err != nil {
 		return "", err
@@ -64,7 +67,13 @@ func saveImage(src *multipart.File, name string) (string, error) {
 
 	filename := name + "." + fmtName
 
-	dst, err := os.Create("../avatars/" + filename)
+	var dst *os.File
+	if isTest {
+		dst, err = os.Create("../../../avatars/" + filename)
+	} else {
+		dst, err = os.Create("../avatars/" + filename)
+	}
+
 	if err != nil {
 		return "", err
 	}
@@ -97,5 +106,3 @@ func saveImage(src *multipart.File, name string) (string, error) {
 	}
 	return filename, nil
 }
-
-

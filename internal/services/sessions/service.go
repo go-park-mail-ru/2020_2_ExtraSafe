@@ -16,10 +16,10 @@ type Service interface {
 }
 
 type service struct {
-	sessionsStorage sessionsStorage
+	sessionsStorage SessionStorage
 }
 
-func NewService(sessionsStorage sessionsStorage) Service {
+func NewService(sessionsStorage SessionStorage) Service {
 	return &service{
 		sessionsStorage: sessionsStorage,
 	}

@@ -72,7 +72,7 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 	}
 
 	if request.Avatar != nil {
-		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar)
+		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar, false)
 		if errAvatar != nil {
 			multiErrors.Codes = append(multiErrors.Codes, errAvatar.(models.ServeError).Codes...)
 			multiErrors.Descriptions = append(multiErrors.Descriptions, errAvatar.(models.ServeError).Descriptions...)

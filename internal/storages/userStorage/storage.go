@@ -46,18 +46,22 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 	err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
 				Scan(&userID, &pass, &user.Username, &user.FullName, &user.Avatar)
 
-
-	if err != sql.ErrNoRows {
-		if err != nil {
-			fmt.Println(err)
-		}
+	if err == sql.ErrNoRows {
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email "}, MethodName: "CheckUser"}
+	}
+	if err != nil {
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CheckUser"}
+	}
+	if checkPass(pass, userInput.Password) {
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
 		return userID, user, nil
 	}
-
-	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
-		"or password"}, MethodName: "CheckUser"}
+	return 0, models.UserOutside{}, models.ServeError{
+			Codes: []string{"101"},
+			Descriptions: []string{"Invalid password"},
+			MethodName: "CheckUser" }
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {

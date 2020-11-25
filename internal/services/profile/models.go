@@ -21,7 +21,7 @@ type UserStorage interface {
 }
 
 type AvatarStorage interface {
-	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
+	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error
 }
 
 type BoardStorage interface {
