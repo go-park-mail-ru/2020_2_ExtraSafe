@@ -26,7 +26,7 @@ func NewTransport() Transport {
 
 func (t transport) ProfileRead(c echo.Context) (request models.UserInput, err error) {
 	userInput := new(models.UserInput)
-	userInput.ID = c.Get("userId").(uint64)
+	userInput.ID = c.Get("userId").(int64)
 	return *userInput, nil
 }
 
@@ -47,7 +47,7 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 		userInput.Avatar = file
 	}
 
-	userInput.ID = c.Get("userId").(uint64)
+	userInput.ID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -59,7 +59,7 @@ func (t transport) AccountsChangeRead(c echo.Context) (request models.UserInputL
 			MethodName: "AccountsChangeRead"}
 	}
 
-	userInput.ID = c.Get("userId").(uint64)
+	userInput.ID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -71,7 +71,7 @@ func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputP
 			MethodName: "PasswordChangeRead"}
 	}
 
-	userInput.ID = c.Get("userId").(uint64)
+	userInput.ID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }

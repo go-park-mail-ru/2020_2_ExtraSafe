@@ -32,13 +32,13 @@ func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err err
 	userInput := new(models.BoardInput)
 
 	boardID := c.Param("ID")
-	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
+	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
 	if err != nil {
 		return models.BoardInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -47,14 +47,14 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	userInput := new(models.BoardChangeInput)
 
 	boardID := c.Param("ID")
-	userInput.BoardID, err = strconv.ParseUint(boardID, 10, 64)
+	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
 
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -89,13 +89,13 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 	}
 
 	cardID := c.Param("ID")
-	userInput.CardID, err = strconv.ParseUint(cardID, 10, 64)
+	userInput.CardID, err = strconv.ParseInt(cardID, 10, 64)
 	if err != nil {
 		return models.CardInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CardChangeRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -108,7 +108,7 @@ func (t transport) CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderIn
 			MethodName: "CardOrderRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -131,13 +131,13 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 	}
 
 	taskID := c.Param("ID")
-	userInput.TaskID, err = strconv.ParseUint(taskID, 10, 64)
+	userInput.TaskID, err = strconv.ParseInt(taskID, 10, 64)
 	if err != nil {
 		return models.TaskInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TaskChangeRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }
@@ -159,7 +159,7 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 			MethodName: "TasksOrderRead"}
 	}
 
-	userInput.UserID = c.Get("userId").(uint64)
+	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
 }

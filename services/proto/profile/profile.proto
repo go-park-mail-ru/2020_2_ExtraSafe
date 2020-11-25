@@ -21,7 +21,7 @@ message UserLinks {
 }
 
 message UserInputLinks {
-  uint64 ID = 1;
+  int64 ID = 1;
   string Instagram = 2;
   string Github = 3;
   string Bitbucket = 4;
@@ -31,7 +31,7 @@ message UserInputLinks {
 }
 
 message UserInputProfile {
-  uint64 ID = 1;
+  int64 ID = 1;
   string Email = 2;
   string Username = 3;
   string FullName = 4;
@@ -39,14 +39,14 @@ message UserInputProfile {
 }
 
 message BoardOutsideShort {
-  uint64 BoardID = 1;
+  int64 BoardID = 1;
   string Name = 2;
   string Theme = 3;
   bool Star = 4;
 }
 
 message UserInputPassword {
-  uint64 ID = 1;
+  int64 ID = 1;
   string OldPassword = 2;
   string Password = 3;
 }
@@ -67,7 +67,7 @@ message UserInputReg {
 }
 
 message UserID {
-  uint64 ID = 1;
+  int64 ID = 1;
 }
 
 message UserBoardsOutside {

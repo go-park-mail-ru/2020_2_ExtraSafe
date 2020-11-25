@@ -27,7 +27,7 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
-	var cardID uint64
+	var cardID int64
 
 	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
 								cardInput.BoardID, cardInput.Name, cardInput.Order).Scan(&cardID)

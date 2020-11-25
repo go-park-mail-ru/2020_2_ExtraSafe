@@ -1,33 +1,33 @@
 package models
 
 type Card struct {
-	CardID  uint64 `json:"columnID"`
-	BoardID uint64 `json:"boardID"`
+	CardID  int64 `json:"columnID"`
+	BoardID int64 `json:"boardID"`
 	Name    string `json:"cardName"`
-	Order   uint8  `json:"order"`
+	Order   int64  `json:"order"`
 }
 
 type CardOutside struct {
-	CardID uint64        `json:"cardID"`
+	CardID int64        `json:"cardID"`
 	Name   string        `json:"cardName"`
-	Order  uint8         `json:"order"`
+	Order  int64         `json:"order"`
 	Tasks  []TaskOutside `json:"tasks"`
 }
 
 type CardInput struct {
-	UserID  uint64 `json:"-"`
-	CardID  uint64 `json:"cardID"`
-	BoardID uint64 `json:"boardID"`
+	UserID  int64 `json:"-"`
+	CardID  int64 `json:"cardID"`
+	BoardID int64 `json:"boardID"`
 	Name    string `json:"cardName"`
-	Order   uint8  `json:"order"`
+	Order   int64  `json:"order"`
 }
 
 type CardOrder struct {
-	CardID uint64 `json:"cardID"`
-	Order  uint8  `json:"order"`
+	CardID int64 `json:"cardID"`
+	Order  int64  `json:"order"`
 }
 
 type CardsOrderInput struct {
-	UserID uint64      `json:"-"`
+	UserID int64      `json:"-"`
 	Cards  []CardOrder `json:"cards"`
 }

@@ -13,8 +13,8 @@ import (
 
 type AuthService interface {
 	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
-	Login(request models.UserInputLogin) (userID uint64, response models.UserOutside, err error)
-	Registration(request models.UserInputReg) (userID uint64, response models.UserOutside, err error)
+	Login(request models.UserInputLogin) (userID int64, response models.UserOutside, err error)
+	Registration(request models.UserInputReg) (userID int64, response models.UserOutside, err error)
 }
 
 type AuthTransport interface {
@@ -28,9 +28,9 @@ type AuthTransport interface {
 }
 
 type AuthSessions interface {
-	SetCookie(c echo.Context, userID uint64) error
+	SetCookie(c echo.Context, userID int64) error
 	DeleteCookie(c echo.Context) error
-	CheckCookie(c echo.Context) (uint64, error)
+	CheckCookie(c echo.Context) (int64, error)
 }
 
 type ErrorWorker interface {

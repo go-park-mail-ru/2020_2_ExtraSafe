@@ -6,9 +6,9 @@ import (
 )
 
 type sessionsService interface {
-	SetCookie(c echo.Context, userID uint64) error
+	SetCookie(c echo.Context, userID int64) error
 	DeleteCookie(c echo.Context) error
-	CheckCookie(c echo.Context) (uint64, error)
+	CheckCookie(c echo.Context) (int64, error)
 }
 
 type errorWorker interface {
@@ -26,7 +26,7 @@ type authTransport interface {
 }
 
 type boardStorage interface {
-	CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error)
-	CheckCardPermission(userID uint64, cardID uint64) (err error)
-	CheckTaskPermission(userID uint64, taskID uint64) (err error)
+	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (err error)
+	CheckTaskPermission(userID int64, taskID int64) (err error)
 }

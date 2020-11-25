@@ -74,7 +74,7 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 }
 
 func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
-	var boardID uint64
+	var boardID int64
 
 	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
 		boardInput.UserID,
@@ -95,7 +95,7 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
 		Cards:    []models.CardOutside{},
-		UsersIDs: []uint64{},
+		UsersIDs: []int64{},
 	}
 	return board, nil
 }
@@ -142,21 +142,21 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 	return board, nil
 }
 
-func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error) {
-	members := make([]uint64, 0)
+func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]int64, error) {
+	members := make([]int64, 0)
 
 	rows, err := s.db.Query("SELECT userID from board_members WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		return []uint64{}, models.ServeError{Codes: []string{"500"}, MethodName: "getBoardMembers"}
+		return []int64{}, models.ServeError{Codes: []string{"500"}, MethodName: "getBoardMembers"}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var userID uint64
+		var userID int64
 
 		err = rows.Scan(&userID)
 		if err != nil {
-			return []uint64{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			return []int64{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "getBoardMembers"}
 		}
 

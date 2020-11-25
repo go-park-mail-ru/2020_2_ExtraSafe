@@ -95,7 +95,7 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		/*token := c.Request().Header.Get("X-CSRF-Token")
-		userID := c.Get("userId").(uint64)
+		userID := c.Get("userId").(int64)
 
 		err := csrf.CheckToken(userID, token)
 		if err != nil {
@@ -153,7 +153,7 @@ func (m middlew) Logger(next echo.HandlerFunc) echo.HandlerFunc {
 func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		bid := c.Param("ID")
-		boardID, err := strconv.ParseUint(bid, 10, 64)
+		boardID, err := strconv.ParseInt(bid, 10, 64)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
@@ -161,7 +161,7 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 			return err
 		}
 
-		userID := c.Get("userId").(uint64)
+		userID := c.Get("userId").(int64)
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, false)
 		if err != nil {
@@ -180,12 +180,12 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		bid := c.Param("ID")
-		boardID, err := strconv.ParseUint(bid, 10, 64)
+		boardID, err := strconv.ParseInt(bid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
 		}
 
-		userID := c.Get("userId").(uint64)
+		userID := c.Get("userId").(int64)
 
 		err = m.boardStorage.CheckBoardPermission(userID, boardID, true)
 		if err != nil {
@@ -204,12 +204,12 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cid := c.Param("ID")
-		cardID, err := strconv.ParseUint(cid, 10, 64)
+		cardID, err := strconv.ParseInt(cid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
 		}
 
-		userID := c.Get("userId").(uint64)
+		userID := c.Get("userId").(int64)
 
 		err = m.boardStorage.CheckCardPermission(userID, cardID)
 		if err != nil {
@@ -226,12 +226,12 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tid := c.Param("ID")
-		taskID, err := strconv.ParseUint(tid, 10, 64)
+		taskID, err := strconv.ParseInt(tid, 10, 64)
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
 		}
 
-		userID := c.Get("userId").(uint64)
+		userID := c.Get("userId").(int64)
 
 		err = m.boardStorage.CheckTaskPermission(userID, taskID)
 		if err != nil {

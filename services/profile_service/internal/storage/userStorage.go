@@ -11,20 +11,20 @@ import (
 )
 
 type Storage interface {
-	CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error)
-	CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error)
+	CheckUser(userInput models.UserInputLogin) (int64, models.UserOutside, error)
+	CreateUser(userInput models.UserInputReg) (int64, models.UserOutside, error)
 
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
-	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
 	CheckExistingUser(email string, username string) (errors models.MultiErrors)
-	checkExistingUserOnUpdate(email string, username string, userID uint64) (errors models.MultiErrors)
+	checkExistingUserOnUpdate(email string, username string, userID int64) (errors models.MultiErrors)
 	GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
 }
 
@@ -38,9 +38,9 @@ func NewStorage(db *sql.DB) Storage {
 	}
 }
 
-func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.UserOutside, error) {
+func (s *storage) CheckUser(userInput models.UserInputLogin) (int64, models.UserOutside, error) {
 	user := models.UserOutside{}
-	var userID uint64
+	var userID int64
 
 	pass := make([]byte, 0)
 	err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
@@ -60,14 +60,14 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (uint64, models.Use
 		"or password"}, MethodName: "CheckUser"}
 }
 
-func (s *storage) CreateUser(userInput models.UserInputReg) (uint64, models.UserOutside, error) {
+func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserOutside, error) {
 	multiErrors := s.CheckExistingUser(userInput.Email, userInput.Username)
 	if len(multiErrors.Codes) != 0 {
 		return 0, models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes,
 			Descriptions: multiErrors.Descriptions}
 	}
 
-	var ID uint64
+	var ID int64
 	salt := make([]byte, 8)
 
 	rand.Read(salt)
@@ -113,8 +113,8 @@ func (s *storage) CheckExistingUser(email string, username string) (multiErrors 
 	return multiErrors
 }
 
-func (s *storage) checkExistingUserOnUpdate(email string, username string, userID uint64) (multiErrors models.MultiErrors){
-	var existingUserID uint64 = 0
+func (s *storage) checkExistingUserOnUpdate(email string, username string, userID int64) (multiErrors models.MultiErrors){
+	var existingUserID int64 = 0
 
 	err := s.db.QueryRow("SELECT userID FROM users WHERE email = $1", email).Scan(&existingUserID)
 	if err != sql.ErrNoRows && existingUserID != userID {
@@ -291,7 +291,7 @@ func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutsid
 	return user, nil, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
 }
 
-func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) {
+func (s *storage) GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) {
 	members := make([]models.UserOutsideShort, 0)
 
 	for _, userID := range userIDs {

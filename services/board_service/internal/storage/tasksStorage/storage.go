@@ -27,7 +27,7 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, error) {
-	var taskID uint64
+	var taskID int64
 
 	err := s.db.QueryRow("INSERT INTO tasks (cardID, taskName, description, tasksOrder) VALUES ($1, $2, $3, $4) RETURNING taskID",
 								taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).Scan(&taskID)
@@ -119,7 +119,7 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, e
 }
 
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
-	for _, card := range taskInput.Cards {
+	for _, card := range taskInput.Tasks {
 		for _, task := range card.Tasks {
 			_, err := s.db.Exec("UPDATE tasks SET cardID = $1, tasksOrder = $2 WHERE taskID = $3",
 				card.CardID, task.Order, task.TaskID)
