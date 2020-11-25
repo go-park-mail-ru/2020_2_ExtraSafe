@@ -9,13 +9,13 @@ import (
 )
 
 type Service interface {
-	GenerateToken(userID uint64) (token string, err error)
-	CheckToken(userID uint64, tokenString string) (err error)
+	GenerateToken(userID int64) (token string, err error)
+	CheckToken(userID int64, tokenString string) (err error)
 }
 
 var mySigningKey = []byte("3ndec")
 
-func GenerateToken(userID uint64) (token string, err error) {
+func GenerateToken(userID int64) (token string, err error) {
 	jwtToken := jwt.New(jwt.SigningMethodHS256)
 
 	claims := jwtToken.Claims.(jwt.MapClaims)
@@ -25,7 +25,7 @@ func GenerateToken(userID uint64) (token string, err error) {
 	return jwtToken.SignedString(mySigningKey)
 }
 
-func CheckToken(userID uint64, tokenString string) (err error) {
+func CheckToken(userID int64, tokenString string) (err error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return mySigningKey, nil
 	})
@@ -41,7 +41,7 @@ func CheckToken(userID uint64, tokenString string) (err error) {
 			MethodName: "CheckToken"}
 	}
 
-	UID := strconv.FormatUint(userID, 10)
+	UID := strconv.FormatInt(userID, 10)
 	tokenUID := strconv.FormatFloat(claims["uid"].(float64), 'f', 0, 64)
 
 	if tokenUID != UID {

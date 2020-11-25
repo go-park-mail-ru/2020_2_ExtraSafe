@@ -54,7 +54,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 		return models.BoardOutside{}, err
 	}
 
-	membersIDs := make([]uint64, 0)
+	membersIDs := make([]int64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
@@ -74,7 +74,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 		return models.BoardOutside{}, err
 	}
 
-	membersIDs := make([]uint64, 0)
+	membersIDs := make([]int64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 

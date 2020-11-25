@@ -10,9 +10,9 @@ import (
 )
 
 type Service interface {
-	SetCookie(c echo.Context, userID uint64) error
+	SetCookie(c echo.Context, userID int64) error
 	DeleteCookie(c echo.Context) error
-	CheckCookie(c echo.Context) (uint64, error)
+	CheckCookie(c echo.Context) (int64, error)
 }
 
 type service struct {
@@ -29,7 +29,7 @@ var (
 	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
-func (s *service)SetCookie(c echo.Context, userID uint64) error {
+func (s *service)SetCookie(c echo.Context, userID int64) error {
 	cookie := new(http.Cookie)
 	SID := RandStringRunes(32)
 
@@ -65,7 +65,7 @@ func (s *service)DeleteCookie(c echo.Context) error {
 	return nil
 }
 
-func (s *service)CheckCookie(c echo.Context) (uint64, error) {
+func (s *service)CheckCookie(c echo.Context) (int64, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
 		fmt.Println(err)

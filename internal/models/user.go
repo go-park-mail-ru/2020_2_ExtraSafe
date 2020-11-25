@@ -37,12 +37,12 @@ type UserLinks struct {
 }
 
 type UserAvatar struct {
-	ID uint64
+	ID int64
 	Avatar string
 }
 
 type UserInputLinks struct {
-	ID        uint64 `json:"-"`
+	ID        int64 `json:"-"`
 	Telegram  string `json:"telegram" valid:"telegramValid~611"`
 	Instagram string `json:"instagram" valid:"instagramValid~612"`
 	Github    string `json:"github" valid:"githubValid~613"`
@@ -52,7 +52,7 @@ type UserInputLinks struct {
 }
 
 type UserInput struct {
-	ID uint64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
 type UserInputLogin struct {
@@ -67,7 +67,7 @@ type UserInputReg struct {
 }
 
 type UserInputProfile struct {
-	ID       uint64                `json:"-"`
+	ID       int64                `json:"-"`
 	Email    string                `json:"email" valid:"required~311, emailValid~311"`
 	Username string                `json:"username" valid:"required~312, userNameValid~312"`
 	FullName string                `json:"fullName" valid:"fullNameValid~314"`
@@ -75,14 +75,14 @@ type UserInputProfile struct {
 }
 
 type UserInputPassword struct {
-	ID          uint64 `json:"-"`
+	ID          int64 `json:"-"`
 	OldPassword string `json:"oldpassword" valid:"required~511, passwordValid~511"`
 	Password    string `json:"password" valid:"required~512, passwordValid~512"`
 }
 
 // для работы в бд
 type User struct {
-	ID       uint64 `json:"id"`
+	ID       int64 `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
