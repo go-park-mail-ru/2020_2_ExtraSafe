@@ -23,13 +23,16 @@ type Storage interface {
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 	DeleteTask(taskInput models.TaskInput) error
 
+	AddUser(input models.BoardMember) (err error)
+	RemoveUser(input models.BoardMember) (err error)
+
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
 	GetCard(cardInput models.CardInput) (models.CardOutside, error)
 	GetTask(taskInput models.TaskInput) (models.TaskOutside, error)
 
-	CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error)
-	CheckCardPermission(userID uint64, cardID uint64) (err error)
-	CheckTaskPermission(userID uint64, taskID uint64) (err error)
+	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (err error)
+	CheckTaskPermission(userID int64, taskID int64) (err error)
 }
 
 type storage struct {
@@ -72,7 +75,7 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 }
 
 func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
-	var boardID uint64
+	var boardID int64
 
 	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
 		boardInput.UserID,
@@ -93,7 +96,7 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
 		Cards:    []models.CardOutside{},
-		UsersIDs: []uint64{},
+		UsersIDs: []int64{},
 	}
 	return board, nil
 }
@@ -138,21 +141,21 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 	return board, nil
 }
 
-func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]uint64, error) {
-	members := make([]uint64, 0)
+func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]int64, error) {
+	members := make([]int64, 0)
 
 	rows, err := s.db.Query("SELECT userID from board_members WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		return []uint64{}, models.ServeError{Codes: []string{"500"}, MethodName: "getBoardMembers"}
+		return []int64{}, models.ServeError{Codes: []string{"500"}, MethodName: "getBoardMembers"}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var userID uint64
+		var userID int64
 
 		err = rows.Scan(&userID)
 		if err != nil {
-			return []uint64{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			return []int64{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "getBoardMembers"}
 		}
 
@@ -278,7 +281,7 @@ func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskOutside, error
 	return s.tasksStorage.GetTaskByID(taskInput)
 }
 
-func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bool) (err error) {
+func (s *storage) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error) {
 	var ok bool
 
 	if ifAdmin {
@@ -300,8 +303,8 @@ func (s *storage) CheckBoardPermission(userID uint64, boardID uint64, ifAdmin bo
 	return nil
 }
 
-func (s *storage) checkBoardAdminPermission(userID uint64, boardID uint64) (flag bool, err error) {
-	var ID uint64
+func (s *storage) checkBoardAdminPermission(userID int64, boardID int64) (flag bool, err error) {
+	var ID int64
 	err = s.db.QueryRow("SELECT boardID FROM boards WHERE boardID = $1 AND adminID = $2", boardID, userID).Scan(&ID)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
@@ -315,8 +318,8 @@ func (s *storage) checkBoardAdminPermission(userID uint64, boardID uint64) (flag
 	return true, nil
 }
 
-func (s *storage) checkBoardUserPermission(userID uint64, boardID uint64) (flag bool, err error) {
-	var ID uint64
+func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bool, err error) {
+	var ID int64
 	err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err)
@@ -330,8 +333,8 @@ func (s *storage) checkBoardUserPermission(userID uint64, boardID uint64) (flag 
 	return true, nil
 }
 
-func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) {
-	var boardID uint64
+func (s *storage) CheckCardPermission(userID int64, cardID int64) (err error) {
+	var boardID int64
 
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
@@ -350,8 +353,8 @@ func (s *storage) CheckCardPermission(userID uint64, cardID uint64) (err error) 
 	return nil
 }
 
-func (s *storage) CheckTaskPermission(userID uint64, taskID uint64) (err error) {
-	var boardID uint64
+func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
+	var boardID int64
 
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +

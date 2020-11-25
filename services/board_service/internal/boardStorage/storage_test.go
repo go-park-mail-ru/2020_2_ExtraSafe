@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage/mock"
+	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/mock"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -37,7 +37,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
 		Cards:    []models.CardOutside{},
-		UsersIDs: []uint64{},
+		UsersIDs: []int64{},
 	}
 
 	mock.
@@ -168,7 +168,7 @@ func TestStorage_ChangeBoard(t *testing.T) {
 
 	expectedCards[0].Tasks = append(expectedCards[0].Tasks, expectedTasks...)
 	expectBoardOutside.Cards = append(expectBoardOutside.Cards, expectedCards...)
-	expectBoardOutside.UsersIDs = []uint64{2, 3}
+	expectBoardOutside.UsersIDs = []int64{2, 3}
 
 	board, err := storage.ChangeBoard(boardInput)
 	if err != nil {
@@ -521,7 +521,7 @@ func TestStorage_GetBoard(t *testing.T) {
 	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
 
 	expectBoardOutside.Cards = append(expectBoardOutside.Cards, cards...)
-	expectBoardOutside.UsersIDs = []uint64{2, 3}
+	expectBoardOutside.UsersIDs = []int64{2, 3}
 
 	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
 
@@ -870,8 +870,8 @@ func TestStorage_CheckBoardPermissionAdmin(t *testing.T) {
 	}
 
 	ifAdmin := true
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM boards").
@@ -897,8 +897,8 @@ func TestStorage_CheckBoardPermissionAdminQueryFail(t *testing.T) {
 	}
 
 	ifAdmin := true
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM boards").
@@ -924,8 +924,8 @@ func TestStorage_CheckBoardPermissionAdminFail(t *testing.T) {
 	}
 
 	ifAdmin := true
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM boards").
@@ -951,8 +951,8 @@ func TestStorage_CheckBoardPermissionUser(t *testing.T) {
 	}
 
 	ifAdmin := false
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM board_members").
@@ -978,8 +978,8 @@ func TestStorage_CheckBoardPermissionUserFail(t *testing.T) {
 	}
 
 	ifAdmin := false
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM board_members").
@@ -1005,8 +1005,8 @@ func TestStorage_CheckBoardPermissionUserQueryFail(t *testing.T) {
 	}
 
 	ifAdmin := false
-	boardID := uint64(1)
-	userID := uint64(1)
+	boardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT boardID FROM board_members").
@@ -1110,7 +1110,7 @@ func TestStorage_ChangeCard(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskOutside{}, nil)
 
-	storage := &storage {
+	storage := &storage{
 		cardsStorage: mockCards,
 		tasksStorage: mockTasks,
 	}
@@ -1141,7 +1141,7 @@ func TestStorage_ChangeCardFail(t *testing.T) {
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 	mockCards.EXPECT().ChangeCard(cardInput).Times(1).Return(models.CardOutside{}, errors.New(""))
 
-	storage := &storage {
+	storage := &storage{
 		cardsStorage: mockCards,
 	}
 
@@ -1180,7 +1180,7 @@ func TestStorage_ChangeCardFailGetTasks(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskOutside{}, errors.New(""))
 
-	storage := &storage {
+	storage := &storage{
 		cardsStorage: mockCards,
 		tasksStorage: mockTasks,
 	}
@@ -1206,7 +1206,7 @@ func TestStorage_ChangeCardOrder(t *testing.T) {
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 	mockCards.EXPECT().ChangeCardOrder(input).Times(1).Return(nil)
 
-	storage := &storage {
+	storage := &storage{
 		cardsStorage: mockCards,
 	}
 
@@ -1231,7 +1231,7 @@ func TestStorage_ChangeCardOrderFail(t *testing.T) {
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 	mockCards.EXPECT().ChangeCardOrder(input).Times(1).Return(errors.New(""))
 
-	storage := &storage {
+	storage := &storage{
 		cardsStorage: mockCards,
 	}
 
@@ -1250,7 +1250,7 @@ func TestStorage_ChangeTaskOrder(t *testing.T) {
 	card := models.TasksOrder{CardID: 1}
 	card.Tasks = append(card.Tasks, tasks)
 	input := models.TasksOrderInput{ UserID: 1 }
-	input.Cards = append(input.Cards, card)
+	input.Tasks = append(input.Tasks, card)
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
@@ -1258,7 +1258,7 @@ func TestStorage_ChangeTaskOrder(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().ChangeTaskOrder(input).Times(1).Return(nil)
 
-	storage := &storage {
+	storage := &storage{
 		tasksStorage: mockTasks,
 	}
 
@@ -1277,7 +1277,7 @@ func TestStorage_ChangeTaskOrderFail(t *testing.T) {
 	card := models.TasksOrder{CardID: 1}
 	card.Tasks = append(card.Tasks, tasks)
 	input := models.TasksOrderInput{ UserID: 1 }
-	input.Cards = append(input.Cards, card)
+	input.Tasks = append(input.Tasks, card)
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
@@ -1285,7 +1285,7 @@ func TestStorage_ChangeTaskOrderFail(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().ChangeTaskOrder(input).Times(1).Return(errors.New(""))
 
-	storage := &storage {
+	storage := &storage{
 		tasksStorage: mockTasks,
 	}
 
@@ -1459,8 +1459,8 @@ func TestStorage_CheckCardPermission(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	cardID := uint64(1)
-	userID := uint64(1)
+	cardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").
@@ -1487,8 +1487,8 @@ func TestStorage_CheckCardPermissionQueryFail(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	cardID := uint64(1)
-	userID := uint64(1)
+	cardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").
@@ -1515,8 +1515,8 @@ func TestStorage_CheckCardPermissionFail(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	cardID := uint64(1)
-	userID := uint64(1)
+	cardID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").
@@ -1722,8 +1722,8 @@ func TestStorage_CheckTaskPermission(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	taskID := uint64(1)
-	userID := uint64(1)
+	taskID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").
@@ -1750,8 +1750,8 @@ func TestStorage_CheckTaskPermissionQueryFail(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	taskID := uint64(1)
-	userID := uint64(1)
+	taskID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").
@@ -1778,8 +1778,8 @@ func TestStorage_CheckTaskPermissionFail(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	taskID := uint64(1)
-	userID := uint64(1)
+	taskID := int64(1)
+	userID := int64(1)
 
 	mock.
 		ExpectQuery("SELECT B.boardID").

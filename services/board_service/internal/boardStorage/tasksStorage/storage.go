@@ -14,6 +14,10 @@ type Storage interface {
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
+
+	AssignUser(input models.TaskAssigner) (err error)
+	DismissUser(input models.TaskAssigner) (err error)
+	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
 }
 
 type storage struct {

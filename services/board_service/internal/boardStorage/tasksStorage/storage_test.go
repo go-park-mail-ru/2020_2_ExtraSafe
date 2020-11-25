@@ -419,11 +419,11 @@ func TestStorage_ChangeTaskOrder(t *testing.T) {
 	card := models.TasksOrder{CardID: 1}
 	card.Tasks = append(card.Tasks, tasks)
 	input := models.TasksOrderInput{ UserID: 1 }
-	input.Cards = append(input.Cards, card)
+	input.Tasks = append(input.Tasks, card)
 
 	mock.
 		ExpectExec("UPDATE tasks SET").
-		WithArgs(input.Cards[0].CardID, input.Cards[0].Tasks[0].Order, input.Cards[0].Tasks[0].TaskID).
+		WithArgs(input.Tasks[0].CardID, input.Tasks[0].Tasks[0].Order, input.Tasks[0].Tasks[0].TaskID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = storage.ChangeTaskOrder(input)
@@ -453,11 +453,11 @@ func TestStorage_ChangeTaskOrderFail(t *testing.T) {
 	card := models.TasksOrder{CardID: 1}
 	card.Tasks = append(card.Tasks, tasks)
 	input := models.TasksOrderInput{ UserID: 1 }
-	input.Cards = append(input.Cards, card)
+	input.Tasks = append(input.Tasks, card)
 
 	mock.
 		ExpectExec("UPDATE tasks SET").
-		WithArgs(input.Cards[0].CardID, input.Cards[0].Tasks[0].Order, input.Cards[0].Tasks[0].TaskID).
+		WithArgs(input.Tasks[0].CardID, input.Tasks[0].Tasks[0].Order, input.Tasks[0].Tasks[0].TaskID).
 		WillReturnError(errors.New("update exec error"))
 
 	err = storage.ChangeTaskOrder(input)

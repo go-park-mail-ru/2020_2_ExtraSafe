@@ -18,6 +18,14 @@ type UserOutsideShort struct {
 	Avatar   string `json:"avatar"`
 }
 
+type UserInternal struct {
+	ID        int64 `json:"-"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Avatar   string `json:"avatar"`
+}
+
 type UserBoardsOutside struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`

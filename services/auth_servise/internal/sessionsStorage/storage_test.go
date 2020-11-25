@@ -16,7 +16,7 @@ func TestStorage_CreateUserSession(t *testing.T) {
 		return
 	}
 
-	userID := uint64(1)
+	userID := int64(1)
 	SID := "lalalalalalalalala"
 	sessionStorage := NewStorage(tConn)
 
@@ -33,7 +33,7 @@ func TestStorage_CreateUserSessionFail(t *testing.T) {
 		return
 	}
 
-	userID := uint64(1)
+	userID := int64(1)
 	SID := "lalalalalalalalala"
 	sessionStorage := NewStorage(tConn)
 
@@ -50,7 +50,7 @@ func TestStorage_CheckUserSession(t *testing.T) {
 		return
 	}
 
-	userID := uint64(1)
+	userID := int64(1)
 	SID := "lalalalalalalalala"
 	sessionStorage := NewStorage(tConn)
 
@@ -67,7 +67,7 @@ func TestStorage_CheckUserSessionFail(t *testing.T) {
 		return
 	}
 
-	//userID := uint64(1)
+	//userID := int64(1)
 	SID := "lalalala"
 	sessionStorage := NewStorage(tConn)
 

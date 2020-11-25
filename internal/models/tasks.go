@@ -38,3 +38,16 @@ type TasksOrderInput struct {
 	UserID      int64 `json:"-"`
 	Tasks []TasksOrder `json:"cards"`
 }
+
+// add, delete
+type TaskTagInput struct {
+	UserID      int64 `json:"-"`
+	TaskID int64 `json:"taskID"`
+	TagID  int64 `json:"tagID"`
+}
+
+type TaskAssigner struct {
+	UserID    int64 `json:"-"`
+	TaskID   int64 `json:"taskID"`
+	AssignerID  int64
+}

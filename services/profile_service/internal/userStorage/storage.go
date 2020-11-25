@@ -1,4 +1,4 @@
-package storage
+package userStorage
 
 import (
 	"bytes"
@@ -17,7 +17,11 @@ type Storage interface {
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
+
+	//TODO заменить на GetMembers (GetUsersByID)
 	GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	GetUserByUsername(username string) (user models.UserInternal, err error)
+//	GetUserByID(userID int64) (models.UserOutsideShort, error)
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
@@ -44,20 +48,24 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (int64, models.User
 
 	pass := make([]byte, 0)
 	err := s.db.QueryRow("SELECT userID, password, username, fullname, avatar FROM users WHERE email = $1", userInput.Email).
-		Scan(&userID, &pass, &user.Username, &user.FullName, &user.Avatar)
+				Scan(&userID, &pass, &user.Username, &user.FullName, &user.Avatar)
 
-
-	if err != sql.ErrNoRows {
-		if err != nil {
-			fmt.Println(err)
-		}
+	if err == sql.ErrNoRows {
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email "}, MethodName: "CheckUser"}
+	}
+	if err != nil {
+		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CheckUser"}
+	}
+	if checkPass(pass, userInput.Password) {
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
 		return userID, user, nil
 	}
-
-	return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email " +
-		"or password"}, MethodName: "CheckUser"}
+	return 0, models.UserOutside{}, models.ServeError{
+			Codes: []string{"101"},
+			Descriptions: []string{"Invalid password"},
+			MethodName: "CheckUser" }
 }
 
 func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserOutside, error) {
@@ -74,11 +82,11 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 	hashedPass := hashPass(salt, userInput.Password)
 
 	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
-		userInput.Email,
-		hashedPass,
-		userInput.Username,
-		"",
-		"default/default_avatar.png").Scan(&ID)
+						userInput.Email,
+						hashedPass,
+						userInput.Username,
+						"",
+						"default/default_avatar.png").Scan(&ID)
 	if err != nil {
 		fmt.Println(err)
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -323,4 +331,3 @@ func checkPass(passHash []byte, plainPassword string) bool {
 	userPassHash := hashPass(salt, plainPassword)
 	return bytes.Equal(userPassHash, passHash)
 }
-

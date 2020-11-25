@@ -50,3 +50,12 @@ type Board struct {
 	Star     bool     `json:"star"`
 	UsersIDs []int64 `json:"usersIDs"` // массив с пользователями этой доски
 }
+
+// add user to board
+type BoardMember struct {
+	UserID    int64 `json:"-"`
+	BoardID   int64 `json:"boardID"`
+	MemberID  int64
+}
+// TODO return UserShortOutside
+

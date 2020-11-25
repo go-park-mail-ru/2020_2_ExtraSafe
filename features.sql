@@ -8,7 +8,9 @@ DROP TABLE IF EXISTS attaches;
 CREATE TABLE comments (
     commentID SERIAL PRIMARY KEY,
     message TEXT,
-    taskID INTEGER REFERENCES tasks(taskID)
+    taskID INTEGER REFERENCES tasks(taskID),
+    commentOrder INTEGER,
+    userID INTEGER
 );
 
 CREATE TABLE tags (
@@ -28,6 +30,7 @@ CREATE TABLE task_tags (
 );
 
 CREATE TABLE checklists (
+    checklistID SERIAL PRIMARY KEY,
     taskID INTEGER REFERENCES tasks(taskID),
     name TEXT,
     items JSONB
@@ -35,6 +38,7 @@ CREATE TABLE checklists (
 
 CREATE TABLE attachments (
     taskID INTEGER REFERENCES tasks(taskID),
+    attachmentID SERIAL PRIMARY KEY,
     filename TEXT,
     filepath TEXT
 );
