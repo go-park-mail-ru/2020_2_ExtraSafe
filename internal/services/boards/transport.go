@@ -17,7 +17,7 @@ type Transport interface {
 	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
-	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
+	TaskWrite(card models.TaskInternalShort) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
 }
 
@@ -142,7 +142,7 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 	return *userInput, nil
 }
 
-func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseTask, err error) {
+func (t transport) TaskWrite(task models.TaskInternalShort) (response models.ResponseTask, err error) {
 	response.TaskID = task.TaskID
 	response.Description = task.Description
 	response.Order = task.Order

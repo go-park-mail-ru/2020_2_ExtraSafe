@@ -1129,7 +1129,7 @@ func TestStorage_CheckExistingUserSecondFail(t *testing.T) {
 	}
 }
 
-func TestStorage_GetBoardMembers(t *testing.T) {
+func TestStorage_GetUsersByIDs(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -1138,7 +1138,7 @@ func TestStorage_GetBoardMembers(t *testing.T) {
 
 	storage := &storage{db: db}
 
-	userIDs := []uint64{1, 2}
+	userIDs := []int64{1, 2}
 
 	expect := make([]models.UserOutsideShort, 0)
 	first := models.UserOutsideShort{
@@ -1170,7 +1170,7 @@ func TestStorage_GetBoardMembers(t *testing.T) {
 		WithArgs(userIDs[1]).
 		WillReturnRows(rowsSecond)
 
-	users, err := storage.GetBoardMembers(userIDs)
+	users, err := storage.GetUsersByIDs(userIDs)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -1185,7 +1185,7 @@ func TestStorage_GetBoardMembers(t *testing.T) {
 	}
 }
 
-func TestStorage_GetBoardMembersFail(t *testing.T) {
+func TestStorage_GetUsersByIDsFail(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -1193,19 +1193,118 @@ func TestStorage_GetBoardMembersFail(t *testing.T) {
 	defer db.Close()
 
 	storage := &storage{db: db}
-	userIDs := []uint64{1, 2}
+	userIDs := []int64{1, 2}
 
 	mock.ExpectQuery("SELECT").
 		WithArgs(userIDs[0]).
 		WillReturnError(sql.ErrNoRows)
 
-	_, err = storage.GetBoardMembers(userIDs)
+	_, err = storage.GetUsersByIDs(userIDs)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
 	}
 	if err == nil {
 		t.Error("expected err, got nil")
+		return
+	}
+}
+
+func TestStorage_GetUserByUsername(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	userInput := "pkaterinaa"
+	//userInput := models.UserInput{ ID: 1 }
+
+	rows := sqlmock.NewRows([]string{"userID", "email", "username", "fullname", "avatar"})
+	rows.AddRow(1, "epridius@yandex.ru", "pkaterinaa", "Kate", "default/default_avatar.png")
+	expect := models.UserInternal{
+		ID:       1,
+		Email:    "epridius@yandex.ru",
+		Username: "pkaterinaa",
+		FullName: "Kate",
+		Avatar:   "default/default_avatar.png",
+	}
+
+	mock.
+		ExpectQuery("SELECT").
+		WithArgs(userInput).
+		WillReturnRows(rows)
+
+	user, err := storage.GetUserByUsername(userInput)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(user, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, user)
+		return
+	}
+}
+
+func TestStorage_GetUserByUsernameNoUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	userInput := "pkaterinaa"
+
+	mock.
+		ExpectQuery("SELECT").
+		WithArgs(userInput).
+		WillReturnError(sql.ErrNoRows)
+
+	_, err = storage.GetUserByUsername(userInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected error, got nil")
+		return
+	}
+}
+
+func TestStorage_GetUserByUsernameFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	userInput := "pkaterinaa"
+	rows := sqlmock.NewRows([]string{"email", "username"}).
+		AddRow("epridius@yandex.ru", "pkaterinaa")
+
+	//bad scan result
+	mock.
+		ExpectQuery("SELECT").
+		WithArgs(userInput).
+		WillReturnRows(rows)
+
+	_, err = storage.GetUserByUsername(userInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected error, got nil")
 		return
 	}
 }

@@ -22,3 +22,10 @@ type CommentOutside struct {
 	Order int64
 	User UserOutsideShort
 }
+
+type CommentInternal struct {
+	CommentID int64
+	Message string
+	Order int64
+	UserID int64
+}

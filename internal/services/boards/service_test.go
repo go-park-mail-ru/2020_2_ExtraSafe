@@ -28,7 +28,7 @@ import (
 		UsersIDs: nil,
 	}
 
-	membersIDs := make([]uint64, 0)
+	membersIDs := make([]int64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 
 	admin := models.UserOutsideShort{
@@ -72,7 +72,7 @@ import (
 	}
 
 	mockBoardStorage.EXPECT().CreateBoard(boardInput).Return(boardInternal, nil)
-	mockUserStorage.EXPECT().GetBoardMembers(membersIDs).Return(members, nil)
+	mockUserStorage.EXPECT().GetUsersByIDs(membersIDs).Return(members, nil)
 
 	board, err := service.CreateBoard(boardInput)
 	if err != nil {
@@ -95,7 +95,7 @@ func TestService_ChangeBoard(t *testing.T) {
 		Star:      false,
 	}
 
-	userIDs := []uint64 {2}
+	userIDs := []int64 {2}
 	boardInternal := models.BoardInternal{
 		BoardID:  1,
 		AdminID:  boardInput.UserID,
@@ -106,7 +106,7 @@ func TestService_ChangeBoard(t *testing.T) {
 		UsersIDs: userIDs,
 	}
 
-	membersIDs := make([]uint64, 0)
+	membersIDs := make([]int64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, userIDs...)
 
@@ -190,7 +190,7 @@ func TestService_GetBoard(t *testing.T) {
 		UserID: 1,
 	}
 
-	userIDs := []uint64 {2}
+	userIDs := []int64 {2}
 	boardInternal := models.BoardInternal{
 		BoardID:  1,
 		AdminID:  boardInput.UserID,
@@ -201,7 +201,7 @@ func TestService_GetBoard(t *testing.T) {
 		UsersIDs: userIDs,
 	}
 
-	membersIDs := make([]uint64, 0)
+	membersIDs := make([]int64, 0)
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, userIDs...)
 
@@ -280,7 +280,7 @@ func TestService_CreateCard(t *testing.T) {
 		CardID: cardInput.CardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	mockBoardStorage.EXPECT().CreateCard(cardInput).Return(expectedCardOutside, nil)
@@ -317,7 +317,7 @@ func TestService_ChangeCard(t *testing.T) {
 		CardID: cardInput.CardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	mockBoardStorage.EXPECT().ChangeCard(cardInput).Return(expectedCardOutside, nil)
@@ -367,7 +367,7 @@ func TestService_GetCard(t *testing.T) {
 		CardID: cardInput.CardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	mockBoardStorage.EXPECT().GetCard(cardInput).Return(expectedCardOutside, nil)
@@ -400,7 +400,7 @@ func TestService_CreateTask(t *testing.T) {
 		Order:   1,
 	}
 
-	expectedTaskOutside := models.TaskOutside{
+	expectedTaskOutside := models.TaskInternalShort{
 		TaskID: taskInput.TaskID,
 		Name:   taskInput.Name,
 		Order:  taskInput.Order,
@@ -437,7 +437,7 @@ func TestService_ChangeTask(t *testing.T) {
 		Order:   1,
 	}
 
-	expectedTaskOutside := models.TaskOutside{
+	expectedTaskOutside := models.TaskInternalShort{
 		TaskID: taskInput.TaskID,
 		Name:   taskInput.Name,
 		Order:  taskInput.Order,
@@ -488,7 +488,7 @@ func TestService_GetTask(t *testing.T) {
 
 	taskInput := models.TaskInput{ TaskID: 1 }
 
-	expectedTaskOutside := models.TaskOutside{
+	expectedTaskOutside := models.TaskInternalShort{
 		TaskID: taskInput.TaskID,
 		Name:   "task",
 		Order:  1,

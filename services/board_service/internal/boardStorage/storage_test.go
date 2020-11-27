@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/mock"
+	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/mock"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -117,15 +117,15 @@ func TestStorage_ChangeBoard(t *testing.T) {
 	}
 	expectedCards = append(expectedCards, card1)
 
-	expectedTasks := make([]models.TaskOutside, 0)
-	task1 := models.TaskOutside{
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        "task 1",
 		Description: "first task ever",
 		Order:       1,
 	}
 
-	task2 := models.TaskOutside{
+	task2 := models.TaskInternalShort{
 		TaskID:      2,
 		Name:        "task 2",
 		Description: "second task",
@@ -254,7 +254,7 @@ func TestStorage_ChangeBoardGetTasksFail(t *testing.T) {
 	}
 	expectedCards = append(expectedCards, card1)
 
-	expectedTasks := make([]models.TaskOutside, 0)
+	expectedTasks := make([]models.TaskInternalShort, 0)
 
 	ctrlCards := gomock.NewController(t)
 	defer ctrlCards.Finish()
@@ -479,15 +479,15 @@ func TestStorage_GetBoard(t *testing.T) {
 	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
-	expectedTasks := make([]models.TaskOutside, 0)
-	task1 := models.TaskOutside{
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        "task 1",
 		Description: "first task ever",
 		Order:       1,
 	}
 
-	task2 := models.TaskOutside{
+	task2 := models.TaskInternalShort{
 		TaskID:      2,
 		Name:        "task 2",
 		Description: "second task",
@@ -696,7 +696,7 @@ func TestStorage_GetBoardTasksFail(t *testing.T) {
 	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
-	expectedTasks := make([]models.TaskOutside, 0)
+	expectedTasks := make([]models.TaskInternalShort, 0)
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
@@ -1095,7 +1095,7 @@ func TestStorage_ChangeCard(t *testing.T) {
 		CardID: 1,
 		Name:   "todo changed",
 		Order:  1,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	ctrlCards := gomock.NewController(t)
@@ -1108,7 +1108,7 @@ func TestStorage_ChangeCard(t *testing.T) {
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskOutside{}, nil)
+	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskInternalShort{}, nil)
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1165,7 +1165,7 @@ func TestStorage_ChangeCardFailGetTasks(t *testing.T) {
 		CardID: 1,
 		Name:   "todo changed",
 		Order:  1,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	ctrlCards := gomock.NewController(t)
@@ -1178,7 +1178,7 @@ func TestStorage_ChangeCardFailGetTasks(t *testing.T) {
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskOutside{}, errors.New(""))
+	mockTasks.EXPECT().GetTasksByCard(cardInput).Times(1).Return([]models.TaskInternalShort{}, errors.New(""))
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1349,15 +1349,15 @@ func TestStorage_GetCard(t *testing.T) {
 		Order:  1,
 	}
 
-	expectedTasks := make([]models.TaskOutside, 0)
-	task1 := models.TaskOutside{
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        "task 1",
 		Description: "first task ever",
 		Order:       1,
 	}
 
-	task2 := models.TaskOutside{
+	task2 := models.TaskInternalShort{
 		TaskID:      2,
 		Name:        "task 2",
 		Description: "second task",
@@ -1424,7 +1424,7 @@ func TestStorage_GetCardTasksFail(t *testing.T) {
 		Order:  1,
 	}
 
-	expectedTasks := make([]models.TaskOutside, 0)
+	expectedTasks := make([]models.TaskInternalShort, 0)
 
 	ctrlCards := gomock.NewController(t)
 	defer ctrlCards.Finish()
@@ -1543,7 +1543,7 @@ func TestStorage_CreateTask(t *testing.T) {
 		Order:   1,
 	}
 
-	taskOutside := models.TaskOutside{
+	taskOutside := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
@@ -1584,7 +1584,7 @@ func TestStorage_CreateTaskFail(t *testing.T) {
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().CreateTask(taskInput).Times(1).Return(models.TaskOutside{}, errors.New(""))
+	mockTasks.EXPECT().CreateTask(taskInput).Times(1).Return(models.TaskInternalShort{}, errors.New(""))
 
 	storage := &storage{
 		tasksStorage: mockTasks,
@@ -1607,7 +1607,7 @@ func TestStorage_ChangeTask(t *testing.T) {
 		Order:   1,
 	}
 
-	taskOutside := models.TaskOutside{
+	taskOutside := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
@@ -1624,7 +1624,7 @@ func TestStorage_ChangeTask(t *testing.T) {
 		tasksStorage: mockTasks,
 	}
 
-	task, err := storage.ChangeTask(taskInput)
+	task, _, err := storage.ChangeTask(taskInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -1649,13 +1649,13 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().ChangeTask(taskInput).Times(1).Return(models.TaskOutside{}, errors.New(""))
+	mockTasks.EXPECT().ChangeTask(taskInput).Times(1).Return(models.TaskInternalShort{}, errors.New(""))
 
 	storage := &storage{
 		tasksStorage: mockTasks,
 	}
 
-	_, err := storage.ChangeTask(taskInput)
+	_, _, err := storage.ChangeTask(taskInput)
 	if err == nil {
 		t.Errorf("expected err")
 		return
@@ -1685,7 +1685,7 @@ func TestStorage_DeleteTask(t *testing.T) {
 func TestStorage_GetTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID: 1 }
 
-	taskOutside := models.TaskOutside{
+	taskOutside := models.TaskInternalShort{
 		TaskID:      1,
 		Name:        "task",
 		Description: "description",

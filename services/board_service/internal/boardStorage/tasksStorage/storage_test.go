@@ -26,7 +26,7 @@ func TestStorage_CreateTask(t *testing.T) {
 		Order:   1,
 	}
 
-	expectTaskOutside := models.TaskOutside{
+	expectTaskOutside := models.TaskInternalShort{
 		TaskID: 1,
 		Name:   taskInput.Name,
 		Order:  taskInput.Order,
@@ -103,7 +103,7 @@ func TestStorage_ChangeTask(t *testing.T) {
 		Order:   2,
 	}
 
-	expectTaskOutside := models.TaskOutside{
+	expectTaskOutside := models.TaskInternalShort{
 		TaskID: 1,
 		Name:   taskInput.Name,
 		Order:  taskInput.Order,
@@ -227,7 +227,7 @@ func TestStorage_GetTaskByID(t *testing.T) {
 
 	taskInput := models.TaskInput{ TaskID:  1}
 
-	expectedTaskOutside := models.TaskOutside {
+	expectedTaskOutside := models.TaskInternalShort{
 		TaskID: 1,
 		Name:   "todo",
 		Description: "just task",
@@ -295,15 +295,15 @@ func TestStorage_GetTasksByCard(t *testing.T) {
 
 	cardInput := models.CardInput{ CardID:  1}
 
-	expectedTasks := make([]models.TaskOutside, 0)
-	task1 := models.TaskOutside{
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
 		TaskID: 1,
 		Name:   "task 1",
 		Description: "first task ever",
 		Order:  1,
 	}
 
-	task2 := models.TaskOutside{
+	task2 := models.TaskInternalShort{
 		TaskID: 2,
 		Name:   "task 2",
 		Description: "second task",
@@ -374,8 +374,8 @@ func TestStorage_GetTasksByCardFailScan(t *testing.T) {
 
 	cardInput := models.CardInput{ CardID:  1}
 
-	expectedTasks := make([]models.TaskOutside, 0)
-	task1 := models.TaskOutside{
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
 		TaskID: 1,
 		Name:   "task 1",
 		Description: "first task ever",

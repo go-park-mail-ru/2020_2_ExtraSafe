@@ -20,9 +20,9 @@ type Service interface {
 	DeleteCard(request models.CardInput) (err error)
 	CardOrderChange(request models.CardsOrderInput) (err error)
 
-	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
-	GetTask(request models.TaskInput) (board models.TaskOutside, err error)
-	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
+	CreateTask(request models.TaskInput) (task models.TaskInternalShort, err error)
+	GetTask(request models.TaskInput) (board models.TaskInternalShort, err error)
+	ChangeTask(request models.TaskInput) (task models.TaskInternalShort, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
 
@@ -104,7 +104,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 				Name:        task.Name,
 				Description: task.Description,
 				Order:       task.Order,
-				Users:       models.UserOutsideShort{},
+				Users:       []models.UserOutsideShort{},
 			})
 		}
 		board.Cards = append(board.Cards, models.CardOutside{
@@ -163,7 +163,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 				Name:        task.Name,
 				Description: task.Description,
 				Order:       task.Order,
-				Users:       models.UserOutsideShort{},
+				Users:       []models.UserOutsideShort{},
 			})
 		}
 		board.Cards = append(board.Cards, models.CardOutside{
@@ -352,7 +352,7 @@ func (s *service) CardOrderChange(request models.CardsOrderInput) (err error) {
 	return nil
 }
 
-func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) CreateTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.TaskInput{
@@ -378,7 +378,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside,
 	return task, nil
 }
 
-func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) GetTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.TaskInput{
@@ -404,7 +404,7 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 	return task, nil
 }
 
-func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) ChangeTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.TaskInput{

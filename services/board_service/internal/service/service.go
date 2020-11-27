@@ -358,7 +358,7 @@ func (s *service) ChangeTask(c context.Context, input *protoBoard.TaskInput) (ou
 		Description: input.Description,
 	}
 
-	task, err := s.boardStorage.ChangeTask(userInput)
+	task, _, err := s.boardStorage.ChangeTask(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}

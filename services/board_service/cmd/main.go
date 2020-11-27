@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/cardsStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tasksStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
@@ -18,6 +21,8 @@ import (
 
 func main() {
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
+	//FIXME new DB
+	//db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_boards")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -34,7 +39,10 @@ func main() {
 
 	taskStorage := tasksStorage.NewStorage(db)
 	cardStorage := cardsStorage.NewStorage(db)
-	storage := boardStorage.NewStorage(db, cardStorage, taskStorage)
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	bStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage)
 
 	/*// =============================
 
@@ -72,7 +80,7 @@ func main() {
 
 	lis, err := net.Listen("tcp", ":9083")
 	if err != nil {
-		log.Fatalln("cant listet port", err)
+		log.Fatalln("cant listen port", err)
 	}
 
 	server := grpc.NewServer()
@@ -82,7 +90,7 @@ func main() {
 	_, err = profileService.Accounts(context.Background(), &protoProfile.UserID{ID: 2})
 	fmt.Println(err)
 
-	handler := service.NewService(storage, profileService)
+	handler := service.NewService(bStorage, profileService)
 
 	protoBoard.RegisterBoardServer(server, handler)
 

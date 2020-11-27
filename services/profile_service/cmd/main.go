@@ -18,6 +18,8 @@ import (
 func main() {
 	// =============================
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
+	//FIXME new DB
+	//db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -17,9 +17,9 @@ type boardsService interface {
 	DeleteCard(request models.CardInput) (err error)
 	CardOrderChange(request models.CardsOrderInput) (err error)
 
-	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
-	GetTask(request models.TaskInput) (task models.TaskOutside, err error)
-	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
+	CreateTask(request models.TaskInput) (task models.TaskInternalShort, err error)
+	GetTask(request models.TaskInput) (task models.TaskInternalShort, err error)
+	ChangeTask(request models.TaskInput) (task models.TaskInternalShort, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
 }
@@ -35,7 +35,7 @@ type boardsTransport interface {
 	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
-	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
+	TaskWrite(card models.TaskInternalShort) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
 }
 

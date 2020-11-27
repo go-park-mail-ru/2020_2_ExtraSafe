@@ -37,12 +37,14 @@ DROP TABLE IF EXISTS checklists;
 DROP TABLE IF EXISTS task_members;
 DROP TABLE IF EXISTS task_tags;
 DROP TABLE IF EXISTS tags CASCADE;
-DROP TABLE IF EXISTS attaches;
+DROP TABLE IF EXISTS attachments;
 
 CREATE TABLE comments (
     commentID SERIAL PRIMARY KEY,
     message TEXT,
-    taskID INTEGER REFERENCES tasks(taskID)
+    taskID INTEGER REFERENCES tasks(taskID),
+    commentOrder INTEGER,
+    userID INTEGER
 );
 
 -- ID  ДОСКИ!!!!
@@ -56,21 +58,23 @@ CREATE TABLE tags (
 CREATE TABLE task_members (
     taskID INTEGER REFERENCES tasks(taskID),
     userID INTEGER
-   -- userID INTEGER REFERENCES users(userID)
 );
 
 CREATE TABLE task_tags (
     taskID INTEGER REFERENCES tasks(taskID),
     tagID INTEGER REFERENCES tags(tagID)
 );
+ALTER TABLE IF EXISTS task_tags ADD CONSTRAINT uniq UNIQUE (taskID, tagID);
 
 CREATE TABLE checklists (
+    checklistID SERIAL PRIMARY KEY,
     taskID INTEGER REFERENCES tasks(taskID),
     name TEXT,
     items JSONB
 );
 
 CREATE TABLE attachments (
+    attachmentID SERIAL PRIMARY KEY,
     taskID INTEGER REFERENCES tasks(taskID),
     filename TEXT,
     filepath TEXT

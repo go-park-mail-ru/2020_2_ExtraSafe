@@ -34,10 +34,10 @@ func (m *MockTasksStorage) EXPECT() *MockTasksStorageMockRecorder {
 }
 
 // ChangeTask mocks base method
-func (m *MockTasksStorage) ChangeTask(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockTasksStorage) ChangeTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeTask", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,10 +63,10 @@ func (mr *MockTasksStorageMockRecorder) ChangeTaskOrder(arg0 interface{}) *gomoc
 }
 
 // CreateTask mocks base method
-func (m *MockTasksStorage) CreateTask(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockTasksStorage) CreateTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -92,10 +92,10 @@ func (mr *MockTasksStorageMockRecorder) DeleteTask(arg0 interface{}) *gomock.Cal
 }
 
 // GetTaskByID mocks base method
-func (m *MockTasksStorage) GetTaskByID(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockTasksStorage) GetTaskByID(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTaskByID", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -107,10 +107,10 @@ func (mr *MockTasksStorageMockRecorder) GetTaskByID(arg0 interface{}) *gomock.Ca
 }
 
 // GetTasksByCard mocks base method
-func (m *MockTasksStorage) GetTasksByCard(arg0 models.CardInput) ([]models.TaskOutside, error) {
+func (m *MockTasksStorage) GetTasksByCard(arg0 models.CardInput) ([]models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTasksByCard", arg0)
-	ret0, _ := ret[0].([]models.TaskOutside)
+	ret0, _ := ret[0].([]models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

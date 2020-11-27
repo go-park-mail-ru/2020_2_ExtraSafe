@@ -78,10 +78,10 @@ func (mr *MockBoardStorageMockRecorder) ChangeCardOrder(arg0 interface{}) *gomoc
 }
 
 // ChangeTask mocks base method
-func (m *MockBoardStorage) ChangeTask(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockBoardStorage) ChangeTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeTask", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -137,10 +137,10 @@ func (mr *MockBoardStorageMockRecorder) CreateCard(arg0 interface{}) *gomock.Cal
 }
 
 // CreateTask mocks base method
-func (m *MockBoardStorage) CreateTask(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockBoardStorage) CreateTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -224,10 +224,10 @@ func (mr *MockBoardStorageMockRecorder) GetCard(arg0 interface{}) *gomock.Call {
 }
 
 // GetTask mocks base method
-func (m *MockBoardStorage) GetTask(arg0 models.TaskInput) (models.TaskOutside, error) {
+func (m *MockBoardStorage) GetTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTask", arg0)
-	ret0, _ := ret[0].(models.TaskOutside)
+	ret0, _ := ret[0].(models.TaskInternalShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
