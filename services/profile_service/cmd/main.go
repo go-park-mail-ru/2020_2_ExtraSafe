@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/storage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -29,13 +32,13 @@ func main() {
 		return
 	}
 
-	userStorage := storage.NewStorage(db)
-	//avatarStorage := imgStorage.NewStorage()
+	profileStorage := userStorage.NewStorage(db)
+	avatarStorage := imgStorage.NewStorage()
 
 	// =============================
 
 	grpcConn, err := grpc.Dial(
-		"127.0.0.1:8083",
+		"127.0.0.1:9083",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -45,7 +48,7 @@ func main() {
 
 	// =============================
 
-	lis, err := net.Listen("tcp", ":8082")
+	lis, err := net.Listen("tcp", ":9082")
 	if err != nil {
 		log.Fatalln("cant listet port", err)
 	}
@@ -54,12 +57,20 @@ func main() {
 
 	server := grpc.NewServer()
 
+	fmt.Println(grpcConn.GetState())
 	boardService := protoBoard.NewBoardClient(grpcConn)
 
-	handler := profile.NewService(userStorage, boardService)
+	_, err = boardService.GetBoard(context.Background(), &protoBoard.BoardInput{
+		UserID:  2,
+		BoardID: 2,
+	})
+	fmt.Println(err)
+
+	handler := profile.NewService(profileStorage, avatarStorage, boardService)
 
 	protoProfile.RegisterProfileServer(server, handler)
 
-	fmt.Println("starting server at :8082")
+	fmt.Println("starting server at :9082")
+	//fmt.Println(server.GetServiceInfo())
 	server.Serve(lis)
 }

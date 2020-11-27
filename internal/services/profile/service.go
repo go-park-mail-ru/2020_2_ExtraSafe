@@ -1,7 +1,10 @@
 package profile
 
 import (
+	"context"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
 
 type Service interface {
@@ -14,112 +17,207 @@ type Service interface {
 }
 
 type service struct {
-	userStorage   UserStorage
-	avatarStorage AvatarStorage
-	boardStorage  BoardStorage
+	profileService protoProfile.ProfileClient
 	validator     Validator
 }
 
 
-func NewService(userStorage UserStorage, avatarStorage AvatarStorage, boardStorage BoardStorage,
-	validator Validator) Service {
+func NewService(profileService protoProfile.ProfileClient, validator Validator) Service {
 	return &service{
-		userStorage: userStorage,
-		avatarStorage: avatarStorage,
-		boardStorage: boardStorage,
+		profileService: profileService,
 		validator: validator,
 	}
 }
 
 func (s *service) Profile(request models.UserInput) (user models.UserOutside, err error) {
-	user, err = s.userStorage.GetUserProfile(request)
+	ctx := context.Background()
+
+	input := &protoProfile.UserID{ID: request.ID}
+
+	output, err := s.profileService.Profile(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, err
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	return user, err
+	/*link := &models.UserLinks{
+		Telegram:  output.Links.Telegram,
+		Instagram: output.Links.Instagram,
+		Github:    output.Links.Github,
+		Bitbucket: output.Links.Bitbucket,
+		Vk:        output.Links.Vk,
+		Facebook:  output.Links.Facebook,
+	}*/
+
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	//user.Links = link
+
+	return user, nil
 }
 
 func (s *service) Accounts(request models.UserInput) (user models.UserOutside, err error) {
-	user, err = s.userStorage.GetUserAccounts(request)
+	ctx := context.Background()
+
+	input := &protoProfile.UserID{ID: request.ID}
+
+	output, err := s.profileService.Accounts(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, err
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	return user, err
+	link := &models.UserLinks{
+		Telegram:  output.Links.Telegram,
+		Instagram: output.Links.Instagram,
+		Github:    output.Links.Github,
+		Bitbucket: output.Links.Bitbucket,
+		Vk:        output.Links.Vk,
+		Facebook:  output.Links.Facebook,
+	}
+
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	user.Links = link
+
+	return user, nil
 }
 
 func (s *service) Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error) {
-	boards, err = s.boardStorage.GetBoardsList(request)
+	ctx := context.Background()
+
+	input := &protoProfile.UserID{ID: request.ID}
+
+	output, err := s.profileService.Boards(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, errorWorker.ConvertStatusToError(err)
 	}
 
-	return boards, err
+	for _, board := range output.Boards{
+		boards = append(boards, models.BoardOutsideShort{
+			BoardID: board.BoardID,
+			Name:    board.Name,
+			Theme:   board.Theme,
+			Star:    board.Star,
+		})
+	}
+
+	return boards, nil
 }
 
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error) {
-	multiErrors := new(models.MultiErrors)
+	ctx := context.Background()
 
 	err = s.validator.ValidateProfile(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
 
-	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: request.ID})
-	if errGetAvatar != nil {
-		return user, errGetAvatar
+	input := &protoProfile.UserInputProfile{
+		ID:       request.ID,
+		Email:    request.Email,
+		Username: request.Username,
+		FullName: request.FullName,
+		Avatar:   request.Avatar,
 	}
 
-	if request.Avatar != nil {
-		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar, false)
-		if errAvatar != nil {
-			multiErrors.Codes = append(multiErrors.Codes, errAvatar.(models.ServeError).Codes...)
-			multiErrors.Descriptions = append(multiErrors.Descriptions, errAvatar.(models.ServeError).Descriptions...)
-		}
+	output, err := s.profileService.ProfileChange(ctx, input)
+	if err != nil {
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	user, errProfile := s.userStorage.ChangeUserProfile(request, userAvatar)
-	if errProfile != nil {
-		if errProfile.(models.ServeError).Codes[0] == models.ServerError {
-			return user, errProfile
-		}
-		multiErrors.Codes = append(multiErrors.Codes, errProfile.(models.ServeError).Codes...)
-		multiErrors.Descriptions = append(multiErrors.Descriptions, errProfile.(models.ServeError).Descriptions...)
-	}
+	/*link := &models.UserLinks{
+		Telegram:  output.Links.Telegram,
+		Instagram: output.Links.Instagram,
+		Github:    output.Links.Github,
+		Bitbucket: output.Links.Bitbucket,
+		Vk:        output.Links.Vk,
+		Facebook:  output.Links.Facebook,
+	}*/
 
-	if len(multiErrors.Codes) != 0 {
-		return models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions,
-			MethodName: "ProfileChange"}
-	}
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	//user.Links = link
 
-	return user, err
+	return user, nil
 }
 
 func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {
+	ctx := context.Background()
 	err = s.validator.ValidateLinks(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.ChangeUserAccounts(request)
-	if err != nil {
-		return models.UserOutside{}, err
+	input := &protoProfile.UserInputLinks{
+		ID:        request.ID,
+		Instagram: request.Instagram,
+		Github:    request.Github,
+		Bitbucket: request.Bitbucket,
+		Vk:        request.Vk,
+		Facebook:  request.Facebook,
+		Telegram:  request.Telegram,
 	}
 
-	return user, err
+	output, err := s.profileService.AccountsChange(ctx, input)
+	if err != nil {
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	link := &models.UserLinks{
+		Telegram:  output.Links.Telegram,
+		Instagram: output.Links.Instagram,
+		Github:    output.Links.Github,
+		Bitbucket: output.Links.Bitbucket,
+		Vk:        output.Links.Vk,
+		Facebook:  output.Links.Facebook,
+	}
+
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	user.Links = link
+
+	return user, nil
 }
 
 func (s *service) PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error) {
+	ctx := context.Background()
 	err = s.validator.ValidateChangePassword(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.ChangeUserPassword(request)
-	if err != nil {
-		return models.UserOutside{}, err
+	input := &protoProfile.UserInputPassword{
+		ID:          request.ID,
+		OldPassword: request.OldPassword,
+		Password:    request.Password,
 	}
 
-	return user, err
+	output, err := s.profileService.PasswordChange(ctx, input)
+	if err != nil {
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	link := &models.UserLinks{
+		Telegram:  output.Links.Telegram,
+		Instagram: output.Links.Instagram,
+		Github:    output.Links.Github,
+		Bitbucket: output.Links.Bitbucket,
+		Vk:        output.Links.Vk,
+		Facebook:  output.Links.Facebook,
+	}
+
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	user.Links = link
+
+	return user, nil
 }

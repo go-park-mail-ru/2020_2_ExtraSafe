@@ -21,7 +21,7 @@ type Storage interface {
 	//TODO заменить на GetMembers (GetUsersByID)
 	GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 	GetUserByUsername(username string) (user models.UserInternal, err error)
-//	GetUserByID(userID int64) (models.UserOutsideShort, error)
+	GetUserByID(userID int64) (models.UserOutsideShort, error)
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
@@ -53,15 +53,18 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (int64, models.User
 	if err == sql.ErrNoRows {
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"101"}, Descriptions: []string{"Invalid email "}, MethodName: "CheckUser"}
 	}
+
 	if err != nil {
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CheckUser"}
 	}
+
 	if checkPass(pass, userInput.Password) {
 		user.Email = userInput.Email
 		user.Links = &models.UserLinks{}
 		return userID, user, nil
 	}
+
 	return 0, models.UserOutside{}, models.ServeError{
 			Codes: []string{"101"},
 			Descriptions: []string{"Invalid password"},

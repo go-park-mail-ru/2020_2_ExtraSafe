@@ -7,17 +7,19 @@ package protoAuth;
 //option go_package = "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto";
 import "profile/profile.proto";
 
-/*message UserLinks {
-  string Instagram = 1;
-  string Github = 2;
-  string Bitbucket = 3;
-  string Vk = 4;
-  string Facebook = 5;
-}*/
+message UserSession {
+  string SessionID = 1;
+  int64 UserID = 2;
+}
 
+message Nothing {
+  bool dummy = 1;
+}
 
 service Auth {
   rpc Auth (protoProfile.UserID) returns (protoProfile.UserBoardsOutside) {}
-  rpc Login (protoProfile.UserInputLogin) returns (protoProfile.UserID) {}
-  rpc Registration (protoProfile.UserInputReg) returns (protoProfile.UserID) {}
+  rpc Login (protoProfile.UserInputLogin) returns (UserSession) {}
+  rpc Registration (protoProfile.UserInputReg) returns (UserSession) {}
+  rpc CheckCookie (UserSession) returns (protoProfile.UserID) {}
+  rpc DeleteCookie (UserSession) returns (Nothing) {}
 }

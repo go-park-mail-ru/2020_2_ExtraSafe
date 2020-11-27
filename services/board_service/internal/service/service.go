@@ -1,8 +1,9 @@
 package service
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
@@ -10,12 +11,15 @@ import (
 
 type service struct {
 	boardStorage boardStorage.Storage
+	profileService protoProfile.ProfileClient
 }
 
+var ServiceName = "BoardService"
 
-func NewService(boardStorage boardStorage.Storage) *service {
+func NewService(boardStorage boardStorage.Storage, profileService protoProfile.ProfileClient) *service {
 	return &service{
 		boardStorage: boardStorage,
+		profileService: profileService,
 	}
 }
 
@@ -24,7 +28,7 @@ func (s *service) GetBoardsList(c context.Context, input *protoProfile.UserID) (
 
 	boardsList, err := s.boardStorage.GetBoardsList(userInput)
 	if err != nil {
-		return output, nil
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = new(protoProfile.BoardsOutsideShort)
@@ -52,7 +56,7 @@ func (s *service) CreateBoard(c context.Context, input *protoBoard.BoardChangeIn
 
 	boardInternal, err := s.boardStorage.CreateBoard(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.BoardOutsideShort{
@@ -72,6 +76,15 @@ func (s *service) GetBoard(c context.Context, input *protoBoard.BoardInput) (out
 
 	boardInternal, err := s.boardStorage.GetBoard(userInput)
 	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	membersIDs := make([]int64, 0)
+	membersIDs = append(membersIDs, boardInternal.AdminID)
+	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
+
+	members, err := s.profileService.GetBoardMembers(c, &protoProfile.UserIDS{UserIDs: membersIDs})
+	if err != nil {
 		return output, err
 	}
 
@@ -96,11 +109,11 @@ func (s *service) GetBoard(c context.Context, input *protoBoard.BoardInput) (out
 
 	output = &protoBoard.BoardOutside{
 		BoardID: boardInternal.BoardID,
-		Admin:   nil,
+		Admin:   members.Users[0],
 		Name:    boardInternal.Name,
 		Theme:   boardInternal.Theme,
 		Star:    boardInternal.Star,
-		Users:   nil,
+		Users:   members.Users[1:],
 		Cards:   cards,
 	}
 
@@ -118,6 +131,15 @@ func (s *service) ChangeBoard(c context.Context, input *protoBoard.BoardChangeIn
 
 	boardInternal, err := s.boardStorage.ChangeBoard(userInput)
 	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	membersIDs := make([]int64, 0)
+	membersIDs = append(membersIDs, boardInternal.AdminID)
+	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
+
+	members, err := s.profileService.GetBoardMembers(c, &protoProfile.UserIDS{UserIDs: membersIDs})
+	if err != nil {
 		return output, err
 	}
 
@@ -142,11 +164,11 @@ func (s *service) ChangeBoard(c context.Context, input *protoBoard.BoardChangeIn
 
 	output = &protoBoard.BoardOutside{
 		BoardID: boardInternal.BoardID,
-		Admin:   nil,
+		Admin:   members.Users[0],
 		Name:    boardInternal.Name,
 		Theme:   boardInternal.Theme,
 		Star:    boardInternal.Star,
-		Users:   nil,
+		Users:   members.Users[1:],
 		Cards:   cards,
 	}
 	return output, nil
@@ -160,9 +182,10 @@ func (s *service) DeleteBoard(c context.Context, input *protoBoard.BoardInput) (
 
 	err := s.boardStorage.DeleteBoard(userInput)
 	if err != nil {
-		return nil, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
-	return nil, nil
+
+	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
 func (s *service) CreateCard(c context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutside, err error) {
@@ -176,7 +199,7 @@ func (s *service) CreateCard(c context.Context, input *protoBoard.CardInput) (ou
 
 	card, err := s.boardStorage.CreateCard(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.CardOutside{
@@ -200,7 +223,7 @@ func (s *service) GetCard(c context.Context, input *protoBoard.CardInput) (outpu
 
 	card, err := s.boardStorage.GetCard(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.CardOutside{
@@ -224,7 +247,7 @@ func (s *service) ChangeCard(c context.Context, input *protoBoard.CardInput) (ou
 
 	card, err := s.boardStorage.ChangeCard(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.CardOutside{
@@ -240,15 +263,16 @@ func (s *service) ChangeCard(c context.Context, input *protoBoard.CardInput) (ou
 func (s *service) DeleteCard(c context.Context, input *protoBoard.CardInput) (*protoBoard.Nothing, error) {
 	userInput := models.CardInput{
 		UserID:    input.UserID,
-		CardID:   input.BoardID,
+		CardID:   input.CardID,
 		BoardID: input.BoardID,
 	}
 
 	err := s.boardStorage.DeleteCard(userInput)
 	if err != nil {
-		return nil, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
-	return nil, nil
+
+	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
 func (s *service) CardOrderChange(c context.Context, input *protoBoard.CardsOrderInput) (*protoBoard.Nothing, error) {
@@ -267,10 +291,10 @@ func (s *service) CardOrderChange(c context.Context, input *protoBoard.CardsOrde
 
 	err := s.boardStorage.ChangeCardOrder(userInput)
 	if err != nil {
-		return nil, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	return nil, nil
+	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
 func (s *service) CreateTask(c context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutside, err error) {
@@ -285,7 +309,7 @@ func (s *service) CreateTask(c context.Context, input *protoBoard.TaskInput) (ou
 
 	task, err := s.boardStorage.CreateTask(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.TaskOutside{
@@ -297,6 +321,8 @@ func (s *service) CreateTask(c context.Context, input *protoBoard.TaskInput) (ou
 
 	return output, nil
 }
+
+//TODO - добавлять пользователя на задачу
 func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutside, err error) {
 	userInput := models.TaskInput{
 		UserID:  input.UserID,
@@ -309,7 +335,7 @@ func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (outpu
 
 	task, err := s.boardStorage.GetTask(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.TaskOutside{
@@ -334,7 +360,7 @@ func (s *service) ChangeTask(c context.Context, input *protoBoard.TaskInput) (ou
 
 	task, err := s.boardStorage.ChangeTask(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoBoard.TaskOutside{
@@ -356,9 +382,10 @@ func (s *service) DeleteTask(c context.Context, input *protoBoard.TaskInput) (*p
 
 	err := s.boardStorage.DeleteTask(userInput)
 	if err != nil {
-		return nil, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
-	return nil, nil
+
+	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
 func (s *service) TasksOrderChange(c context.Context, input *protoBoard.TasksOrderInput) (*protoBoard.Nothing, error) {
@@ -384,8 +411,35 @@ func (s *service) TasksOrderChange(c context.Context, input *protoBoard.TasksOrd
 
 	err := s.boardStorage.ChangeTaskOrder(userInput)
 	if err != nil {
-		return nil, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	return nil, nil
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) CheckBoardPermission(c context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
+	err := s.boardStorage.CheckBoardPermission(input.UserID, input.ElementID, input.IfAdmin)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) CheckCardPermission(c context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
+	err := s.boardStorage.CheckCardPermission(input.UserID, input.ElementID)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) CheckTaskPermission(c context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
+	err := s.boardStorage.CheckTaskPermission(input.UserID, input.ElementID)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
 }

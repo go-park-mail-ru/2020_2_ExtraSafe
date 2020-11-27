@@ -1,9 +1,11 @@
 package authHandler
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/labstack/echo"
 	"net/http"
+	"time"
 )
 
 type Handler interface {
@@ -14,17 +16,15 @@ type Handler interface {
 }
 
 type handler struct {
-	authService   AuthService
+	authService   auth.Service
 	authTransport AuthTransport
-	authSessions  AuthSessions
 	errorWorker   ErrorWorker
 }
 
-func NewHandler(authService AuthService, authTransport AuthTransport, authSessions AuthSessions, errorWorker ErrorWorker) *handler {
+func NewHandler(authService auth.Service, authTransport AuthTransport, errorWorker ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
-		authSessions: authSessions,
 		errorWorker:     errorWorker,
 	}
 }
@@ -68,7 +68,7 @@ func (h *handler) Login(c echo.Context) error {
 		return err
 	}
 
-	userID, _, err := h.authService.Login(userInput)
+	user, err := h.authService.Login(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -76,7 +76,7 @@ func (h *handler) Login(c echo.Context) error {
 		return err
 	}
 
-	token, _ := csrf.GenerateToken(userID)
+	token, _ := csrf.GenerateToken(user.UserID)
 
 	response, err := h.authTransport.LoginWrite(token)
 	if err != nil {
@@ -86,18 +86,19 @@ func (h *handler) Login(c echo.Context) error {
 		return err
 	}
 
-	if err := h.authSessions.SetCookie(c, userID); err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
-	}
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Value = user.SessionID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Logout(c echo.Context) error {
-	err := h.authSessions.DeleteCookie(c)
+	err := h.authService.Logout(c)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -116,7 +117,7 @@ func (h *handler) Registration(c echo.Context) error{
 		return err
 	}
 
-	userID, _, err := h.authService.Registration(userInput)
+	user, err := h.authService.Registration(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -132,12 +133,13 @@ func (h *handler) Registration(c echo.Context) error{
 		return err
 	}
 
-	err = h.authSessions.SetCookie(c, userID)
-	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-	}
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Value = user.SessionID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, response)
 }

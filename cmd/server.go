@@ -1,8 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers"
 	authHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth"
 	boardsHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/boards"
@@ -12,25 +10,23 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/sessions"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/imgStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/userStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/sessionsStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/cardsStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tasksStorage"
-	"github.com/kelseyhightower/envconfig"
+	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
+	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
+	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	_"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	_ "github.com/rs/zerolog/log"
-	"github.com/tarantool/go-tarantool"
+	_"github.com/tarantool/go-tarantool"
+	"google.golang.org/grpc"
+	"log"
 	"os"
 )
 
 func main() {
-	var cfg config
+	/*var cfg config
 	err := envconfig.Process("", &cfg)
 	if err != nil {
 		return
@@ -58,31 +54,73 @@ func main() {
 	if err != nil {
 		fmt.Println("Connection refused")
 	}
-	defer tConn.Close()
+	defer tConn.Close()*/
 
-	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
+	// =============================
+
+	grpcConn3, err := grpc.Dial(
+		"127.0.0.1:9083",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+	defer grpcConn3.Close()
+
+	// =============================
+	// =============================
+
+	grpcConn2, err := grpc.Dial(
+		"127.0.0.1:9082",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+	defer grpcConn2.Close()
+
+	// =============================
+
+	// =============================
+
+	grpcConn1, err := grpc.Dial(
+		"127.0.0.1:9081",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+	defer grpcConn1.Close()
+
+	// =============================
+
+	loggg := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	errWorker := errorWorker.NewErrorWorker()
 
-	usersStorage := userStorage.NewStorage(db)
+	/*usersStorage := userStorage.NewStorage(db)
 	sessionStorage := sessionsStorage.NewStorage(tConn)
 	avatarStorage := imgStorage.NewStorage()
 	cardStorage := cardsStorage.NewStorage(db)
 	taskStorage := tasksStorage.NewStorage(db)
-	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)
+	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)*/
+
+	boardClient := protoBoard.NewBoardClient(grpcConn3)
+	profileClient := protoProfile.NewProfileClient(grpcConn2)
+	authClient := protoAuth.NewAuthClient(grpcConn1)
 
 	validationService := validation.NewService()
-	sessionService := sessions.NewService(sessionStorage)
-	authService := auth.NewService(usersStorage, boardsStorage, validationService)
+	//sessionService := sessions.NewService(sessionStorage)
+	authService := auth.NewService(authClient, validationService)
 	authTransport := auth.NewTransport()
-	profileService := profile.NewService(usersStorage, avatarStorage, boardsStorage, validationService)
+	profileService := profile.NewService(profileClient, validationService)
 	profileTransport := profile.NewTransport()
-	boardsService := boards.NewService(usersStorage, boardsStorage, validationService)
+	boardsService := boards.NewService(boardClient, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(sessionService, errWorker, authService, authTransport, boardsStorage, &log)
+	middlewaresService := middlewares.NewMiddleware(errWorker, authService, authTransport, boardsService, &loggg)
 
-	aHandler := authHandler.NewHandler(authService, authTransport, sessionService, errWorker)
+	aHandler := authHandler.NewHandler(authService, authTransport, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)
 	boardHandler := boardsHandler.NewHandler(boardsService, boardsTransport, errWorker)
 

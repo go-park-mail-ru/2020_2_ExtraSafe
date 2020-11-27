@@ -18,6 +18,7 @@ message UserLinks {
   string Bitbucket = 3;
   string Vk = 4;
   string Facebook = 5;
+  string Telegram = 6;
 }
 
 message UserInputLinks {
@@ -30,12 +31,16 @@ message UserInputLinks {
   string Telegram = 7;
 }
 
+/*message File {
+  bytes content = 1;
+}*/
+
 message UserInputProfile {
   int64 ID = 1;
   string Email = 2;
   string Username = 3;
   string FullName = 4;
-  //*multipart.FileHeader Avatar = 5;
+  bytes Avatar = 5;
 }
 
 message BoardOutsideShort {
@@ -86,13 +91,22 @@ message UserOutsideShort {
   string Avatar = 4;
 }
 
+message UsersOutsideShort {
+  repeated UserOutsideShort users = 1;
+}
+
+message UserIDS {
+  repeated int64 userIDs = 1;
+}
+
 service Profile {
-  rpc CheckUser (UserInputLogin) returns (UserID);
-  rpc CreateUser (UserInputReg) returns (UserID);
-  rpc Profile (UserID) returns (UserOutside);
-  rpc Accounts (UserID) returns (UserOutside);
-  rpc Boards (UserID) returns (BoardsOutsideShort);
-  rpc ProfileChange (UserInputProfile) returns (UserOutside);
-  rpc AccountsChange (UserInputLinks) returns (UserOutside);
-  rpc PasswordChange (UserInputPassword) returns (UserOutside);
+  rpc CheckUser (UserInputLogin) returns (UserID) {}
+  rpc CreateUser (UserInputReg) returns (UserID) {}
+  rpc Profile (UserID) returns (UserOutside) {}
+  rpc Accounts (UserID) returns (UserOutside) {}
+  rpc Boards (UserID) returns (BoardsOutsideShort) {}
+  rpc ProfileChange (UserInputProfile) returns (UserOutside) {}
+  rpc AccountsChange (UserInputLinks) returns (UserOutside) {}
+  rpc PasswordChange (UserInputPassword) returns (UserOutside) {}
+  rpc GetBoardMembers (UserIDS) returns (UsersOutsideShort) {}
 }

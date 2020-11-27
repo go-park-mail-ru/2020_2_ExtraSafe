@@ -2,6 +2,7 @@ package boardsHandler
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -26,12 +27,12 @@ type Handler interface {
 }
 
 type handler struct {
-	boardsService boardsService
+	boardsService boards.Service
 	boardsTransport boardsTransport
 	errorWorker errorWorker
 }
 
-func NewHandler(boardsService boardsService, boardsTransport boardsTransport, errorWorker errorWorker) *handler {
+func NewHandler(boardsService boards.Service, boardsTransport boardsTransport, errorWorker errorWorker) *handler {
 	return &handler{
 		boardsService: boardsService,
 		boardsTransport: boardsTransport,

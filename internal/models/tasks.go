@@ -13,6 +13,7 @@ type TaskOutside struct {
 	Name        string `json:"taskName"`
 	Description string `json:"description"`
 	Order       int64  `json:"order"`
+	Users		UserOutsideShort `json:"users"`
 }
 
 type TaskInput struct {
