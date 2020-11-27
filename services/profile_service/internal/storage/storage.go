@@ -1,4 +1,4 @@
-package userStorage
+package storage
 
 import (
 	"bytes"
@@ -18,8 +18,7 @@ type Storage interface {
 	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
 
-	//TODO заменить на GetMembers (GetUsersByID)
-	GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 	GetUserByUsername(username string) (user models.UserInternal, err error)
 //	GetUserByID(userID int64) (models.UserOutsideShort, error)
 
@@ -88,7 +87,6 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 						"",
 						"default/default_avatar.png").Scan(&ID)
 	if err != nil {
-		fmt.Println(err)
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateUser"}
 	}
@@ -299,7 +297,7 @@ func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutsid
 	return user, nil, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "getInternalUser"}
 }
 
-func (s *storage) GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, error) {
+func (s *storage) GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) {
 	members := make([]models.UserOutsideShort, 0)
 
 	for _, userID := range userIDs {
@@ -310,13 +308,28 @@ func (s *storage) GetBoardMembers(userIDs []int64) ([] models.UserOutsideShort, 
 		if err != nil {
 			fmt.Println(err)
 			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-				MethodName: "GetBoardMembers"}
+				MethodName: "GetUsersByIDs"}
 		}
 
 		members = append(members, user)
 	}
 
 	return members, nil
+}
+
+func (s *storage) GetUserByUsername(username string) (user models.UserInternal, err error) {
+	err = s.db.QueryRow("SELECT userID, email, username,  fullname, avatar FROM users WHERE username = $1", username).
+		Scan(&user.ID, &user.Email, &user.Username, &user.FullName, &user.Avatar)
+
+	if err != sql.ErrNoRows {
+		if err != nil {
+			return user, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetUserByUsername"}
+		}
+		return user, nil
+	}
+
+	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserByUsername"}
 }
 
 func hashPass(salt []byte, plainPassword string) []byte {

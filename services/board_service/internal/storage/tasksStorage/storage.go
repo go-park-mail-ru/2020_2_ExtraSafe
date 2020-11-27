@@ -7,14 +7,15 @@ import (
 )
 
 type Storage interface {
-	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
-	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
 	DeleteTask(taskInput models.TaskInput) error
 
-	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
-	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
+	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
+	GetTaskByID(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
+	//TODO tests
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
 	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
@@ -30,7 +31,7 @@ func NewStorage(db *sql.DB) Storage {
 	}
 }
 
-func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, error) {
+func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error) {
 	var taskID int64
 
 	err := s.db.QueryRow("INSERT INTO tasks (cardID, taskName, description, tasksOrder) VALUES ($1, $2, $3, $4) RETURNING taskID",
@@ -38,11 +39,11 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 
 	if err != nil {
 		fmt.Println(err)
-		return models.TaskOutside{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.TaskInternalShort{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateTask"}
 	}
 
-	task := models.TaskOutside{
+	task := models.TaskInternalShort{
 		TaskID:      taskID,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
@@ -52,16 +53,16 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskOutside, er
 	return task, nil
 }
 
-func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error) {
+func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error) {
 	_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2, tasksOrder = $3 WHERE taskID = $4",
 								taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID)
 	if err != nil {
 		fmt.Println(err)
-		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.TaskInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeTask"}
 	}
 
-	task := models.TaskOutside{
+	task := models.TaskInternal{
 		TaskID:      taskInput.TaskID,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
@@ -81,22 +82,22 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) error {
 	return nil
 }
 
-func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error) {
-	tasks := make([]models.TaskOutside, 0)
+func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error) {
+	tasks := make([]models.TaskInternalShort, 0)
 
 	rows, err := s.db.Query("SELECT taskID, taskName, description, tasksOrder FROM tasks WHERE cardID = $1", cardInput.CardID)
 	if err != nil {
-		return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return []models.TaskInternalShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetTasksByCard"}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var task models.TaskOutside
+		var task models.TaskInternalShort
 
 		err = rows.Scan(&task.TaskID, &task.Name, &task.Description, &task.Order)
 		if err != nil {
-			return []models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			return []models.TaskInternalShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetTasksByCard"}
 		}
 
@@ -106,8 +107,8 @@ func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutsi
 	return tasks, nil
 }
 
-func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error) {
-	task := models.TaskOutside{}
+func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskInternalShort, error) {
+	task := models.TaskInternalShort{}
 	task.TaskID = taskInput.TaskID
 
 	err := s.db.QueryRow("SELECT taskName, description, tasksOrder FROM tasks WHERE taskID = $1", taskInput.TaskID).
@@ -115,7 +116,7 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, e
 
 	if err != nil {
 		fmt.Println(err)
-		return models.TaskOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.TaskInternalShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetTaskByID"}
 	}
 
@@ -136,4 +137,41 @@ func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	}
 
 	return nil
+}
+
+func (s *storage) AssignUser(input models.TaskAssigner) (err error) {
+	_, err = s.db.Exec("INSERT INTO task_members (taskID, userID) VALUES ($1, $2)", input.TaskID, input.AssignerID)
+	if err != nil {
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "AssignUser"}
+	}
+	return
+}
+func (s *storage) DismissUser(input models.TaskAssigner) (err error) {
+	_, err = s.db.Exec("DELETE FROM task_members WHERE taskID = $1 AND userID = $2", input.TaskID, input.AssignerID)
+	if err != nil {
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DismissUser"}
+	}
+	return
+}
+
+func (s *storage) GetAssigners(input models.TaskInput) (assignerIDs []int64, err error) {
+	rows, err := s.db.Query("SELECT userID FROM task_members WHERE taskID = $1", input.TaskID)
+	if err != nil {
+		return assignerIDs, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetAssigners"}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var assignerID int64
+		err = rows.Scan(&assignerID)
+		if err != nil {
+			return assignerIDs, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetAssigners"}
+		}
+
+		assignerIDs = append(assignerIDs, assignerID)
+	}
+
+	return
 }

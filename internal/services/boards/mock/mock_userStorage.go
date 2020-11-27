@@ -36,7 +36,7 @@ func (m *MockUserStorage) EXPECT() *MockUserStorageMockRecorder {
 // GetBoardMembers mocks base method
 func (m *MockUserStorage) GetBoardMembers(arg0 []uint64) ([]models.UserOutsideShort, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBoardMembers", arg0)
+	ret := m.ctrl.Call(m, "GetUsersByIDs", arg0)
 	ret0, _ := ret[0].([]models.UserOutsideShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -45,5 +45,5 @@ func (m *MockUserStorage) GetBoardMembers(arg0 []uint64) ([]models.UserOutsideSh
 // GetBoardMembers indicates an expected call of GetBoardMembers
 func (mr *MockUserStorageMockRecorder) GetBoardMembers(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardMembers", reflect.TypeOf((*MockUserStorage)(nil).GetBoardMembers), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsersByIDs", reflect.TypeOf((*MockUserStorage)(nil).GetBoardMembers), arg0)
 }

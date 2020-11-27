@@ -42,7 +42,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 		CardID: cardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 	return card, nil
 }

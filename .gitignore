@@ -26,3 +26,4 @@ tarantool_configs
 queries.sql
 test_data.sql
 useful
+/test.sql

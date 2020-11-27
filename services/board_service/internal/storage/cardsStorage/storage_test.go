@@ -30,7 +30,7 @@ func TestStorage_CreateCard(t *testing.T) {
 		CardID: 1,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskOutside{},
+		Tasks:  []models.TaskInternalShort{},
 	}
 
 	mock.

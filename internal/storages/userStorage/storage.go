@@ -306,7 +306,7 @@ func (s *storage) GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort,
 		if err != nil {
 			fmt.Println(err)
 			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-				MethodName: "GetBoardMembers"}
+				MethodName: "GetUsersByIDs"}
 		}
 
 		members = append(members, user)

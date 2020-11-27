@@ -16,9 +16,9 @@ type Service interface {
 	DeleteCard(request models.CardInput) (err error)
 	CardOrderChange(request models.CardsOrderInput) (err error)
 
-	CreateTask(request models.TaskInput) (task models.TaskOutside, err error)
-	GetTask(request models.TaskInput) (board models.TaskOutside, err error)
-	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
+	CreateTask(request models.TaskInput) (task models.TaskInternalShort, err error)
+	GetTask(request models.TaskInput) (board models.TaskInternalShort, err error)
+	ChangeTask(request models.TaskInput) (task models.TaskInternalShort, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
 }
@@ -78,7 +78,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	members, err := s.userStorage.GetBoardMembers(membersIDs)
+	members, err := s.userStorage.GetUsersByIDs(membersIDs)
 	if err != nil {
 		return models.BoardOutside{}, err
 	}
@@ -163,28 +163,28 @@ func (s *service) CardOrderChange(request models.CardsOrderInput) (err error) {
 	return err
 }
 
-func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) CreateTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	task, err = s.boardStorage.CreateTask(request)
 	if err != nil {
-		return models.TaskOutside{}, err
+		return models.TaskInternalShort{}, err
 	}
 
 	return task, err
 }
 
-func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) GetTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	task, err = s.boardStorage.GetTask(request)
 	if err != nil {
-		return models.TaskOutside{}, err
+		return models.TaskInternalShort{}, err
 	}
 
 	return task, err
 }
 
-func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside, err error) {
+func (s *service) ChangeTask(request models.TaskInput) (task models.TaskInternalShort, err error) {
 	task, err = s.boardStorage.ChangeTask(request)
 	if err != nil {
-		return models.TaskOutside{}, err
+		return models.TaskInternalShort{}, err
 	}
 
 	return task, err

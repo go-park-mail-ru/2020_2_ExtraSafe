@@ -6,6 +6,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/cardsStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/checklistStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/commentStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/tagStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/tasksStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"google.golang.org/grpc"
@@ -15,6 +18,8 @@ import (
 
 func main() {
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
+	//FIXME new DB
+	//db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_boards")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -31,15 +36,18 @@ func main() {
 
 	taskStorage := tasksStorage.NewStorage(db)
 	cardStorage := cardsStorage.NewStorage(db)
-	storage := boardStorage.NewStorage(db, cardStorage, taskStorage)
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	boardStorage := storage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage)
 
 	lis, err := net.Listen("tcp", ":8083")
 	if err != nil {
-		log.Fatalln("cant listet port", err)
+		log.Fatalln("cant listen port", err)
 	}
 
 	server := grpc.NewServer()
-	handler := service.NewService(storage)
+	handler := service.NewService(boardStorage)
 
 	protoBoard.RegisterBoardServer(server, handler)
 

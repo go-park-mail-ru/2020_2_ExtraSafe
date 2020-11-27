@@ -1,4 +1,4 @@
-package boardStorage
+package storage
 
 import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 
@@ -17,11 +17,15 @@ type CardsStorage interface {
 }
 
 type TasksStorage interface {
-	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
-	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
 	DeleteTask(taskInput models.TaskInput) error
 
-	GetTasksByCard(cardInput models.CardInput) ([]models.TaskOutside, error)
-	GetTaskByID(taskInput models.TaskInput) (models.TaskOutside, error)
+	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
+	GetTaskByID(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
+
+	AssignUser(input models.TaskAssigner) (err error)
+	DismissUser(input models.TaskAssigner) (err error)
+	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
 }

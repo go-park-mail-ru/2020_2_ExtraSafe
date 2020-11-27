@@ -65,11 +65,11 @@ type ResponseBoards struct {
 }
 
 type ResponseCard struct {
-	Status  int          `json:"status"`
-	CardID int64        `json:"cardID"`
-	Name   string        `json:"cardName"`
-	Order  int64         `json:"order"`
-	Tasks  []TaskOutside `json:"tasks"`
+	Status  int                `json:"status"`
+	CardID int64               `json:"cardID"`
+	Name   string              `json:"cardName"`
+	Order  int64               `json:"order"`
+	Tasks  []TaskInternalShort `json:"tasks"`
 }
 
 type ResponseTask struct {

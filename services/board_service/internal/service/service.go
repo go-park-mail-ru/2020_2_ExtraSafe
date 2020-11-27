@@ -9,11 +9,12 @@ import (
 )
 
 type service struct {
-	boardStorage boardStorage.Storage
+	boardStorage storage.Storage
+
 }
 
 
-func NewService(boardStorage boardStorage.Storage) *service {
+func NewService(boardStorage storage.Storage) *service {
 	return &service{
 		boardStorage: boardStorage,
 	}
@@ -332,7 +333,7 @@ func (s *service) ChangeTask(c context.Context, input *protoBoard.TaskInput) (ou
 		Description: input.Description,
 	}
 
-	task, err := s.boardStorage.ChangeTask(userInput)
+	task, _, err := s.boardStorage.ChangeTask(userInput)
 	if err != nil {
 		return output, err
 	}

@@ -8,6 +8,8 @@ type BoardInternal struct {
 	Star     bool          `json:"star"`
 	Cards    []CardOutside `json:"cards"`
 	UsersIDs []int64      `json:"usersIDs"` // массив с пользователями этой доски
+	//FIXME added
+	Tags 	[]TagOutside
 }
 
 // для пользователя, отправившего запрос формируется эта структура
@@ -19,6 +21,8 @@ type BoardOutside struct {
 	Star    bool               `json:"star"`
 	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
 	Cards   []CardOutside      `json:"cards"`
+	//FIXME added
+	Tags 	[]TagOutside
 }
 
 type BoardOutsideShort struct {
