@@ -7,7 +7,7 @@ import (
 )
 
 type Storage interface {
-	CreateCard(cardInput models.CardInput) (models.CardInternal, error)
+	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(cardInput models.CardInput) (models.CardInternal, error)
 	DeleteCard(cardInput models.CardInput) error
 
@@ -26,7 +26,7 @@ func NewStorage(db *sql.DB) Storage {
 	}
 }
 
-func (s *storage) CreateCard(cardInput models.CardInput) (models.CardInternal, error) {
+func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
 	var cardID int64
 
 	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
@@ -34,15 +34,15 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardInternal, e
 
 	if err != nil {
 		fmt.Println(err)
-		return models.CardInternal{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateCard"}
 	}
 	
-	card := models.CardInternal{
+	card := models.CardOutside{
 		CardID: cardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskInternalShort{},
+		Tasks:  []models.TaskOutsideShort{},
 	}
 	return card, nil
 }

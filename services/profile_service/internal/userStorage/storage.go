@@ -305,8 +305,8 @@ func (s *storage) GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, er
 
 	for _, userID := range userIDs {
 		user := models.UserOutsideShort{}
-		err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userID).
-			Scan(&user.Email, &user.Username, &user.FullName, &user.Avatar)
+		err := s.db.QueryRow("SELECT userID, email, username, fullname, avatar FROM users WHERE userID = $1", userID).
+			Scan(&user.ID, &user.Email, &user.Username, &user.FullName, &user.Avatar)
 
 		if err != nil {
 			fmt.Println(err)

@@ -34,6 +34,7 @@ func main() {
 		return
 	}
 
+
 	profileStorage := userStorage.NewStorage(db)
 	avatarStorage := imgStorage.NewStorage()
 
