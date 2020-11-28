@@ -63,7 +63,7 @@ func (mr *MockCardsStorageMockRecorder) ChangeCardOrder(arg0 interface{}) *gomoc
 }
 
 // CreateCard mocks base method
-func (m *MockCardsStorage) CreateCard(arg0 models.CardInput) (models.CardInternal, error) {
+func (m *MockCardsStorage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCard", arg0)
 	ret0, _ := ret[0].(models.CardInternal)

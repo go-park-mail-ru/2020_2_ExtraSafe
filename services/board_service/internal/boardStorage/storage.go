@@ -16,7 +16,7 @@ type Storage interface {
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
-	CreateCard(cardInput models.CardInput) (models.CardInternal, error)
+	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(cardInput models.CardsOrderInput) error
 	DeleteCard(userInput models.CardInput) error
@@ -39,8 +39,9 @@ type Storage interface {
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
+	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
 
-	/////////////////////////////////////////
+/////////////////////////////////////////
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
 	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
@@ -320,7 +321,7 @@ func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
 	return nil
 }
 
-func (s *storage) CreateCard(cardInput models.CardInput) (models.CardInternal, error) {
+func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
 	//не ищем таски, потому что при создании доски они пустые
 	return s.cardsStorage.CreateCard(cardInput)
 }
@@ -334,6 +335,28 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, e
 	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
 	if err != nil {
 		return models.CardInternal{}, err
+	}
+
+	for _, task := range tasks {
+		taskInput := models.TaskInput{TaskID: task.TaskID}
+
+		tags, err := s.tagStorage.GetTaskTags(taskInput)
+		if err != nil {
+			return models.CardInternal{}, err
+		}
+		task.Tags = append(task.Tags, tags...)
+
+		users, err := s.tasksStorage.GetAssigners(taskInput)
+		if err != nil {
+			return models.CardInternal{}, err
+		}
+		task.Users = append(task.Users, users...)
+
+		checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
+		if err != nil {
+			return models.CardInternal{}, err
+		}
+		task.Checklists = append(task.Checklists, checklists...)
 	}
 
 	card.Tasks = append(card.Tasks, tasks...)
@@ -520,6 +543,39 @@ func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
 	if err == sql.ErrNoRows {
 		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckTaskPermission"}
+	}
+
+	return nil
+}
+
+func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error) {
+	var boardID int64
+	var query string
+
+	if ifAdmin {
+		query = "SELECT B.boardID FROM boards B " +
+			"JOIN cards C on C.boardID = B.boardID " +
+			"JOIN tasks T on T.cardID = C.cardID " +
+			"JOIN comments Com on Com.taskID = T.taskID" +
+			"WHERE (B.adminID = 1 OR Com.userID = 1) AND Com.commentID = $2"
+	} else {
+		query = "SELECT B.boardID FROM boards B " +
+			"JOIN cards C on C.boardID = B.boardID " +
+			"JOIN tasks T on T.cardID = C.cardID " +
+			"JOIN comments Com on Com.taskID = T.taskID" +
+			"WHERE Com.userID = $1 = $1 AND Com.commentID = $2"
+	}
+
+	err = s.db.QueryRow(query, userID, commentID).Scan(&boardID)
+
+	if err != nil && err != sql.ErrNoRows {
+		fmt.Println(err)
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
+	}
+
+	if err == sql.ErrNoRows {
+		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+			MethodName: "CheckCommentPermission"}
 	}
 
 	return nil
