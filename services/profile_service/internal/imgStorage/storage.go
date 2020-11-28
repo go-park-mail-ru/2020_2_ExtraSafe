@@ -50,9 +50,9 @@ func (s *storage) UploadAvatar(file []byte, user *models.UserAvatar, isTest bool
 	user.Avatar = "avatars/" + filename
 	if oldAvatar != "default/default_avatar.png" {
 		if isTest {
-			os.Remove("../../../" + oldAvatar)
+			os.Remove("../../../../" + oldAvatar)
 		} else {
-			os.Remove("../" + oldAvatar)
+			os.Remove("../../../" + oldAvatar)
 		}
 	}
 
@@ -71,7 +71,7 @@ func saveImage(src []byte, name string, isTest bool) (string, error) {
 
 	var dst *os.File
 	if isTest {
-		dst, err = os.Create("../../../avatars/" + filename)
+		dst, err = os.Create("../../../../avatars/" + filename)
 	} else {
 		dst, err = os.Create("../../../avatars/" + filename)
 	}
@@ -102,8 +102,6 @@ func saveImage(src []byte, name string, isTest bool) (string, error) {
 
 			err = jpeg.Encode(dst, img, &opt)
 			if err != nil {
-				fmt.Println("2")
-				fmt.Println(err)
 				return "", err
 			}
 		}

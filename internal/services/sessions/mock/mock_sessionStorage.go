@@ -33,10 +33,10 @@ func (m *MockSessionStorage) EXPECT() *MockSessionStorageMockRecorder {
 }
 
 // CheckUserSession mocks base method
-func (m *MockSessionStorage) CheckUserSession(arg0 string) (uint64, error) {
+func (m *MockSessionStorage) CheckUserSession(arg0 string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckUserSession", arg0)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -48,7 +48,7 @@ func (mr *MockSessionStorageMockRecorder) CheckUserSession(arg0 interface{}) *go
 }
 
 // CreateUserSession mocks base method
-func (m *MockSessionStorage) CreateUserSession(arg0 uint64, arg1 string) error {
+func (m *MockSessionStorage) CreateUserSession(arg0 int64, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUserSession", arg0, arg1)
 	ret0, _ := ret[0].(error)

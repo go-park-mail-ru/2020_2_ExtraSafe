@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS attachments;
 CREATE TABLE comments (
     commentID SERIAL PRIMARY KEY,
     message TEXT,
-    taskID INTEGER REFERENCES tasks(taskID),
+    taskID INTEGER REFERENCES tasks(taskID)  ON DELETE CASCADE,
     commentOrder INTEGER,
     userID INTEGER
 );
@@ -50,32 +50,32 @@ CREATE TABLE comments (
 -- ID  ДОСКИ!!!!
 CREATE TABLE tags (
     tagID SERIAL PRIMARY KEY,
-    boardID  INTEGER REFERENCES boards(boardID),
+    boardID  INTEGER REFERENCES boards(boardID)  ON DELETE CASCADE,
     name TEXT,
     color TEXT
 );
 
 CREATE TABLE task_members (
-    taskID INTEGER REFERENCES tasks(taskID),
+    taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
     userID INTEGER
 );
 
 CREATE TABLE task_tags (
-    taskID INTEGER REFERENCES tasks(taskID),
-    tagID INTEGER REFERENCES tags(tagID)
+    taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
+    tagID INTEGER REFERENCES tags(tagID) ON DELETE CASCADE
 );
 ALTER TABLE IF EXISTS task_tags ADD CONSTRAINT uniq UNIQUE (taskID, tagID);
 
 CREATE TABLE checklists (
     checklistID SERIAL PRIMARY KEY,
-    taskID INTEGER REFERENCES tasks(taskID),
+    taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
     name TEXT,
     items JSONB
 );
 
 CREATE TABLE attachments (
     attachmentID SERIAL PRIMARY KEY,
-    taskID INTEGER REFERENCES tasks(taskID),
+    taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
     filename TEXT,
     filepath TEXT
 );

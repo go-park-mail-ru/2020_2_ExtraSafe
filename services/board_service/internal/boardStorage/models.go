@@ -2,9 +2,8 @@ package boardStorage
 
 import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 
-//go:generate mockgen -destination=./mock/mock_cardsStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage CardsStorage
-//go:generate mockgen -destination=./mock/mock_tasksStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/storages/boardStorage TasksStorage
-
+//go:generate mockgen -destination=./mock/mock_cardsStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage CardsStorage
+//go:generate mockgen -destination=./mock/mock_tasksStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage TasksStorage
 
 type CardsStorage interface {
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
