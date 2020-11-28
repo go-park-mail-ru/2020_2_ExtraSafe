@@ -74,3 +74,15 @@ func (s *storage) DeleteChecklist(input models.ChecklistInput) (err error){
 func (s *storage) GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error){
 	return s.checklistStorage.GetChecklistsByTask(input)
 }
+
+func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error) {
+	return s.attachmentStorage.AddAttachment(input)
+}
+
+func (s *storage) RemoveAttachment(input models.AttachmentInternal) (err error) {
+	return s.attachmentStorage.RemoveAttachment(input)
+}
+
+func (s *storage) GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error) {
+	return s.attachmentStorage.GetAttachmentsByTask(input)
+}
