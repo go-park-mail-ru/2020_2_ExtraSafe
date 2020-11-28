@@ -50,6 +50,8 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.DELETE("/tag/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.TagDelete))))
 	e.PUT("/task/:ID/tag-add/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TagAdd))))
 	e.PUT("/task/:ID/tag-remove/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TagRemove))))
+	e.PUT("/task/:ID/user-add/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TaskUserAdd))))
+	e.PUT("/task/:ID/user-remove/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TaskUserRemove))))
 
 	e.POST("/comment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.CommentCreate))))
 	e.PUT("/comment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckCommentUpdateUserPermission(board.CommentChange))))

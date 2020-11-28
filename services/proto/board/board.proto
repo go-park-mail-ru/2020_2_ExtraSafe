@@ -102,10 +102,10 @@ message TaskInternalShort {
   repeated ChecklistOutside Checklists = 7;
 }
 
-message TaskAssigner {
+message TaskAssignerInput {
   int64 UserID = 1;
   int64 TaskID = 2;
-  int64 AssignerID = 3;
+  string AssignerName = 3;
 }
 
 message TaskAssignerIDs {
@@ -238,8 +238,8 @@ service Board {
   rpc ChangeTask (TaskInput) returns (TaskOutside) {}
   rpc DeleteTask (TaskInput) returns (Nothing) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
-  rpc AssignUser (TaskAssigner) returns (Nothing) {}
-  rpc DismissUser (TaskAssigner) returns (Nothing) {}
+  rpc AssignUser (TaskAssignerInput) returns (Nothing) {}
+  rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
   rpc GetAssigners (TaskInput) returns (TaskAssignerIDs) {}
 
   rpc CreateTag (TagInput) returns (TagOutside) {}

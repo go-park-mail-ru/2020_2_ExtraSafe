@@ -26,7 +26,7 @@ func NewService(userStorage uStorage.Storage, avatarStorage imgStorage.Storage, 
 	}
 }
 
-func (s *service) CheckUser(c context.Context, input *protoProfile.UserInputLogin) (output *protoProfile.UserID, err error) {
+func (s *service) CheckUser(_ context.Context, input *protoProfile.UserInputLogin) (output *protoProfile.UserID, err error) {
 	userInput := models.UserInputLogin{
 		Email:    input.Email,
 		Password: input.Password,
@@ -42,7 +42,7 @@ func (s *service) CheckUser(c context.Context, input *protoProfile.UserInputLogi
 	return output, nil
 }
 
-func (s *service) CreateUser(c context.Context, input *protoProfile.UserInputReg) (output *protoProfile.UserID, err error) {
+func (s *service) CreateUser(_ context.Context, input *protoProfile.UserInputReg) (output *protoProfile.UserID, err error) {
 	userInput := models.UserInputReg{
 		Username: input.Username,
 		Email:    input.Email,
@@ -59,7 +59,7 @@ func (s *service) CreateUser(c context.Context, input *protoProfile.UserInputReg
 	return output, nil
 }
 
-func (s *service) Profile(c context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
+func (s *service) Profile(_ context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
 	userInput := models.UserInput{
 		ID: input.ID,
 	}
@@ -88,7 +88,7 @@ func (s *service) Profile(c context.Context, input *protoProfile.UserID) (output
 	return output, nil
 }
 
-func (s *service) Accounts(c context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
+func (s *service) Accounts(_ context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
 	userInput := models.UserInput{
 		ID: input.ID,
 	}
@@ -119,7 +119,7 @@ func (s *service) Boards(c context.Context, input *protoProfile.UserID) (output 
 	return output, nil
 }
 
-func (s *service) ProfileChange(c context.Context, input *protoProfile.UserInputProfile) (output *protoProfile.UserOutside, err error) {
+func (s *service) ProfileChange(_ context.Context, input *protoProfile.UserInputProfile) (output *protoProfile.UserOutside, err error) {
 	multiErrors := new(models.MultiErrors)
 
 	userInput := models.UserInputProfile{
@@ -177,7 +177,7 @@ func (s *service) ProfileChange(c context.Context, input *protoProfile.UserInput
 	return output, nil
 }
 
-func (s *service) AccountsChange(c context.Context, input *protoProfile.UserInputLinks) (output *protoProfile.UserOutside, err error) {
+func (s *service) AccountsChange(_ context.Context, input *protoProfile.UserInputLinks) (output *protoProfile.UserOutside, err error) {
 	userInput := models.UserInputLinks{
 		ID:        input.ID,
 		Telegram:  "",
@@ -212,7 +212,7 @@ func (s *service) AccountsChange(c context.Context, input *protoProfile.UserInpu
 	return output, nil
 }
 
-func (s *service) PasswordChange(c context.Context, input *protoProfile.UserInputPassword) (output *protoProfile.UserOutside, err error) {
+func (s *service) PasswordChange(_ context.Context, input *protoProfile.UserInputPassword) (output *protoProfile.UserOutside, err error) {
 	userInput := models.UserInputPassword{
 		ID:          input.ID,
 		OldPassword: input.OldPassword,
@@ -243,7 +243,7 @@ func (s *service) PasswordChange(c context.Context, input *protoProfile.UserInpu
 	return output, nil
 }
 
-func (s *service) GetUsersByIDs(ctx context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error) {
+func (s *service) GetUsersByIDs(_ context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error) {
 	userIDS := make([]int64, 0)
 
 	for _, id := range input.UserIDs {
@@ -264,6 +264,22 @@ func (s *service) GetUsersByIDs(ctx context.Context, input *protoProfile.UserIDS
 			FullName: userShort.FullName,
 			Avatar:   userShort.Avatar,
 		})
+	}
+
+	return output, nil
+}
+
+func (s *service) GetUserByUsername(_ context.Context, input *protoProfile.UserName) (output *protoProfile.UserOutsideShort, err error) {
+	user, err := s.userStorage.GetUserByUsername(input.UserName)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoProfile.UserOutsideShort{
+		Email:    user.Email,
+		Username: user.Username,
+		FullName: user.FullName,
+		Avatar:   user.Avatar,
 	}
 
 	return output, nil

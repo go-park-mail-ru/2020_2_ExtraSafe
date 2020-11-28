@@ -24,6 +24,8 @@ type Handler interface {
 	TaskChange(c echo.Context) error
 	TaskDelete(c echo.Context) error
 	TaskOrder(c echo.Context) error
+	TaskUserAdd(c echo.Context) error
+	TaskUserRemove(c echo.Context) error
 
 	TagCreate(c echo.Context) error
 	TagChange(c echo.Context) error
@@ -399,6 +401,46 @@ func (h *handler) TaskOrder(c echo.Context) error {
 	}
 
 	err = h.boardsService.TasksOrderChange(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TaskUserAdd(c echo.Context) error {
+	userInput, err := h.boardsTransport.TasksUserRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.AssignUser(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TaskUserRemove(c echo.Context) error {
+	userInput, err := h.boardsTransport.TasksUserRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DismissUser(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err

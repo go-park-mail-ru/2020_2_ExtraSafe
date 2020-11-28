@@ -20,6 +20,7 @@ type Transport interface {
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
 	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
+	TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error)
 
 	TagChangeRead(c echo.Context) (request models.TagInput, err error)
 	TagTaskRead(c echo.Context) (request models.TaskTagInput, err error)
@@ -176,6 +177,19 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 	if err := c.Bind(userInput); err != nil {
 		return models.TasksOrderInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TasksOrderRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error) {
+	userInput := new(models.TaskAssignerInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.TaskAssignerInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "TasksUserRead"}
 	}
 
 	userInput.UserID = c.Get("userId").(int64)

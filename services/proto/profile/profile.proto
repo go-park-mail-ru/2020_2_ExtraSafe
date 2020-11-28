@@ -100,6 +100,10 @@ message UserIDS {
   repeated int64 userIDs = 1;
 }
 
+message UserName {
+  string userName = 1;
+}
+
 service Profile {
   rpc CheckUser (UserInputLogin) returns (UserID) {}
   rpc CreateUser (UserInputReg) returns (UserID) {}
@@ -110,4 +114,5 @@ service Profile {
   rpc AccountsChange (UserInputLinks) returns (UserOutside) {}
   rpc PasswordChange (UserInputPassword) returns (UserOutside) {}
   rpc GetUsersByIDs (UserIDS) returns (UsersOutsideShort) {}
+  rpc GetUserByUsername (UserName) returns (UserOutsideShort) {}
 }

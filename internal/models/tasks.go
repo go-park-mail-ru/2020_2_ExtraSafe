@@ -81,8 +81,14 @@ type TaskTagInput struct {
 	TagID  		int64 `json:"tagID"`
 }
 
+type TaskAssignerInput struct {
+	UserID       int64  `json:"-"`
+	TaskID       int64  `json:"taskID"`
+	AssignerName string `json:"assignerName"`
+}
+
 type TaskAssigner struct {
-	UserID      int64 `json:"-"`
-	TaskID      int64 `json:"taskID"`
+	UserID      int64
+	TaskID      int64
 	AssignerID  int64
 }

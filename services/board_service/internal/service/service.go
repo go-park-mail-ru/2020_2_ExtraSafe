@@ -459,14 +459,19 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AssignUser(_ context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
-		AssignerID: input.AssignerID,
+		AssignerID: user.ID,
 	}
 
-	err := s.boardStorage.AssignUser(userInput)
+	err = s.boardStorage.AssignUser(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
@@ -474,14 +479,19 @@ func (s *service) AssignUser(_ context.Context, input *protoBoard.TaskAssigner) 
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) DismissUser(_ context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
-		AssignerID: input.AssignerID,
+		AssignerID: user.ID,
 	}
 
-	err := s.boardStorage.DismissUser(userInput)
+	err = s.boardStorage.DismissUser(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}

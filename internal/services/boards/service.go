@@ -25,6 +25,8 @@ type Service interface {
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
+	AssignUser(request models.TaskAssignerInput) (err error)
+	DismissUser(request models.TaskAssignerInput) (err error)
 
 	CreateTag(request models.TagInput) (task models.TagOutside, err error)
 	ChangeTag(request models.TagInput) (task models.TagOutside, err error)
@@ -539,6 +541,40 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 	}
 
 	_, err = s.boardService.TasksOrderChange(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) AssignUser(request models.TaskAssignerInput) (err error) {
+	ctx := context.Background()
+
+	userInput := &protoBoard.TaskAssignerInput{
+		UserID:     request.UserID,
+		TaskID:     request.TaskID,
+		AssignerName: request.AssignerName,
+	}
+
+	_, err = s.boardService.AssignUser(ctx, userInput)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
+	ctx := context.Background()
+
+	userInput := &protoBoard.TaskAssignerInput{
+		UserID:     request.UserID,
+		TaskID:     request.TaskID,
+		AssignerName: request.AssignerName,
+	}
+
+	_, err = s.boardService.DismissUser(ctx, userInput)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
