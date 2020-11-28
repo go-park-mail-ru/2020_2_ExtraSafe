@@ -29,6 +29,9 @@ type Transport interface {
 
 	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
 	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
+
+	AttachmentRead(c echo.Context) (request models.ChecklistInput, err error)
+	AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error)
 }
 
 type transport struct {
@@ -209,6 +212,7 @@ func (t transport) TagWrite(tag models.TagOutside) (response models.ResponseTag,
 	response.TagID = tag.TagID
 	response.Color = tag.Color
 	response.TagName = tag.Name
+	response.Status = 200
 
 	return response, nil
 }
@@ -231,6 +235,7 @@ func (t transport) CommentWrite(comment models.CommentOutside) (response models.
 	response.User = comment.User
 	response.Message = comment.Message
 	response.Order = comment.Order
+	response.Status = 200
 
 	return response, nil
 }
@@ -252,6 +257,17 @@ func (t transport) ChecklistWrite(checklist models.ChecklistOutside) (response m
 	response.ChecklistID = checklist.ChecklistID
 	response.Name = checklist.Name
 	response.Items = checklist.Items
+	response.Status = 200
+
+	return response, nil
+}
+
+func (t transport) AttachmentRead(c echo.Context) (request models.ChecklistInput, err error) {
+	return request, nil
+}
+
+func (t transport) AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error) {
+	response.Status = 200
 
 	return response, nil
 }

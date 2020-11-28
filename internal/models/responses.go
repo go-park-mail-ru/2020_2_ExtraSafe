@@ -88,12 +88,14 @@ type ResponseTask struct {
 }
 
 type ResponseTag struct {
+	Status  int    `json:"status"`
 	TagID   int64  `json:"tagID"`
 	Color   string `json:"color"`
 	TagName string `json:"TagName"`
 }
 
 type ResponseComment struct {
+	Status    int              `json:"status"`
 	CommentID int64            `json:"commentID"`
 	Message   string           `json:"message"`
 	Order     int64            `json:"order"`
@@ -101,7 +103,15 @@ type ResponseComment struct {
 }
 
 type ResponseChecklist struct {
+	Status      int             `json:"status"`
 	ChecklistID int64           `json:"checklistID"`
 	Name        string          `json:"checklistName"`
 	Items       json.RawMessage `json:"items"`
+}
+
+type ResponseAttachment struct {
+	Status       int    `json:"status"`
+	AttachmentID int64  `json:"attachmentID"`
+	Filename     string `json:"filename"`
+	Filepath     string `json:"filepath"`
 }

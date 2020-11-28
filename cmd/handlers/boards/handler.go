@@ -38,6 +38,9 @@ type Handler interface {
 	ChecklistCreate(c echo.Context) error
 	ChecklistChange(c echo.Context) error
 	ChecklistDelete(c echo.Context) error
+
+	AttachmentCreate(c echo.Context) error
+	AttachmentDelete(c echo.Context) error
 }
 
 type handler struct {

@@ -58,4 +58,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistCreate))))
 	e.PUT("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistChange))))
 	e.DELETE("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistDelete))))
+
+	e.POST("/attachment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.AttachmentCreate))))
+	e.DELETE("/attachment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.AttachmentDelete))))
 }

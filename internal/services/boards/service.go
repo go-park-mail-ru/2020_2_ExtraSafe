@@ -40,6 +40,9 @@ type Service interface {
 	ChangeChecklist(request models.ChecklistInput) (task models.ChecklistOutside, err error)
 	DeleteChecklist(request models.ChecklistInput) (err error)
 
+	CreateAttachment(request models.AttachmentInput) (task models.AttachmentOutside, err error)
+	DeleteAttachment(request models.AttachmentInput) (err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
@@ -786,6 +789,46 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 	}
 
 	_, err = s.boardService.DeleteChecklist(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) CreateAttachment(request models.AttachmentInput) (attachment models.AttachmentOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.AttachmentInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		Filename: request.Filename,
+		File: request.File,
+	}
+
+	output, err := s.boardService.AddAttachment(ctx, input)
+	if err != nil {
+		return models.AttachmentOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	attachment.AttachmentID = output.AttachmentID
+	attachment.Filename = output.Filename
+	attachment.Filepath = output.Filepath
+
+	return attachment, nil
+}
+
+func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.AttachmentInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		Filename: request.Filename,
+		File: request.File,
+	}
+
+	_, err = s.boardService.RemoveAttachment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
