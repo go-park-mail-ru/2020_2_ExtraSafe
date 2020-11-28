@@ -36,7 +36,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 		Name:     boardInput.BoardName,
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
-		Cards:    []models.CardOutside{},
+		Cards:    []models.CardInternal{},
 		UsersIDs: []int64{},
 	}
 
@@ -109,8 +109,8 @@ func TestStorage_ChangeBoard(t *testing.T) {
 		Star:      false,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -200,7 +200,7 @@ func TestStorage_ChangeBoardGetCardsFail(t *testing.T) {
 		Star:      false,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
+	expectedCards := make([]models.CardInternal, 0)
 
 	ctrlCards := gomock.NewController(t)
 	defer ctrlCards.Finish()
@@ -246,8 +246,8 @@ func TestStorage_ChangeBoardGetTasksFail(t *testing.T) {
 		Star:      false,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -462,8 +462,8 @@ func TestStorage_GetBoard(t *testing.T) {
 		BoardID:   1,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -516,7 +516,7 @@ func TestStorage_GetBoard(t *testing.T) {
 		Star:    false,
 	}
 
-	cards := make([]models.CardOutside, 0)
+	cards := make([]models.CardInternal, 0)
 	cards = append(cards, expectedCards...)
 	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
 
@@ -630,7 +630,7 @@ func TestStorage_GetBoardCardsFail(t *testing.T) {
 		BoardID:   1,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
+	expectedCards := make([]models.CardInternal, 0)
 
 	ctrlCards := gomock.NewController(t)
 	defer ctrlCards.Finish()
@@ -679,8 +679,8 @@ func TestStorage_GetBoardTasksFail(t *testing.T) {
 		BoardID:   1,
 	}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -1029,7 +1029,7 @@ func TestStorage_CreateCard(t *testing.T) {
 		Order:   1,
 	}
 
-	cardOutside := models.CardOutside{
+	cardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -1069,7 +1069,7 @@ func TestStorage_CreateCardFail(t *testing.T) {
 	defer ctrlCards.Finish()
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
-	mockCards.EXPECT().CreateCard(cardInput).Times(1).Return(models.CardOutside{}, errors.New("error creating card"))
+	mockCards.EXPECT().CreateCard(cardInput).Times(1).Return(models.CardInternal{}, errors.New("error creating card"))
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1091,7 +1091,7 @@ func TestStorage_ChangeCard(t *testing.T) {
 		Order:   1,
 	}
 
-	cardOutside := models.CardOutside{
+	cardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   "todo changed",
 		Order:  1,
@@ -1139,7 +1139,7 @@ func TestStorage_ChangeCardFail(t *testing.T) {
 	defer ctrlCards.Finish()
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
-	mockCards.EXPECT().ChangeCard(cardInput).Times(1).Return(models.CardOutside{}, errors.New(""))
+	mockCards.EXPECT().ChangeCard(cardInput).Times(1).Return(models.CardInternal{}, errors.New(""))
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1161,7 +1161,7 @@ func TestStorage_ChangeCardFailGetTasks(t *testing.T) {
 		Order:   1,
 	}
 
-	cardOutside := models.CardOutside{
+	cardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   "todo changed",
 		Order:  1,
@@ -1343,7 +1343,7 @@ func TestStorage_DeleteCardFail(t *testing.T) {
 func TestStorage_GetCard(t *testing.T) {
 	cardInput := models.CardInput{ CardID: 1 }
 
-	expectedCard := models.CardOutside{
+	expectedCard := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -1402,7 +1402,7 @@ func TestStorage_GetCardByIDFail(t *testing.T) {
 	defer ctrlCards.Finish()
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
-	mockCards.EXPECT().GetCardByID(cardInput).Times(1).Return(models.CardOutside{}, errors.New(""))
+	mockCards.EXPECT().GetCardByID(cardInput).Times(1).Return(models.CardInternal{}, errors.New(""))
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1418,7 +1418,7 @@ func TestStorage_GetCardByIDFail(t *testing.T) {
 func TestStorage_GetCardTasksFail(t *testing.T) {
 	cardInput := models.CardInput{ CardID: 1 }
 
-	expectedCard := models.CardOutside{
+	expectedCard := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,

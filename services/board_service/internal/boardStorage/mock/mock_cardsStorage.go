@@ -34,10 +34,10 @@ func (m *MockCardsStorage) EXPECT() *MockCardsStorageMockRecorder {
 }
 
 // ChangeCard mocks base method
-func (m *MockCardsStorage) ChangeCard(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockCardsStorage) ChangeCard(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeCard", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,10 +63,10 @@ func (mr *MockCardsStorageMockRecorder) ChangeCardOrder(arg0 interface{}) *gomoc
 }
 
 // CreateCard mocks base method
-func (m *MockCardsStorage) CreateCard(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockCardsStorage) CreateCard(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCard", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -92,10 +92,10 @@ func (mr *MockCardsStorageMockRecorder) DeleteCard(arg0 interface{}) *gomock.Cal
 }
 
 // GetCardByID mocks base method
-func (m *MockCardsStorage) GetCardByID(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockCardsStorage) GetCardByID(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCardByID", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -107,10 +107,10 @@ func (mr *MockCardsStorageMockRecorder) GetCardByID(arg0 interface{}) *gomock.Ca
 }
 
 // GetCardsByBoard mocks base method
-func (m *MockCardsStorage) GetCardsByBoard(arg0 models.BoardInput) ([]models.CardOutside, error) {
+func (m *MockCardsStorage) GetCardsByBoard(arg0 models.BoardInput) ([]models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCardsByBoard", arg0)
-	ret0, _ := ret[0].([]models.CardOutside)
+	ret0, _ := ret[0].([]models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

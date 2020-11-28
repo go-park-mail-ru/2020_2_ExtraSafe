@@ -49,10 +49,10 @@ func (mr *MockBoardStorageMockRecorder) ChangeBoard(arg0 interface{}) *gomock.Ca
 }
 
 // ChangeCard mocks base method
-func (m *MockBoardStorage) ChangeCard(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockBoardStorage) ChangeCard(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeCard", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -122,10 +122,10 @@ func (mr *MockBoardStorageMockRecorder) CreateBoard(arg0 interface{}) *gomock.Ca
 }
 
 // CreateCard mocks base method
-func (m *MockBoardStorage) CreateCard(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockBoardStorage) CreateCard(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCard", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -209,10 +209,10 @@ func (mr *MockBoardStorageMockRecorder) GetBoard(arg0 interface{}) *gomock.Call 
 }
 
 // GetCard mocks base method
-func (m *MockBoardStorage) GetCard(arg0 models.CardInput) (models.CardOutside, error) {
+func (m *MockBoardStorage) GetCard(arg0 models.CardInput) (models.CardInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCard", arg0)
-	ret0, _ := ret[0].(models.CardOutside)
+	ret0, _ := ret[0].(models.CardInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

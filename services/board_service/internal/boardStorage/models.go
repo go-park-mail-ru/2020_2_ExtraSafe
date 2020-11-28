@@ -7,12 +7,12 @@ import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 
 
 type CardsStorage interface {
-	CreateCard(userInput models.CardInput) (models.CardOutside, error)
-	ChangeCard(userInput models.CardInput) (models.CardOutside, error)
+	CreateCard(userInput models.CardInput) (models.CardInternal, error)
+	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
 	DeleteCard(userInput models.CardInput) error
 
-	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
-	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
+	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardInternal, error)
+	GetCardByID(cardInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(taskInput models.CardsOrderInput) error
 }
 
