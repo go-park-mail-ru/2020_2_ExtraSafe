@@ -1,12 +1,12 @@
-package storage
+package boardStorage
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/checklistStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/commentStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/tagStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 )
 
 type Storage interface {
@@ -36,7 +36,11 @@ type Storage interface {
 	GetCard(cardInput models.CardInput) (models.CardOutside, error)
 	GetTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
-/////////////////////////////////////////
+	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (err error)
+	CheckTaskPermission(userID int64, taskID int64) (err error)
+
+	/////////////////////////////////////////
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
 	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
@@ -58,11 +62,7 @@ type Storage interface {
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	DeleteChecklist(input models.ChecklistInput) (err error)
 	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
-////////////////////////////////////////////
-
-	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
-	CheckCardPermission(userID int64, cardID int64) (err error)
-	CheckTaskPermission(userID int64, taskID int64) (err error)
+	////////////////////////////////////////////
 }
 
 type storage struct {

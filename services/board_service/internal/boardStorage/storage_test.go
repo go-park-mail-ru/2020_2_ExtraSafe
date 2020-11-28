@@ -1,4 +1,4 @@
-package storage
+package boardStorage
 
 import (
 	"database/sql"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/mock"
+	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/mock"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"

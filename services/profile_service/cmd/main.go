@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/storage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"google.golang.org/grpc"
@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 
-	userStorage := storage.NewStorage(db)
+	userStorage := userStorage.NewStorage(db)
 	//avatarStorage := imgStorage.NewStorage()
 
 	// =============================

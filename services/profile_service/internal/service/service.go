@@ -2,19 +2,19 @@ package profile
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/storage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
 )
 
 type service struct {
-	userStorage storage.Storage
+	userStorage  userStorage.Storage
 	boardService protoBoard.BoardClient
 }
 
 
-func NewService(userStorage storage.Storage, boardService protoBoard.BoardClient) *service {
+func NewService(userStorage userStorage.Storage, boardService protoBoard.BoardClient) *service {
 	return &service{
 		userStorage: userStorage,
 		boardService: boardService,

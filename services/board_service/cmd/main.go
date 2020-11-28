@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/cardsStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/checklistStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/commentStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/tagStorage"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/storage/tasksStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/cardsStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tasksStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"google.golang.org/grpc"
 	"log"
@@ -39,7 +39,7 @@ func main() {
 	tagsStorage := tagStorage.NewStorage(db)
 	commentsStorage := commentStorage.NewStorage(db)
 	checklistsStorage := checklistStorage.NewStorage(db)
-	boardStorage := storage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage)
+	boardStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage)
 
 	lis, err := net.Listen("tcp", ":8083")
 	if err != nil {

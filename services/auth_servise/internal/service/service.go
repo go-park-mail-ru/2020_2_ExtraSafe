@@ -3,7 +3,7 @@ package auth
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/storage"
+	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
