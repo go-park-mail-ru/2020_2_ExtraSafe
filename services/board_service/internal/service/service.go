@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
+	fStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/fileStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
@@ -11,14 +12,16 @@ import (
 
 type service struct {
 	boardStorage boardStorage.Storage
+	fileStorage fStorage.Storage
 	profileService protoProfile.ProfileClient
 }
 
 var NameService = "BoardService"
 
-func NewService(boardStorage boardStorage.Storage, profileService protoProfile.ProfileClient) *service {
+func NewService(boardStorage boardStorage.Storage, fileStorage fStorage.Storage, profileService protoProfile.ProfileClient) *service {
 	return &service{
 		boardStorage: boardStorage,
+		fileStorage: fileStorage,
 		profileService: profileService,
 	}
 }
@@ -728,6 +731,57 @@ func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.Checklist
 	err := s.boardStorage.DeleteChecklist(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentInput) (output *protoBoard.AttachmentOutside, err error) {
+	fileInput := models.AttachmentFileInternal{
+		UserID:   input.UserID,
+		Filename: input.Filename,
+		File:     input.File,
+	}
+
+	userInput := &models.AttachmentInternal{
+		TaskID:       input.TaskID,
+		Filename:     input.Filename,
+	}
+
+	err = s.fileStorage.UploadFile(fileInput, userInput, false)
+	if err != nil {
+		return output, err
+	}
+
+	attachment, err := s.boardStorage.AddAttachment(*userInput)
+	if err != nil {
+		return output, err
+	}
+
+	output = &protoBoard.AttachmentOutside{
+		AttachmentID: attachment.AttachmentID,
+		Filename:     attachment.Filename,
+		Filepath:     attachment.Filepath,
+	}
+
+	return output, nil
+}
+
+func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInput) (*protoBoard.Nothing, error) {
+	userInput := models.AttachmentInternal{
+		TaskID:       input.TaskID,
+		Filename:     input.Filename,
+		AttachmentID: input.AttachmentID,
+	}
+
+	err := s.boardStorage.RemoveAttachment(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, err
+	}
+
+	err = s.fileStorage.DeleteFile(userInput.Filepath, false)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, err
 	}
 
 	return &protoBoard.Nothing{Dummy: true}, nil

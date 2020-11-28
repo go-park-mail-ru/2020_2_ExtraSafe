@@ -3,6 +3,7 @@ package boards
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
+	"io/ioutil"
 	"strconv"
 )
 
@@ -30,7 +31,7 @@ type Transport interface {
 	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
 	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
 
-	AttachmentRead(c echo.Context) (request models.ChecklistInput, err error)
+	AttachmentRead(c echo.Context) (request models.AttachmentInput, err error)
 	AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error)
 }
 
@@ -262,12 +263,38 @@ func (t transport) ChecklistWrite(checklist models.ChecklistOutside) (response m
 	return response, nil
 }
 
-func (t transport) AttachmentRead(c echo.Context) (request models.ChecklistInput, err error) {
-	return request, nil
+func (t transport) AttachmentRead(c echo.Context) (request models.AttachmentInput, err error) {
+	formParams, err := c.FormParams()
+	if err != nil {
+		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "AttachmentRead"}
+	}
+
+	userInput := new(models.AttachmentInput)
+	userInput.Filename = formParams.Get("fileName")
+	userInput.TaskID, _ = strconv.ParseInt(formParams.Get("taskID"), 10, 64)
+	userInput.AttachmentID, _ = strconv.ParseInt(formParams.Get("attachmentID"), 10, 64)
+
+	//TODO какая то фигня
+	file, err := c.FormFile("file")
+	if err == nil {
+		fileContent, _ := file.Open()
+		var byteContainer []byte
+		byteContainer = make([]byte, file.Size)
+		byteContainer, _ = ioutil.ReadAll(fileContent)
+		userInput.File = byteContainer
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
 }
 
-func (t transport) AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error) {
+func (t transport) AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error) {
 	response.Status = 200
+	response.Filename = attachment.Filename
+	response.Filepath = attachment.Filepath
+	response.AttachmentID = attachment.AttachmentID
 
 	return response, nil
 }

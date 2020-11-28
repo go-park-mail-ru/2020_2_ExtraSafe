@@ -676,3 +676,51 @@ func (h *handler) ChecklistDelete(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
+
+func (h *handler) AttachmentCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.AttachmentRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.CreateAttachment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.AttachmentWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) AttachmentDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.AttachmentRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DeleteAttachment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
