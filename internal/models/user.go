@@ -9,7 +9,6 @@ type UserOutside struct {
 	Avatar   string `json:"avatar"`
 }
 
-//TODO добавить заполнение ID
 type UserOutsideShort struct {
 	ID int64
 	Email    string `json:"email"`
