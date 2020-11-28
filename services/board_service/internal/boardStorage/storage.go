@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
@@ -63,6 +64,10 @@ type Storage interface {
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	DeleteChecklist(input models.ChecklistInput) (err error)
 	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
+
+	AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
+	RemoveAttachment(input models.AttachmentInternal) (err error)
+	GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error)
 	////////////////////////////////////////////
 }
 
@@ -73,9 +78,10 @@ type storage struct {
 	tagStorage tagStorage.Storage
 	commentStorage commentStorage.Storage
 	checklistStorage checklistStorage.Storage
+	attachmentStorage attachmentStorage.Storage
 }
 
-func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage) Storage {
+func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) Storage {
 	return &storage{
 		db: db,
 		cardsStorage: cardsStorage,
@@ -83,6 +89,7 @@ func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage
 		tagStorage: tagStorage,
 		commentStorage: commentStorage,
 		checklistStorage: checklistStorage,
+		attachmentStorage: attachmentStorage,
 	}
 }
 
