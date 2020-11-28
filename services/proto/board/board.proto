@@ -194,6 +194,21 @@ message ChecklistOutside {
 }
 
 //==========================================
+message AttachmentInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 AttachmentID = 3;
+  string Filename = 4;
+  bytes File = 5;
+}
+
+message AttachmentOutside {
+  int64 AttachmentID = 1;
+  string Filename = 2;
+  string Filepath = 3;
+}
+
+//==========================================
 message CheckPermissions {
   int64 UserID = 1;
   int64 ElementID = 2;
@@ -240,6 +255,9 @@ service Board {
   rpc CreateChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
+
+  rpc AddAttachment(AttachmentInput) returns (AttachmentOutside) {}
+  rpc RemoveAttachment(AttachmentInput) returns (Nothing) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}
