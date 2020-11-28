@@ -11,7 +11,7 @@ import (
 )
 
 type Storage interface {
-	UploadFile(file models.AttachmentFileInput, attachment *models.AttachmentInput, isTest bool) error
+	UploadFile(file models.AttachmentFileInternal, attachment *models.AttachmentInternal, isTest bool) error
 }
 
 type storage struct {}
@@ -20,7 +20,7 @@ func NewStorage() Storage {
 	return &storage{}
 }
 
-func (s *storage) UploadFile(file models.AttachmentFileInput, attachment *models.AttachmentInput, isTest bool) error {
+func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *models.AttachmentInternal, isTest bool) error {
 	hash := sha256.New()
 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
