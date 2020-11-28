@@ -85,10 +85,11 @@ message UserBoardsOutside {
 }
 
 message UserOutsideShort {
-  string Email = 1;
-  string Username = 2;
-  string FullName = 3;
-  string Avatar = 4;
+  int64 ID = 1;
+  string Email = 2;
+  string Username = 3;
+  string FullName = 4;
+  string Avatar = 5;
 }
 
 message UsersOutsideShort {
@@ -108,5 +109,5 @@ service Profile {
   rpc ProfileChange (UserInputProfile) returns (UserOutside) {}
   rpc AccountsChange (UserInputLinks) returns (UserOutside) {}
   rpc PasswordChange (UserInputPassword) returns (UserOutside) {}
-  rpc GetBoardMembers (UserIDS) returns (UsersOutsideShort) {}
+  rpc GetUsersByIDs (UserIDS) returns (UsersOutsideShort) {}
 }

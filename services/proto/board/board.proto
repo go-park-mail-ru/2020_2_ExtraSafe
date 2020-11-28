@@ -5,6 +5,7 @@ syntax = "proto3";
 package protoBoard;
 import "profile/profile.proto";
 
+//==========================================
 message BoardChangeInput {
   int64 UserID = 1;
   int64 BoardID = 2;
@@ -28,6 +29,7 @@ message BoardOutside {
   repeated CardOutside Cards = 7;
 }
 
+//==========================================
 message CardInput {
   int64 UserID = 1;
   int64 CardID = 2;
@@ -50,9 +52,10 @@ message CardOutside {
   int64 CardID = 1;
   string Name = 2;
   int64 Order = 3;
-  repeated TaskOutside Tasks = 4;
+  repeated TaskOutsideShort Tasks = 4;
 }
 
+//==========================================
 message TaskInput {
   int64 UserID = 1;
   int64 TaskID = 2;
@@ -77,13 +80,119 @@ message TasksOrderInput {
   repeated TasksOrder Tasks = 2;
 }
 
+message TaskInternal {
+  int64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated int64 Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+  repeated CommentOutside Comments = 8;
+}
+
+message TaskInternalShort {
+  int64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated int64 Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+}
+
+message TaskAssigner {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 AssignerID = 3;
+}
+
+message TaskAssignerIDs {
+  repeated int64 assignerIDs = 1;
+}
+
 message TaskOutside {
   int64 TaskID = 1;
   string Name = 2;
   string Description = 3;
   int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+  repeated CommentOutside Comments = 8;
 }
 
+message TaskOutsideShort {
+  int64 TaskID = 1;
+  string  Name = 2;
+  string  Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+}
+
+//==========================================
+message TagInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 TagID = 3;
+  int64 BoardID = 4;
+  string Color = 5;
+  string Name = 6;
+}
+
+message TaskTagInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 TagID = 3;
+}
+
+message TagOutside {
+  int64 TagID = 1;
+  string Color = 2;
+  string Name = 3;
+}
+
+//==========================================
+message CommentInput {
+  int64 CommentID = 1;
+  int64 TaskID = 2;
+  string Message = 3;
+  int64 Order = 4;
+  int64 UserID = 5;
+}
+
+message CommentInternal {
+  int64 CommentID = 1;
+  string Message = 2;
+  int64 Order = 3;
+  int64  UserID = 4;
+}
+
+message CommentOutside {
+  int64 CommentID = 1;
+  string Message = 2;
+  int64 Order = 3;
+  protoProfile.UserOutsideShort User = 4;
+}
+
+//==========================================
+message ChecklistInput {
+  int64 UserID = 1;
+  int64 ChecklistID = 2;
+  int64 TaskID = 3;
+  string Name = 4;
+  bytes Items = 5;
+}
+
+message ChecklistOutside {
+  int64 ChecklistID = 1;
+  string Name = 2;
+  bytes Items = 3;
+}
+
+//==========================================
 message CheckPermissions {
   int64 UserID = 1;
   int64 ElementID = 2;
@@ -95,24 +204,41 @@ message Nothing {
 }
 
 service Board {
-  rpc GetBoardsList(protoProfile.UserID) returns (protoProfile.BoardsOutsideShort);
+  rpc GetBoardsList(protoProfile.UserID) returns (protoProfile.BoardsOutsideShort) {}
 
-  rpc CreateBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort);
-  rpc GetBoard (BoardInput) returns (BoardOutside);
-  rpc ChangeBoard (BoardChangeInput) returns (BoardOutside);
-  rpc DeleteBoard (BoardInput) returns (Nothing);
+  rpc CreateBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
+  rpc GetBoard (BoardInput) returns (BoardOutside) {}
+  rpc ChangeBoard (BoardChangeInput) returns (BoardOutside) {}
+  rpc DeleteBoard (BoardInput) returns (Nothing) {}
 
-  rpc CreateCard (CardInput) returns (CardOutside);
-  rpc GetCard (CardInput) returns (CardOutside);
-  rpc ChangeCard (CardInput) returns (CardOutside);
-  rpc DeleteCard (CardInput) returns (Nothing);
-  rpc CardOrderChange (CardsOrderInput) returns (Nothing);
+  rpc CreateCard (CardInput) returns (CardOutside) {}
+  rpc GetCard (CardInput) returns (CardOutside) {}
+  rpc ChangeCard (CardInput) returns (CardOutside) {}
+  rpc DeleteCard (CardInput) returns (Nothing) {}
+  rpc CardOrderChange (CardsOrderInput) returns (Nothing) {}
 
-  rpc CreateTask (TaskInput) returns (TaskOutside);
-  rpc GetTask (TaskInput) returns (TaskOutside);
-  rpc ChangeTask (TaskInput) returns (TaskOutside);
-  rpc DeleteTask (TaskInput) returns (Nothing);
-  rpc TasksOrderChange (TasksOrderInput) returns (Nothing);
+  rpc CreateTask (TaskInput) returns (TaskOutside) {}
+  rpc GetTask (TaskInput) returns (TaskOutside) {}
+  rpc ChangeTask (TaskInput) returns (TaskOutside) {}
+  rpc DeleteTask (TaskInput) returns (Nothing) {}
+  rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
+  rpc AssignUser (TaskAssigner) returns (Nothing) {}
+  rpc DismissUser (TaskAssigner) returns (Nothing) {}
+  rpc GetAssigners (TaskInput) returns (TaskAssignerIDs) {}
+
+  rpc CreateTag (TagInput) returns (TagOutside) {}
+  rpc ChangeTag (TagInput) returns (TagOutside) {}
+  rpc DeleteTag (TagInput) returns (Nothing) {}
+  rpc AddTag (TaskTagInput) returns (Nothing) {}
+  rpc RemoveTag (TaskTagInput) returns (Nothing) {}
+
+  rpc CreateComment (CommentInput) returns (CommentOutside) {}
+  rpc ChangeComment (CommentInput) returns (CommentOutside) {}
+  rpc DeleteComment (CommentInput) returns (Nothing) {}
+
+  rpc CreateChecklist (ChecklistInput) returns (ChecklistOutside) {}
+  rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
+  rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}

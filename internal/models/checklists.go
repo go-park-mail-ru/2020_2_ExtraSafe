@@ -16,11 +16,11 @@ type Checklist struct {
 }
 */
 type ChecklistInput struct {
-	UserID int64
-	ChecklistID int64
-	TaskID int64
-	Name string
-	Items json.RawMessage
+	UserID      int64           `json:"userID"`
+	ChecklistID int64           `json:"checklistID"`
+	TaskID      int64           `json:"taskID"`
+	Name        string          `json:"name"`
+	Items       json.RawMessage `json:"items"`
 }
 
 type ChecklistOutside struct {

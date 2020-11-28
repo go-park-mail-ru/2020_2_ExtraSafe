@@ -83,20 +83,23 @@ func (s *service) GetBoard(c context.Context, input *protoBoard.BoardInput) (out
 	membersIDs = append(membersIDs, boardInternal.AdminID)
 	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
 
-	members, err := s.profileService.GetBoardMembers(c, &protoProfile.UserIDS{UserIDs: membersIDs})
+	members, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: membersIDs})
 	if err != nil {
 		return output, err
 	}
 
 	cards := make([]*protoBoard.CardOutside, 0)
 	for _, card := range boardInternal.Cards {
-		tasks := make([]*protoBoard.TaskOutside, 0)
+		tasks := make([]*protoBoard.TaskOutsideShort, 0)
 		for _, task := range card.Tasks {
-			tasks = append(tasks, &protoBoard.TaskOutside{
+			tasks = append(tasks, &protoBoard.TaskOutsideShort{
 				TaskID:      task.TaskID,
 				Name:        task.Name,
 				Description: task.Description,
 				Order:       task.Order,
+				Tags: convertTags(task.Tags),
+				Users: getUsersForTask(task.Users, members),
+				Checklists: convertChecklists(task.Checklists),
 			})
 		}
 		cards = append(cards, &protoBoard.CardOutside{
@@ -120,6 +123,41 @@ func (s *service) GetBoard(c context.Context, input *protoBoard.BoardInput) (out
 	return output, nil
 }
 
+func convertChecklists(checklists []models.ChecklistOutside) (output []*protoBoard.ChecklistOutside) {
+	for _, checklist := range checklists {
+		output = append(output, &protoBoard.ChecklistOutside{
+			ChecklistID: checklist.ChecklistID,
+			Items: checklist.Items,
+			Name:  checklist.Name,
+		})
+	}
+	return output
+}
+
+func convertTags(tags []models.TagOutside) (output []*protoBoard.TagOutside) {
+	for _, tag := range tags {
+		output = append(output, &protoBoard.TagOutside{
+			TagID: tag.TagID,
+			Color: tag.Color,
+			Name:  tag.Name,
+		})
+	}
+	return output
+}
+
+func getUsersForTask(userIDs []int64, users *protoProfile.UsersOutsideShort) []*protoProfile.UserOutsideShort {
+	output := make([]*protoProfile.UserOutsideShort, 0)
+	for _, id := range userIDs {
+		for _, user := range users.Users{
+			if id == user.ID {
+				output = append(output, user)
+			}
+		}
+	}
+
+	return output
+}
+
 func (s *service) ChangeBoard(c context.Context, input *protoBoard.BoardChangeInput) (output *protoBoard.BoardOutside, err error) {
 	userInput := models.BoardChangeInput{
 		UserID:    input.UserID,
@@ -134,42 +172,14 @@ func (s *service) ChangeBoard(c context.Context, input *protoBoard.BoardChangeIn
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	membersIDs := make([]int64, 0)
-	membersIDs = append(membersIDs, boardInternal.AdminID)
-	membersIDs = append(membersIDs, boardInternal.UsersIDs...)
-
-	members, err := s.profileService.GetBoardMembers(c, &protoProfile.UserIDS{UserIDs: membersIDs})
-	if err != nil {
-		return output, err
-	}
-
-	cards := make([]*protoBoard.CardOutside, 0)
-	for _, card := range boardInternal.Cards {
-		tasks := make([]*protoBoard.TaskOutside, 0)
-		for _, task := range card.Tasks {
-			tasks = append(tasks, &protoBoard.TaskOutside{
-				TaskID:      task.TaskID,
-				Name:        task.Name,
-				Description: task.Description,
-				Order:       task.Order,
-			})
-		}
-		cards = append(cards, &protoBoard.CardOutside{
-			CardID: card.CardID,
-			Name:   card.Name,
-			Order:  card.Order,
-			Tasks:  tasks,
-		})
-	}
-
 	output = &protoBoard.BoardOutside{
 		BoardID: boardInternal.BoardID,
-		Admin:   members.Users[0],
+		Admin:   nil,
 		Name:    boardInternal.Name,
 		Theme:   boardInternal.Theme,
 		Star:    boardInternal.Star,
-		Users:   members.Users[1:],
-		Cards:   cards,
+		Users:   nil,
+		Cards:   nil,
 	}
 	return output, nil
 }
@@ -363,6 +373,11 @@ func (s *service) ChangeTask(c context.Context, input *protoBoard.TaskInput) (ou
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
+	/*users, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: task.Users})
+	if err != nil {
+		return output, err
+	}*/
+
 	output = &protoBoard.TaskOutside{
 		TaskID: task.TaskID,
 		Name:   task.Name,
@@ -410,6 +425,283 @@ func (s *service) TasksOrderChange(c context.Context, input *protoBoard.TasksOrd
 	}
 
 	err := s.boardStorage.ChangeTaskOrder(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) AssignUser(ctx context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+	userInput := models.TaskAssigner{
+		UserID:    input.UserID,
+		TaskID:   input.TaskID,
+		AssignerID: input.AssignerID,
+	}
+
+	err := s.boardStorage.AssignUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) DismissUser(ctx context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+	userInput := models.TaskAssigner{
+		UserID:    input.UserID,
+		TaskID:   input.TaskID,
+		AssignerID: input.AssignerID,
+	}
+
+	err := s.boardStorage.DismissUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) GetAssigners(ctx context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskAssignerIDs, err error) {
+	userInput := models.TaskInput{
+		UserID:    input.UserID,
+		TaskID:   input.TaskID,
+		CardID: input.CardID,
+	}
+
+	assigners, err := s.boardStorage.GetAssigners(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.TaskAssignerIDs{AssignerIDs: assigners}
+
+	return output, nil
+}
+
+func (s *service) CreateTag(ctx context.Context, input *protoBoard.TagInput) (output *protoBoard.TagOutside, err error) {
+	userInput := models.TagInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+		Color:   input.Color,
+		Name:    input.Name,
+	}
+
+	tag, err := s.boardStorage.CreateTag(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.TagOutside{
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
+	return output, nil
+}
+
+func (s *service) ChangeTag(ctx context.Context, input *protoBoard.TagInput) (output *protoBoard.TagOutside, err error) {
+	userInput := models.TagInput{
+		UserID:  input.UserID,
+		TagID: input.TagID,
+		BoardID: input.BoardID,
+		Color:   input.Color,
+		Name:    input.Name,
+	}
+
+	tag, err := s.boardStorage.UpdateTag(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.TagOutside{
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
+	return output, nil
+}
+
+func (s *service) DeleteTag(ctx context.Context, input *protoBoard.TagInput) (*protoBoard.Nothing, error) {
+	userInput := models.TagInput{
+		UserID:  input.UserID,
+		TagID: input.TagID,
+		BoardID: input.BoardID,
+	}
+
+	err := s.boardStorage.DeleteTag(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) AddTag(ctx context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error) {
+	userInput := models.TaskTagInput{
+		UserID:  input.UserID,
+		TagID: input.TagID,
+		TaskID: input.TaskID,
+	}
+
+	err := s.boardStorage.AddTag(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) RemoveTag(ctx context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error) {
+	userInput := models.TaskTagInput{
+		UserID:  input.UserID,
+		TagID: input.TagID,
+		TaskID: input.TaskID,
+	}
+
+	err := s.boardStorage.RemoveTag(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) CreateComment(ctx context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error) {
+	userInput := models.CommentInput{
+		CommentID: input.CommentID,
+		UserID:  input.UserID,
+		TaskID: input.TaskID,
+		Message: input.Message,
+		Order: input.Order,
+	}
+
+	comment, err := s.boardStorage.CreateComment(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	//TODO - менить на GetUserByID
+	user, err := s.profileService.GetUsersByIDs(ctx, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.CommentOutside{
+		CommentID: comment.CommentID,
+		Message:   comment.Message,
+		Order:     comment.Order,
+		User:      user.Users[0],
+	}
+
+	return output, nil
+}
+
+func (s *service) ChangeComment(ctx context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error) {
+	userInput := models.CommentInput{
+		CommentID: input.CommentID,
+		UserID:  input.UserID,
+		TaskID: input.TaskID,
+		Message: input.Message,
+		Order: input.Order,
+	}
+
+	comment, err := s.boardStorage.UpdateComment(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	//TODO - менить на GetUserByID
+	user, err := s.profileService.GetUsersByIDs(ctx, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.CommentOutside{
+		CommentID: comment.CommentID,
+		Message:   comment.Message,
+		Order:     comment.Order,
+		User:      user.Users[0],
+	}
+
+	return output, nil
+}
+
+func (s *service) DeleteComment(ctx context.Context, input *protoBoard.CommentInput) (*protoBoard.Nothing, error) {
+	userInput := models.CommentInput{
+		CommentID: input.CommentID,
+		UserID:  input.UserID,
+		TaskID: input.TaskID,
+		Message: input.Message,
+		Order: input.Order,
+	}
+
+	err := s.boardStorage.DeleteComment(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) CreateChecklist(ctx context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error) {
+	userInput := models.ChecklistInput{
+		UserID: input.UserID,
+		ChecklistID: input.ChecklistID,
+		TaskID: input.TaskID,
+		Name: input.Name,
+		Items: input.Items,
+	}
+
+	checklist, err := s.boardStorage.CreateChecklist(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.ChecklistOutside{
+		ChecklistID: checklist.ChecklistID,
+		Name:   checklist.Name,
+		Items: checklist.Items,
+	}
+
+	return output, nil
+}
+
+func (s *service) ChangeChecklist(ctx context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error) {
+	userInput := models.ChecklistInput{
+		UserID: input.UserID,
+		ChecklistID: input.ChecklistID,
+		TaskID: input.TaskID,
+		Name: input.Name,
+		Items: input.Items,
+	}
+
+	checklist, err := s.boardStorage.UpdateChecklist(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoBoard.ChecklistOutside{
+		ChecklistID: checklist.ChecklistID,
+		Name:   checklist.Name,
+		Items: checklist.Items,
+	}
+
+	return output, nil
+}
+
+func (s *service) DeleteChecklist(ctx context.Context, input *protoBoard.ChecklistInput) (*protoBoard.Nothing, error) {
+	userInput := models.ChecklistInput{
+		UserID: input.UserID,
+		ChecklistID: input.ChecklistID,
+		TaskID: input.TaskID,
+		Name: input.Name,
+		Items: input.Items,
+	}
+
+	err := s.boardStorage.DeleteChecklist(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}

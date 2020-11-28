@@ -17,8 +17,18 @@ type Transport interface {
 	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
-	TaskWrite(card models.TaskInternalShort) (response models.ResponseTask, err error)
+	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
+
+	TagChangeRead(c echo.Context) (request models.TagInput, err error)
+	TagTaskRead(c echo.Context) (request models.TaskTagInput, err error)
+	TagWrite(card models.TagOutside) (response models.ResponseTag, err error)
+
+	CommentChangeRead(c echo.Context) (request models.CommentInput, err error)
+	CommentWrite(card models.CommentOutside) (response models.ResponseComment, err error)
+
+	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
+	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
 }
 
 type transport struct {
@@ -142,7 +152,7 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 	return *userInput, nil
 }
 
-func (t transport) TaskWrite(task models.TaskInternalShort) (response models.ResponseTask, err error) {
+func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseTask, err error) {
 	response.TaskID = task.TaskID
 	response.Description = task.Description
 	response.Order = task.Order
@@ -162,4 +172,81 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 	userInput.UserID = c.Get("userId").(int64)
 
 	return *userInput, nil
+}
+
+func (t transport) TagChangeRead(c echo.Context) (request models.TagInput, err error) {
+	userInput := new(models.TagInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.TagInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "TagChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) TagTaskRead(c echo.Context) (request models.TaskTagInput, err error) {
+	userInput := new(models.TaskTagInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.TaskTagInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "TagTaskRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) TagWrite(tag models.TagOutside) (response models.ResponseTag, err error) {
+	response.TagID = tag.TagID
+	response.Color = tag.Color
+	response.TagName = tag.Name
+
+	return response, nil
+}
+
+func (t transport) CommentChangeRead(c echo.Context) (request models.CommentInput, err error) {
+	userInput := new(models.CommentInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.CommentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CommentChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) CommentWrite(comment models.CommentOutside) (response models.ResponseComment, err error) {
+	response.CommentID = comment.CommentID
+	response.User = comment.User
+	response.Message = comment.Message
+	response.Order = comment.Order
+
+	return response, nil
+}
+
+func (t transport) ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error) {
+	userInput := new(models.ChecklistInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.ChecklistInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChecklistChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) ChecklistWrite(checklist models.ChecklistOutside) (response models.ResponseChecklist, err error) {
+	response.ChecklistID = checklist.ChecklistID
+	response.Name = checklist.Name
+	response.Items = checklist.Items
+
+	return response, nil
 }

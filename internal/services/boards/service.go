@@ -26,6 +26,20 @@ type Service interface {
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
 
+	CreateTag(request models.TagInput) (task models.TagOutside, err error)
+	ChangeTag(request models.TagInput) (task models.TagOutside, err error)
+	DeleteTag(request models.TagInput) (err error)
+	AddTag(request models.TaskTagInput) (err error)
+	RemoveTag(request models.TaskTagInput) (err error)
+
+	CreateComment(request models.CommentInput) (task models.CommentOutside, err error)
+	ChangeComment(request models.CommentInput) (task models.CommentOutside, err error)
+	DeleteComment(request models.CommentInput) (err error)
+
+	CreateChecklist(request models.ChecklistInput) (task models.ChecklistOutside, err error)
+	ChangeChecklist(request models.ChecklistInput) (task models.ChecklistOutside, err error)
+	DeleteChecklist(request models.ChecklistInput) (err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
@@ -97,9 +111,9 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	}
 
 	for _, card := range boardInternal.Cards{
-		tasks := make([]models.TaskOutside, 0)
+		tasks := make([]models.TaskOutsideShort, 0)
 		for _, task := range card.Tasks {
-			tasks = append(tasks, models.TaskOutside{
+			tasks = append(tasks, models.TaskOutsideShort{
 				TaskID:      task.TaskID,
 				Name:        task.Name,
 				Description: task.Description,
@@ -139,7 +153,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 		return models.BoardOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	board.Admin = models.UserOutsideShort{
+/*	board.Admin = models.UserOutsideShort{
 		Email:    boardInternal.Admin.Email,
 		Username: boardInternal.Admin.Username,
 		FullName: boardInternal.Admin.FullName,
@@ -172,7 +186,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 			Order:  card.Order,
 			Tasks:  tasks,
 		})
-	}
+	}*/
 
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name
@@ -182,7 +196,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	return board, nil
 }
 
-func writeBoardOutside(boardInternal models.BoardInternal, members []models.UserOutsideShort) (board models.BoardOutside) {
+/*func writeBoardOutside(boardInternal models.BoardInternal, members []models.UserOutsideShort) (board models.BoardOutside) {
 	board.BoardID = boardInternal.BoardID
 	board.Name = boardInternal.Name
 	board.Star = boardInternal.Star
@@ -193,7 +207,7 @@ func writeBoardOutside(boardInternal models.BoardInternal, members []models.User
 		board.Users = members[0:]
 	}
 	return
-}
+}*/
 
 func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	ctx := context.Background()
@@ -228,16 +242,6 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutside,
 		return models.CardOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	for _, task := range output.Tasks{
-		card.Tasks = append(card.Tasks, models.TaskOutside{
-			TaskID:      task.TaskID,
-			Name:        task.Name,
-			Description: task.Description,
-			Order:       task.Order,
-			Users:       models.UserOutsideShort{},
-		})
-	}
-
 	card.CardID = output.CardID
 	card.Name = output.Name
 	card.Order = output.Order
@@ -262,7 +266,7 @@ func (s *service) GetCard(request models.CardInput) (card models.CardOutside, er
 	}
 
 	for _, task := range output.Tasks{
-		card.Tasks = append(card.Tasks, models.TaskOutside{
+		card.Tasks = append(card.Tasks, models.TaskOutsideShort{
 			TaskID:      task.TaskID,
 			Name:        task.Name,
 			Description: task.Description,
@@ -295,7 +299,7 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutside,
 	}
 
 	for _, task := range output.Tasks{
-		card.Tasks = append(card.Tasks, models.TaskOutside{
+		card.Tasks = append(card.Tasks, models.TaskOutsideShort{
 			TaskID:      task.TaskID,
 			Name:        task.Name,
 			Description: task.Description,
@@ -479,6 +483,257 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 
 	return nil
 }
+
+func (s *service) CreateTag(request models.TagInput) (tag models.TagOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.TagInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		TagID:      request.TagID,
+		BoardID: request.BoardID,
+		Name:        request.Name,
+		Color: request.Color,
+	}
+
+	output, err := s.boardService.CreateTag(ctx, input)
+	if err != nil {
+		return models.TagOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	tag.TagID = output.TagID
+	tag.Color = output.Color
+	tag.Name = output.Name
+
+	return tag, nil
+}
+
+func (s *service) ChangeTag(request models.TagInput) (tag models.TagOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.TagInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		TagID:      request.TagID,
+		BoardID: request.BoardID,
+		Name:        request.Name,
+		Color: request.Color,
+	}
+
+	output, err := s.boardService.ChangeTag(ctx, input)
+	if err != nil {
+		return models.TagOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	tag.TagID = output.TagID
+	tag.Color = output.Color
+	tag.Name = output.Name
+
+	return tag, nil
+}
+
+func (s *service) DeleteTag(request models.TagInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.TagInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		TagID:      request.TagID,
+		BoardID: request.BoardID,
+		Name:        request.Name,
+		Color: request.Color,
+	}
+
+	_, err = s.boardService.DeleteTag(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) AddTag(request models.TaskTagInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.TaskTagInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		TagID:      request.TagID,
+	}
+
+	_, err = s.boardService.AddTag(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.TaskTagInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		TagID:      request.TagID,
+	}
+
+	_, err = s.boardService.AddTag(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+
+func (s *service) CreateComment(request models.CommentInput) (comment models.CommentOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.CommentInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		CommentID:      request.CommentID,
+		Message: request.Message,
+		Order: request.Order,
+	}
+
+	output, err := s.boardService.CreateComment(ctx, input)
+	if err != nil {
+		return models.CommentOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	user := models.UserOutsideShort{
+		Email:    output.User.Email,
+		Username: output.User.Username,
+		FullName: output.User.FullName,
+		Avatar:   output.User.Avatar,
+	}
+
+	comment.CommentID = output.CommentID
+	comment.Message = output.Message
+	comment.Order = output.Order
+	comment.User = user
+
+	return comment, nil
+}
+
+func (s *service) ChangeComment(request models.CommentInput) (comment models.CommentOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.CommentInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		CommentID:      request.CommentID,
+		Message: request.Message,
+		Order: request.Order,
+	}
+
+	output, err := s.boardService.ChangeComment(ctx, input)
+	if err != nil {
+		return models.CommentOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	user := models.UserOutsideShort{
+		Email:    output.User.Email,
+		Username: output.User.Username,
+		FullName: output.User.FullName,
+		Avatar:   output.User.Avatar,
+	}
+
+	comment.CommentID = output.CommentID
+	comment.Message = output.Message
+	comment.Order = output.Order
+	comment.User = user
+
+	return comment, nil
+}
+
+func (s *service) DeleteComment(request models.CommentInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.CommentInput{
+		UserID:      request.UserID,
+		TaskID:      request.TaskID,
+		CommentID:      request.CommentID,
+		Message: request.Message,
+		Order: request.Order,
+	}
+
+	_, err = s.boardService.DeleteComment(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+
+func (s *service) CreateChecklist(request models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.ChecklistInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		ChecklistID: request.ChecklistID,
+		Name: request.Name,
+		Items: request.Items,
+	}
+
+	output, err := s.boardService.CreateChecklist(ctx, input)
+	if err != nil {
+		return models.ChecklistOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	checklist.ChecklistID = output.ChecklistID
+	checklist.Name = output.Name
+	checklist.Items = output.Items
+
+	return checklist, nil
+}
+
+func (s *service) ChangeChecklist(request models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.ChecklistInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		ChecklistID: request.ChecklistID,
+		Name: request.Name,
+		Items: request.Items,
+	}
+
+	output, err := s.boardService.ChangeChecklist(ctx, input)
+	if err != nil {
+		return models.ChecklistOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	checklist.ChecklistID = output.ChecklistID
+	checklist.Name = output.Name
+	checklist.Items = output.Items
+
+	return checklist, nil
+}
+
+func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.ChecklistInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		ChecklistID: request.ChecklistID,
+		Name: request.Name,
+		Items: request.Items,
+	}
+
+	_, err = s.boardService.DeleteChecklist(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
 
 func (s *service) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error) {
 	ctx := context.Background()

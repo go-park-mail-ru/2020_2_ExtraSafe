@@ -23,6 +23,8 @@ type Middleware interface {
 	CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 	CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckCommentUpdateUserPermission(next echo.HandlerFunc) echo.HandlerFunc
+	CheckCommentDeleteUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type middlew struct {
@@ -235,6 +237,50 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 		userID := c.Get("userId").(int64)
 
 		err = m.boardService.CheckTaskPermission(userID, taskID)
+		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
+			return err
+		}
+
+		return next(c)
+	}
+}
+
+func (m middlew) CheckCommentUpdateUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		comid := c.Param("ID")
+		commentID, err := strconv.ParseInt(comid, 10, 64)
+		if err != nil {
+			return c.NoContent(http.StatusBadRequest)
+		}
+
+		userID := c.Get("userId").(int64)
+
+		err = m.boardService.CheckCommentPermission(userID, commentID, false)
+		if err != nil {
+			if err := m.errorWorker.RespError(c, err); err != nil {
+				return err
+			}
+			return err
+		}
+
+		return next(c)
+	}
+}
+
+func (m middlew) CheckCommentDeleteUserPermission(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		comid := c.Param("ID")
+		commentID, err := strconv.ParseInt(comid, 10, 64)
+		if err != nil {
+			return c.NoContent(http.StatusBadRequest)
+		}
+
+		userID := c.Get("userId").(int64)
+
+		err = m.boardService.CheckCommentPermission(userID, commentID, true)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err

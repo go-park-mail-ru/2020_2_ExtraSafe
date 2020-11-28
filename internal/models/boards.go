@@ -6,7 +6,7 @@ type BoardInternal struct {
 	Name     string        `json:"name"` // название доски
 	Theme    string        `json:"theme"`
 	Star     bool          `json:"star"`
-	Cards    []CardOutside `json:"cards"`
+	Cards    []CardInternal `json:"cards"`
 	UsersIDs []int64      `json:"usersIDs"` // массив с пользователями этой доски
 	//FIXME added
 	Tags 	[]TagOutside

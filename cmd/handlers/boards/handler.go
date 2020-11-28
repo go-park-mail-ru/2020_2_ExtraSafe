@@ -24,15 +24,29 @@ type Handler interface {
 	TaskChange(c echo.Context) error
 	TaskDelete(c echo.Context) error
 	TaskOrder(c echo.Context) error
+
+	TagCreate(c echo.Context) error
+	TagChange(c echo.Context) error
+	TagDelete(c echo.Context) error
+	TagAdd(c echo.Context) error
+	TagRemove(c echo.Context) error
+
+	CommentCreate(c echo.Context) error
+	CommentChange(c echo.Context) error
+	CommentDelete(c echo.Context) error
+
+	ChecklistCreate(c echo.Context) error
+	ChecklistChange(c echo.Context) error
+	ChecklistDelete(c echo.Context) error
 }
 
 type handler struct {
 	boardsService boards.Service
-	boardsTransport boardsTransport
+	boardsTransport boards.Transport
 	errorWorker errorWorker
 }
 
-func NewHandler(boardsService boards.Service, boardsTransport boardsTransport, errorWorker errorWorker) *handler {
+func NewHandler(boardsService boards.Service, boardsTransport boards.Transport, errorWorker errorWorker) *handler {
 	return &handler{
 		boardsService: boardsService,
 		boardsTransport: boardsTransport,
@@ -390,4 +404,272 @@ func (h *handler) TaskOrder(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TagCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.TagChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.CreateTag(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.TagWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) TagChange(c echo.Context) error {
+	userInput, err := h.boardsTransport.TagChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.ChangeTag(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.TagWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) TagDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.TagChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DeleteTag(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) TagAdd(c echo.Context) error {
+	userInput, err := h.boardsTransport.TagTaskRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.AddTag(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) TagRemove(c echo.Context) error {
+	userInput, err := h.boardsTransport.TagTaskRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.RemoveTag(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) CommentCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.CommentChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.CreateComment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.CommentWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) CommentChange(c echo.Context) error {
+	userInput, err := h.boardsTransport.CommentChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.ChangeComment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.CommentWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) CommentDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.CommentChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DeleteComment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) ChecklistCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.ChecklistChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.CreateChecklist(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.ChecklistWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) ChecklistChange(c echo.Context) error {
+	userInput, err := h.boardsTransport.ChecklistChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.ChangeChecklist(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.ChecklistWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) ChecklistDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.ChecklistChangeRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DeleteChecklist(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }

@@ -44,4 +44,18 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 
 	e.POST("/task-order/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.TaskOrder)))
 	e.POST("/card-order/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.CardOrder)))
+
+	e.POST("/tag/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.TagCreate))))
+	e.PUT("/tag/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardUserPermission(board.TagChange))))
+	e.DELETE("/tag/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardUserPermission(board.TagDelete))))
+	e.PUT("/task/:ID/tag-add/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TagAdd))))
+	e.PUT("/task/:ID/tag-remove", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.TagRemove))))
+
+	e.POST("/comment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.CommentCreate))))
+	e.PUT("/comment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckCommentUpdateUserPermission(board.CommentChange))))
+	e.DELETE("/comment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckCommentDeleteUserPermission(board.CommentDelete))))
+
+	e.POST("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistCreate))))
+	e.PUT("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistChange))))
+	e.DELETE("/checklist/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.ChecklistDelete))))
 }

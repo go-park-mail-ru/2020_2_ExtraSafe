@@ -1,5 +1,7 @@
 package models
 
+import "encoding/json"
+
 type ResponseStatus struct {
 	Status   int    `json:"status"`
 }
@@ -65,17 +67,36 @@ type ResponseBoards struct {
 }
 
 type ResponseCard struct {
-	Status  int                `json:"status"`
-	CardID int64               `json:"cardID"`
-	Name   string              `json:"cardName"`
-	Order  int64               `json:"order"`
-	Tasks  []TaskInternalShort `json:"tasks"`
+	Status int           `json:"status"`
+	CardID int64         `json:"cardID"`
+	Name   string        `json:"cardName"`
+	Order  int64         `json:"order"`
+	Tasks  []TaskOutsideShort `json:"tasks"`
 }
 
 type ResponseTask struct {
-	Status int `json:"status"`
-	TaskID      int64 `json:"taskID"`
+	Status      int    `json:"status"`
+	TaskID      int64  `json:"taskID"`
 	Name        string `json:"taskName"`
 	Description string `json:"description"`
 	Order       int64  `json:"order"`
+}
+
+type ResponseTag struct {
+	TagID   int64  `json:"tagID"`
+	Color   string `json:"color"`
+	TagName string `json:"TagName"`
+}
+
+type ResponseComment struct {
+	CommentID int64            `json:"commentID"`
+	Message   string           `json:"message"`
+	Order     int64            `json:"order"`
+	User      UserOutsideShort `json:"user"`
+}
+
+type ResponseChecklist struct {
+	ChecklistID int64           `json:"checklistID"`
+	Name        string          `json:"checklistName"`
+	Items       json.RawMessage `json:"items"`
 }

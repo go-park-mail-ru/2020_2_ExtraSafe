@@ -243,14 +243,14 @@ func (s *service) PasswordChange(c context.Context, input *protoProfile.UserInpu
 	return output, nil
 }
 
-func (s *service) GetBoardMembers(ctx context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error) {
+func (s *service) GetUsersByIDs(ctx context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error) {
 	userIDS := make([]int64, 0)
 
 	for _, id := range input.UserIDs {
 		userIDS = append(userIDS, id)
 	}
 
-	users, err := s.userStorage.GetBoardMembers(userIDS)
+	users, err := s.userStorage.GetUsersByIDs(userIDS)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
