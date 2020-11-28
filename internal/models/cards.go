@@ -7,11 +7,18 @@ type Card struct {
 	Order   int64  `json:"order"`
 }
 
-type CardOutside struct {
+type CardInternal struct {
 	CardID int64               `json:"cardID"`
 	Name   string              `json:"cardName"`
 	Order  int64               `json:"order"`
 	Tasks  []TaskInternalShort `json:"tasks"`
+}
+
+type CardOutside struct {
+	CardID int64               `json:"cardID"`
+	Name   string              `json:"cardName"`
+	Order  int64               `json:"order"`
+	Tasks  []TaskOutsideShort `json:"tasks"`
 }
 
 type CardInput struct {

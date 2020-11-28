@@ -16,8 +16,8 @@ type Storage interface {
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
-	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
-	ChangeCard(userInput models.CardInput) (models.CardOutside, error)
+	CreateCard(cardInput models.CardInput) (models.CardInternal, error)
+	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(cardInput models.CardsOrderInput) error
 	DeleteCard(userInput models.CardInput) error
 
@@ -33,7 +33,7 @@ type Storage interface {
 	RemoveUser(input models.BoardMember) (err error)
 
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
-	GetCard(cardInput models.CardInput) (models.CardOutside, error)
+	GetCard(cardInput models.CardInput) (models.CardInternal, error)
 	GetTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
@@ -131,7 +131,7 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		Name:     boardInput.BoardName,
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
-		Cards:    []models.CardOutside{},
+		Cards:    []models.CardInternal{},
 		UsersIDs: []int64{},
 	}
 	return board, nil
@@ -320,20 +320,20 @@ func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
 	return nil
 }
 
-func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
+func (s *storage) CreateCard(cardInput models.CardInput) (models.CardInternal, error) {
 	//не ищем таски, потому что при создании доски они пустые
 	return s.cardsStorage.CreateCard(cardInput)
 }
 
-func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, error) {
+func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
 	card, err := s.cardsStorage.ChangeCard(cardInput)
 	if err != nil {
-		return models.CardOutside{}, err
+		return models.CardInternal{}, err
 	}
 
 	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
 	if err != nil {
-		return models.CardOutside{}, err
+		return models.CardInternal{}, err
 	}
 
 	card.Tasks = append(card.Tasks, tasks...)
@@ -395,15 +395,15 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) error {
 	return s.tasksStorage.DeleteTask(taskInput)
 }
 
-func (s *storage) GetCard(cardInput models.CardInput) (models.CardOutside, error) {
+func (s *storage) GetCard(cardInput models.CardInput) (models.CardInternal, error) {
 	card, err := s.cardsStorage.GetCardByID(cardInput)
 	if err != nil {
-		return models.CardOutside{}, err
+		return models.CardInternal{}, err
 	}
 
 	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
 	if err != nil {
-		return models.CardOutside{}, err
+		return models.CardInternal{}, err
 	}
 
 	//FIXME добавить сбор фич для тасок

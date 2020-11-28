@@ -84,6 +84,12 @@ message TaskOutside {
   int64 Order = 4;
 }
 
+message CheckPermissions {
+  int64 UserID = 1;
+  int64 ElementID = 2;
+  bool IfAdmin = 3;
+}
+
 message Nothing {
   bool dummy = 1;
 }
@@ -107,4 +113,8 @@ service Board {
   rpc ChangeTask (TaskInput) returns (TaskOutside);
   rpc DeleteTask (TaskInput) returns (Nothing);
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing);
+
+  rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckTaskPermission (CheckPermissions) returns (Nothing) {}
 }

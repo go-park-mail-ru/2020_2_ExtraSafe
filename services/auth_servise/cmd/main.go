@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/storage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
@@ -21,11 +21,11 @@ func main() {
 		fmt.Println("Connection refused")
 	}
 
-	authStorage := storage.NewStorage(tConn)
+	authStorage := sessionsStorage.NewStorage(tConn)
 
 	// =============================
 
-	lis, err := net.Listen("tcp", ":8081")
+	lis, err := net.Listen("tcp", ":9081")
 	if err != nil {
 		log.Fatalln("cant listet port", err)
 	}
@@ -33,7 +33,7 @@ func main() {
 	// =============================
 
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:8082",
+		"127.0.0.1:9082",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -44,7 +44,7 @@ func main() {
 	// =============================
 
 	grpcConn, err := grpc.Dial(
-		"127.0.0.1:8083",
+		"127.0.0.1:9083",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -63,6 +63,6 @@ func main() {
 
 	protoAuth.RegisterAuthServer(server, handler)
 
-	fmt.Println("starting server at :8081")
+	fmt.Println("starting server at :9081")
 	server.Serve(lis)
 }

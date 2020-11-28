@@ -26,7 +26,7 @@ func TestStorage_CreateCard(t *testing.T) {
 		Order:   1,
 	}
 
-	expectCardOutside := models.CardOutside{
+	expectCardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
@@ -103,7 +103,7 @@ func TestStorage_ChangeCard(t *testing.T) {
 		Order:   2,
 	}
 
-	expectCardOutside := models.CardOutside{
+	expectCardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
@@ -227,7 +227,7 @@ func TestStorage_GetCardByID(t *testing.T) {
 
 	cardInput := models.CardInput{ CardID:  1}
 
-	expectCardOutside := models.CardOutside{
+	expectCardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -293,14 +293,14 @@ func TestStorage_GetCardsByBoard(t *testing.T) {
 
 	boardInput := models.BoardInput{ BoardID:  1}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
 	}
 
-	card2 := models.CardOutside{
+	card2 := models.CardInternal{
 		CardID: 2,
 		Name:   "todo",
 		Order:  2,
@@ -342,8 +342,8 @@ func TestStorage_GetCardsByBoardScanFail(t *testing.T) {
 
 	boardInput := models.BoardInput{ BoardID:  1}
 
-	expectedCards := make([]models.CardOutside, 0)
-	card1 := models.CardOutside{
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,

@@ -3,6 +3,7 @@ package profile
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
+	"io/ioutil"
 )
 
 type Transport interface {
@@ -42,9 +43,14 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 	userInput.Email = formParams.Get("email")
 	userInput.FullName = formParams.Get("fullName")
 
+	//TODO какая то фигня
 	file, err := c.FormFile("avatar")
 	if err == nil {
-		userInput.Avatar = file
+		fileContent, _ := file.Open()
+		var byteContainer []byte
+		byteContainer = make([]byte, file.Size)
+		byteContainer, _ = ioutil.ReadAll(fileContent)
+		userInput.Avatar = byteContainer
 	}
 
 	userInput.ID = c.Get("userId").(int64)

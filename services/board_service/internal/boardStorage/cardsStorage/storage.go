@@ -7,12 +7,12 @@ import (
 )
 
 type Storage interface {
-	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
-	ChangeCard(cardInput models.CardInput) (models.CardOutside, error)
+	CreateCard(cardInput models.CardInput) (models.CardInternal, error)
+	ChangeCard(cardInput models.CardInput) (models.CardInternal, error)
 	DeleteCard(cardInput models.CardInput) error
 
-	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error)
-	GetCardByID(cardInput models.CardInput) (models.CardOutside, error)
+	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardInternal, error)
+	GetCardByID(cardInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(taskInput models.CardsOrderInput) error
 }
 
@@ -26,7 +26,7 @@ func NewStorage(db *sql.DB) Storage {
 	}
 }
 
-func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, error) {
+func (s *storage) CreateCard(cardInput models.CardInput) (models.CardInternal, error) {
 	var cardID int64
 
 	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
@@ -34,11 +34,11 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 
 	if err != nil {
 		fmt.Println(err)
-		return models.CardOutside{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.CardInternal{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateCard"}
 	}
 	
-	card := models.CardOutside{
+	card := models.CardInternal{
 		CardID: cardID,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
@@ -47,15 +47,15 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 	return card, nil
 }
 
-func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardOutside, error) {
+func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
 	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order, cardInput.CardID)
 	if err != nil {
 		fmt.Println(err)
-		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeCard"}
 	}
 
-	card := models.CardOutside{
+	card := models.CardInternal{
 		CardID: cardInput.CardID,
 		Name: cardInput.Name,
 		Order: cardInput.Order,
@@ -73,22 +73,22 @@ func (s *storage) DeleteCard(cardInput models.CardInput) error {
 	return nil
 }
 
-func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOutside, error) {
-	cards := make([]models.CardOutside, 0)
+func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardInternal, error) {
+	cards := make([]models.CardInternal, 0)
 
 	rows, err := s.db.Query("SELECT cardID, cardName, cardOrder FROM cards WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return []models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetCardsByBoard"}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var card models.CardOutside
+		var card models.CardInternal
 
 		err = rows.Scan(&card.CardID, &card.Name, &card.Order)
 		if err != nil {
-			return []models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			return []models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetCardsByBoard"}
 		}
 
@@ -97,8 +97,8 @@ func (s *storage) GetCardsByBoard(boardInput models.BoardInput) ([]models.CardOu
 	return cards, nil
 }
 
-func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, error) {
-	card := models.CardOutside{}
+func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardInternal, error) {
+	card := models.CardInternal{}
 	card.CardID = cardInput.CardID
 
 	err := s.db.QueryRow("SELECT cardName, cardOrder FROM cards WHERE cardID = $1", cardInput.CardID).
@@ -106,7 +106,7 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardOutside, e
 
 	if err != nil {
 		fmt.Println(err)
-		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetCardByID"}
 	}
 

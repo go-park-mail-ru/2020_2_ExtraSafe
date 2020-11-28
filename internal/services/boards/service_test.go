@@ -24,7 +24,7 @@ import (
 		Name:     boardInput.BoardName,
 		Theme:    boardInput.Theme,
 		Star:     boardInput.Star,
-		Cards:    []models.CardOutside{},
+		Cards:    []models.CardInternal{},
 		UsersIDs: nil,
 	}
 

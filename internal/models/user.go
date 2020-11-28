@@ -1,7 +1,5 @@
 package models
 
-import "mime/multipart"
-
 // для формирования ответа пользователю
 type UserOutside struct {
 	Email    string `json:"email"`
@@ -79,13 +77,18 @@ type UserInputProfile struct {
 	Email    string                `json:"email" valid:"required~311, emailValid~311"`
 	Username string                `json:"username" valid:"required~312, userNameValid~312"`
 	FullName string                `json:"fullName" valid:"fullNameValid~314"`
-	Avatar   *multipart.FileHeader `json:"-"`
+	Avatar   []byte `json:"-"`
 }
 
 type UserInputPassword struct {
 	ID          int64 `json:"-"`
 	OldPassword string `json:"oldpassword" valid:"required~511, passwordValid~511"`
 	Password    string `json:"password" valid:"required~512, passwordValid~512"`
+}
+
+type UserSession struct {
+	SessionID string
+	UserID int64
 }
 
 // для работы в бд

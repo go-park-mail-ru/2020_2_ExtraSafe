@@ -2,8 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/userStorage"
+	_ "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/sessionsStorage"
+	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
@@ -15,6 +18,8 @@ type service struct {
 	profileService protoProfile.ProfileClient
 	boardService protoBoard.BoardClient
 }
+
+var ServiceName = "AuthService"
 
 func NewService(authStorage authStorage.Storage , profileService protoProfile.ProfileClient, boardService protoBoard.BoardClient) *service {
 	return &service{
@@ -44,60 +49,73 @@ func (s *service) Auth(ctx context.Context, input *protoProfile.UserID) (output 
 		Boards:   boards.Boards,
 	}
 
-	return output, err
+	return output, nil
 }
 
-func (s *service) Login(ctx context.Context, input *protoProfile.UserInputLogin) (output *protoProfile.UserID, err error) {
-	//err = s.validator.ValidateLogin(request)
-	output, err = s.profileService.CheckUser(ctx, input)
+func (s *service) Login(ctx context.Context, input *protoProfile.UserInputLogin) (output *protoAuth.UserSession, err error) {
+	user, err := s.profileService.CheckUser(ctx, input)
 	if err != nil {
 		return output, err
 	}
 
-	return output, err
-}
-
-func (s *service) Registration(ctx context.Context, input *protoProfile.UserInputReg) (output *protoProfile.UserID, err error) {
-	//err = s.validator.ValidateRegistration(request)
-
-	output, err = s.profileService.CreateUser(ctx, input)
+	cookieValue, err := s.SetCookie(user.ID)
 	if err != nil {
 		return output, err
 	}
 
-	return output, err
+	output = &protoAuth.UserSession{SessionID: cookieValue, UserID: user.ID}
+
+	return output, nil
+}
+
+func (s *service) Registration(ctx context.Context, input *protoProfile.UserInputReg) (output *protoAuth.UserSession, err error) {
+	user, err := s.profileService.CreateUser(ctx, input)
+	if err != nil {
+		return output, err
+	}
+
+	cookieValue, err := s.SetCookie(user.ID)
+	if err != nil {
+		return output, err
+	}
+
+	output = &protoAuth.UserSession{SessionID: cookieValue, UserID: user.ID}
+
+	return output, nil
+}
+
+func (s *service)CheckCookie(ctx context.Context, input *protoAuth.UserSession) (output *protoProfile.UserID, err error) {
+	userId, err := s.authStorage.CheckUserSession(input.SessionID)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoProfile.UserID{ID: userId}
+
+	return output, nil
+}
+
+func (s *service) DeleteCookie(ctx context.Context, input *protoAuth.UserSession) (output *protoAuth.Nothing, err error) {
+	if err := s.authStorage.DeleteUserSession(input.SessionID); err != nil {
+		return &protoAuth.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	return &protoAuth.Nothing{Dummy: true}, nil
 }
 
 var (
 	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
-func (s *service) SetCookie(userID uint64) (cookieValue string, err error) {
+func (s *service) SetCookie(userID int64) (cookieValue string, err error) {
 	cookieValue = RandStringRunes(32)
 
 	if err := s.authStorage.CreateUserSession(userID, cookieValue); err != nil {
 		fmt.Println(err)
-		return cookieValue, err
+		return cookieValue, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	return cookieValue, nil
-}
-
-func (s *service) DeleteCookie(sessionID string) error {
-	if err := s.authStorage.DeleteUserSession(sessionID); err != nil {
-		fmt.Println(err)
-		return err
-	}
-	return nil
-}
-
-func (s *service)CheckCookie(sessionID string) (uint64, error) {
-	userId, err := s.authStorage.CheckUserSession(sessionID)
-	if err != nil {
-		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCookie"}
-
-	}
-	return userId, nil
 }
 
 func RandStringRunes(n int) string {

@@ -53,7 +53,7 @@ func (s *storage) CheckUserSession(sessionId string) (int64, error) {
 
 	data := resp.Data[0]
 	sessionDataSlice, _ := data.([]interface{})
-	userData, _ := sessionDataSlice[1].(int64)
+	userData, _ := sessionDataSlice[1].(uint64)
 
-	return userData, nil
+	return int64(userData), nil
 }

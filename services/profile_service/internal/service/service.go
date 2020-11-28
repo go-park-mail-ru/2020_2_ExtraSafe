@@ -1,22 +1,27 @@
 package profile
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage"
+	uStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
 )
 
 type service struct {
-	userStorage  userStorage.Storage
+	userStorage uStorage.Storage
+	avatarStorage imgStorage.Storage
 	boardService protoBoard.BoardClient
 }
 
+var ServiceName = "ProfileService"
 
-func NewService(userStorage userStorage.Storage, boardService protoBoard.BoardClient) *service {
+func NewService(userStorage uStorage.Storage, avatarStorage imgStorage.Storage, boardService protoBoard.BoardClient) *service {
 	return &service{
 		userStorage: userStorage,
+		avatarStorage: avatarStorage,
 		boardService: boardService,
 	}
 }
@@ -29,7 +34,7 @@ func (s *service) CheckUser(c context.Context, input *protoProfile.UserInputLogi
 
 	userID, _, err :=  s.userStorage.CheckUser(userInput)
 	if err != nil {
-		return output, err
+		return nil, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserID{ID: userID}
@@ -46,7 +51,7 @@ func (s *service) CreateUser(c context.Context, input *protoProfile.UserInputReg
 
 	userID, _, err :=  s.userStorage.CreateUser(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserID{ID: userID}
@@ -61,26 +66,26 @@ func (s *service) Profile(c context.Context, input *protoProfile.UserID) (output
 
 	user, err := s.userStorage.GetUserProfile(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	lincks := &protoProfile.UserLinks{
+	/*lincks := &protoProfile.UserLinks{
 		Instagram: user.Links.Instagram,
 		Github:    user.Links.Github,
 		Bitbucket: user.Links.Bitbucket,
 		Vk:        user.Links.Vk,
 		Facebook:  user.Links.Facebook,
-	}
+	}*/
 
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		Links:    lincks,
+		//Links:    lincks,
 		Avatar:   user.Avatar,
 	}
 
-	return output, err
+	return output, nil
 }
 
 func (s *service) Accounts(c context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
@@ -90,10 +95,10 @@ func (s *service) Accounts(c context.Context, input *protoProfile.UserID) (outpu
 
 	user, err := s.userStorage.GetUserAccounts(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	// пропущены ссылки
+	// TODO пропущены ссылки
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
@@ -101,7 +106,7 @@ func (s *service) Accounts(c context.Context, input *protoProfile.UserID) (outpu
 		Avatar:   user.Avatar,
 	}
 
-	return output, err
+	return output, nil
 }
 
 func (s *service) Boards(c context.Context, input *protoProfile.UserID) (output *protoProfile.BoardsOutsideShort, err error) {
@@ -111,7 +116,7 @@ func (s *service) Boards(c context.Context, input *protoProfile.UserID) (output 
 		return nil, err
 	}
 
-	return output, err
+	return output, nil
 }
 
 func (s *service) ProfileChange(c context.Context, input *protoProfile.UserInputProfile) (output *protoProfile.UserOutside, err error) {
@@ -121,31 +126,22 @@ func (s *service) ProfileChange(c context.Context, input *protoProfile.UserInput
 		ID:       input.ID,
 		Email:    input.Email,
 		Username: input.Username,
-		FullName: input.Username,
-		Avatar:   nil,
+		FullName: input.FullName,
+		Avatar:   input.Avatar,
 	}
 
-	/*err = s.validator.ValidateProfile(request)
-	if err != nil {
-		return nil, err
-	}*/
 	// TODO - работа с аватаром
-	/*userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: request.ID})
+	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: input.ID})
 	if errGetAvatar != nil {
-		return user, errGetAvatar
+		return output, errGetAvatar
 	}
 
-	if request.Avatar != nil {
-		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar)
+	if input.Avatar != nil {
+		errAvatar := s.avatarStorage.UploadAvatar(input.Avatar, &userAvatar, false)
 		if errAvatar != nil {
 			multiErrors.Codes = append(multiErrors.Codes, errAvatar.(models.ServeError).Codes...)
 			multiErrors.Descriptions = append(multiErrors.Descriptions, errAvatar.(models.ServeError).Descriptions...)
 		}
-	}*/
-
-	userAvatar := models.UserAvatar{
-		ID:     input.ID,
-		Avatar: "",
 	}
 
 	user, errProfile := s.userStorage.ChangeUserProfile(userInput, userAvatar)
@@ -158,35 +154,30 @@ func (s *service) ProfileChange(c context.Context, input *protoProfile.UserInput
 	}
 
 	if len(multiErrors.Codes) != 0 {
-		return nil, models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions,
-			MethodName: "ProfileChange"}
+		return nil, errorWorker.ConvertErrorToStatus(models.ServeError{Codes: multiErrors.Codes,
+			Descriptions: multiErrors.Descriptions, MethodName: "ProfileChange"}, ServiceName)
 	}
 
-	lincks := &protoProfile.UserLinks{
+	/*links := &protoProfile.UserLinks{
 		Instagram: user.Links.Instagram,
 		Github:    user.Links.Github,
 		Bitbucket: user.Links.Bitbucket,
 		Vk:        user.Links.Vk,
 		Facebook:  user.Links.Facebook,
-	}
+	}*/
 
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		Links: lincks,
+		//Links: links,
 		Avatar:   user.Avatar,
 	}
 
-	return output, err
+	return output, nil
 }
 
 func (s *service) AccountsChange(c context.Context, input *protoProfile.UserInputLinks) (output *protoProfile.UserOutside, err error) {
-	/*err = s.validator.ValidateLinks(request)
-	if err != nil {
-		return output, err
-	}*/
-
 	userInput := models.UserInputLinks{
 		ID:        input.ID,
 		Telegram:  "",
@@ -199,33 +190,29 @@ func (s *service) AccountsChange(c context.Context, input *protoProfile.UserInpu
 
 	user, err := s.userStorage.ChangeUserAccounts(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	lincks := &protoProfile.UserLinks{
+	/*links := &protoProfile.UserLinks{
 		Instagram: user.Links.Instagram,
 		Github:    user.Links.Github,
 		Bitbucket: user.Links.Bitbucket,
 		Vk:        user.Links.Vk,
 		Facebook:  user.Links.Facebook,
-	}
+	}*/
 
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		Links: lincks,
+		//Links: links,
 		Avatar:   user.Avatar,
 	}
 
-	return output, err
+	return output, nil
 }
 
 func (s *service) PasswordChange(c context.Context, input *protoProfile.UserInputPassword) (output *protoProfile.UserOutside, err error) {
-	/*err = s.validator.ValidateChangePassword(request)
-	if err != nil {
-		return output, err
-	}*/
 	userInput := models.UserInputPassword{
 		ID:          input.ID,
 		OldPassword: input.OldPassword,
@@ -234,25 +221,50 @@ func (s *service) PasswordChange(c context.Context, input *protoProfile.UserInpu
 
 	user, err := s.userStorage.ChangeUserPassword(userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	lincks := &protoProfile.UserLinks{
+	/*links := &protoProfile.UserLinks{
 		Instagram: user.Links.Instagram,
 		Github:    user.Links.Github,
 		Bitbucket: user.Links.Bitbucket,
 		Vk:        user.Links.Vk,
 		Facebook:  user.Links.Facebook,
-	}
+	}*/
 
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		Links: lincks,
+		//Links: links,
 		Avatar:   user.Avatar,
 	}
 
-	return output, err
+	return output, nil
 }
 
+func (s *service) GetBoardMembers(ctx context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error) {
+	userIDS := make([]int64, 0)
+
+	for _, id := range input.UserIDs {
+		userIDS = append(userIDS, id)
+	}
+
+	users, err := s.userStorage.GetUsersByIDs(userIDS)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+	}
+
+	output = &protoProfile.UsersOutsideShort{Users: nil}
+
+	for _, userShort := range users {
+		output.Users = append(output.Users, &protoProfile.UserOutsideShort{
+			Email:    userShort.Email,
+			Username: userShort.Username,
+			FullName: userShort.FullName,
+			Avatar:   userShort.Avatar,
+		})
+	}
+
+	return output, nil
+}

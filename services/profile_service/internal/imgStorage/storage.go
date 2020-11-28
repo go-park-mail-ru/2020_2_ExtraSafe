@@ -1,6 +1,7 @@
 package imgStorage
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -8,7 +9,6 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"mime/multipart"
 	"os"
 	"strconv"
 	"strings"
@@ -16,7 +16,7 @@ import (
 )
 
 type Storage interface {
-	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error
+	UploadAvatar(file []byte, user *models.UserAvatar, isTest bool) error
 }
 
 type storage struct {}
@@ -25,23 +25,23 @@ func NewStorage() Storage {
 	return &storage{}
 }
 
-func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error {
-	src, err := file.Open()
+func (s *storage) UploadAvatar(file []byte, user *models.UserAvatar, isTest bool) error {
+	/*src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
 		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
 			MethodName: "UploadAvatar"}
 	}
-	defer src.Close()
+	defer src.Close()*/
 
 	oldAvatar := user.Avatar
 	hash := sha256.New()
 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
-	formattedID := strconv.FormatUint(user.ID, 10)
+	formattedID := strconv.FormatInt(user.ID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 
-	filename, err := saveImage(&src, name, isTest)
+	filename, err := saveImage(file, name, isTest)
 	if err != nil {
 		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
 			MethodName: "UploadAvatar"}
@@ -59,9 +59,11 @@ func (s *storage) UploadAvatar(file *multipart.FileHeader, user *models.UserAvat
 	return nil
 }
 
-func saveImage(src *multipart.File, name string, isTest bool) (string, error) {
-	img, fmtName, err := image.Decode(*src)
+func saveImage(src []byte, name string, isTest bool) (string, error) {
+	r := bytes.NewReader(src)
+	img, fmtName, err := image.Decode(r)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
@@ -71,10 +73,12 @@ func saveImage(src *multipart.File, name string, isTest bool) (string, error) {
 	if isTest {
 		dst, err = os.Create("../../../avatars/" + filename)
 	} else {
-		dst, err = os.Create("../avatars/" + filename)
+		dst, err = os.Create("../../../avatars/" + filename)
 	}
 
 	if err != nil {
+		fmt.Println(err)
+		fmt.Println("1")
 		return "", err
 	}
 	defer dst.Close()
@@ -98,6 +102,8 @@ func saveImage(src *multipart.File, name string, isTest bool) (string, error) {
 
 			err = jpeg.Encode(dst, img, &opt)
 			if err != nil {
+				fmt.Println("2")
+				fmt.Println(err)
 				return "", err
 			}
 		}
