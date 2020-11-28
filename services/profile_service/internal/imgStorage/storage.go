@@ -52,7 +52,7 @@ func (s *storage) UploadAvatar(file []byte, user *models.UserAvatar, isTest bool
 		if isTest {
 			os.Remove("../../../" + oldAvatar)
 		} else {
-			os.Remove("../" + oldAvatar)
+			os.Remove("../../../" + oldAvatar)
 		}
 	}
 
@@ -63,7 +63,6 @@ func saveImage(src []byte, name string, isTest bool) (string, error) {
 	r := bytes.NewReader(src)
 	img, fmtName, err := image.Decode(r)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
@@ -77,8 +76,6 @@ func saveImage(src []byte, name string, isTest bool) (string, error) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("1")
 		return "", err
 	}
 	defer dst.Close()
@@ -102,8 +99,6 @@ func saveImage(src []byte, name string, isTest bool) (string, error) {
 
 			err = jpeg.Encode(dst, img, &opt)
 			if err != nil {
-				fmt.Println("2")
-				fmt.Println(err)
 				return "", err
 			}
 		}

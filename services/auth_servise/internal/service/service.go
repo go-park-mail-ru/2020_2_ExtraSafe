@@ -84,7 +84,7 @@ func (s *service) Registration(ctx context.Context, input *protoProfile.UserInpu
 	return output, nil
 }
 
-func (s *service)CheckCookie(ctx context.Context, input *protoAuth.UserSession) (output *protoProfile.UserID, err error) {
+func (s *service)CheckCookie(_ context.Context, input *protoAuth.UserSession) (output *protoProfile.UserID, err error) {
 	userId, err := s.authStorage.CheckUserSession(input.SessionID)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
@@ -95,7 +95,7 @@ func (s *service)CheckCookie(ctx context.Context, input *protoAuth.UserSession) 
 	return output, nil
 }
 
-func (s *service) DeleteCookie(ctx context.Context, input *protoAuth.UserSession) (output *protoAuth.Nothing, err error) {
+func (s *service) DeleteCookie(_ context.Context, input *protoAuth.UserSession) (output *protoAuth.Nothing, err error) {
 	if err := s.authStorage.DeleteUserSession(input.SessionID); err != nil {
 		return &protoAuth.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
@@ -109,6 +109,7 @@ var (
 
 func (s *service) SetCookie(userID int64) (cookieValue string, err error) {
 	cookieValue = RandStringRunes(32)
+	fmt.Println(cookieValue)
 
 	if err := s.authStorage.CreateUserSession(userID, cookieValue); err != nil {
 		fmt.Println(err)

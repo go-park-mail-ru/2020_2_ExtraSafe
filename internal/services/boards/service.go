@@ -2,10 +2,10 @@ package boards
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
 
 type Service interface {
@@ -43,6 +43,7 @@ type Service interface {
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
+	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
 }
 
 type service struct {
@@ -118,7 +119,8 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 				Name:        task.Name,
 				Description: task.Description,
 				Order:       task.Order,
-				Users:       []models.UserOutsideShort{},
+				Users:       convertUsers(task.Users),
+				Tags: 	   	 convertTags(task.Tags),
 			})
 		}
 		board.Cards = append(board.Cards, models.CardOutside{
@@ -133,8 +135,39 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	board.Name = boardInternal.Name
 	board.Theme = boardInternal.Theme
 	board.Star = boardInternal.Star
+	board.Admin = models.UserOutsideShort{
+		Email: boardInternal.Admin.Email,
+		Username: boardInternal.Admin.Username,
+		FullName:  boardInternal.Admin.FullName,
+		Avatar: boardInternal.Admin.Avatar,
+	}
+	board.Tags = convertTags(boardInternal.Tags)
+	board.Users = convertUsers(boardInternal.Users)
 
 	return board, nil
+}
+
+func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
+	for _, tag := range tags {
+		output = append(output, models.TagOutside{
+			TagID: tag.TagID,
+			Color: tag.Color,
+			Name:  tag.Name,
+		})
+	}
+	return output
+}
+
+func convertUsers(users []*protoProfile.UserOutsideShort) (output []models.UserOutsideShort) {
+	for _, user := range users {
+		output = append(output, models.UserOutsideShort{
+			Email: user.Email,
+			Username: user.Username,
+			FullName:  user.FullName,
+			Avatar: user.Avatar,
+		})
+	}
+	return output
 }
 
 func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error) {
@@ -228,7 +261,6 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 func (s *service) CreateCard(request models.CardInput) (card models.CardOutside, err error) {
 	ctx := context.Background()
 
-	fmt.Println(request)
 	input := &protoBoard.CardInput{
 		UserID:  request.UserID,
 		CardID:  request.CardID,
@@ -399,11 +431,38 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 		return models.TaskOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
+	checklists := make([]models.ChecklistOutside, 0)
+	for _, checklist := range output.Checklists{
+		checklists = append(checklists, models.ChecklistOutside{
+			ChecklistID: checklist.ChecklistID,
+			Name:   checklist.Name,
+			Items:  checklist.Items,
+		})
+	}
+
+	comments := make([]models.CommentOutside, 0)
+	for _, comment := range output.Comments{
+		comments = append(comments, models.CommentOutside{
+			CommentID: comment.CommentID,
+			Message:   comment.Message,
+			Order:     comment.Order,
+			User:      models.UserOutsideShort{
+							Email: comment.User.Email,
+							Username: comment.User.Username,
+							FullName:  comment.User.FullName,
+							Avatar: comment.User.Avatar,
+			},
+		})
+	}
+
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
 	task.Order = output.Order
-	task.Users = []models.UserOutsideShort{}
+	task.Users = convertUsers(output.Users)
+	task.Checklists = checklists
+	task.Tags = convertTags(output.Tags)
+	task.Comments = comments
 
 	return task, nil
 }
@@ -578,7 +637,7 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 		TagID:      request.TagID,
 	}
 
-	_, err = s.boardService.AddTag(ctx, input)
+	_, err = s.boardService.RemoveTag(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
@@ -775,6 +834,22 @@ func (s *service) CheckTaskPermission(userID int64, taskID int64) (err error) {
 	}
 
 	_, err = s.boardService.CheckTaskPermission(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+	return nil
+}
+
+func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.CheckPermissions{
+		UserID:    userID,
+		ElementID: commentID,
+		IfAdmin: ifAdmin,
+	}
+
+	_, err = s.boardService.CheckCommentPermission(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}

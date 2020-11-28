@@ -27,6 +27,7 @@ message BoardOutside {
   bool Star = 5;
   repeated protoProfile.UserOutsideShort Users = 6;
   repeated CardOutside Cards = 7;
+  repeated TagOutside Tags = 8;
 }
 
 //==========================================
@@ -243,4 +244,5 @@ service Board {
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckTaskPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckCommentPermission (CheckPermissions) returns (Nothing) {}
 }

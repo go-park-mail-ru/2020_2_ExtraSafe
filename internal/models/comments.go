@@ -13,7 +13,7 @@ type CommentInput struct {
 	TaskID    int64  `json:"taskID"`
 	Message   string `json:"message"`
 	Order     int64  `json:"order"`
-	UserID    int64  `json:"userID"`
+	UserID    int64  `json:"-"`
 }
 
 type CommentOutside struct {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage"
@@ -17,9 +16,9 @@ import (
 
 func main() {
 	// =============================
-	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
+	//db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
 	//FIXME new DB
-	//db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
+	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,12 +61,12 @@ func main() {
 
 	fmt.Println(grpcConn.GetState())
 	boardService := protoBoard.NewBoardClient(grpcConn)
-
+/*
 	_, err = boardService.GetBoard(context.Background(), &protoBoard.BoardInput{
 		UserID:  2,
 		BoardID: 2,
 	})
-	fmt.Println(err)
+	fmt.Println(err)*/
 
 	handler := profile.NewService(profileStorage, avatarStorage, boardService)
 

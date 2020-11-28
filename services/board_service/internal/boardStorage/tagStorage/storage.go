@@ -27,7 +27,7 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateTag(input models.TagInput) (tag models.TagOutside, err error) {
-	err = s.db.QueryRow("INSERT INTO tags (boardID, name, color) VALUES ($1, $2, $3, $4) RETURNING tagID", input.BoardID, input.Name, input.Color).
+	err = s.db.QueryRow("INSERT INTO tags (boardID, name, color) VALUES ($1, $2, $3) RETURNING tagID", input.BoardID, input.Name, input.Color).
 				Scan(&tag.TagID)
 	if err != nil {
 		return tag, models.ServeError{Codes: []string{"500"}, OriginalError: err,

@@ -77,6 +77,7 @@ func (t transport) BoardWrite(board models.BoardOutside) (response models.Respon
 	response.Users = board.Users
 	response.Name = board.Name
 	response.Cards = board.Cards
+	response.Tags = board.Tags
 	response.Status = 200
 	return response, err
 }
@@ -157,6 +158,10 @@ func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseT
 	response.Description = task.Description
 	response.Order = task.Order
 	response.Name = task.Name
+	response.Tags = task.Tags
+	response.Comments = task.Comments
+	response.Checklists = task.Checklists
+	response.Users = task.Users
 	response.Status = 200
 	return response, err
 }

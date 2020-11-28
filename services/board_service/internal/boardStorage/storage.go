@@ -34,7 +34,7 @@ type Storage interface {
 
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
 	GetCard(cardInput models.CardInput) (models.CardInternal, error)
-	GetTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
@@ -170,7 +170,7 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 			return models.BoardInternal{}, err
 		}
 
-		for _, task := range tasks {
+		for i, task := range tasks {
 			//fmt.Println(task)
 			taskInput := models.TaskInput{TaskID: task.TaskID}
 
@@ -179,21 +179,21 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
-			task.Tags = append(task.Tags, tags...)
+			tasks[i].Tags = append(tasks[i].Tags, tags...)
 
 			// FIXME сборка юзеров на таски
 			users, err := s.tasksStorage.GetAssigners(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
-			task.Users = append(task.Users, users...)
+			tasks[i].Users = append(tasks[i].Users, users...)
 
 			// FIXME сборка чеклистов на таски
 			checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
-			task.Checklists = append(task.Checklists, checklists...)
+			tasks[i].Checklists = append(tasks[i].Checklists, checklists...)
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
@@ -434,9 +434,38 @@ func (s *storage) GetCard(cardInput models.CardInput) (models.CardInternal, erro
 	return card, nil
 }
 
-func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskInternalShort, error) {
+func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error) {
 	//FIXME добавить сбор фич для тасок (перенести код из ChangeTask)
-	return s.tasksStorage.GetTaskByID(taskInput)
+	task, err := s.tasksStorage.GetTaskByID(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+
+	tags, err := s.tagStorage.GetTaskTags(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+	task.Tags = append(task.Tags, tags...)
+
+	users, err := s.tasksStorage.GetAssigners(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+	task.Users = append(task.Users, users...)
+
+	checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+	task.Checklists = append(task.Checklists, checklists...)
+
+	comments, userIDs, err := s.commentStorage.GetCommentsByTask(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+	task.Comments = append(task.Comments, comments...)
+
+	return task, userIDs, nil
 }
 
 func (s *storage) AddUser(input models.BoardMember) (err error) {

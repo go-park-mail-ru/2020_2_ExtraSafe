@@ -1702,7 +1702,7 @@ func TestStorage_GetTask(t *testing.T) {
 		tasksStorage: mockTasks,
 	}
 
-	task, err := storage.GetTask(taskInput)
+	task, _, err := storage.GetTask(taskInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return

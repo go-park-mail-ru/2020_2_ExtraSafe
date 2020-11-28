@@ -22,7 +22,7 @@ type TasksStorage interface {
 	DeleteTask(taskInput models.TaskInput) error
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
-	GetTaskByID(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
 	AssignUser(input models.TaskAssigner) (err error)

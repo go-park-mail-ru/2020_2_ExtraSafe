@@ -52,13 +52,14 @@ type ResponseBoardShort struct {
 
 type ResponseBoard struct {
 	Status  int                `json:"status"`
-	BoardID int64             `json:"boardID"`
-	Admin   UserOutsideShort   `json:"admin"` // структура владельца доски
-	Name    string             `json:"boardName"`  // название доски
+	BoardID int64              `json:"boardID"`
+	Admin   UserOutsideShort   `json:"admin"`     // структура владельца доски
+	Name    string             `json:"boardName"` // название доски
 	Theme   string             `json:"theme"`
 	Star    bool               `json:"star"`
 	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
 	Cards   []CardOutside      `json:"cards"`
+	Tags    []TagOutside       `json:"tags"`
 }
 
 type ResponseBoards struct {
@@ -75,11 +76,15 @@ type ResponseCard struct {
 }
 
 type ResponseTask struct {
-	Status      int    `json:"status"`
-	TaskID      int64  `json:"taskID"`
-	Name        string `json:"taskName"`
-	Description string `json:"description"`
-	Order       int64  `json:"order"`
+	Status      int                `json:"status"`
+	TaskID      int64              `json:"taskID"`
+	Name        string             `json:"taskName"`
+	Description string             `json:"description"`
+	Order       int64              `json:"order"`
+	Tags        []TagOutside       `json:"tags"`
+	Users       []UserOutsideShort `json:"users"`
+	Checklists  []ChecklistOutside `json:"checklists"`
+	Comments    []CommentOutside   `json:"comments"`
 }
 
 type ResponseTag struct {

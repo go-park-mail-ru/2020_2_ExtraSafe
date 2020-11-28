@@ -25,7 +25,7 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
-	err = s.db.QueryRow("INSERT INTO checklists (taskID, name, items) VALUES ($1, $2, $3, $4) RETURNING checklistID",
+	err = s.db.QueryRow("INSERT INTO checklists (taskID, name, items) VALUES ($1, $2, $3) RETURNING checklistID",
 							input.TaskID, input.Name, input.Items).Scan(&checklist.ChecklistID)
 	if err != nil {
 		return checklist, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -58,7 +58,7 @@ func (s *storage) DeleteChecklist(input models.ChecklistInput) (err error) {
 }
 
 func (s *storage) GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error) {
-	rows, err := s.db.Query("SELECT (checklistID, name, items) FROM checklists WHERE taskID = $1", input.TaskID)
+	rows, err := s.db.Query("SELECT checklistID, name, items FROM checklists WHERE taskID = $1", input.TaskID)
 	if err != nil {
 		return checklists, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 		MethodName: "GetChecklistsByTask"}

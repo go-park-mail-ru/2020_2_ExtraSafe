@@ -4,9 +4,9 @@ import "encoding/json"
 
 type Checklist struct {
 	ChecklistID int64
-	TaskID int64
-	Name string
-	Items json.RawMessage
+	TaskID      int64
+	Name        string
+	Items       json.RawMessage
 	//Items []Item
 }
 
@@ -16,15 +16,15 @@ type Checklist struct {
 }
 */
 type ChecklistInput struct {
-	UserID      int64           `json:"userID"`
+	UserID      int64           `json:"-"`
 	ChecklistID int64           `json:"checklistID"`
 	TaskID      int64           `json:"taskID"`
-	Name        string          `json:"name"`
+	Name        string          `json:"checklistName"`
 	Items       json.RawMessage `json:"items"`
 }
 
 type ChecklistOutside struct {
 	ChecklistID int64
-	Name string
-	Items json.RawMessage
+	Name        string
+	Items       json.RawMessage
 }

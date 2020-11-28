@@ -59,7 +59,7 @@ func (s *storage) DeleteComment(input models.CommentInput) (err error) {
 }
 
 func (s *storage) GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error) {
-	rows, err := s.db.Query("SELECT (commentID, message, commentOrder, userID) FROM comments WHERE taskID = $1", input.TaskID)
+	rows, err := s.db.Query("SELECT commentID, message, commentOrder, userID FROM comments WHERE taskID = $1", input.TaskID)
 	if err != nil {
 		return comments, userIDS, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetBoardTags"}
