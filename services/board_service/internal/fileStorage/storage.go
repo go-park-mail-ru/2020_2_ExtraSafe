@@ -12,6 +12,7 @@ import (
 
 type Storage interface {
 	UploadFile(file models.AttachmentFileInternal, attachment *models.AttachmentInternal, isTest bool) error
+	DeleteFile(filepath string, isTest bool) error
 }
 
 type storage struct {}
@@ -42,5 +43,14 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	defer dst.Close()
 
 	attachment.Filepath = "attachments/" + file.Filename
+	return nil
+}
+
+func (s *storage) DeleteFile(filepath string, isTest bool) error {
+	if isTest {
+		os.Remove("../../../../" + filepath)
+	} else {
+		os.Remove("../../../" + filepath)
+	}
 	return nil
 }

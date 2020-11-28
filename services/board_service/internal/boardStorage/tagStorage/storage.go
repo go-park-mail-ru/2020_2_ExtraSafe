@@ -64,9 +64,6 @@ func (s *storage) DeleteTag(input models.TagInput) (err error) {
 func (s *storage) AddTag(input models.TaskTagInput) (err error) {
 	_, err = s.db.Exec("INSERT INTO task_tags (taskID, tagID) VALUES ($1, $2)", input.TaskID, input.TagID)
 	if err != nil {
-		/*if err, ok := err.(*pq.Error); ok {
-			if err == pq.Err
-		}*/
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "AddTag"}
 	}

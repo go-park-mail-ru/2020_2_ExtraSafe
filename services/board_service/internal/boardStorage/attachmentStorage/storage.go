@@ -27,7 +27,7 @@ func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment mod
 				Scan(&attachment.AttachmentID)
 	if err != nil {
 		return attachment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-			MethodName: "AddAttachments"}
+			MethodName: "AddAttachment"}
 	}
 
 	attachment.Filepath = input.Filepath
@@ -36,9 +36,32 @@ func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment mod
 }
 
 func (s *storage) RemoveAttachment(input models.AttachmentInternal) (err error) {
-return
+	_, err = s.db.Exec("DELETE FROM attachments WHERE attachmentID = $1", input.AttachmentID)
+	if err != nil {
+		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "RemoveAttachment"}
+	}
+	return
 }
 
 func (s *storage) GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error) {
-return
+	rows, err := s.db.Query("SELECT attachmentID, filename, filepath FROM attachments WHERE taskID = $1", input.TaskID)
+	if err != nil {
+		return attachments, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetAttachmentsByTask"}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		attachment := models.AttachmentOutside{}
+
+		err = rows.Scan(&attachment.AttachmentID, &attachment.Filename, &attachment.Filepath)
+		if err != nil {
+			return attachments, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetAttachmentsByTask"}
+		}
+
+		attachments = append(attachments, attachment)
+	}
+	return
 }
