@@ -1,19 +1,14 @@
 package imgStorage
 
 import (
-	"bytes"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/labstack/echo"
 	"io/ioutil"
-	"mime/multipart"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 )
 
 func TestStorage_UploadAvatar(t *testing.T) {
-	path := "../../../test/testPic.jpeg"
+	path := "../../../../test/testPic.jpeg"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error("cannot open test file")
@@ -21,38 +16,11 @@ func TestStorage_UploadAvatar(t *testing.T) {
 	}
 	defer file.Close()
 
-	fileContents, err := ioutil.ReadAll(file)
+	avatar, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Error("cannot read test file")
 		return
 	}
-
-	_, err = file.Stat()
-	if err != nil {
-		t.Error("cannot get stat of test file")
-		return
-	}
-
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("avatar", "someName")
-	if err != nil {
-		t.Error("cannot create form file")
-		return
-	}
-	part.Write(fileContents)
-
-	err = writer.Close()
-	if err != nil {
-		t.Error("cannot close writer")
-		return
-	}
-
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/profile/", body)
-	req.Header.Set("Content-Type", writer.FormDataContentType()) // <<< important part
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 
 	storage := NewStorage()
 	userAvatar := models.UserAvatar{
@@ -60,11 +28,6 @@ func TestStorage_UploadAvatar(t *testing.T) {
 		Avatar: "default/default_avatar.png",
 	}
 
-	avatar, err := c.FormFile("avatar")
-	if err != nil {
-		t.Error("cannot form file from test request")
-		return
-	}
 
 	err = storage.UploadAvatar(avatar, &userAvatar, true)
 	if err != nil {
@@ -72,12 +35,7 @@ func TestStorage_UploadAvatar(t *testing.T) {
 		return
 	}
 
-	err = storage.UploadAvatar(avatar, &userAvatar, true)
-	if err != nil {
-		t.Errorf("unexpected error: %s ", err)
-	}
-
-	err = os.Remove("../../../" + userAvatar.Avatar)
+	err = os.Remove("../../../../" + userAvatar.Avatar)
 	if err != nil {
 		t.Errorf("unexpected error: %s ", err)
 	}
@@ -85,7 +43,7 @@ func TestStorage_UploadAvatar(t *testing.T) {
 }
 
 func TestStorage_UploadAvatarFailOnCreate(t *testing.T) {
-	path := "../../../test/testPic.jpeg"
+	path := "../../../../test/testPic.jpeg"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error("cannot open test file")
@@ -93,49 +51,16 @@ func TestStorage_UploadAvatarFailOnCreate(t *testing.T) {
 	}
 	defer file.Close()
 
-	fileContents, err := ioutil.ReadAll(file)
+	avatar, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Error("cannot read test file")
 		return
 	}
 
-	_, err = file.Stat()
-	if err != nil {
-		t.Error("cannot get stat of test file")
-		return
-	}
-
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("avatar", "someName")
-	if err != nil {
-		t.Error("cannot create form file")
-		return
-	}
-	part.Write(fileContents)
-
-	err = writer.Close()
-	if err != nil {
-		t.Error("cannot close writer")
-		return
-	}
-
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/profile/", body)
-	req.Header.Set("Content-Type", writer.FormDataContentType()) // <<< important part
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
 	storage := NewStorage()
 	userAvatar := models.UserAvatar{
 		ID: 1,
 		Avatar: "default/default_avatar.png",
-	}
-
-	avatar, err := c.FormFile("avatar")
-	if err != nil {
-		t.Error("cannot form file from test request")
-		return
 	}
 
 	err = storage.UploadAvatar(avatar, &userAvatar, false)
@@ -146,7 +71,7 @@ func TestStorage_UploadAvatarFailOnCreate(t *testing.T) {
 }
 
 func TestStorage_UploadAvatarPngDecode(t *testing.T) {
-	path := "../../../test/testPic.png"
+	path := "../../../../test/testPic.png"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error("cannot open test file")
@@ -154,49 +79,16 @@ func TestStorage_UploadAvatarPngDecode(t *testing.T) {
 	}
 	defer file.Close()
 
-	fileContents, err := ioutil.ReadAll(file)
+	avatar, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Error("cannot read test file")
 		return
 	}
 
-	_, err = file.Stat()
-	if err != nil {
-		t.Error("cannot get stat of test file")
-		return
-	}
-
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("avatar", "someName")
-	if err != nil {
-		t.Error("cannot create form file")
-		return
-	}
-	part.Write(fileContents)
-
-	err = writer.Close()
-	if err != nil {
-		t.Error("cannot close writer")
-		return
-	}
-
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/profile/", body)
-	req.Header.Set("Content-Type", writer.FormDataContentType()) // <<< important part
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
 	storage := NewStorage()
 	userAvatar := models.UserAvatar{
 		ID: 1,
 		Avatar: "default/default_avatar.png",
-	}
-
-	avatar, err := c.FormFile("avatar")
-	if err != nil {
-		t.Error("cannot form file from test request")
-		return
 	}
 
 	err = storage.UploadAvatar(avatar, &userAvatar, true)
@@ -204,7 +96,7 @@ func TestStorage_UploadAvatarPngDecode(t *testing.T) {
 		t.Errorf("unexpected error: %s ", err)
 	}
 
-	err = os.Remove("../../../" + userAvatar.Avatar)
+	err = os.Remove("../../../../" + userAvatar.Avatar)
 	if err != nil {
 		t.Errorf("unexpected error: %s ", err)
 	}
@@ -212,7 +104,7 @@ func TestStorage_UploadAvatarPngDecode(t *testing.T) {
 }
 
 func TestStorage_UploadAvatarFailOnDecode(t *testing.T) {
-	path := "../../../test/testPic.webp"
+	path := "../../../../test/testPic.webp"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error("cannot open test file")
@@ -220,49 +112,16 @@ func TestStorage_UploadAvatarFailOnDecode(t *testing.T) {
 	}
 	defer file.Close()
 
-	fileContents, err := ioutil.ReadAll(file)
+	avatar, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Error("cannot read test file")
 		return
 	}
 
-	_, err = file.Stat()
-	if err != nil {
-		t.Error("cannot get stat of test file")
-		return
-	}
-
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("avatar", "someName")
-	if err != nil {
-		t.Error("cannot create form file")
-		return
-	}
-	part.Write(fileContents)
-
-	err = writer.Close()
-	if err != nil {
-		t.Error("cannot close writer")
-		return
-	}
-
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/profile/", body)
-	req.Header.Set("Content-Type", writer.FormDataContentType()) // <<< important part
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
 	storage := NewStorage()
 	userAvatar := models.UserAvatar{
 		ID: 1,
 		Avatar: "default/default_avatar.png",
-	}
-
-	avatar, err := c.FormFile("avatar")
-	if err != nil {
-		t.Error("cannot form file from test request")
-		return
 	}
 
 	err = storage.UploadAvatar(avatar, &userAvatar, true)

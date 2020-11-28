@@ -1142,6 +1142,7 @@ func TestStorage_GetUsersByIDs(t *testing.T) {
 
 	expect := make([]models.UserOutsideShort, 0)
 	first := models.UserOutsideShort{
+		ID: 1,
 		Email:    "epridius@yandex.ru",
 		Username: "pkaterinaa",
 		FullName: "",
@@ -1149,16 +1150,17 @@ func TestStorage_GetUsersByIDs(t *testing.T) {
 	}
 
 	second := models.UserOutsideShort{
+		ID: 2,
 		Email:    "egoraist@gmail.com",
 		Username: "egoraist",
 		FullName: "",
 		Avatar:   "default/default_avatar.png",
 	}
-	rowsFirst := sqlmock.NewRows([]string{"email", "username", "fullname", "avatar"})
-	rowsFirst.AddRow(first.Email, first.Username, first.FullName, first.Avatar)
+	rowsFirst := sqlmock.NewRows([]string{"userID", "email", "username", "fullname", "avatar"})
+	rowsFirst.AddRow(1, first.Email, first.Username, first.FullName, first.Avatar)
 
-	rowsSecond := sqlmock.NewRows([]string{"email", "username", "fullname", "avatar"})
-	rowsSecond.AddRow(second.Email, second.Username, second.FullName, second.Avatar)
+	rowsSecond := sqlmock.NewRows([]string{"userID", "email", "username", "fullname", "avatar"})
+	rowsSecond.AddRow(2, second.Email, second.Username, second.FullName, second.Avatar)
 
 	expect = append(expect, first, second)
 

@@ -34,10 +34,10 @@ func (m *MockAuthSessions) EXPECT() *MockAuthSessionsMockRecorder {
 }
 
 // CheckCookie mocks base method
-func (m *MockAuthSessions) CheckCookie(arg0 echo.Context) (uint64, error) {
+func (m *MockAuthSessions) CheckCookie(arg0 echo.Context) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckCookie", arg0)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,7 +63,7 @@ func (mr *MockAuthSessionsMockRecorder) DeleteCookie(arg0 interface{}) *gomock.C
 }
 
 // SetCookie mocks base method
-func (m *MockAuthSessions) SetCookie(arg0 echo.Context, arg1 uint64) error {
+func (m *MockAuthSessions) SetCookie(arg0 echo.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetCookie", arg0, arg1)
 	ret0, _ := ret[0].(error)

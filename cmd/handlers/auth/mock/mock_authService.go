@@ -49,10 +49,10 @@ func (mr *MockAuthServiceMockRecorder) Auth(arg0 interface{}) *gomock.Call {
 }
 
 // Login mocks base method
-func (m *MockAuthService) Login(arg0 models.UserInputLogin) (uint64, models.UserOutside, error) {
+func (m *MockAuthService) Login(arg0 models.UserInputLogin) (int64, models.UserOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", arg0)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(models.UserOutside)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -65,10 +65,10 @@ func (mr *MockAuthServiceMockRecorder) Login(arg0 interface{}) *gomock.Call {
 }
 
 // Registration mocks base method
-func (m *MockAuthService) Registration(arg0 models.UserInputReg) (uint64, models.UserOutside, error) {
+func (m *MockAuthService) Registration(arg0 models.UserInputReg) (int64, models.UserOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Registration", arg0)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(models.UserOutside)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
