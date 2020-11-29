@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
+	fStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/fileStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
@@ -11,14 +12,16 @@ import (
 
 type service struct {
 	boardStorage boardStorage.Storage
+	fileStorage fStorage.Storage
 	profileService protoProfile.ProfileClient
 }
 
 var NameService = "BoardService"
 
-func NewService(boardStorage boardStorage.Storage, profileService protoProfile.ProfileClient) *service {
+func NewService(boardStorage boardStorage.Storage, fileStorage fStorage.Storage, profileService protoProfile.ProfileClient) *service {
 	return &service{
 		boardStorage: boardStorage,
+		fileStorage: fileStorage,
 		profileService: profileService,
 	}
 }
@@ -199,6 +202,46 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
+func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	userInput := models.BoardMember{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+		MemberID:  user.ID,
+	}
+
+	err = s.boardStorage.AddUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	userInput := models.BoardMember{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+		MemberID:  user.ID,
+	}
+
+	err = s.boardStorage.RemoveUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
 func (s *service) CreateCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutside, err error) {
 	userInput := models.CardInput{
 		UserID:  input.UserID,
@@ -368,6 +411,15 @@ func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (outpu
 		})
 	}
 
+	attachments := make([]*protoBoard.AttachmentOutside, 0)
+	for _, attachment := range task.Attachments{
+		attachments = append(attachments, &protoBoard.AttachmentOutside{
+			AttachmentID: attachment.AttachmentID,
+			Filename:   attachment.Filename,
+			Filepath:   attachment.Filepath,
+		})
+	}
+
 	output = &protoBoard.TaskOutside{
 		TaskID: task.TaskID,
 		Name:   task.Name,
@@ -377,6 +429,7 @@ func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (outpu
 		Users: getUsersForTask(task.Users, taskAssigners),
 		Checklists: convertChecklists(task.Checklists),
 		Comments: comments,
+		Attachments: attachments,
 	}
 
 	return output, nil
@@ -456,14 +509,19 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AssignUser(_ context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
-		AssignerID: input.AssignerID,
+		AssignerID: user.ID,
 	}
 
-	err := s.boardStorage.AssignUser(userInput)
+	err = s.boardStorage.AssignUser(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
@@ -471,14 +529,19 @@ func (s *service) AssignUser(_ context.Context, input *protoBoard.TaskAssigner) 
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) DismissUser(_ context.Context, input *protoBoard.TaskAssigner) (*protoBoard.Nothing, error) {
+func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
-		AssignerID: input.AssignerID,
+		AssignerID: user.ID,
 	}
 
-	err := s.boardStorage.DismissUser(userInput)
+	err = s.boardStorage.DismissUser(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
@@ -487,7 +550,7 @@ func (s *service) DismissUser(_ context.Context, input *protoBoard.TaskAssigner)
 }
 
 func (s *service) GetAssigners(_ context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskAssignerIDs, err error) {
-	userInput := models.TaskInput{
+	/*userInput := models.TaskInput{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
 		CardID: input.CardID,
@@ -498,7 +561,7 @@ func (s *service) GetAssigners(_ context.Context, input *protoBoard.TaskInput) (
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	output = &protoBoard.TaskAssignerIDs{AssignerIDs: assigners}
+	output = &protoBoard.TaskAssignerIDs{AssignerIDs: assigners}*/
 
 	return output, nil
 }
@@ -726,6 +789,57 @@ func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.Checklist
 	}
 
 	err := s.boardStorage.DeleteChecklist(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentInput) (output *protoBoard.AttachmentOutside, err error) {
+	fileInput := models.AttachmentFileInternal{
+		UserID:   input.UserID,
+		Filename: input.Filename,
+		File:     input.File,
+	}
+
+	userInput := &models.AttachmentInternal{
+		TaskID:       input.TaskID,
+		Filename:     input.Filename,
+	}
+
+	err = s.fileStorage.UploadFile(fileInput, userInput, false)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	attachment, err := s.boardStorage.AddAttachment(*userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	output = &protoBoard.AttachmentOutside{
+		AttachmentID: attachment.AttachmentID,
+		Filename:     attachment.Filename,
+		Filepath:     attachment.Filepath,
+	}
+
+	return output, nil
+}
+
+func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInput) (*protoBoard.Nothing, error) {
+	userInput := models.AttachmentInternal{
+		TaskID:       input.TaskID,
+		Filename:     input.Filename,
+		AttachmentID: input.AttachmentID,
+	}
+
+	err := s.boardStorage.RemoveAttachment(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	err = s.fileStorage.DeleteFile(userInput.Filename, false)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}

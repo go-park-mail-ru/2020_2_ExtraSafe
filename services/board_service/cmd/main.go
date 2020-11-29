@@ -9,6 +9,8 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tasksStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
+	fStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/fileStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
@@ -41,7 +43,10 @@ func main() {
 	tagsStorage := tagStorage.NewStorage(db)
 	commentsStorage := commentStorage.NewStorage(db)
 	checklistsStorage := checklistStorage.NewStorage(db)
-	bStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage)
+	attachStorage := attachmentStorage.NewStorage(db)
+	bStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage, attachStorage)
+
+	fileStorage := fStorage.NewStorage()
 
 	/*// =============================
 
@@ -86,10 +91,7 @@ func main() {
 
 	profileService := protoProfile.NewProfileClient(grpcConn)
 
-	/*_, err = profileService.Accounts(context.Background(), &protoProfile.UserID{ID: 2})
-	fmt.Println(err)*/
-
-	handler := service.NewService(bStorage, profileService)
+	handler := service.NewService(bStorage, fileStorage, profileService)
 
 	protoBoard.RegisterBoardServer(server, handler)
 

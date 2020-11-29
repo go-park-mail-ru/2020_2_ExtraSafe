@@ -13,6 +13,8 @@ type Service interface {
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
+	AddMember(request models.BoardMemberInput) (err error)
+	RemoveMember(request models.BoardMemberInput) (err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutside, err error)
 	GetCard(request models.CardInput) (board models.CardOutside, err error)
@@ -25,6 +27,8 @@ type Service interface {
 	ChangeTask(request models.TaskInput) (task models.TaskOutside, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
+	AssignUser(request models.TaskAssignerInput) (err error)
+	DismissUser(request models.TaskAssignerInput) (err error)
 
 	CreateTag(request models.TagInput) (task models.TagOutside, err error)
 	ChangeTag(request models.TagInput) (task models.TagOutside, err error)
@@ -39,6 +43,9 @@ type Service interface {
 	CreateChecklist(request models.ChecklistInput) (task models.ChecklistOutside, err error)
 	ChangeChecklist(request models.ChecklistInput) (task models.ChecklistOutside, err error)
 	DeleteChecklist(request models.ChecklistInput) (err error)
+
+	CreateAttachment(request models.AttachmentInput) (task models.AttachmentOutside, err error)
+	DeleteAttachment(request models.AttachmentInput) (err error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
@@ -121,6 +128,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 				Order:       task.Order,
 				Users:       convertUsers(task.Users),
 				Tags: 	   	 convertTags(task.Tags),
+				Checklists:  convertChecklists(task.Checklists),
 			})
 		}
 		board.Cards = append(board.Cards, models.CardOutside{
@@ -251,6 +259,40 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	}
 
 	_, err = s.boardService.DeleteBoard(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) AddMember(request models.BoardMemberInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardMemberInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+		MemberName: request.MemberName,
+	}
+
+	_, err = s.boardService.AddUserToBoard(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardMemberInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+		MemberName: request.MemberName,
+	}
+
+	_, err = s.boardService.RemoveUserToBoard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
@@ -431,15 +473,6 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 		return models.TaskOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	checklists := make([]models.ChecklistOutside, 0)
-	for _, checklist := range output.Checklists{
-		checklists = append(checklists, models.ChecklistOutside{
-			ChecklistID: checklist.ChecklistID,
-			Name:   checklist.Name,
-			Items:  checklist.Items,
-		})
-	}
-
 	comments := make([]models.CommentOutside, 0)
 	for _, comment := range output.Comments{
 		comments = append(comments, models.CommentOutside{
@@ -455,16 +488,38 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 		})
 	}
 
+	attachments := make([]models.AttachmentOutside, 0)
+	for _, attachment := range task.Attachments{
+		attachments = append(attachments, models.AttachmentOutside{
+			AttachmentID: attachment.AttachmentID,
+			Filename:   attachment.Filename,
+			Filepath:   attachment.Filepath,
+		})
+	}
+
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
 	task.Order = output.Order
 	task.Users = convertUsers(output.Users)
-	task.Checklists = checklists
+	task.Checklists = convertChecklists(output.Checklists)
 	task.Tags = convertTags(output.Tags)
 	task.Comments = comments
+	task.Attachments = attachments
 
 	return task, nil
+}
+
+func convertChecklists(checklists []*protoBoard.ChecklistOutside) []models.ChecklistOutside {
+	output := make([]models.ChecklistOutside, 0)
+	for _, checklist := range checklists{
+		output = append(output, models.ChecklistOutside{
+			ChecklistID: checklist.ChecklistID,
+			Name:   checklist.Name,
+			Items:  checklist.Items,
+		})
+	}
+	return output
 }
 
 func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside, err error) {
@@ -536,6 +591,40 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 	}
 
 	_, err = s.boardService.TasksOrderChange(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) AssignUser(request models.TaskAssignerInput) (err error) {
+	ctx := context.Background()
+
+	userInput := &protoBoard.TaskAssignerInput{
+		UserID:     request.UserID,
+		TaskID:     request.TaskID,
+		AssignerName: request.AssignerName,
+	}
+
+	_, err = s.boardService.AssignUser(ctx, userInput)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
+	ctx := context.Background()
+
+	userInput := &protoBoard.TaskAssignerInput{
+		UserID:     request.UserID,
+		TaskID:     request.TaskID,
+		AssignerName: request.AssignerName,
+	}
+
+	_, err = s.boardService.DismissUser(ctx, userInput)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
@@ -786,6 +875,47 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 	}
 
 	_, err = s.boardService.DeleteChecklist(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) CreateAttachment(request models.AttachmentInput) (attachment models.AttachmentOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.AttachmentInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		Filename: request.Filename,
+		File: request.File,
+	}
+
+	output, err := s.boardService.AddAttachment(ctx, input)
+	if err != nil {
+		return models.AttachmentOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	attachment.AttachmentID = output.AttachmentID
+	attachment.Filename = output.Filename
+	attachment.Filepath = output.Filepath
+
+	return attachment, nil
+}
+
+func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.AttachmentInput{
+		UserID: request.UserID,
+		TaskID: request.TaskID,
+		AttachmentID: request.AttachmentID,
+		Filename: request.Filename,
+		File: request.File,
+	}
+
+	_, err = s.boardService.RemoveAttachment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}

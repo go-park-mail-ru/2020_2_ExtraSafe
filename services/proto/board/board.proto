@@ -19,6 +19,12 @@ message BoardInput {
   int64 BoardID = 2;
 }
 
+message BoardMemberInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+  string MemberName = 3;
+}
+
 message BoardOutside {
   int64 BoardID = 1;
   protoProfile.UserOutsideShort Admin = 2;
@@ -90,6 +96,7 @@ message TaskInternal {
   repeated int64 Users = 6;
   repeated ChecklistOutside Checklists = 7;
   repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
 }
 
 message TaskInternalShort {
@@ -102,10 +109,10 @@ message TaskInternalShort {
   repeated ChecklistOutside Checklists = 7;
 }
 
-message TaskAssigner {
+message TaskAssignerInput {
   int64 UserID = 1;
   int64 TaskID = 2;
-  int64 AssignerID = 3;
+  string AssignerName = 3;
 }
 
 message TaskAssignerIDs {
@@ -121,6 +128,7 @@ message TaskOutside {
   repeated protoProfile.UserOutsideShort Users = 6;
   repeated ChecklistOutside Checklists = 7;
   repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
 }
 
 message TaskOutsideShort {
@@ -194,6 +202,21 @@ message ChecklistOutside {
 }
 
 //==========================================
+message AttachmentInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 AttachmentID = 3;
+  string Filename = 4;
+  bytes File = 5;
+}
+
+message AttachmentOutside {
+  int64 AttachmentID = 1;
+  string Filename = 2;
+  string Filepath = 3;
+}
+
+//==========================================
 message CheckPermissions {
   int64 UserID = 1;
   int64 ElementID = 2;
@@ -211,6 +234,8 @@ service Board {
   rpc GetBoard (BoardInput) returns (BoardOutside) {}
   rpc ChangeBoard (BoardChangeInput) returns (BoardOutside) {}
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
+  rpc AddUserToBoard (BoardMemberInput) returns (Nothing) {}
+  rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
 
   rpc CreateCard (CardInput) returns (CardOutside) {}
   rpc GetCard (CardInput) returns (CardOutside) {}
@@ -223,8 +248,8 @@ service Board {
   rpc ChangeTask (TaskInput) returns (TaskOutside) {}
   rpc DeleteTask (TaskInput) returns (Nothing) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
-  rpc AssignUser (TaskAssigner) returns (Nothing) {}
-  rpc DismissUser (TaskAssigner) returns (Nothing) {}
+  rpc AssignUser (TaskAssignerInput) returns (Nothing) {}
+  rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
   rpc GetAssigners (TaskInput) returns (TaskAssignerIDs) {}
 
   rpc CreateTag (TagInput) returns (TagOutside) {}
@@ -240,6 +265,9 @@ service Board {
   rpc CreateChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
+
+  rpc AddAttachment(AttachmentInput) returns (AttachmentOutside) {}
+  rpc RemoveAttachment(AttachmentInput) returns (Nothing) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}

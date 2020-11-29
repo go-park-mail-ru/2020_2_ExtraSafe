@@ -12,6 +12,8 @@ type Handler interface {
 	Board(c echo.Context) error
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
+	BoardAddMember(c echo.Context) error
+	BoardRemoveMember(c echo.Context) error
 
 	CardCreate(c echo.Context) error
 	Card(c echo.Context) error
@@ -24,6 +26,8 @@ type Handler interface {
 	TaskChange(c echo.Context) error
 	TaskDelete(c echo.Context) error
 	TaskOrder(c echo.Context) error
+	TaskUserAdd(c echo.Context) error
+	TaskUserRemove(c echo.Context) error
 
 	TagCreate(c echo.Context) error
 	TagChange(c echo.Context) error
@@ -38,6 +42,9 @@ type Handler interface {
 	ChecklistCreate(c echo.Context) error
 	ChecklistChange(c echo.Context) error
 	ChecklistDelete(c echo.Context) error
+
+	AttachmentCreate(c echo.Context) error
+	AttachmentDelete(c echo.Context) error
 }
 
 type handler struct {
@@ -148,6 +155,46 @@ func (h *handler) BoardDelete(c echo.Context) error {
 	}
 
 	err = h.boardsService.DeleteBoard(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) BoardAddMember(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardMemberRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.AddMember(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) BoardRemoveMember(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardMemberRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.RemoveMember(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -396,6 +443,46 @@ func (h *handler) TaskOrder(c echo.Context) error {
 	}
 
 	err = h.boardsService.TasksOrderChange(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TaskUserAdd(c echo.Context) error {
+	userInput, err := h.boardsTransport.TasksUserRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.AssignUser(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *handler) TaskUserRemove(c echo.Context) error {
+	userInput, err := h.boardsTransport.TasksUserRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DismissUser(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -664,6 +751,54 @@ func (h *handler) ChecklistDelete(c echo.Context) error {
 	}
 
 	err = h.boardsService.DeleteChecklist(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) AttachmentCreate(c echo.Context) error {
+	userInput, err := h.boardsTransport.AttachmentAddRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	tag, err := h.boardsService.CreateAttachment(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	response, err := h.boardsTransport.AttachmentWrite(tag)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) AttachmentDelete(c echo.Context) error {
+	userInput, err := h.boardsTransport.AttachmentDeleteRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.DeleteAttachment(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err

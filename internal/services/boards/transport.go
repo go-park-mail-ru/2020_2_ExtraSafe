@@ -3,12 +3,14 @@ package boards
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
+	"io/ioutil"
 	"strconv"
 )
 
 type Transport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
+	BoardMemberRead(c echo.Context) (request models.BoardMemberInput, err error)
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
 	BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error)
 
@@ -19,6 +21,7 @@ type Transport interface {
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
 	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
+	TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error)
 
 	TagChangeRead(c echo.Context) (request models.TagInput, err error)
 	TagTaskRead(c echo.Context) (request models.TaskTagInput, err error)
@@ -29,6 +32,10 @@ type Transport interface {
 
 	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
 	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
+
+	AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error)
+	AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error)
+	AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error)
 }
 
 type transport struct {
@@ -61,6 +68,22 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "BoardChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberInput, err error) {
+	userInput := new(models.BoardMemberInput)
+
+	boardID := c.Param("ID")
+	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.BoardMemberInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
 	}
 
@@ -162,6 +185,7 @@ func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseT
 	response.Comments = task.Comments
 	response.Checklists = task.Checklists
 	response.Users = task.Users
+	response.Attachments = task.Attachments
 	response.Status = 200
 	return response, err
 }
@@ -172,6 +196,19 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 	if err := c.Bind(userInput); err != nil {
 		return models.TasksOrderInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TasksOrderRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error) {
+	userInput := new(models.TaskAssignerInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.TaskAssignerInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "TasksUserRead"}
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
@@ -209,6 +246,7 @@ func (t transport) TagWrite(tag models.TagOutside) (response models.ResponseTag,
 	response.TagID = tag.TagID
 	response.Color = tag.Color
 	response.TagName = tag.Name
+	response.Status = 200
 
 	return response, nil
 }
@@ -231,6 +269,7 @@ func (t transport) CommentWrite(comment models.CommentOutside) (response models.
 	response.User = comment.User
 	response.Message = comment.Message
 	response.Order = comment.Order
+	response.Status = 200
 
 	return response, nil
 }
@@ -252,6 +291,55 @@ func (t transport) ChecklistWrite(checklist models.ChecklistOutside) (response m
 	response.ChecklistID = checklist.ChecklistID
 	response.Name = checklist.Name
 	response.Items = checklist.Items
+	response.Status = 200
+
+	return response, nil
+}
+
+func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error) {
+	formParams, err := c.FormParams()
+	if err != nil {
+		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "AttachmentRead"}
+	}
+
+	userInput := new(models.AttachmentInput)
+	userInput.Filename = formParams.Get("fileName")
+	userInput.TaskID, _ = strconv.ParseInt(formParams.Get("taskID"), 10, 64)
+
+	//TODO какая то фигня
+	file, err := c.FormFile("file")
+	if err == nil {
+		fileContent, _ := file.Open()
+		var byteContainer []byte
+		byteContainer = make([]byte, file.Size)
+		byteContainer, _ = ioutil.ReadAll(fileContent)
+		userInput.File = byteContainer
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error) {
+	userInput := new(models.AttachmentInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChecklistChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error) {
+	response.Status = 200
+	response.Filename = attachment.Filename
+	response.Filepath = attachment.Filepath
+	response.AttachmentID = attachment.AttachmentID
 
 	return response, nil
 }

@@ -158,10 +158,7 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 		bid := c.Param("ID")
 		boardID, err := strconv.ParseInt(bid, 10, 64)
 		if err != nil {
-			if err := m.errorWorker.RespError(c, err); err != nil {
-				return err
-			}
-			return err
+			return c.NoContent(http.StatusBadRequest)
 		}
 
 		userID := c.Get("userId").(int64)

@@ -57,9 +57,15 @@ type Board struct {
 
 // add user to board
 type BoardMember struct {
-	UserID    int64 `json:"-"`
-	BoardID   int64 `json:"boardID"`
+	UserID    int64
+	BoardID   int64
 	MemberID  int64
+}
+
+type BoardMemberInput struct {
+	UserID     int64  `json:"-"`
+	BoardID    int64  `json:"boardID"`
+	MemberName string `json:"memberName"`
 }
 // TODO return UserShortOutside
 
