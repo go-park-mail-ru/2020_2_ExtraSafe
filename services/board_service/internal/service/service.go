@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
@@ -200,10 +201,13 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 }
 
 func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	fmt.Println(input.MemberName)
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
+
+	fmt.Println(user.ID)
 
 	userInput := models.BoardMember{
 		UserID:    input.UserID,
@@ -498,8 +502,10 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.Nothing{Dummy: true}, err
 	}
+
+	fmt.Println(user)
 
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,

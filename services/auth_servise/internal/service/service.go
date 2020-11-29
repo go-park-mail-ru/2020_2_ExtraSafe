@@ -21,6 +21,7 @@ type service struct {
 
 var ServiceName = "AuthService"
 
+
 func NewService(authStorage authStorage.Storage , profileService protoProfile.ProfileClient, boardService protoBoard.BoardClient) *service {
 	return &service{
 		authStorage: authStorage,

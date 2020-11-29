@@ -105,6 +105,11 @@ func (h *handler) Logout(c echo.Context) error {
 		}
 		return err
 	}
+
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	c.SetCookie(cookie)
 	return c.NoContent(http.StatusOK)
 }
 

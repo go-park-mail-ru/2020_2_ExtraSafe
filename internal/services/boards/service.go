@@ -2,6 +2,7 @@ package boards
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
@@ -542,6 +543,8 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (err error) {
 		TaskID:     request.TaskID,
 		AssignerName: request.AssignerName,
 	}
+
+	fmt.Println(userInput)
 
 	_, err = s.boardService.AssignUser(ctx, userInput)
 	if err != nil {
