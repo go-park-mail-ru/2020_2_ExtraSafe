@@ -452,13 +452,11 @@ func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskInternal, []in
 	}
 	task.Comments = append(task.Comments, comments...)
 
-	/*attachments, err := s.attachmentStorage.GetAttachmentsByTask(taskInput)
+	attachments, err := s.attachmentStorage.GetAttachmentsByTask(taskInput)
 	if err != nil {
 		return models.TaskInternal{}, nil, err
 	}
-	task. = append(task.Comments, comments...)*/
-
-
+	task.Attachments = append(task.Attachments, attachments...)
 	return task, userIDs, nil
 }
 
