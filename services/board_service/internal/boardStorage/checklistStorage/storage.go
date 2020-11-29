@@ -5,7 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
-//FIXME implement
 type Storage interface {
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)

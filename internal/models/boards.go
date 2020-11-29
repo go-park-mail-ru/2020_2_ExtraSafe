@@ -29,7 +29,6 @@ type BoardMemberInput struct {
 	BoardID    int64  `json:"boardID"`
 	MemberName string `json:"memberName"`
 }
-// TODO return UserShortOutside
 
 //===================================================<-Internal
 type BoardInternal struct {
@@ -41,7 +40,6 @@ type BoardInternal struct {
 	Cards    []CardInternal `json:"cards"`
 	UsersIDs []int64        `json:"usersIDs"`
 	Tags     []TagOutside
-	//FIXME added
 }
 
 //===================================================<-Outside
@@ -54,7 +52,6 @@ type BoardOutside struct {
 	Users   []UserOutsideShort `json:"users"`
 	Cards   []CardOutside      `json:"cards"`
 	Tags    []TagOutside       `json:"tags"`
-	//FIXME added
 }
 
 type BoardOutsideShort struct {
