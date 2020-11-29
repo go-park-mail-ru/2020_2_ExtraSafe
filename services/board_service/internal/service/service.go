@@ -502,8 +502,10 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.Nothing{Dummy: true}, err
 	}
+
+	fmt.Println(user)
 
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,

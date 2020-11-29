@@ -470,7 +470,7 @@ func (h *handler) TaskUserAdd(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
 
 func (h *handler) TaskUserRemove(c echo.Context) error {
@@ -490,7 +490,7 @@ func (h *handler) TaskUserRemove(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
 }
 
 func (h *handler) TagCreate(c echo.Context) error {
