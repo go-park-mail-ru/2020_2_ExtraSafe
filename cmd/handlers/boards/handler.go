@@ -134,7 +134,7 @@ func (h *handler) BoardChange(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.BoardWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -222,7 +222,7 @@ func (h *handler) CardCreate(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.CardWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -278,7 +278,7 @@ func (h *handler) CardChange(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.CardWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -346,7 +346,7 @@ func (h *handler) TaskCreate(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.TaskWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -402,7 +402,7 @@ func (h *handler) TaskChange(c echo.Context) error {
 		return err
 	}
 
-	response, err := h.boardsTransport.TaskWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err

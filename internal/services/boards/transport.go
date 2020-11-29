@@ -16,26 +16,28 @@ type Transport interface {
 
 	CardChangeRead(c echo.Context) (request models.CardInput, err error)
 	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
+	CardShortWrite(card models.CardOutsideShort) (response models.ResponseCard, err error)
 	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
-	TaskWrite(card models.TaskOutside) (response models.ResponseTask, err error)
+	TaskWrite(task models.TaskOutside) (response models.ResponseTask, err error)
+	TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTask, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
 	TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error)
 
 	TagChangeRead(c echo.Context) (request models.TagInput, err error)
 	TagTaskRead(c echo.Context) (request models.TaskTagInput, err error)
-	TagWrite(card models.TagOutside) (response models.ResponseTag, err error)
+	TagWrite(tag models.TagOutside) (response models.ResponseTag, err error)
 
 	CommentChangeRead(c echo.Context) (request models.CommentInput, err error)
-	CommentWrite(card models.CommentOutside) (response models.ResponseComment, err error)
+	CommentWrite(comment models.CommentOutside) (response models.ResponseComment, err error)
 
 	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
-	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
+	ChecklistWrite(checklist models.ChecklistOutside) (response models.ResponseChecklist, err error)
 
 	AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error)
 	AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error)
-	AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error)
+	AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error)
 }
 
 type transport struct {
@@ -156,6 +158,13 @@ func (t transport) CardWrite(card models.CardOutside) (response models.ResponseC
 	return response, err
 }
 
+func (t transport) CardShortWrite(card models.CardOutsideShort) (response models.ResponseCard, err error) {
+	response.CardID = card.CardID
+	response.Name = card.Name
+	response.Status = 200
+	return response, err
+}
+
 func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err error) {
 	userInput := new(models.TaskInput)
 
@@ -186,6 +195,14 @@ func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseT
 	response.Checklists = task.Checklists
 	response.Users = task.Users
 	response.Attachments = task.Attachments
+	response.Status = 200
+	return response, err
+}
+
+func (t transport) TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTask, err error) {
+	response.TaskID = task.TaskID
+	response.Description = task.Description
+	response.Name = task.Name
 	response.Status = 200
 	return response, err
 }

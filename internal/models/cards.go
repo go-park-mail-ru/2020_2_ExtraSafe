@@ -21,6 +21,11 @@ type CardOutside struct {
 	Tasks  []TaskOutsideShort `json:"tasks"`
 }
 
+type CardOutsideShort struct {
+	CardID int64               `json:"cardID"`
+	Name   string              `json:"cardName"`
+}
+
 type CardInput struct {
 	UserID  int64 `json:"-"`
 	CardID  int64 `json:"cardID"`

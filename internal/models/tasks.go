@@ -40,6 +40,12 @@ type TaskOutsideShort struct {
 	Checklists  []ChecklistOutside
 }
 
+type TaskOutsideSuperShort struct {
+	TaskID      int64 `json:"taskID"`
+	Name        string `json:"taskName"`
+	Description string `json:"description"`
+}
+
 type TaskInternal struct {
 	TaskID      int64 `json:"taskID"`
 	Name        string `json:"taskName"`

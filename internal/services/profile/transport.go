@@ -10,10 +10,8 @@ type Transport interface {
 	ProfileRead(c echo.Context) (request models.UserInput, err error)
 
 	ProfileChangeRead(c echo.Context) (request models.UserInputProfile, err error)
-	AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error)
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
-	AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error)
 	BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error)
 	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
@@ -58,18 +56,6 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 	return *userInput, nil
 }
 
-func (t transport) AccountsChangeRead(c echo.Context) (request models.UserInputLinks, err error) {
-	userInput := new(models.UserInputLinks)
-	if err := c.Bind(userInput); err != nil {
-		return models.UserInputLinks{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-			MethodName: "AccountsChangeRead"}
-	}
-
-	userInput.ID = c.Get("userId").(int64)
-
-	return *userInput, nil
-}
-
 func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error) {
 	userInput := new(models.UserInputPassword)
 	if err := c.Bind(userInput); err != nil {
@@ -80,19 +66,6 @@ func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputP
 	userInput.ID = c.Get("userId").(int64)
 
 	return *userInput, nil
-}
-
-func (t transport)AccountsWrite(user models.UserOutside) (response models.ResponseUserLinks, err error) {
-	response.Status = 200
-	response.Username = user.Username
-	response.Telegram = user.Links.Telegram
-	response.Instagram = user.Links.Instagram
-	response.Github = user.Links.Github
-	response.Bitbucket = user.Links.Bitbucket
-	response.Vk = user.Links.Vk
-	response.Facebook = user.Links.Facebook
-	response.Avatar = user.Avatar
-	return response, nil
 }
 
 func (t transport) BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error) {

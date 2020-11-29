@@ -62,6 +62,11 @@ message CardOutside {
   repeated TaskOutsideShort Tasks = 4;
 }
 
+message CardOutsideShort {
+  int64 CardID = 1;
+  string Name = 2;
+}
+
 //==========================================
 message TaskInput {
   int64 UserID = 1;
@@ -139,6 +144,12 @@ message TaskOutsideShort {
   repeated TagOutside Tags = 5;
   repeated protoProfile.UserOutsideShort Users = 6;
   repeated ChecklistOutside Checklists = 7;
+}
+
+message TaskOutsideSuperShort {
+  int64 TaskID = 1;
+  string  Name = 2;
+  string  Description = 3;
 }
 
 //==========================================
@@ -232,25 +243,24 @@ service Board {
 
   rpc CreateBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
   rpc GetBoard (BoardInput) returns (BoardOutside) {}
-  rpc ChangeBoard (BoardChangeInput) returns (BoardOutside) {}
+  rpc ChangeBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
   rpc AddUserToBoard (BoardMemberInput) returns (Nothing) {}
   rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
 
-  rpc CreateCard (CardInput) returns (CardOutside) {}
+  rpc CreateCard (CardInput) returns (CardOutsideShort) {}
   rpc GetCard (CardInput) returns (CardOutside) {}
-  rpc ChangeCard (CardInput) returns (CardOutside) {}
+  rpc ChangeCard (CardInput) returns (CardOutsideShort) {}
   rpc DeleteCard (CardInput) returns (Nothing) {}
   rpc CardOrderChange (CardsOrderInput) returns (Nothing) {}
 
-  rpc CreateTask (TaskInput) returns (TaskOutside) {}
+  rpc CreateTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc GetTask (TaskInput) returns (TaskOutside) {}
-  rpc ChangeTask (TaskInput) returns (TaskOutside) {}
+  rpc ChangeTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc DeleteTask (TaskInput) returns (Nothing) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
   rpc AssignUser (TaskAssignerInput) returns (Nothing) {}
   rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
-  rpc GetAssigners (TaskInput) returns (TaskAssignerIDs) {}
 
   rpc CreateTag (TagInput) returns (TagOutside) {}
   rpc ChangeTag (TagInput) returns (TagOutside) {}
