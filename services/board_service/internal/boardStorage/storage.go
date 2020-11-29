@@ -21,7 +21,7 @@ type Storage interface {
 	DeleteCard(userInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
-	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
+	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 	DeleteTask(taskInput models.TaskInput) error
 
@@ -235,62 +235,10 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 			MethodName: "ChangeBoard"}
 	}
 
-	input := models.BoardInput{ BoardID: boardInput.BoardID }
-	members, err := s.getBoardMembers(input)
-	if err != nil {
-		return models.BoardInternal{}, err
-	}
-
-	cards, err := s.cardsStorage.GetCardsByBoard(input)
-	if err != nil {
-		return models.BoardInternal{}, err
-	}
-
-	for _, card := range cards {
-		cardInput := models.CardInput{CardID: card.CardID}
-
-		tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
-		if err != nil {
-			return models.BoardInternal{}, err
-		}
-
-		for _, task := range tasks {
-			taskInput := models.TaskInput{TaskID: task.TaskID}
-
-			tags, err := s.tagStorage.GetTaskTags(taskInput)
-			if err != nil {
-				return models.BoardInternal{}, err
-			}
-			task.Tags = append(task.Tags, tags...)
-
-			users, err := s.tasksStorage.GetAssigners(taskInput)
-			if err != nil {
-				return models.BoardInternal{}, err
-			}
-			task.Users = append(task.Users, users...)
-
-			checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
-			if err != nil {
-				return models.BoardInternal{}, err
-			}
-			task.Checklists = append(task.Checklists, checklists...)
-		}
-
-		card.Tasks = append(card.Tasks, tasks...)
-	}
-
 	board.BoardID = boardInput.BoardID
 	board.Name = boardInput.BoardName
 	board.Theme = boardInput.Theme
 	board.Star = boardInput.Star
-	board.UsersIDs = append(board.UsersIDs, members...)
-	board.Cards = append(board.Cards, cards...)
-
-	tags, err := s.tagStorage.GetBoardTags(input)
-	if err != nil {
-		return models.BoardInternal{}, err
-	}
-	board.Tags = append(board.Tags, tags...)
 
 	return board, nil
 }
@@ -310,40 +258,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
-	card, err := s.cardsStorage.ChangeCard(cardInput)
-	if err != nil {
-		return models.CardInternal{}, err
-	}
-
-	tasks, err := s.tasksStorage.GetTasksByCard(cardInput)
-	if err != nil {
-		return models.CardInternal{}, err
-	}
-
-	for _, task := range tasks {
-		taskInput := models.TaskInput{TaskID: task.TaskID}
-
-		tags, err := s.tagStorage.GetTaskTags(taskInput)
-		if err != nil {
-			return models.CardInternal{}, err
-		}
-		task.Tags = append(task.Tags, tags...)
-
-		users, err := s.tasksStorage.GetAssigners(taskInput)
-		if err != nil {
-			return models.CardInternal{}, err
-		}
-		task.Users = append(task.Users, users...)
-
-		checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
-		if err != nil {
-			return models.CardInternal{}, err
-		}
-		task.Checklists = append(task.Checklists, checklists...)
-	}
-
-	card.Tasks = append(card.Tasks, tasks...)
-	return card, nil
+	return s.cardsStorage.ChangeCard(cardInput)
 }
 
 func (s *storage) ChangeCardOrder(cardInput models.CardsOrderInput) error {
@@ -358,37 +273,8 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalSho
 	return s.tasksStorage.CreateTask(taskInput)
 }
 
-func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error) {
-	task, err := s.tasksStorage.ChangeTask(taskInput)
-	if err != nil {
-		return models.TaskInternal{}, nil, err
-	}
-
-	tags, err := s.tagStorage.GetTaskTags(taskInput)
-	if err != nil {
-		return models.TaskInternal{}, nil, err
-	}
-	task.Tags = append(task.Tags, tags...)
-
-	users, err := s.tasksStorage.GetAssigners(taskInput)
-	if err != nil {
-		return models.TaskInternal{}, nil, err
-	}
-	task.Users = append(task.Users, users...)
-
-	checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
-	if err != nil {
-		return models.TaskInternal{}, nil, err
-	}
-	task.Checklists = append(task.Checklists, checklists...)
-
-	comments, userIDs, err := s.commentStorage.GetCommentsByTask(taskInput)
-	if err != nil {
-		return models.TaskInternal{}, nil, err
-	}
-	task.Comments = append(task.Comments, comments...)
-
-	return task, userIDs, nil
+func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error) {
+	return s.tasksStorage.ChangeTask(taskInput)
 }
 
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {

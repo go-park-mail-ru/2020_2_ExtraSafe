@@ -48,10 +48,8 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
-	//FIXME убрать изменение порядка карточки!! (оставить только имя)
-	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order, cardInput.CardID)
+	_, err := s.db.Exec("UPDATE cards SET cardName = $1 WHERE cardID = $2", cardInput.Name, cardInput.CardID)
 	if err != nil {
-		fmt.Println(err)
 		return models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeCard"}
 	}
@@ -59,7 +57,6 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, e
 	card := models.CardInternal{
 		CardID: cardInput.CardID,
 		Name: cardInput.Name,
-		Order: cardInput.Order,
 	}
 	return card, nil
 }

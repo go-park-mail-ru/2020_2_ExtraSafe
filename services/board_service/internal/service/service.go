@@ -445,7 +445,7 @@ func (s *service) ChangeTask(_ context.Context, input *protoBoard.TaskInput) (ou
 		Description: input.Description,
 	}
 
-	task, _, err := s.boardStorage.ChangeTask(userInput)
+	task, err := s.boardStorage.ChangeTask(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
