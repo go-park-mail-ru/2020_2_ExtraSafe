@@ -23,7 +23,6 @@ type Storage interface {
 	DeleteCard(userInput models.CardInput) error
 
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
-	//возвращается слайс айдишников пользователей, оставивших комментарии
 	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 	DeleteTask(taskInput models.TaskInput) error
@@ -42,33 +41,31 @@ type Storage interface {
 	CheckTaskPermission(userID int64, taskID int64) (err error)
 	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
 
-/////////////////////////////////////////
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
-	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
+//	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
 
 	CreateTag(input models.TagInput) (tag models.TagOutside, err error)
 	UpdateTag(input models.TagInput) (tag models.TagOutside, err error)
 	DeleteTag(input models.TagInput) (err error)
 	AddTag(input models.TaskTagInput) (err error)
 	RemoveTag(input models.TaskTagInput) (err error)
-	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
-	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
+//	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
+//	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
 
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	DeleteComment(input models.CommentInput) (err error)
-	GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error)
+//	GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error)
 
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	DeleteChecklist(input models.ChecklistInput) (err error)
-	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
+//	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
 
 	AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
 	RemoveAttachment(input models.AttachmentInternal) (err error)
-	GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error)
-	////////////////////////////////////////////
+//	GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error)
 }
 
 type storage struct {
@@ -97,7 +94,7 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 	boards := make([]models.BoardOutsideShort, 0)
 
 	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
-									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR  M.userID = $1;", userInput.ID)
+									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR M.userID = $1;", userInput.ID)
 	if err != nil {
 		return []models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetBoardsList"}
@@ -128,7 +125,6 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 		boardInput.Star).Scan(&boardID)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateBoard"}
 	}
@@ -178,42 +174,42 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		}
 
 		for i, task := range tasks {
-			//fmt.Println(task)
 			taskInput := models.TaskInput{TaskID: task.TaskID}
 
-			// FIXME сборка тегов на таски
 			tags, err := s.tagStorage.GetTaskTags(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
 			tasks[i].Tags = append(tasks[i].Tags, tags...)
 
-			// FIXME сборка юзеров на таски
 			users, err := s.tasksStorage.GetAssigners(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
 			tasks[i].Users = append(tasks[i].Users, users...)
 
-			// FIXME сборка чеклистов на таски
 			checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
 			tasks[i].Checklists = append(tasks[i].Checklists, checklists...)
+
+		/*	attachments, err := s.attachmentStorage.GetAttachmentsByTask(taskInput)
+			if err != nil {
+				return models.BoardInternal{}, err
+			}
+			tasks[i] = append(tasks[i].Checklists, checklists...)*/
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
 		board.Cards = append(board.Cards, card)
 	}
 
-	//FIXME сборка тегов на доску
 	tags, err := s.tagStorage.GetBoardTags(boardInput)
 	if err != nil {
 		return models.BoardInternal{}, err
 	}
 	board.Tags = append(board.Tags, tags...)
-
 
 	return board, nil
 }
@@ -248,7 +244,6 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 	err := s.db.QueryRow("UPDATE boards SET boardName = $1, theme = $2, star = $3 WHERE boardID = $4 RETURNING adminID",
 								boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
 	if err != nil {
-		fmt.Println(err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeBoard"}
 	}
@@ -273,24 +268,20 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 		}
 
 		for _, task := range tasks {
-			//fmt.Println(task)
 			taskInput := models.TaskInput{TaskID: task.TaskID}
 
-			// FIXME сборка тегов на таски
 			tags, err := s.tagStorage.GetTaskTags(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
 			task.Tags = append(task.Tags, tags...)
 
-			// FIXME сборка юзеров на таски
 			users, err := s.tasksStorage.GetAssigners(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
 			}
 			task.Users = append(task.Users, users...)
 
-			// FIXME сборка чеклистов на таски
 			checklists, err := s.checklistStorage.GetChecklistsByTask(taskInput)
 			if err != nil {
 				return models.BoardInternal{}, err
@@ -308,7 +299,6 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 	board.UsersIDs = append(board.UsersIDs, members...)
 	board.Cards = append(board.Cards, cards...)
 
-	//FIXME сборка тегов на доску
 	tags, err := s.tagStorage.GetBoardTags(input)
 	if err != nil {
 		return models.BoardInternal{}, err
@@ -321,7 +311,6 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 func (s *storage) DeleteBoard(boardInput models.BoardInput) error {
 	_, err := s.db.Exec("DELETE FROM boards WHERE boardID = $1", boardInput.BoardID)
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteBoard"}
 	}
 
@@ -383,8 +372,6 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalSho
 }
 
 func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error) {
-	//FIXME добавить сбор ВСЕХ фич для тасок (останется еще добавить аттачи)
-//	return s.tasksStorage.ChangeTask(taskInput)
 	task, err := s.tasksStorage.ChangeTask(taskInput)
 	if err != nil {
 		return models.TaskInternal{}, nil, err
@@ -442,7 +429,6 @@ func (s *storage) GetCard(cardInput models.CardInput) (models.CardInternal, erro
 }
 
 func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error) {
-	//FIXME добавить сбор фич для тасок (перенести код из ChangeTask)
 	task, err := s.tasksStorage.GetTaskByID(taskInput)
 	if err != nil {
 		return models.TaskInternal{}, nil, err
@@ -500,7 +486,6 @@ func (s *storage) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool
 	}
 
 	if err != nil {
-		fmt.Println(err)	//log
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckBoardPermission"}
 	}
 
@@ -531,7 +516,6 @@ func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bo
 	var ID int64
 	err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
 		return false, err
 	}
 
@@ -550,7 +534,6 @@ func (s *storage) CheckCardPermission(userID int64, cardID int64) (err error) {
 								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
 								"WHERE (B.adminID = $1 OR  M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
 
@@ -572,7 +555,6 @@ func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
 								"WHERE (B.adminID = $1 OR  M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
 	}
 
@@ -605,7 +587,6 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	err = s.db.QueryRow(query, userID, commentID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
 	}
 

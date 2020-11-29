@@ -1,9 +1,11 @@
 package fileStorage
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"image"
 	"os"
 	"strconv"
 	"strings"
@@ -28,8 +30,27 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	formattedID := strconv.FormatInt(file.UserID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID+file.Filename)))
 
+	filename, err := saveFile(file.File, name, false)
+
+	if err != nil {
+		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
+			MethodName: "UploadFile"}
+	}
+
+	attachment.Filepath = "attachments/" + filename
+	return nil
+}
+
+func saveFile(src []byte, name string, isTest bool) (filename string, err error) {
+	r := bytes.NewReader(src)
+	_, fmtName, err := image.Decode(r)
+	if err != nil {
+		return "", err
+	}
+
+	filename = name + "." + fmtName
+
 	var dst *os.File
-	var err error
 	if isTest {
 		dst, err = os.Create("../../../../attachments/" + name)
 	} else {
@@ -37,13 +58,16 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	}
 
 	if err != nil {
-		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
-			MethodName: "UploadFile"}
+		return "", err
 	}
 	defer dst.Close()
 
-	attachment.Filepath = "attachments/" + file.Filename
-	return nil
+	_, err = dst.Write(src)
+	if err != nil {
+		return "", err
+	}
+
+	return filename, nil
 }
 
 func (s *storage) DeleteFile(filepath string, isTest bool) error {

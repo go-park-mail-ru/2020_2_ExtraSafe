@@ -26,11 +26,11 @@ func TestStorage_CreateCard(t *testing.T) {
 		Order:   1,
 	}
 
-	expectCardOutside := models.CardInternal{
+	expectCardOutside := models.CardOutside{
 		CardID: 1,
 		Name:   cardInput.Name,
 		Order:  cardInput.Order,
-		Tasks:  []models.TaskInternalShort{},
+		Tasks:  []models.TaskOutsideShort{},
 	}
 
 	mock.
