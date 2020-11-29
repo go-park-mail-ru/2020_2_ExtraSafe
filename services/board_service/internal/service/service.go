@@ -202,6 +202,46 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
+func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	userInput := models.BoardMember{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+		MemberID:  user.ID,
+	}
+
+	err = s.boardStorage.AddUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	userInput := models.BoardMember{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+		MemberID:  user.ID,
+	}
+
+	err = s.boardStorage.RemoveUser(userInput)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
 func (s *service) CreateCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutside, err error) {
 	userInput := models.CardInput{
 		UserID:  input.UserID,

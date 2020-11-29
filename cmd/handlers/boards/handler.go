@@ -12,6 +12,8 @@ type Handler interface {
 	Board(c echo.Context) error
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
+	BoardAddMember(c echo.Context) error
+	BoardRemoveMember(c echo.Context) error
 
 	CardCreate(c echo.Context) error
 	Card(c echo.Context) error
@@ -153,6 +155,46 @@ func (h *handler) BoardDelete(c echo.Context) error {
 	}
 
 	err = h.boardsService.DeleteBoard(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) BoardAddMember(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardMemberRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.AddMember(userInput)
+	if err != nil {
+		if err := h.errorWorker.RespError(c, err); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) BoardRemoveMember(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardMemberRead(c)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	err = h.boardsService.RemoveMember(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err

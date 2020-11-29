@@ -13,6 +13,8 @@ type Service interface {
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutside, err error)
 	DeleteBoard(request models.BoardInput) (err error)
+	AddMember(request models.BoardMemberInput) (err error)
+	RemoveMember(request models.BoardMemberInput) (err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutside, err error)
 	GetCard(request models.CardInput) (board models.CardOutside, err error)
@@ -256,6 +258,40 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	}
 
 	_, err = s.boardService.DeleteBoard(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) AddMember(request models.BoardMemberInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardMemberInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+		MemberName: request.MemberName,
+	}
+
+	_, err = s.boardService.AddUserToBoard(ctx, input)
+	if err != nil {
+		return errorWorker.ConvertStatusToError(err)
+	}
+
+	return nil
+}
+
+func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardMemberInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+		MemberName: request.MemberName,
+	}
+
+	_, err = s.boardService.RemoveUserToBoard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}

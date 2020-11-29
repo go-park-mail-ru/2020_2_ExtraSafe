@@ -19,6 +19,12 @@ message BoardInput {
   int64 BoardID = 2;
 }
 
+message BoardMemberInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+  string MemberName = 3;
+}
+
 message BoardOutside {
   int64 BoardID = 1;
   protoProfile.UserOutsideShort Admin = 2;
@@ -226,6 +232,8 @@ service Board {
   rpc GetBoard (BoardInput) returns (BoardOutside) {}
   rpc ChangeBoard (BoardChangeInput) returns (BoardOutside) {}
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
+  rpc AddUserToBoard (BoardMemberInput) returns (Nothing) {}
+  rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
 
   rpc CreateCard (CardInput) returns (CardOutside) {}
   rpc GetCard (CardInput) returns (CardOutside) {}

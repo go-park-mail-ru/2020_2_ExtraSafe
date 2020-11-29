@@ -10,6 +10,7 @@ import (
 type Transport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
+	BoardMemberRead(c echo.Context) (request models.BoardMemberInput, err error)
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
 	BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error)
 
@@ -66,6 +67,22 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "BoardChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberInput, err error) {
+	userInput := new(models.BoardMemberInput)
+
+	boardID := c.Param("ID")
+	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.BoardMemberInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
 	}
 
