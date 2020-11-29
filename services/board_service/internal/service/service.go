@@ -550,7 +550,7 @@ func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerI
 }
 
 func (s *service) GetAssigners(_ context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskAssignerIDs, err error) {
-	userInput := models.TaskInput{
+	/*userInput := models.TaskInput{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
 		CardID: input.CardID,
@@ -561,7 +561,7 @@ func (s *service) GetAssigners(_ context.Context, input *protoBoard.TaskInput) (
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	output = &protoBoard.TaskAssignerIDs{AssignerIDs: assigners}
+	output = &protoBoard.TaskAssignerIDs{AssignerIDs: assigners}*/
 
 	return output, nil
 }
@@ -810,12 +810,12 @@ func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentI
 
 	err = s.fileStorage.UploadFile(fileInput, userInput, false)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
 	attachment, err := s.boardStorage.AddAttachment(*userInput)
 	if err != nil {
-		return output, err
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
 	output = &protoBoard.AttachmentOutside{
@@ -836,12 +836,12 @@ func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.Attachme
 
 	err := s.boardStorage.RemoveAttachment(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	err = s.fileStorage.DeleteFile(userInput.Filepath, false)
+	err = s.fileStorage.DeleteFile(userInput.Filename, false)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, err
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
 	return &protoBoard.Nothing{Dummy: true}, nil

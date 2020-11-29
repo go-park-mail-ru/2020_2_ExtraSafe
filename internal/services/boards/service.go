@@ -910,6 +910,7 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 	input := &protoBoard.AttachmentInput{
 		UserID: request.UserID,
 		TaskID: request.TaskID,
+		AttachmentID: request.AttachmentID,
 		Filename: request.Filename,
 		File: request.File,
 	}

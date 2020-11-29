@@ -1,12 +1,11 @@
 package fileStorage
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"image"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -30,7 +29,7 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	formattedID := strconv.FormatInt(file.UserID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID+file.Filename)))
 
-	filename, err := saveFile(file.File, name, false)
+	filename, err := saveFile(file.File, name, file.Filename, false)
 
 	if err != nil {
 		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
@@ -41,29 +40,28 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	return nil
 }
 
-func saveFile(src []byte, name string, isTest bool) (filename string, err error) {
-	r := bytes.NewReader(src)
-	_, fmtName, err := image.Decode(r)
-	if err != nil {
-		return "", err
-	}
+func saveFile(src []byte, name string, initialName string, isTest bool) (filename string, err error) {
+	//r := bytes.NewReader(src)
+	fmtName := filepath.Ext(initialName)
 
-	filename = name + "." + fmtName
+	filename = name + fmtName
 
 	var dst *os.File
 	if isTest {
-		dst, err = os.Create("../../../../attachments/" + name)
+		dst, err = os.Create("../../../../attachments/" + filename)
 	} else {
-		dst, err = os.Create("../../../attachments/" + name)
+		dst, err = os.Create("../../../attachments/" + filename)
 	}
 
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 	defer dst.Close()
 
 	_, err = dst.Write(src)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
