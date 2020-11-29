@@ -2231,11 +2231,18 @@ func TestStorage_GetTaskTagsFail(t *testing.T) {
 
 	taskInput := models.TaskInput{ TaskID: 1 }
 
+	taskOutside := models.TaskInternal{
+		TaskID:      1,
+		Name:        "task",
+		Description: "description",
+		Order:       1,
+	}
+
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(models.TaskInternal{}, errors.New(""))
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(taskOutside, nil)
 
 	tagsStorage := tagStorage.NewStorage(db)
 
@@ -2505,6 +2512,222 @@ func TestStorage_CheckTaskPermissionFail(t *testing.T) {
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_AddUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.BoardMember{
+		BoardID:  1,
+		MemberID: 1,
+	}
+
+	mock.
+		ExpectExec("INSERT INTO board_members").
+		WithArgs(input.BoardID, input.MemberID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = storage.AddUser(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_AddUserFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.BoardMember{
+		BoardID:  1,
+		MemberID: 1,
+	}
+
+	mock.
+		ExpectExec("INSERT INTO board_members").
+		WithArgs(input.BoardID, input.MemberID).
+		WillReturnError(errors.New(""))
+
+	err = storage.AddUser(input)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestStorage_RemoveUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.BoardMember{
+		BoardID:  1,
+		MemberID: 1,
+	}
+
+	mock.
+		ExpectExec("DELETE FROM board_members").
+		WithArgs(input.BoardID, input.MemberID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = storage.RemoveUser(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_RemoveUserFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.BoardMember{
+		BoardID:  1,
+		MemberID: 1,
+	}
+
+	mock.
+		ExpectExec("DELETE FROM board_members").
+		WithArgs(input.BoardID, input.MemberID).
+		WillReturnError(errors.New(""))
+
+	err = storage.RemoveUser(input)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestStorage_CheckCommentPermissionIfAdminFalse(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	commentID := int64(1)
+	userID := int64(1)
+
+	mock.
+		ExpectQuery("SELECT B.boardID").
+		WithArgs(userID, commentID).
+		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
+
+	err = storage.CheckCommentPermission(userID, commentID, false)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_CheckCommentPermissionIfAdminTrue(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	commentID := int64(1)
+	userID := int64(1)
+
+	mock.
+		ExpectQuery("SELECT B.boardID").
+		WithArgs(userID, commentID).
+		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
+
+	err = storage.CheckCommentPermission(userID, commentID, true)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_CheckCommentPermissionQueryError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	commentID := int64(1)
+	userID := int64(1)
+
+	mock.
+		ExpectQuery("SELECT B.boardID").
+		WithArgs(userID, commentID).
+		WillReturnError(errors.New(""))
+
+	err = storage.CheckCommentPermission(userID, commentID, true)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestStorage_CheckCommentPermissionDenied(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	commentID := int64(1)
+	userID := int64(1)
+
+	mock.
+		ExpectQuery("SELECT B.boardID").
+		WithArgs(userID, commentID).
+		WillReturnError(sql.ErrNoRows)
+
+	err = storage.CheckCommentPermission(userID, commentID, true)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
 		return
 	}
 }
