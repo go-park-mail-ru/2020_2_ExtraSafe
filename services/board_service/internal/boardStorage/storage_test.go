@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/mock"
+	tagStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -93,7 +97,7 @@ func TestStorage_CreateBoardFail(t *testing.T) {
 		return
 	}
 }
-
+/*
 func TestStorage_ChangeBoard(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -146,7 +150,10 @@ func TestStorage_ChangeBoard(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
 
-	storage := NewStorage(db, mockCards, mockTasks)
+	storage := &storage{db: db, cardsStorage: mockCards, tasksStorage: mockTasks}
+
+
+	//storage := NewStorage(db, mockCards, mockTasks)
 
 	expectBoardOutside := models.BoardInternal{
 		BoardID: boardInput.BoardID,
@@ -267,8 +274,9 @@ func TestStorage_ChangeBoardGetTasksFail(t *testing.T) {
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, errors.New("error getting tasks"))
+	storage := &storage{db: db, cardsStorage: mockCards, tasksStorage: mockTasks}
 
-	storage := NewStorage(db, mockCards, mockTasks)
+	//storage := NewStorage(db, mockCards, mockTasks)
 
 	mock.
 		ExpectQuery("UPDATE boards SET").
@@ -396,6 +404,7 @@ func TestStorage_ChangeBoardGetMembersScanFail(t *testing.T) {
 		return
 	}
 }
+*/
 
 func TestStorage_DeleteBoard(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -487,14 +496,7 @@ func TestStorage_GetBoard(t *testing.T) {
 		Order:       1,
 	}
 
-	task2 := models.TaskInternalShort{
-		TaskID:      2,
-		Name:        "task 2",
-		Description: "second task",
-		Order:       2,
-	}
-
-	expectedTasks = append(expectedTasks, task1, task2)
+	expectedTasks = append(expectedTasks, task1)
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
@@ -502,11 +504,12 @@ func TestStorage_GetBoard(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
 
-	storage := &storage{
-		db:           db,
-		cardsStorage: mockCards,
-		tasksStorage: mockTasks,
-	}
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := NewStorage(db, mockCards, mockTasks, tagsStorage, commentsStorage,checklistsStorage, attachmentsStorage)
 
 	expectBoardOutside := models.BoardInternal{
 		BoardID: boardInput.BoardID,
@@ -535,6 +538,23 @@ func TestStorage_GetBoard(t *testing.T) {
 		WithArgs(boardInput.BoardID).
 		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(2).AddRow(3))
 
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: task1.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"checklistID", "name", "items"}))
+
+	mock.
+		ExpectQuery("SELECT tagID, name, color FROM tags").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color"}))
+
 	board, err := storage.GetBoard(boardInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
@@ -562,7 +582,7 @@ func TestStorage_GetBoardQueryFail(t *testing.T) {
 	}
 
 	storage := &storage{
-		db:           db,
+		db: db,
 	}
 
 	mock.
@@ -607,6 +627,44 @@ func TestStorage_GetBoardMembersFail(t *testing.T) {
 		ExpectQuery("SELECT userID from board_members").
 		WithArgs(boardInput.BoardID).
 		WillReturnError(sql.ErrNoRows)
+
+	_, err = storage.GetBoard(boardInput)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetBoardMembers2Fail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{
+		BoardID:   1,
+	}
+
+	storage := &storage{
+		db:           db,
+	}
+
+	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
+
+	mock.
+		ExpectQuery("SELECT adminID, boardName, theme, star FROM boards WHERE boardID").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectQuery("SELECT userID from board_members").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID", "something"}).AddRow(1, "lalala"))
 
 	_, err = storage.GetBoard(boardInput)
 	if err == nil {
@@ -729,6 +787,405 @@ func TestStorage_GetBoardTasksFail(t *testing.T) {
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+
+func TestStorage_GetBoardTaskTagsFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{
+		BoardID:   1,
+	}
+
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
+		CardID: 1,
+		Name:   "todo",
+		Order:  1,
+	}
+
+	expectedCards = append(expectedCards, card1)
+
+	ctrlCards := gomock.NewController(t)
+	defer ctrlCards.Finish()
+
+	mockCards := mocks.NewMockCardsStorage(ctrlCards)
+
+	fmt.Println("expected cards ", expectedCards)
+	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
+
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
+		TaskID:      1,
+		Name:        "task 1",
+		Description: "first task ever",
+		Order:       1,
+	}
+
+	expectedTasks = append(expectedTasks, task1)
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := NewStorage(db, mockCards, mockTasks, tagsStorage, commentsStorage,checklistsStorage, attachmentsStorage)
+
+	expectBoardOutside := models.BoardInternal{
+		BoardID: boardInput.BoardID,
+		AdminID: 1,
+		Name:    "test board",
+		Theme:   "dark",
+		Star:    false,
+	}
+
+	cards := make([]models.CardInternal, 0)
+	cards = append(cards, expectedCards...)
+	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
+
+	expectBoardOutside.Cards = append(expectBoardOutside.Cards, cards...)
+	expectBoardOutside.UsersIDs = []int64{2, 3}
+
+	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
+
+	mock.
+		ExpectQuery("SELECT adminID, boardName, theme, star FROM boards WHERE boardID").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectQuery("SELECT userID from board_members").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(2).AddRow(3))
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(task1.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetBoard(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+
+func TestStorage_GetBoardTaskAssignersFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{
+		BoardID:   1,
+	}
+
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
+		CardID: 1,
+		Name:   "todo",
+		Order:  1,
+	}
+
+	expectedCards = append(expectedCards, card1)
+
+	ctrlCards := gomock.NewController(t)
+	defer ctrlCards.Finish()
+
+	mockCards := mocks.NewMockCardsStorage(ctrlCards)
+
+	fmt.Println("expected cards ", expectedCards)
+	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
+
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
+		TaskID:      1,
+		Name:        "task 1",
+		Description: "first task ever",
+		Order:       1,
+	}
+
+	expectedTasks = append(expectedTasks, task1)
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := NewStorage(db, mockCards, mockTasks, tagsStorage, commentsStorage,checklistsStorage, attachmentsStorage)
+
+	expectBoardOutside := models.BoardInternal{
+		BoardID: boardInput.BoardID,
+		AdminID: 1,
+		Name:    "test board",
+		Theme:   "dark",
+		Star:    false,
+	}
+
+	cards := make([]models.CardInternal, 0)
+	cards = append(cards, expectedCards...)
+	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
+
+	expectBoardOutside.Cards = append(expectBoardOutside.Cards, cards...)
+	expectBoardOutside.UsersIDs = []int64{2, 3}
+
+	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
+
+	mock.
+		ExpectQuery("SELECT adminID, boardName, theme, star FROM boards WHERE boardID").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectQuery("SELECT userID from board_members").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(2).AddRow(3))
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: task1.TaskID}).Return([]int64{}, errors.New(""))
+
+	_, err = storage.GetBoard(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("unexpected not err")
+		return
+	}
+}
+
+func TestStorage_GetBoardTags(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{
+		BoardID:   1,
+	}
+
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
+		CardID: 1,
+		Name:   "todo",
+		Order:  1,
+	}
+
+	expectedCards = append(expectedCards, card1)
+
+	ctrlCards := gomock.NewController(t)
+	defer ctrlCards.Finish()
+
+	mockCards := mocks.NewMockCardsStorage(ctrlCards)
+
+	fmt.Println("expected cards ", expectedCards)
+	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
+
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
+		TaskID:      1,
+		Name:        "task 1",
+		Description: "first task ever",
+		Order:       1,
+	}
+
+	expectedTasks = append(expectedTasks, task1)
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := NewStorage(db, mockCards, mockTasks, tagsStorage, commentsStorage,checklistsStorage, attachmentsStorage)
+
+	expectBoardOutside := models.BoardInternal{
+		BoardID: boardInput.BoardID,
+		AdminID: 1,
+		Name:    "test board",
+		Theme:   "dark",
+		Star:    false,
+	}
+
+	cards := make([]models.CardInternal, 0)
+	cards = append(cards, expectedCards...)
+	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
+
+	expectBoardOutside.Cards = append(expectBoardOutside.Cards, cards...)
+	expectBoardOutside.UsersIDs = []int64{2, 3}
+
+	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
+
+	mock.
+		ExpectQuery("SELECT adminID, boardName, theme, star FROM boards WHERE boardID").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectQuery("SELECT userID from board_members").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(2).AddRow(3))
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: task1.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"checklistID", "name", "items"}))
+
+	mock.
+		ExpectQuery("SELECT tagID, name, color FROM tags").
+		WithArgs(boardInput.BoardID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetBoard(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestStorage_GetBoardChecklists(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{
+		BoardID:   1,
+	}
+
+	expectedCards := make([]models.CardInternal, 0)
+	card1 := models.CardInternal{
+		CardID: 1,
+		Name:   "todo",
+		Order:  1,
+	}
+
+	expectedCards = append(expectedCards, card1)
+
+	ctrlCards := gomock.NewController(t)
+	defer ctrlCards.Finish()
+
+	mockCards := mocks.NewMockCardsStorage(ctrlCards)
+
+	fmt.Println("expected cards ", expectedCards)
+	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
+
+	expectedTasks := make([]models.TaskInternalShort, 0)
+	task1 := models.TaskInternalShort{
+		TaskID:      1,
+		Name:        "task 1",
+		Description: "first task ever",
+		Order:       1,
+	}
+
+	expectedTasks = append(expectedTasks, task1)
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTasksByCard(models.CardInput{CardID: expectedCards[0].CardID}).Times(1).Return(expectedTasks, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := NewStorage(db, mockCards, mockTasks, tagsStorage, commentsStorage,checklistsStorage, attachmentsStorage)
+
+	expectBoardOutside := models.BoardInternal{
+		BoardID: boardInput.BoardID,
+		AdminID: 1,
+		Name:    "test board",
+		Theme:   "dark",
+		Star:    false,
+	}
+
+	cards := make([]models.CardInternal, 0)
+	cards = append(cards, expectedCards...)
+	cards[0].Tasks = append(cards[0].Tasks, expectedTasks...)
+
+	expectBoardOutside.Cards = append(expectBoardOutside.Cards, cards...)
+	expectBoardOutside.UsersIDs = []int64{2, 3}
+
+	rows := sqlmock.NewRows([]string{"adminID", "boardName", "theme", "star"}).AddRow(1, "test board", "dark", false)
+
+	mock.
+		ExpectQuery("SELECT adminID, boardName, theme, star FROM boards WHERE boardID").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectQuery("SELECT userID from board_members").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(2).AddRow(3))
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(task1.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: task1.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(task1.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetBoard(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
 		return
 	}
 }
@@ -1029,7 +1486,7 @@ func TestStorage_CreateCard(t *testing.T) {
 		Order:   1,
 	}
 
-	cardOutside := models.CardInternal{
+	cardOutside := models.CardOutside{
 		CardID: 1,
 		Name:   "todo",
 		Order:  1,
@@ -1069,7 +1526,7 @@ func TestStorage_CreateCardFail(t *testing.T) {
 	defer ctrlCards.Finish()
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
-	mockCards.EXPECT().CreateCard(cardInput).Times(1).Return(models.CardInternal{}, errors.New("error creating card"))
+	mockCards.EXPECT().CreateCard(cardInput).Times(1).Return(models.CardOutside{}, errors.New("error creating card"))
 
 	storage := &storage{
 		cardsStorage: mockCards,
@@ -1596,7 +2053,7 @@ func TestStorage_CreateTaskFail(t *testing.T) {
 		return
 	}
 }
-
+/*
 func TestStorage_ChangeTask(t *testing.T) {
 	taskInput := models.TaskInput{
 		UserID:  1,
@@ -1607,7 +2064,7 @@ func TestStorage_ChangeTask(t *testing.T) {
 		Order:   1,
 	}
 
-	taskOutside := models.TaskInternalShort{
+	taskOutside := models.TaskInternal{
 		TaskID:      1,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
@@ -1649,7 +2106,7 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().ChangeTask(taskInput).Times(1).Return(models.TaskInternalShort{}, errors.New(""))
+	mockTasks.EXPECT().ChangeTask(taskInput).Times(1).Return(models.TaskInternal{}, errors.New(""))
 
 	storage := &storage{
 		tasksStorage: mockTasks,
@@ -1661,7 +2118,7 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 		return
 	}
 }
-
+*/
 func TestStorage_DeleteTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID: 1 }
 
@@ -1683,9 +2140,15 @@ func TestStorage_DeleteTask(t *testing.T) {
 }
 
 func TestStorage_GetTask(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
 	taskInput := models.TaskInput{ TaskID: 1 }
 
-	taskOutside := models.TaskInternalShort{
+	taskOutside := models.TaskInternal{
 		TaskID:      1,
 		Name:        "task",
 		Description: "description",
@@ -1698,9 +2161,36 @@ func TestStorage_GetTask(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(taskOutside, nil)
 
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
 	storage := &storage{
+		db:           db,
 		tasksStorage: mockTasks,
+		tagStorage: tagsStorage,
+		commentStorage: commentsStorage,
+		checklistStorage: checklistsStorage,
+		attachmentStorage: attachmentsStorage,
 	}
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: taskOutside.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"checklistID", "name", "items"}))
+
+	mock.
+		ExpectQuery("SELECT commentID, message, commentOrder, userID FROM comments").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"commentID", "message", "commentOrder", "userID"}))
 
 	task, _, err := storage.GetTask(taskInput)
 	if err != nil {
@@ -1709,6 +2199,228 @@ func TestStorage_GetTask(t *testing.T) {
 	}
 	if !reflect.DeepEqual(task, taskOutside) {
 		t.Errorf("results not match, want \n%v, \nhave \n%v", taskOutside, task)
+		return
+	}
+}
+
+func TestStorage_GetTaskByIDFail(t *testing.T) {
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(models.TaskInternal{}, errors.New(""))
+
+	storage := &storage{
+		tasksStorage: mockTasks,
+	}
+	_, _, err := storage.GetTask(taskInput)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestStorage_GetTaskTagsFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(models.TaskInternal{}, errors.New(""))
+
+	tagsStorage := tagStorage.NewStorage(db)
+
+	storage := &storage{
+		tasksStorage: mockTasks,
+		tagStorage: tagsStorage,
+	}
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(taskInput.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, _, err = storage.GetTask(taskInput)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+
+func TestStorage_GetTaskAssignersFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	taskOutside := models.TaskInternal{
+		TaskID:      1,
+		Name:        "task",
+		Description: "description",
+		Order:       1,
+	}
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(taskOutside, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+
+	storage := &storage{
+		db:           db,
+		tasksStorage: mockTasks,
+		tagStorage: tagsStorage,
+	}
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: taskOutside.TaskID}).Return([]int64{}, errors.New(""))
+
+	_, _, err = storage.GetTask(taskInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+
+func TestStorage_GetTaskChecklistsFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	taskOutside := models.TaskInternal{
+		TaskID:      1,
+		Name:        "task",
+		Description: "description",
+		Order:       1,
+	}
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(taskOutside, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+
+	storage := &storage{
+		db:           db,
+		tasksStorage: mockTasks,
+		tagStorage: tagsStorage,
+		checklistStorage: checklistsStorage,
+	}
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: taskOutside.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(taskOutside.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, _, err = storage.GetTask(taskInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+
+func TestStorage_GetTaskCommentsFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	taskInput := models.TaskInput{ TaskID: 1 }
+
+	taskOutside := models.TaskInternal{
+		TaskID:      1,
+		Name:        "task",
+		Description: "description",
+		Order:       1,
+	}
+
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	mockTasks.EXPECT().GetTaskByID(taskInput).Times(1).Return(taskOutside, nil)
+
+	tagsStorage := tagStorage.NewStorage(db)
+	commentsStorage := commentStorage.NewStorage(db)
+	checklistsStorage := checklistStorage.NewStorage(db)
+	attachmentsStorage := attachmentStorage.NewStorage(db)
+
+	storage := &storage{
+		db:           db,
+		tasksStorage: mockTasks,
+		tagStorage: tagsStorage,
+		commentStorage: commentsStorage,
+		checklistStorage: checklistsStorage,
+		attachmentStorage: attachmentsStorage,
+	}
+
+	mock.
+		ExpectQuery("SELECT DISTINCT").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"T.tagID", "T.name", "T.color"}))
+
+	mockTasks.EXPECT().GetAssigners(models.TaskInput{TaskID: taskOutside.TaskID}).Return([]int64{}, nil)
+
+	mock.
+		ExpectQuery("SELECT checklistID, name, items FROM checklists").
+		WithArgs(taskOutside.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"checklistID", "name", "items"}))
+
+	mock.
+		ExpectQuery("SELECT commentID, message, commentOrder, userID FROM comments").
+		WithArgs(taskOutside.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, _, err = storage.GetTask(taskInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Errorf("expected err")
 		return
 	}
 }

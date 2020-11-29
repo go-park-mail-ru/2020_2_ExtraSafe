@@ -11,9 +11,9 @@ func (s *storage) AssignUser(input models.TaskAssigner) (err error) {
 func (s *storage) DismissUser(input models.TaskAssigner) (err error) {
 	return s.tasksStorage.DismissUser(input)
 }
-func (s *storage) GetAssigners(input models.TaskInput) (assignerIDs []int64, err error){
+/*func (s *storage) GetAssigners(input models.TaskInput) (assignerIDs []int64, err error){
 	return s.tasksStorage.GetAssigners(input)
-}
+}*/
 
 func (s *storage) CreateTag(input models.TagInput) (tag models.TagOutside, err error){
 	return s.tagStorage.CreateTag(input)
@@ -35,14 +35,14 @@ func (s *storage) RemoveTag(input models.TaskTagInput) (err error){
 	return s.tagStorage.RemoveTag(input)
 }
 
-func (s *storage) GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error){
+/*func (s *storage) GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error){
 	return s.tagStorage.GetBoardTags(input)
 }
-
-func (s *storage) GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error){
+*/
+/*func (s *storage) GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error){
 	return s.tagStorage.GetTaskTags(input)
 }
-
+*/
 func (s *storage) CreateComment(input models.CommentInput) (comment models.CommentOutside, err error){
 	return s.commentStorage.CreateComment(input)
 }
@@ -55,10 +55,10 @@ func (s *storage) DeleteComment(input models.CommentInput) (err error){
 	return s.commentStorage.DeleteComment(input)
 }
 
-func (s *storage) GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error){
+/*func (s *storage) GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error){
 	return s.commentStorage.GetCommentsByTask(input)
 }
-
+*/
 func (s *storage) CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error){
 	return s.checklistStorage.CreateChecklist(input)
 }
@@ -71,9 +71,9 @@ func (s *storage) DeleteChecklist(input models.ChecklistInput) (err error){
 	return s.checklistStorage.DeleteChecklist(input)
 }
 
-func (s *storage) GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error){
+/*func (s *storage) GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error){
 	return s.checklistStorage.GetChecklistsByTask(input)
-}
+}*/
 
 func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error) {
 	return s.attachmentStorage.AddAttachment(input)
@@ -83,6 +83,6 @@ func (s *storage) RemoveAttachment(input models.AttachmentInternal) (err error) 
 	return s.attachmentStorage.RemoveAttachment(input)
 }
 
-func (s *storage) GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error) {
+/*func (s *storage) GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error) {
 	return s.attachmentStorage.GetAttachmentsByTask(input)
-}
+}*/

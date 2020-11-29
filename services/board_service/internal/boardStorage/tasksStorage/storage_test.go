@@ -103,7 +103,7 @@ func TestStorage_ChangeTask(t *testing.T) {
 		Order:   2,
 	}
 
-	expectTaskOutside := models.TaskInternalShort{
+	expectTaskOutside := models.TaskInternal{
 		TaskID: 1,
 		Name:   taskInput.Name,
 		Order:  taskInput.Order,
@@ -227,7 +227,7 @@ func TestStorage_GetTaskByID(t *testing.T) {
 
 	taskInput := models.TaskInput{ TaskID:  1}
 
-	expectedTaskOutside := models.TaskInternalShort{
+	expectedTaskOutside := models.TaskInternal{
 		TaskID: 1,
 		Name:   "todo",
 		Description: "just task",

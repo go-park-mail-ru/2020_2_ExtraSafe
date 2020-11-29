@@ -135,10 +135,10 @@ func (mr *MockTasksStorageMockRecorder) GetAssigners(arg0 interface{}) *gomock.C
 }
 
 // GetTaskByID mocks base method
-func (m *MockTasksStorage) GetTaskByID(arg0 models.TaskInput) (models.TaskInternalShort, error) {
+func (m *MockTasksStorage) GetTaskByID(arg0 models.TaskInput) (models.TaskInternal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTaskByID", arg0)
-	ret0, _ := ret[0].(models.TaskInternalShort)
+	ret0, _ := ret[0].(models.TaskInternal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
