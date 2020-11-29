@@ -7,14 +7,9 @@ type Checklist struct {
 	TaskID      int64
 	Name        string
 	Items       json.RawMessage
-	//Items []Item
 }
 
-/*type Item struct {
-	Description string `json:"description"`
-	State bool `json:"state"`
-}
-*/
+//===================================================<-Input
 type ChecklistInput struct {
 	UserID      int64           `json:"-"`
 	ChecklistID int64           `json:"checklistID"`
@@ -23,8 +18,14 @@ type ChecklistInput struct {
 	Items       json.RawMessage `json:"items"`
 }
 
+//===================================================<-Internal
+
+
+//===================================================<-Outside
 type ChecklistOutside struct {
-	ChecklistID int64
-	Name        string
-	Items       json.RawMessage
+	ChecklistID int64           `json:"checklistID"`
+	Name        string          `json:"checklistName"`
+	Items       json.RawMessage `json:"items"`
 }
+
+//===================================================<-Other

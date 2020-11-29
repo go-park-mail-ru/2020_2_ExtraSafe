@@ -11,6 +11,7 @@ type ResponseToken struct {
 	Token  string `json:"token"`
 }
 
+//===================================================<-User
 type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
@@ -29,10 +30,11 @@ type ResponseUserAuth struct {
 	Boards   []BoardOutsideShort `json:"boards"`
 }
 
+//===================================================<-Board
 type ResponseBoardShort struct {
 	Status  int                `json:"status"`
 	BoardID int64             `json:"boardID"`
-	Name    string             `json:"boardName"`  // название доски
+	Name    string             `json:"boardName"`
 	Theme   string             `json:"theme"`
 	Star    bool               `json:"star"`
 }
@@ -40,11 +42,11 @@ type ResponseBoardShort struct {
 type ResponseBoard struct {
 	Status  int                `json:"status"`
 	BoardID int64              `json:"boardID"`
-	Admin   UserOutsideShort   `json:"admin"`     // структура владельца доски
-	Name    string             `json:"boardName"` // название доски
+	Admin   UserOutsideShort   `json:"admin"`
+	Name    string             `json:"boardName"`
 	Theme   string             `json:"theme"`
 	Star    bool               `json:"star"`
-	Users   []UserOutsideShort `json:"users"` // массив с пользователями этой доски
+	Users   []UserOutsideShort `json:"users"`
 	Cards   []CardOutside      `json:"cards"`
 	Tags    []TagOutside       `json:"tags"`
 }
@@ -54,12 +56,27 @@ type ResponseBoards struct {
 	Boards []BoardOutsideShort `json:"boards"`
 }
 
-type ResponseCard struct {
+//===================================================<-Card
+type ResponseCardShort struct {
 	Status int           `json:"status"`
 	CardID int64         `json:"cardID"`
 	Name   string        `json:"cardName"`
-	Order  int64         `json:"order"`
+}
+
+type ResponseCard struct {
+	Status int                `json:"status"`
+	CardID int64              `json:"cardID"`
+	Name   string             `json:"cardName"`
+	Order  int64              `json:"order"`
 	Tasks  []TaskOutsideShort `json:"tasks"`
+}
+
+//===================================================<-Task
+type ResponseTaskSuperShort struct {
+	Status      int                 `json:"status"`
+	TaskID      int64               `json:"taskID"`
+	Name        string              `json:"taskName"`
+	Description string              `json:"description"`
 }
 
 type ResponseTask struct {
@@ -75,6 +92,7 @@ type ResponseTask struct {
 	Attachments []AttachmentOutside `json:"attachments"`
 }
 
+//===================================================<-Tag
 type ResponseTag struct {
 	Status  int    `json:"status"`
 	TagID   int64  `json:"tagID"`
@@ -82,6 +100,7 @@ type ResponseTag struct {
 	TagName string `json:"TagName"`
 }
 
+//===================================================<-Comment
 type ResponseComment struct {
 	Status    int              `json:"status"`
 	CommentID int64            `json:"commentID"`
@@ -90,6 +109,7 @@ type ResponseComment struct {
 	User      UserOutsideShort `json:"user"`
 }
 
+//===================================================<-Checklist
 type ResponseChecklist struct {
 	Status      int             `json:"status"`
 	ChecklistID int64           `json:"checklistID"`
@@ -97,6 +117,7 @@ type ResponseChecklist struct {
 	Items       json.RawMessage `json:"items"`
 }
 
+//===================================================<-Attachment
 type ResponseAttachment struct {
 	Status       int    `json:"status"`
 	AttachmentID int64  `json:"attachmentID"`

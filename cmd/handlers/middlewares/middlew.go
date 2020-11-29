@@ -126,16 +126,27 @@ func (m middlew) Logger(next echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 
-		for i, code := range err.(models.ServeError).Codes {
+		servError, ok := err.(models.ServeError)
+		if ok != true {
 			errLog := m.logger.Error()
-			//TODO - исправить, если ошибка не из микросервиса, нет дескрипшена
-			if code == models.ServerError {
+			errLog.
+				Time("Request time",time.Now()).
+				Str("URL", c.Request().RequestURI).
+				Int("Status", c.Response().Status).
+				Str("Error ", err.Error())
+			errLog.Send()
+			return err
+		}
+
+		for i, code := range servError.Codes {
+			errLog := m.logger.Error()
+			if len(err.(models.ServeError).Descriptions) == 0 {
 				errLog.
 					Time("Request time",time.Now()).
 					Str("URL", c.Request().RequestURI).
 					Int("Status", c.Response().Status).
 					Str("Error code", code).
-					Str("Error ", err.(models.ServeError).Descriptions[i]).
+					Str("Error ", err.Error()).
 					Str("In function", err.(models.ServeError).MethodName)
 				errLog.Send()
 			} else {

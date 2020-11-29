@@ -7,7 +7,7 @@ type Tag struct {
 	Name    string
 }
 
-// create, update, delete
+//===================================================<-Input
 type TagInput struct {
 	UserID  int64  `json:"-"`
 	TaskID  int64  `json:"taskID"`
@@ -17,8 +17,14 @@ type TagInput struct {
 	Name    string `json:"tagName"`
 }
 
+//===================================================<-Internal
+
+
+//===================================================<-Outside
 type TagOutside struct {
-	TagID int64
-	Color string
-	Name  string
+	TagID int64  `json:"tagID"`
+	Color string `json:"color"`
+	Name  string `json:"tagName"`
 }
+
+//===================================================<-Other

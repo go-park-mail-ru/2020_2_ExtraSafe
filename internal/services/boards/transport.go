@@ -16,12 +16,12 @@ type Transport interface {
 
 	CardChangeRead(c echo.Context) (request models.CardInput, err error)
 	CardWrite(card models.CardOutside) (response models.ResponseCard, err error)
-	CardShortWrite(card models.CardOutsideShort) (response models.ResponseCard, err error)
+	CardShortWrite(card models.CardOutsideShort) (response models.ResponseCardShort, err error)
 	CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error)
 
 	TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
 	TaskWrite(task models.TaskOutside) (response models.ResponseTask, err error)
-	TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTask, err error)
+	TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTaskSuperShort, err error)
 	TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
 	TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error)
 
@@ -158,7 +158,7 @@ func (t transport) CardWrite(card models.CardOutside) (response models.ResponseC
 	return response, err
 }
 
-func (t transport) CardShortWrite(card models.CardOutsideShort) (response models.ResponseCard, err error) {
+func (t transport) CardShortWrite(card models.CardOutsideShort) (response models.ResponseCardShort, err error) {
 	response.CardID = card.CardID
 	response.Name = card.Name
 	response.Status = 200
@@ -199,7 +199,7 @@ func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseT
 	return response, err
 }
 
-func (t transport) TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTask, err error) {
+func (t transport) TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTaskSuperShort, err error) {
 	response.TaskID = task.TaskID
 	response.Description = task.Description
 	response.Name = task.Name
