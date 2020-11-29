@@ -100,19 +100,17 @@ func TestStorage_ChangeTask(t *testing.T) {
 		TaskID:  1,
 		Name:    "taskNew",
 		Description: "just updated task",
-		Order:   2,
 	}
 
 	expectTaskOutside := models.TaskInternal{
 		TaskID: 1,
 		Name:   taskInput.Name,
-		Order:  taskInput.Order,
 		Description: taskInput.Description,
 	}
 
 	mock.
 		ExpectExec("UPDATE tasks SET").
-		WithArgs(taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID).
+		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	task, err := storage.ChangeTask(taskInput)
@@ -143,12 +141,11 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 		TaskID:  1,
 		Name:    "taskNew",
 		Description: "just updated task",
-		Order:   2,
 	}
 
 	mock.
 		ExpectExec("UPDATE tasks SET").
-		WithArgs(taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID).
+		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
 		WillReturnError(errors.New("fail update exec"))
 
 	_, err = storage.ChangeTask(taskInput)
@@ -467,6 +464,200 @@ func TestStorage_ChangeTaskOrderFail(t *testing.T) {
 	}
 	if err == nil {
 		t.Error("expected err")
+		return
+	}
+}
+
+func TestStorage_AssignUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.TaskAssigner{
+		UserID:     1,
+		TaskID:     1,
+		AssignerID: 2,
+	}
+
+	mock.
+		ExpectExec("INSERT INTO task_members").
+		WithArgs(input.TaskID, input.AssignerID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = storage.AssignUser(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_AssignUserFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	input := models.TaskAssigner{
+		UserID:     1,
+		TaskID:     1,
+		AssignerID: 2,
+	}
+
+	mock.
+		ExpectExec("INSERT INTO task_members").
+		WithArgs(input.TaskID, input.AssignerID).
+		WillReturnError(errors.New(""))
+
+	err = storage.AssignUser(input)
+	if err == nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_DismissUser(t *testing.T) {
+	input := models.TaskAssigner{
+		UserID:     1,
+		TaskID:     1,
+		AssignerID: 2,
+	}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectExec("DELETE FROM task_members").
+		WithArgs(input.TaskID, input.AssignerID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = storage.DismissUser(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_DismissUserFail(t *testing.T) {
+	input := models.TaskAssigner{
+		UserID:     1,
+		TaskID:     1,
+		AssignerID: 2,
+	}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectExec("DELETE FROM task_members").
+		WithArgs(input.TaskID, input.AssignerID).
+		WillReturnError(errors.New(""))
+
+	err = storage.DismissUser(input)
+	if err == nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetAssigners(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT userID FROM task_members").
+		WithArgs(input.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(1).AddRow(2))
+
+	expect := []int64{1, 2}
+	assigns, err := storage.GetAssigners(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(assigns, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, assigns)
+		return
+	}
+}
+
+func TestStorage_GetAssignersQueryFail(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT userID FROM task_members").
+		WithArgs(input.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetAssigners(input)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetAssignersScanFail(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT userID FROM task_members").
+		WithArgs(input.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"userID", "taskID"}).AddRow(1, 1))
+
+	_, err = storage.GetAssigners(input)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
 	}
 }
