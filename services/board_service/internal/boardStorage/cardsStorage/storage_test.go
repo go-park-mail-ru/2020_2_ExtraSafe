@@ -96,22 +96,18 @@ func TestStorage_ChangeCard(t *testing.T) {
 	storage := &storage{db: db}
 
 	cardInput := models.CardInput{
-		UserID:  1,
 		CardID:  1,
-		BoardID: 1,
 		Name:    "Changed todo",
-		Order:   2,
 	}
 
 	expectCardOutside := models.CardInternal{
 		CardID: 1,
 		Name:   cardInput.Name,
-		Order:  cardInput.Order,
 	}
 
 	mock.
 		ExpectExec("UPDATE cards SET").
-		WithArgs(cardInput.Name, cardInput.Order, cardInput.CardID).
+		WithArgs(cardInput.Name, cardInput.CardID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	card, err := storage.ChangeCard(cardInput)
@@ -139,16 +135,13 @@ func TestStorage_ChangeCardFail(t *testing.T) {
 	storage := &storage{db: db}
 
 	cardInput := models.CardInput{
-		UserID:  1,
 		CardID:  1,
-		BoardID: 1,
 		Name:    "Changed todo",
-		Order:   2,
 	}
 
 	mock.
 		ExpectExec("UPDATE cards SET").
-		WithArgs(cardInput.Name, cardInput.Order, cardInput.CardID).
+		WithArgs(cardInput.Name, cardInput.CardID).
 		WillReturnError(errors.New("update exec error"))
 
 	_, err = storage.ChangeCard(cardInput)

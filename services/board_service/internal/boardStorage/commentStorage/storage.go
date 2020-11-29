@@ -37,15 +37,13 @@ func (s *storage) CreateComment(input models.CommentInput) (comment models.Comme
 }
 
 func (s *storage) UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error) {
-	_, err = s.db.Exec("UPDATE comments SET message = $1", input.Message)
+	_, err = s.db.Exec("UPDATE comments SET message = $1 WHERE commentID = $2", input.Message, input.CommentID)
 	if err!= nil {
 		return comment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "UpdateComment"}
 	}
 	comment.Message = input.Message
-	comment.Order = input.Order
 	comment.CommentID = input.CommentID
-
 	return
 }
 
