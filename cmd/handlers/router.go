@@ -19,10 +19,8 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/reg/", middle.AuthCookieSession(auth.Registration))
 
 	e.GET("/profile/", middle.CookieSession(profile.Profile))
-	e.GET("/accounts/", middle.CookieSession(profile.Accounts))
 	e.GET("/boards/", middle.CookieSession(profile.Boards))
 	e.POST("/profile/", middle.CookieSession(middle.CSRFToken(profile.ProfileChange)))
-	e.POST("/accounts/", middle.CookieSession(middle.CSRFToken(profile.AccountsChange)))
 	e.POST("/password/", middle.CookieSession(middle.CSRFToken(profile.PasswordChange)))
 
 	e.Static("/avatar", "../")

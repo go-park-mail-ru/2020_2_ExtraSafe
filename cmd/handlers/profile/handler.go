@@ -8,10 +8,8 @@ import (
 
 type Handler interface {
 	Profile(c echo.Context) error
-	Accounts(c echo.Context) error
 	Boards(c echo.Context) error
 	ProfileChange(c echo.Context) error
-	AccountsChange(c echo.Context) error
 	PasswordChange(c echo.Context) error
 }
 
@@ -47,33 +45,6 @@ func (h *handler) Profile(c echo.Context) error {
 	}
 
 	response, err := h.profileTransport.ProfileWrite(user)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
-	return c.JSON(http.StatusOK, response)
-}
-
-func (h *handler) Accounts(c echo.Context) error {
-	userInput, err := h.profileTransport.ProfileRead(c)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
-
-	user, err := h.profileService.Accounts(userInput)
-	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
-	}
-
-	response, err := h.profileTransport.AccountsWrite(user)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -128,34 +99,6 @@ func (h *handler) ProfileChange(c echo.Context) error {
 	}
 
 	response, err := h.profileTransport.ProfileWrite(user)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
-func (h *handler) AccountsChange(c echo.Context) error {
-	userInput, err := h.profileTransport.AccountsChangeRead(c)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
-
-	user, err := h.profileService.AccountsChange(userInput)
-	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
-	}
-
-	response, err := h.profileTransport.AccountsWrite(user)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err

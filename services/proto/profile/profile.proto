@@ -8,27 +8,7 @@ message UserOutside {
   string Email = 1;
   string Username =  2;
   string FullName = 3;
-  UserLinks Links = 4;
-  string Avatar = 5;
-}
-
-message UserLinks {
-  string Instagram = 1;
-  string Github = 2;
-  string Bitbucket = 3;
-  string Vk = 4;
-  string Facebook = 5;
-  string Telegram = 6;
-}
-
-message UserInputLinks {
-  int64 ID = 1;
-  string Instagram = 2;
-  string Github = 3;
-  string Bitbucket = 4;
-  string Vk = 5;
-  string Facebook = 6;
-  string Telegram = 7;
+  string Avatar = 4;
 }
 
 /*message File {
@@ -79,9 +59,8 @@ message UserBoardsOutside {
   string Email = 1;
   string Username = 2;
   string FullName = 3;
-  protoProfile.UserLinks Links = 4;
-  string Avatar = 5;
-  repeated BoardOutsideShort Boards = 6;
+  string Avatar = 4;
+  repeated BoardOutsideShort Boards = 5;
 }
 
 message UserOutsideShort {
@@ -108,10 +87,8 @@ service Profile {
   rpc CheckUser (UserInputLogin) returns (UserID) {}
   rpc CreateUser (UserInputReg) returns (UserID) {}
   rpc Profile (UserID) returns (UserOutside) {}
-  rpc Accounts (UserID) returns (UserOutside) {}
   rpc Boards (UserID) returns (BoardsOutsideShort) {}
   rpc ProfileChange (UserInputProfile) returns (UserOutside) {}
-  rpc AccountsChange (UserInputLinks) returns (UserOutside) {}
   rpc PasswordChange (UserInputPassword) returns (UserOutside) {}
   rpc GetUsersByIDs (UserIDS) returns (UsersOutsideShort) {}
   rpc GetUserByUsername (UserName) returns (UserOutsideShort) {}

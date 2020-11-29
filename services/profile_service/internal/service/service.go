@@ -69,36 +69,6 @@ func (s *service) Profile(_ context.Context, input *protoProfile.UserID) (output
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	/*lincks := &protoProfile.UserLinks{
-		Instagram: user.Links.Instagram,
-		Github:    user.Links.Github,
-		Bitbucket: user.Links.Bitbucket,
-		Vk:        user.Links.Vk,
-		Facebook:  user.Links.Facebook,
-	}*/
-
-	output = &protoProfile.UserOutside{
-		Email:    user.Email,
-		Username: user.Username,
-		FullName: user.FullName,
-		//Links:    lincks,
-		Avatar:   user.Avatar,
-	}
-
-	return output, nil
-}
-
-func (s *service) Accounts(_ context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error) {
-	userInput := models.UserInput{
-		ID: input.ID,
-	}
-
-	user, err := s.userStorage.GetUserAccounts(userInput)
-	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
-	}
-
-	// TODO пропущены ссылки
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
@@ -158,54 +128,10 @@ func (s *service) ProfileChange(_ context.Context, input *protoProfile.UserInput
 			Descriptions: multiErrors.Descriptions, MethodName: "ProfileChange"}, ServiceName)
 	}
 
-	/*links := &protoProfile.UserLinks{
-		Instagram: user.Links.Instagram,
-		Github:    user.Links.Github,
-		Bitbucket: user.Links.Bitbucket,
-		Vk:        user.Links.Vk,
-		Facebook:  user.Links.Facebook,
-	}*/
-
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		//Links: links,
-		Avatar:   user.Avatar,
-	}
-
-	return output, nil
-}
-
-func (s *service) AccountsChange(_ context.Context, input *protoProfile.UserInputLinks) (output *protoProfile.UserOutside, err error) {
-	userInput := models.UserInputLinks{
-		ID:        input.ID,
-		Telegram:  "",
-		Instagram: input.Instagram,
-		Github:    input.Github,
-		Bitbucket: input.Bitbucket,
-		Vk:        input.Vk,
-		Facebook:  input.Facebook,
-	}
-
-	user, err := s.userStorage.ChangeUserAccounts(userInput)
-	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
-	}
-
-	/*links := &protoProfile.UserLinks{
-		Instagram: user.Links.Instagram,
-		Github:    user.Links.Github,
-		Bitbucket: user.Links.Bitbucket,
-		Vk:        user.Links.Vk,
-		Facebook:  user.Links.Facebook,
-	}*/
-
-	output = &protoProfile.UserOutside{
-		Email:    user.Email,
-		Username: user.Username,
-		FullName: user.FullName,
-		//Links: links,
 		Avatar:   user.Avatar,
 	}
 
@@ -224,19 +150,10 @@ func (s *service) PasswordChange(_ context.Context, input *protoProfile.UserInpu
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
-	/*links := &protoProfile.UserLinks{
-		Instagram: user.Links.Instagram,
-		Github:    user.Links.Github,
-		Bitbucket: user.Links.Bitbucket,
-		Vk:        user.Links.Vk,
-		Facebook:  user.Links.Facebook,
-	}*/
-
 	output = &protoProfile.UserOutside{
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		//Links: links,
 		Avatar:   user.Avatar,
 	}
 

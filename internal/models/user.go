@@ -5,7 +5,6 @@ type UserOutside struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	FullName string `json:"fullName"`
-	Links    *UserLinks
 	Avatar   string `json:"avatar"`
 }
 
@@ -29,33 +28,13 @@ type UserBoardsOutside struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	FullName string `json:"fullName"`
-	Links    *UserLinks
 	Avatar   string `json:"avatar"`
 	Boards   []BoardOutsideShort `json:"boards"`
-}
-
-type UserLinks struct {
-	Telegram  string `json:"telegram"`
-	Instagram string `json:"instagram"`
-	Github    string `json:"github"`
-	Bitbucket string `json:"bitbucket"`
-	Vk        string `json:"vkontakte"`
-	Facebook  string `json:"facebook"`
 }
 
 type UserAvatar struct {
 	ID int64
 	Avatar string
-}
-
-type UserInputLinks struct {
-	ID        int64 `json:"-"`
-	Telegram  string `json:"telegram" valid:"telegramValid~611"`
-	Instagram string `json:"instagram" valid:"instagramValid~612"`
-	Github    string `json:"github" valid:"githubValid~613"`
-	Bitbucket string `json:"bitbucket" valid:"bitbucketValid~614"`
-	Vk        string `json:"vkontakte" valid:"vkValid~615"`
-	Facebook  string `json:"facebook" valid:"facebookValid~616"`
 }
 
 type UserInput struct {
@@ -99,7 +78,6 @@ type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	FullName string `json:"fullName"`
-	Links    *UserLinks
 	Avatar   string `json:"avatar"`
 	Boards   []BoardInternal
 }

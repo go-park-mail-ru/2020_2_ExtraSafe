@@ -69,17 +69,7 @@ func (s *service) Auth(request models.UserInput) (response models.UserBoardsOuts
 		})
 	}
 
-	/*links := &models.UserLinks{
-		Telegram:  user.Links.Telegram,
-		Instagram: user.Links.Instagram,
-		Github:    user.Links.Github,
-		Bitbucket: user.Links.Bitbucket,
-		Vk:        user.Links.Vk,
-		Facebook:  user.Links.Facebook,
-	}*/
-
 	response.Boards = boards
-	//response.Links = links
 	response.Avatar = user.Avatar
 	response.FullName = user.FullName
 	response.Email = user.Email

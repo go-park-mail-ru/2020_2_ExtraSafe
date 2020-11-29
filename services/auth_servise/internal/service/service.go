@@ -30,7 +30,7 @@ func NewService(authStorage authStorage.Storage , profileService protoProfile.Pr
 }
 
 func (s *service) Auth(ctx context.Context, input *protoProfile.UserID) (output *protoProfile.UserBoardsOutside, err error) {
-	user, err := s.profileService.Accounts(ctx, input) // также берет профиль
+	user, err := s.profileService.Profile(ctx, input)
 	if err != nil {
 		return output, err
 	}
@@ -44,7 +44,6 @@ func (s *service) Auth(ctx context.Context, input *protoProfile.UserID) (output 
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
-		Links:    user.Links,
 		Avatar:   user.Avatar,
 		Boards:   boards.Boards,
 	}
