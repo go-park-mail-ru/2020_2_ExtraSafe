@@ -411,6 +411,15 @@ func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (outpu
 		})
 	}
 
+	attachments := make([]*protoBoard.AttachmentOutside, 0)
+	for _, attachment := range task.Attachments{
+		attachments = append(attachments, &protoBoard.AttachmentOutside{
+			AttachmentID: attachment.AttachmentID,
+			Filename:   attachment.Filename,
+			Filepath:   attachment.Filepath,
+		})
+	}
+
 	output = &protoBoard.TaskOutside{
 		TaskID: task.TaskID,
 		Name:   task.Name,
@@ -420,6 +429,7 @@ func (s *service) GetTask(c context.Context, input *protoBoard.TaskInput) (outpu
 		Users: getUsersForTask(task.Users, taskAssigners),
 		Checklists: convertChecklists(task.Checklists),
 		Comments: comments,
+		Attachments: attachments,
 	}
 
 	return output, nil

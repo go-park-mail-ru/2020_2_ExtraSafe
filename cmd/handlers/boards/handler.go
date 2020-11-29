@@ -762,7 +762,7 @@ func (h *handler) ChecklistDelete(c echo.Context) error {
 }
 
 func (h *handler) AttachmentCreate(c echo.Context) error {
-	userInput, err := h.boardsTransport.AttachmentRead(c)
+	userInput, err := h.boardsTransport.AttachmentAddRead(c)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err
@@ -790,7 +790,7 @@ func (h *handler) AttachmentCreate(c echo.Context) error {
 }
 
 func (h *handler) AttachmentDelete(c echo.Context) error {
-	userInput, err := h.boardsTransport.AttachmentRead(c)
+	userInput, err := h.boardsTransport.AttachmentDeleteRead(c)
 	if err != nil {
 		if err := h.errorWorker.TransportError(c); err != nil {
 			return err

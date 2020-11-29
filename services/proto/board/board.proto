@@ -96,6 +96,7 @@ message TaskInternal {
   repeated int64 Users = 6;
   repeated ChecklistOutside Checklists = 7;
   repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
 }
 
 message TaskInternalShort {
@@ -127,6 +128,7 @@ message TaskOutside {
   repeated protoProfile.UserOutsideShort Users = 6;
   repeated ChecklistOutside Checklists = 7;
   repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
 }
 
 message TaskOutsideShort {

@@ -128,6 +128,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 				Order:       task.Order,
 				Users:       convertUsers(task.Users),
 				Tags: 	   	 convertTags(task.Tags),
+				Checklists:  convertChecklists(task.Checklists),
 			})
 		}
 		board.Cards = append(board.Cards, models.CardOutside{
@@ -472,15 +473,6 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 		return models.TaskOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	checklists := make([]models.ChecklistOutside, 0)
-	for _, checklist := range output.Checklists{
-		checklists = append(checklists, models.ChecklistOutside{
-			ChecklistID: checklist.ChecklistID,
-			Name:   checklist.Name,
-			Items:  checklist.Items,
-		})
-	}
-
 	comments := make([]models.CommentOutside, 0)
 	for _, comment := range output.Comments{
 		comments = append(comments, models.CommentOutside{
@@ -496,16 +488,38 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 		})
 	}
 
+	attachments := make([]models.AttachmentOutside, 0)
+	for _, attachment := range task.Attachments{
+		attachments = append(attachments, models.AttachmentOutside{
+			AttachmentID: attachment.AttachmentID,
+			Filename:   attachment.Filename,
+			Filepath:   attachment.Filepath,
+		})
+	}
+
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
 	task.Order = output.Order
 	task.Users = convertUsers(output.Users)
-	task.Checklists = checklists
+	task.Checklists = convertChecklists(output.Checklists)
 	task.Tags = convertTags(output.Tags)
 	task.Comments = comments
+	task.Attachments = attachments
 
 	return task, nil
+}
+
+func convertChecklists(checklists []*protoBoard.ChecklistOutside) []models.ChecklistOutside {
+	output := make([]models.ChecklistOutside, 0)
+	for _, checklist := range checklists{
+		output = append(output, models.ChecklistOutside{
+			ChecklistID: checklist.ChecklistID,
+			Name:   checklist.Name,
+			Items:  checklist.Items,
+		})
+	}
+	return output
 }
 
 func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutside, err error) {

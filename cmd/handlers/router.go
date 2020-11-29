@@ -26,6 +26,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/password/", middle.CookieSession(middle.CSRFToken(profile.PasswordChange)))
 
 	e.Static("/avatar", "../")
+	e.Static("/files", "../")
 
 	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardAdminPermission(board.Board)))
 	e.POST("/board/", middle.CookieSession(middle.CSRFToken(board.BoardCreate)))

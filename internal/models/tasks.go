@@ -27,6 +27,7 @@ type TaskOutside struct {
 	Users 		[]UserOutsideShort
 	Checklists  []ChecklistOutside
 	Comments 	[]CommentOutside
+	Attachments []AttachmentOutside
 }
 
 type TaskOutsideShort struct {
@@ -48,6 +49,7 @@ type TaskInternal struct {
 	Users 		[]int64
 	Checklists  []ChecklistOutside
 	Comments 	[]CommentOutside
+	Attachments []AttachmentOutside
 }
 
 type TaskInput struct {

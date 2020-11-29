@@ -76,15 +76,16 @@ type ResponseCard struct {
 }
 
 type ResponseTask struct {
-	Status      int                `json:"status"`
-	TaskID      int64              `json:"taskID"`
-	Name        string             `json:"taskName"`
-	Description string             `json:"description"`
-	Order       int64              `json:"order"`
-	Tags        []TagOutside       `json:"tags"`
-	Users       []UserOutsideShort `json:"users"`
-	Checklists  []ChecklistOutside `json:"checklists"`
-	Comments    []CommentOutside   `json:"comments"`
+	Status      int                 `json:"status"`
+	TaskID      int64               `json:"taskID"`
+	Name        string              `json:"taskName"`
+	Description string              `json:"description"`
+	Order       int64               `json:"order"`
+	Tags        []TagOutside        `json:"tags"`
+	Users       []UserOutsideShort  `json:"users"`
+	Checklists  []ChecklistOutside  `json:"checklists"`
+	Comments    []CommentOutside    `json:"comments"`
+	Attachments []AttachmentOutside `json:"attachments"`
 }
 
 type ResponseTag struct {

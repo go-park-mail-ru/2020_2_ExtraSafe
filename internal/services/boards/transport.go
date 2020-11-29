@@ -33,7 +33,8 @@ type Transport interface {
 	ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
 	ChecklistWrite(card models.ChecklistOutside) (response models.ResponseChecklist, err error)
 
-	AttachmentRead(c echo.Context) (request models.AttachmentInput, err error)
+	AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error)
+	AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error)
 	AttachmentWrite(card models.AttachmentOutside) (response models.ResponseAttachment, err error)
 }
 
@@ -184,6 +185,7 @@ func (t transport) TaskWrite(task models.TaskOutside) (response models.ResponseT
 	response.Comments = task.Comments
 	response.Checklists = task.Checklists
 	response.Users = task.Users
+	response.Attachments = task.Attachments
 	response.Status = 200
 	return response, err
 }
@@ -294,7 +296,7 @@ func (t transport) ChecklistWrite(checklist models.ChecklistOutside) (response m
 	return response, nil
 }
 
-func (t transport) AttachmentRead(c echo.Context) (request models.AttachmentInput, err error) {
+func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error) {
 	formParams, err := c.FormParams()
 	if err != nil {
 		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -304,7 +306,6 @@ func (t transport) AttachmentRead(c echo.Context) (request models.AttachmentInpu
 	userInput := new(models.AttachmentInput)
 	userInput.Filename = formParams.Get("fileName")
 	userInput.TaskID, _ = strconv.ParseInt(formParams.Get("taskID"), 10, 64)
-	userInput.AttachmentID, _ = strconv.ParseInt(formParams.Get("attachmentID"), 10, 64)
 
 	//TODO какая то фигня
 	file, err := c.FormFile("file")
@@ -314,6 +315,19 @@ func (t transport) AttachmentRead(c echo.Context) (request models.AttachmentInpu
 		byteContainer = make([]byte, file.Size)
 		byteContainer, _ = ioutil.ReadAll(fileContent)
 		userInput.File = byteContainer
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error) {
+	userInput := new(models.AttachmentInput)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "ChecklistChangeRead"}
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
