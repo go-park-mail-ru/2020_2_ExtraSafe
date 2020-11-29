@@ -193,12 +193,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 				return models.BoardInternal{}, err
 			}
 			tasks[i].Checklists = append(tasks[i].Checklists, checklists...)
-
-		/*	attachments, err := s.attachmentStorage.GetAttachmentsByTask(taskInput)
-			if err != nil {
-				return models.BoardInternal{}, err
-			}
-			tasks[i] = append(tasks[i].Checklists, checklists...)*/
 		}
 
 		card.Tasks = append(card.Tasks, tasks...)
@@ -457,6 +451,13 @@ func (s *storage) GetTask(taskInput models.TaskInput) (models.TaskInternal, []in
 		return models.TaskInternal{}, nil, err
 	}
 	task.Comments = append(task.Comments, comments...)
+
+	/*attachments, err := s.attachmentStorage.GetAttachmentsByTask(taskInput)
+	if err != nil {
+		return models.TaskInternal{}, nil, err
+	}
+	task. = append(task.Comments, comments...)*/
+
 
 	return task, userIDs, nil
 }
