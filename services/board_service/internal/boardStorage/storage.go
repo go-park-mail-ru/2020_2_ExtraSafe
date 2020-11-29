@@ -393,7 +393,8 @@ func (s *storage) checkBoardAdminPermission(userID int64, boardID int64) (flag b
 
 func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bool, err error) {
 	var ID int64
-	err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
+	err = s.db.QueryRow("SELECT boardID FROM boards B LEFT OUTER JOIN board_members M ON M.boardID = B.boardID WHERE B.boardID = $1 AND (M.userID = $2 OR B.adminID = $2)", boardID, userID).Scan(&ID)
+	//err = s.db.QueryRow("SELECT boardID FROM board_members WHERE boardID = $1 AND userID = $2", boardID, userID).Scan(&ID)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
