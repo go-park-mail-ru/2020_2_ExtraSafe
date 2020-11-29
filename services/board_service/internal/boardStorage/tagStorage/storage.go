@@ -46,6 +46,7 @@ func (s *storage) UpdateTag(input models.TagInput) (tag models.TagOutside, err e
 			MethodName: "UpdateTag"}
 	}
 
+	tag.TagID = input.TagID
 	tag.Color = input.Color
 	tag.Name = input.Name
 	return
