@@ -193,6 +193,7 @@ func (s *service) GetUserByUsername(_ context.Context, input *protoProfile.UserN
 	}
 
 	output = &protoProfile.UserOutsideShort{
+		ID: user.ID,
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,
