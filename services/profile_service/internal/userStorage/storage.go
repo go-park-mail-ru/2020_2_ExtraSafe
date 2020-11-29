@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"golang.org/x/crypto/argon2"
-	"reflect"
 )
 
 type Storage interface {
@@ -15,7 +14,6 @@ type Storage interface {
 	CreateUser(userInput models.UserInputReg) (int64, models.UserOutside, error)
 
 	GetUserProfile(userInput models.UserInput) (models.UserOutside, error)
-	GetUserAccounts(userInput models.UserInput) (models.UserOutside, error)
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
 
 	GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
@@ -23,7 +21,6 @@ type Storage interface {
 	//GetUserByID(userID int64) (models.UserOutsideShort, error)
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
-	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
 	CheckExistingUser(email string, username string) (errors models.MultiErrors)
@@ -60,7 +57,6 @@ func (s *storage) CheckUser(userInput models.UserInputLogin) (int64, models.User
 
 	if checkPass(pass, userInput.Password) {
 		user.Email = userInput.Email
-		user.Links = &models.UserLinks{}
 		return userID, user, nil
 	}
 
@@ -98,7 +94,6 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 		Email:    userInput.Email,
 		Username: userInput.Username,
 		FullName: "",
-		Links:    &models.UserLinks{},
 		Avatar:   "default/default_avatar.png",
 	}
 
@@ -118,7 +113,6 @@ func (s *storage) CheckExistingUser(email string, username string) (multiErrors 
 		multiErrors.Descriptions = append(multiErrors.Descriptions, "Username is already exist")
 	}
 
-	fmt.Println(err)
 	return multiErrors
 }
 
@@ -137,12 +131,11 @@ func (s *storage) checkExistingUserOnUpdate(email string, username string, userI
 		multiErrors.Descriptions = append(multiErrors.Descriptions, "Username is already exist")
 	}
 
-	fmt.Println(err)
 	return multiErrors
 }
 
 func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside, error) {
-	user := models.UserOutside{Links: &models.UserLinks{}}
+	user := models.UserOutside{}
 
 	err := s.db.QueryRow("SELECT email, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
 		Scan(&user.Email, &user.Username, &user.FullName, &user.Avatar)
@@ -159,35 +152,6 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserProfile"}
 }
 
-func (s *storage) GetUserAccounts(userInput models.UserInput) (models.UserOutside, error) {
-	user, err := s.GetUserProfile(userInput)
-	if err != nil {
-		return models.UserOutside{}, err
-	}
-
-	rows, err := s.db.Query("SELECT networkName, link FROM social_links WHERE userID = $1", userInput.ID)
-	if err != nil {
-		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-			MethodName: "GetUserAccounts"}
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var networkName, link string
-
-		err = rows.Scan(&networkName, &link)
-		if err != nil {
-			return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
-				MethodName: "GetUserAccounts"}
-		}
-
-		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkName).SetString(link)
-	}
-
-	return user, nil
-}
-
-
 func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error) {
 	user := models.UserAvatar{}
 
@@ -199,7 +163,6 @@ func (s *storage) GetUserAvatar(userInput models.UserInput) (models.UserAvatar, 
 		return user, nil
 	}
 
-	fmt.Println(err)
 	return user, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetUserAvatar"}
 }
 
@@ -224,36 +187,6 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 		Email : userInput.Email,
 		FullName : userInput.FullName,
 		Avatar : userAvatar.Avatar,
-	}
-
-	return user, nil
-}
-
-func (s *storage) ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error) {
-	user, err := s.GetUserAccounts(models.UserInput{ ID : userInput.ID })
-	if err != nil {
-		fmt.Println(err)
-		return models.UserOutside{}, err
-	}
-
-	networkNames := []string{"", "Telegram", "Instagram", "Github", "Bitbucket", "Vk", "Facebook"}
-
-	input := reflect.ValueOf(userInput)
-	for i := 1; i < input.NumField(); i++ {
-		inputLink := input.Field(i).Interface().(string)
-		if  inputLink == reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() {
-			continue
-		}
-
-		if reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).String() == "" {
-			_, err = s.db.Exec("INSERT INTO social_links (userID, networkName, link) VALUES ($1, $2, $3)", userInput.ID, networkNames[i], inputLink)
-		} else if inputLink == "" {
-			_, err = s.db.Exec("DELETE FROM social_links WHERE userID = $1 AND networkName = $2", userInput.ID, networkNames[i])
-		} else {
-			_, err = s.db.Exec("UPDATE social_links SET link = $1 WHERE userID = $2 AND networkName = $3", inputLink, userInput.ID, networkNames[i])
-		}
-
-		reflect.Indirect(reflect.ValueOf(user.Links)).FieldByName(networkNames[i]).SetString(inputLink)
 	}
 
 	return user, nil
@@ -287,7 +220,7 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 }
 
 func (s *storage) GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error) {
-	user := models.UserOutside{Links: &models.UserLinks{}}
+	user := models.UserOutside{}
 	var password []byte
 
 	err := s.db.QueryRow("SELECT email, password, username, fullname, avatar FROM users WHERE userID = $1", userInput.ID).
@@ -309,7 +242,6 @@ func (s *storage) GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, er
 			Scan(&user.ID, &user.Email, &user.Username, &user.FullName, &user.Avatar)
 
 		if err != nil {
-			fmt.Println(err)
 			return []models.UserOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetUsersByIDs"}
 		}

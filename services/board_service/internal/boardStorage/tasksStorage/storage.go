@@ -54,6 +54,7 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalSho
 }
 
 func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error) {
+	//FIXME оставить только описание и имя!!!!!!!!
 	_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2, tasksOrder = $3 WHERE taskID = $4",
 								taskInput.Name, taskInput.Description, taskInput.Order, taskInput.TaskID)
 	if err != nil {

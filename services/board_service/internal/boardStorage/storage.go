@@ -11,8 +11,6 @@ import (
 )
 
 type Storage interface {
-	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
-
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
@@ -35,6 +33,7 @@ type Storage interface {
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
 	GetCard(cardInput models.CardInput) (models.CardInternal, error)
 	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
+	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
@@ -43,29 +42,23 @@ type Storage interface {
 
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
-//	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
 
 	CreateTag(input models.TagInput) (tag models.TagOutside, err error)
 	UpdateTag(input models.TagInput) (tag models.TagOutside, err error)
 	DeleteTag(input models.TagInput) (err error)
 	AddTag(input models.TaskTagInput) (err error)
 	RemoveTag(input models.TaskTagInput) (err error)
-//	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
-//	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
 
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	DeleteComment(input models.CommentInput) (err error)
-//	GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error)
 
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	DeleteChecklist(input models.ChecklistInput) (err error)
-//	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
 
 	AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
 	RemoveAttachment(input models.AttachmentInternal) (err error)
-//	GetAttachmentsByTask(input models.TaskInput) (attachments []models.AttachmentOutside, err error)
 }
 
 type storage struct {
@@ -467,6 +460,7 @@ func (s *storage) AddUser(input models.BoardMember) (err error) {
 	}
 	return
 }
+
 func (s *storage) RemoveUser(input models.BoardMember) (err error) {
 	_, err = s.db.Exec("DELETE FROM board_members WHERE boardID = $1 AND userID = $2", input.BoardID, input.MemberID)
 	if err != nil {
@@ -531,7 +525,7 @@ func (s *storage) CheckCardPermission(userID int64, cardID int64) (err error) {
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
 								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
-								"WHERE (B.adminID = $1 OR  M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
+								"WHERE (B.adminID = $1 OR M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
@@ -551,7 +545,7 @@ func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
 								"JOIN cards C on C.boardID = B.boardID " +
 								"JOIN tasks T on T.cardID = C.cardID " +
 								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
-								"WHERE (B.adminID = $1 OR  M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
+								"WHERE (B.adminID = $1 OR M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}

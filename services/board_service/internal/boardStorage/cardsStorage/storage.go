@@ -48,6 +48,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
+	//FIXME убрать изменение порядка карточки!! (оставить только имя)
 	_, err := s.db.Exec("UPDATE cards SET cardName = $1, cardOrder = $2 WHERE cardID = $3", cardInput.Name, cardInput.Order, cardInput.CardID)
 	if err != nil {
 		fmt.Println(err)
