@@ -55,7 +55,6 @@ func (t transport)AuthWrite(user models.UserBoardsOutside, token string) (respon
 	response.Username = user.Username
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
-	//response.Links = *user.Links
 	response.Boards = user.Boards
 	return response, err
 }
