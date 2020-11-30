@@ -58,7 +58,7 @@ type UserOutside struct {
 }
 
 type UserOutsideShort struct {
-	ID       int64
+	ID       int64  `json:"-"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	FullName string `json:"fullName"`

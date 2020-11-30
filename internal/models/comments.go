@@ -13,8 +13,8 @@ type Comment struct {
 type CommentInput struct {
 	CommentID int64  `json:"commentID"`
 	TaskID    int64  `json:"taskID"`
-	Message   string `json:"message"`
-	Order     int64  `json:"order"`
+	Message   string `json:"commentMessage"`
+	Order     int64  `json:"commentOrder"`
 	UserID    int64  `json:"-"`
 }
 
@@ -29,9 +29,9 @@ type CommentInternal struct {
 //===================================================<-Outside
 type CommentOutside struct {
 	CommentID int64            `json:"commentID"`
-	Message   string           `json:"message"`
-	Order     int64            `json:"order"`
-	User      UserOutsideShort `json:"user"`
+	Message   string           `json:"commentMessage"`
+	Order     int64            `json:"commentOrder"`
+	User      UserOutsideShort `json:"commentAuthor"`
 }
 
 //===================================================<-Other

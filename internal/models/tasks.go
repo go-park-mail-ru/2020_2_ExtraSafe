@@ -15,18 +15,18 @@ type TaskInput struct {
 	TaskID      int64  `json:"taskID"`
 	CardID      int64  `json:"cardID"`
 	Name        string `json:"taskName"`
-	Description string `json:"description"`
-	Order       int64  `json:"order"`
+	Description string `json:"taskDescription"`
+	Order       int64  `json:"taskOrder"`
 }
 
 type TaskOrder struct {
 	TaskID int64 `json:"taskID"`
-	Order  int64 `json:"order"`
+	Order  int64 `json:"taskOrder"`
 }
 
 type TasksOrder struct {
 	CardID int64       `json:"cardID"`
-	Tasks  []TaskOrder `json:"tasks"`
+	Tasks  []TaskOrder `json:"cardTasks"`
 }
 
 type TasksOrderInput struct {
@@ -43,7 +43,7 @@ type TaskTagInput struct {
 type TaskAssignerInput struct {
 	UserID       int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
-	AssignerName string `json:"assignerName"`
+	AssignerName string `json:"assignerUsername"`
 }
 
 //===================================================<-Internal
@@ -73,29 +73,29 @@ type TaskInternal struct {
 type TaskOutside struct {
 	TaskID      int64               `json:"taskID"`
 	Name        string              `json:"taskName"`
-	Description string              `json:"description"`
-	Order       int64               `json:"order"`
-	Tags        []TagOutside        `json:"tags"`
-	Users       []UserOutsideShort  `json:"users"`
-	Checklists  []ChecklistOutside  `json:"checklists"`
-	Comments    []CommentOutside    `json:"comments"`
-	Attachments []AttachmentOutside `json:"attachments"`
+	Description string              `json:"taskDescription"`
+	Order       int64               `json:"taskOrder"`
+	Tags        []TagOutside        `json:"taskTags"`
+	Users       []UserOutsideShort  `json:"taskAssigners"`
+	Checklists  []ChecklistOutside  `json:"taskChecklists"`
+	Comments    []CommentOutside    `json:"taskComments"`
+	Attachments []AttachmentOutside `json:"taskAttachments"`
 }
 
 type TaskOutsideShort struct {
 	TaskID      int64              `json:"taskID"`
 	Name        string             `json:"taskName"`
-	Description string             `json:"description"`
-	Order       int64              `json:"order"`
-	Tags        []TagOutside       `json:"tags"`
-	Users       []UserOutsideShort `json:"users"`
-	Checklists  []ChecklistOutside `json:"checklists"`
+	Description string             `json:"taskDescription"`
+	Order       int64              `json:"taskOrder"`
+	Tags        []TagOutside       `json:"taskTags"`
+	Users       []UserOutsideShort `json:"taskAssigners"`
+	Checklists  []ChecklistOutside `json:"taskChecklists"`
 }
 
 type TaskOutsideSuperShort struct {
 	TaskID      int64  `json:"taskID"`
 	Name        string `json:"taskName"`
-	Description string `json:"description"`
+	Description string `json:"taskDescription"`
 }
 
 //===================================================<-Other

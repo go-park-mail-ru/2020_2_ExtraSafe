@@ -10,7 +10,7 @@ type AttachmentInput struct {
 	UserID       int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
 	AttachmentID int64  `json:"attachmentID"`
-	Filename     string `json:"fileName"`
+	Filename     string `json:"attachmentFileName"`
 	File         []byte `json:"-"`
 }
 
@@ -29,6 +29,6 @@ type AttachmentFileInternal struct {
 
 type AttachmentOutside struct {
 	AttachmentID int64  `json:"attachmentID"`
-	Filename     string `json:"filename"`
-	Filepath     string `json:"filepath"`
+	Filename     string `json:"attachmentFileName"`
+	Filepath     string `json:"attachmentFilePath"`
 }

@@ -13,7 +13,7 @@ type TagInput struct {
 	TaskID  int64  `json:"taskID"`
 	TagID   int64  `json:"tagID"`
 	BoardID int64  `json:"boardID"`
-	Color   string `json:"color"`
+	Color   string `json:"tagColor"`
 	Name    string `json:"tagName"`
 }
 
@@ -23,7 +23,7 @@ type TagInput struct {
 //===================================================<-Outside
 type TagOutside struct {
 	TagID int64  `json:"tagID"`
-	Color string `json:"color"`
+	Color string `json:"tagColor"`
 	Name  string `json:"tagName"`
 }
 

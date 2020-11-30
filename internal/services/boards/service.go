@@ -157,6 +157,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 }
 
 func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
+	output = make([]models.TagOutside, 0)
 	for _, tag := range tags {
 		output = append(output, models.TagOutside{
 			TagID: tag.TagID,
@@ -168,6 +169,7 @@ func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
 }
 
 func convertUsers(users []*protoProfile.UserOutsideShort) (output []models.UserOutsideShort) {
+	output = make([]models.UserOutsideShort, 0)
 	for _, user := range users {
 		output = append(output, models.UserOutsideShort{
 			Email: user.Email,
@@ -428,7 +430,7 @@ func (s *service) GetTask(request models.TaskInput) (task models.TaskOutside, er
 	}
 
 	attachments := make([]models.AttachmentOutside, 0)
-	for _, attachment := range task.Attachments{
+	for _, attachment := range output.Attachments{
 		attachments = append(attachments, models.AttachmentOutside{
 			AttachmentID: attachment.AttachmentID,
 			Filename:   attachment.Filename,
@@ -851,6 +853,7 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 		Filename: request.Filename,
 		File: request.File,
 	}
+	fmt.Println(input)
 
 	_, err = s.boardService.RemoveAttachment(ctx, input)
 	if err != nil {

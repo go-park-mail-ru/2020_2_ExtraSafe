@@ -321,7 +321,7 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 	}
 
 	userInput := new(models.AttachmentInput)
-	userInput.Filename = formParams.Get("fileName")
+	userInput.Filename = formParams.Get("attachmentFileName")
 	userInput.TaskID, _ = strconv.ParseInt(formParams.Get("taskID"), 10, 64)
 
 	//TODO какая то фигня

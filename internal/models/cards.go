@@ -14,12 +14,12 @@ type CardInput struct {
 	CardID  int64  `json:"cardID"`
 	BoardID int64  `json:"boardID"`
 	Name    string `json:"cardName"`
-	Order   int64  `json:"order"`
+	Order   int64  `json:"cardOrder"`
 }
 
 type CardOrder struct {
 	CardID int64 `json:"cardID"`
-	Order  int64 `json:"order"`
+	Order  int64 `json:"cardOrder"`
 }
 
 type CardsOrderInput struct {
@@ -39,8 +39,8 @@ type CardInternal struct {
 type CardOutside struct {
 	CardID int64              `json:"cardID"`
 	Name   string             `json:"cardName"`
-	Order  int64              `json:"order"`
-	Tasks  []TaskOutsideShort `json:"tasks"`
+	Order  int64              `json:"cardOrder"`
+	Tasks  []TaskOutsideShort `json:"cardTasks"`
 }
 
 type CardOutsideShort struct {
