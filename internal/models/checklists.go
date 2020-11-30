@@ -15,7 +15,7 @@ type ChecklistInput struct {
 	ChecklistID int64           `json:"checklistID"`
 	TaskID      int64           `json:"taskID"`
 	Name        string          `json:"checklistName"`
-	Items       json.RawMessage `json:"items"`
+	Items       json.RawMessage `json:"checklistItems"`
 }
 
 //===================================================<-Internal
@@ -25,7 +25,7 @@ type ChecklistInput struct {
 type ChecklistOutside struct {
 	ChecklistID int64           `json:"checklistID"`
 	Name        string          `json:"checklistName"`
-	Items       json.RawMessage `json:"items"`
+	Items       json.RawMessage `json:"checklistItems"`
 }
 
 //===================================================<-Other

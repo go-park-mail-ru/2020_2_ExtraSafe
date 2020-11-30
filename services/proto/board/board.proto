@@ -245,7 +245,7 @@ service Board {
   rpc GetBoard (BoardInput) returns (BoardOutside) {}
   rpc ChangeBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
-  rpc AddUserToBoard (BoardMemberInput) returns (Nothing) {}
+  rpc AddUserToBoard (BoardMemberInput) returns (protoProfile.UserOutsideShort) {}
   rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
 
   rpc CreateCard (CardInput) returns (CardOutsideShort) {}
@@ -259,7 +259,7 @@ service Board {
   rpc ChangeTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc DeleteTask (TaskInput) returns (Nothing) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
-  rpc AssignUser (TaskAssignerInput) returns (Nothing) {}
+  rpc AssignUser (TaskAssignerInput) returns (protoProfile.UserOutsideShort) {}
   rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
 
   rpc CreateTag (TagInput) returns (TagOutside) {}

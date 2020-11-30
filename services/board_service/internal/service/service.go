@@ -200,11 +200,11 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoProfile.UserOutsideShort, err error) {
 	fmt.Println(input.MemberName)
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, err
 	}
 
 	fmt.Println(user.ID)
@@ -217,16 +217,16 @@ func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMembe
 
 	err = s.boardStorage.AddUser(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	return user, nil
 }
 
 func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.Nothing{Dummy: true}, err
 	}
 
 	userInput := models.BoardMember{
@@ -499,13 +499,11 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (output *protoProfile.UserOutsideShort, err error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, err
+		return output, err
 	}
-
-	fmt.Println(user)
 
 	userInput := models.TaskAssigner{
 		UserID:    input.UserID,
@@ -515,16 +513,16 @@ func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerIn
 
 	err = s.boardStorage.AssignUser(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	return user, nil
 }
 
 func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.Nothing{Dummy: true}, err
 	}
 
 	userInput := models.TaskAssigner{
@@ -647,7 +645,7 @@ func (s *service) CreateComment(ctx context.Context, input *protoBoard.CommentIn
 
 	user, err := s.profileService.GetUsersByIDs(ctx, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, err
 	}
 
 	output = &protoBoard.CommentOutside{
@@ -676,7 +674,7 @@ func (s *service) ChangeComment(ctx context.Context, input *protoBoard.CommentIn
 
 	user, err := s.profileService.GetUsersByIDs(ctx, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, err
 	}
 
 	output = &protoBoard.CommentOutside{

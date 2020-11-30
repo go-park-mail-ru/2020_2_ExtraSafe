@@ -20,14 +20,14 @@ type BoardChangeInput struct {
 	UserID    int64  `json:"-"`
 	BoardID   int64  `json:"boardID"`
 	BoardName string `json:"boardName"`
-	Theme     string `json:"theme"`
-	Star      bool   `json:"star"`
+	Theme     string `json:"boardTheme"`
+	Star      bool   `json:"boardStar"`
 }
 
 type BoardMemberInput struct {
 	UserID     int64  `json:"-"`
 	BoardID    int64  `json:"boardID"`
-	MemberName string `json:"memberName"`
+	MemberName string `json:"memberUsername"`
 }
 
 //===================================================<-Internal
@@ -45,20 +45,20 @@ type BoardInternal struct {
 //===================================================<-Outside
 type BoardOutside struct {
 	BoardID int64              `json:"boardID"`
-	Admin   UserOutsideShort   `json:"admin"`
+	Admin   UserOutsideShort   `json:"boardAdmin"`
 	Name    string             `json:"boardName"`
-	Theme   string             `json:"theme"`
-	Star    bool               `json:"star"`
-	Users   []UserOutsideShort `json:"users"`
-	Cards   []CardOutside      `json:"cards"`
-	Tags    []TagOutside       `json:"tags"`
+	Theme   string             `json:"boardTheme"`
+	Star    bool               `json:"boardStar"`
+	Users   []UserOutsideShort `json:"boardMembers"`
+	Cards   []CardOutside      `json:"boardCards"`
+	Tags    []TagOutside       `json:"boardTags"`
 }
 
 type BoardOutsideShort struct {
 	BoardID int64  `json:"boardID"`
 	Name    string `json:"boardName"`
-	Theme   string `json:"theme"`
-	Star    bool   `json:"star"`
+	Theme   string `json:"boardTheme"`
+	Star    bool   `json:"boardStar"`
 }
 
 //===================================================<-Other

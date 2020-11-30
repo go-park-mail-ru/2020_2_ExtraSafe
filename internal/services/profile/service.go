@@ -55,6 +55,7 @@ func (s *service) Boards(request models.UserInput) (boards []models.BoardOutside
 		return nil, errorWorker.ConvertStatusToError(err)
 	}
 
+	boards = make([]models.BoardOutsideShort, 0)
 	for _, board := range output.Boards{
 		boards = append(boards, models.BoardOutsideShort{
 			BoardID: board.BoardID,
