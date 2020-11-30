@@ -11,6 +11,47 @@ import (
 	"golang.org/x/net/context"
 )
 
+//go:generate mockgen -destination=../../../mock/mock_boardService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service Service
+
+type Service interface {
+	GetBoardsList(_ context.Context, input *protoProfile.UserID) (output *protoProfile.BoardsOutsideShort, err error)
+	CreateBoard(_ context.Context, input *protoBoard.BoardChangeInput) (output *protoProfile.BoardOutsideShort, err error)
+	GetBoard(c context.Context, input *protoBoard.BoardInput) (output *protoBoard.BoardOutside, err error)
+	ChangeBoard(_ context.Context, input *protoBoard.BoardChangeInput) (output *protoProfile.BoardOutsideShort, err error)
+	DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (*protoBoard.Nothing, error)
+	AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoProfile.UserOutsideShort, err error)
+	RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error)
+	CreateCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutsideShort, err error)
+	GetCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutside, err error)
+	ChangeCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutsideShort, err error)
+	DeleteCard(_ context.Context, input *protoBoard.CardInput) (*protoBoard.Nothing, error)
+	CardOrderChange(_ context.Context, input *protoBoard.CardsOrderInput) (*protoBoard.Nothing, error)
+	CreateTask(_ context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutsideSuperShort, err error)
+	GetTask(c context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutside, err error)
+	ChangeTask(_ context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutsideSuperShort, err error)
+	DeleteTask(_ context.Context, input *protoBoard.TaskInput) (*protoBoard.Nothing, error)
+	TasksOrderChange(_ context.Context, input *protoBoard.TasksOrderInput) (*protoBoard.Nothing, error)
+	AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (output *protoProfile.UserOutsideShort, err error)
+	DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error)
+	CreateTag(_ context.Context, input *protoBoard.TagInput) (output *protoBoard.TagOutside, err error)
+	ChangeTag(_ context.Context, input *protoBoard.TagInput) (output *protoBoard.TagOutside, err error)
+	DeleteTag(_ context.Context, input *protoBoard.TagInput) (*protoBoard.Nothing, error)
+	AddTag(_ context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error)
+	RemoveTag(_ context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error)
+	CreateComment(ctx context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error)
+	ChangeComment(ctx context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error)
+	DeleteComment(_ context.Context, input *protoBoard.CommentInput) (*protoBoard.Nothing, error)
+	CreateChecklist(_ context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error)
+	ChangeChecklist(_ context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error)
+	DeleteChecklist(_ context.Context, input *protoBoard.ChecklistInput) (*protoBoard.Nothing, error)
+	AddAttachment(_ context.Context, input *protoBoard.AttachmentInput) (output *protoBoard.AttachmentOutside, err error)
+	RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInput) (*protoBoard.Nothing, error)
+	CheckBoardPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error)
+	CheckCardPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error)
+	CheckTaskPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error)
+	CheckCommentPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error)
+}
+
 type service struct {
 	boardStorage boardStorage.Storage
 	fileStorage fStorage.Storage

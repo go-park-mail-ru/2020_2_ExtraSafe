@@ -48,7 +48,7 @@ func (s *storage) UpdateComment(input models.CommentInput) (comment models.Comme
 }
 
 func (s *storage) DeleteComment(input models.CommentInput) (err error) {
-	_, err = s.db.Exec("DELETE FROM comments where commentID = $1", input.CommentID)
+	_, err = s.db.Exec("DELETE FROM comments WHERE commentID = $1", input.CommentID)
 	if err!= nil {
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "DeleteComment"}
