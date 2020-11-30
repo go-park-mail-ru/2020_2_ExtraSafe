@@ -1181,7 +1181,7 @@ func TestStorage_CheckBoardPermissionUser(t *testing.T) {
 	userID := int64(1)
 
 	mock.
-		ExpectQuery("SELECT boardID FROM board_members").
+		ExpectQuery("SELECT B.boardID FROM boards").
 		WithArgs(boardID, userID).
 		WillReturnRows(sqlmock.NewRows([]string{"userID"}).AddRow(1))
 
@@ -1208,7 +1208,7 @@ func TestStorage_CheckBoardPermissionUserFail(t *testing.T) {
 	userID := int64(1)
 
 	mock.
-		ExpectQuery("SELECT boardID FROM board_members").
+		ExpectQuery("SELECT B.boardID FROM boards").
 		WithArgs(boardID, userID).
 		WillReturnError(sql.ErrNoRows)
 
@@ -1235,7 +1235,7 @@ func TestStorage_CheckBoardPermissionUserQueryFail(t *testing.T) {
 	userID := int64(1)
 
 	mock.
-		ExpectQuery("SELECT boardID FROM board_members").
+		ExpectQuery("SELECT B.boardID FROM boards").
 		WithArgs(boardID, userID).
 		WillReturnError(errors.New(""))
 
