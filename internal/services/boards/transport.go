@@ -38,6 +38,8 @@ type Transport interface {
 	AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error)
 	AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error)
 	AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error)
+
+	UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error)
 }
 
 type transport struct {
@@ -359,4 +361,13 @@ func (t transport) AttachmentWrite(attachment models.AttachmentOutside) (respons
 	response.AttachmentID = attachment.AttachmentID
 
 	return response, nil
+}
+
+func (t transport) UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error) {
+	response.Status = 200
+	response.Email = user.Email
+	response.Username = user.Username
+	response.FullName = user.FullName
+	response.Avatar = user.Avatar
+	return response, err
 }

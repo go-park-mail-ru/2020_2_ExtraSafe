@@ -174,7 +174,7 @@ func (h *handler) BoardAddMember(c echo.Context) error {
 		return err
 	}
 
-	err = h.boardsService.AddMember(userInput)
+	user, err := h.boardsService.AddMember(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -182,7 +182,15 @@ func (h *handler) BoardAddMember(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+	response, err := h.boardsTransport.UserShortWrite(user)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) BoardRemoveMember(c echo.Context) error {
@@ -462,7 +470,7 @@ func (h *handler) TaskUserAdd(c echo.Context) error {
 		return err
 	}
 
-	err = h.boardsService.AssignUser(userInput)
+	user, err := h.boardsService.AssignUser(userInput)
 	if err != nil {
 		if err := h.errorWorker.RespError(c, err); err != nil {
 			return err
@@ -470,7 +478,15 @@ func (h *handler) TaskUserAdd(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+	response, err := h.boardsTransport.UserShortWrite(user)
+	if err != nil {
+		if err := h.errorWorker.TransportError(c); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TaskUserRemove(c echo.Context) error {

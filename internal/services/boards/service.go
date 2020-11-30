@@ -14,7 +14,7 @@ type Service interface {
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	DeleteBoard(request models.BoardInput) (err error)
-	AddMember(request models.BoardMemberInput) (err error)
+	AddMember(request models.BoardMemberInput) (user models.UserOutsideShort, err error)
 	RemoveMember(request models.BoardMemberInput) (err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutsideShort, err error)
@@ -28,7 +28,7 @@ type Service interface {
 	ChangeTask(request models.TaskInput) (task models.TaskOutsideSuperShort, err error)
 	DeleteTask(request models.TaskInput) (err error)
 	TasksOrderChange(request models.TasksOrderInput) (err error)
-	AssignUser(request models.TaskAssignerInput) (err error)
+	AssignUser(request models.TaskAssignerInput) (user models.UserOutsideShort, err error)
 	DismissUser(request models.TaskAssignerInput) (err error)
 
 	CreateTag(request models.TagInput) (task models.TagOutside, err error)
@@ -221,7 +221,7 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	return nil
 }
 
-func (s *service) AddMember(request models.BoardMemberInput) (err error) {
+func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOutsideShort, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.BoardMemberInput{
@@ -230,12 +230,17 @@ func (s *service) AddMember(request models.BoardMemberInput) (err error) {
 		MemberName: request.MemberName,
 	}
 
-	_, err = s.boardService.AddUserToBoard(ctx, input)
+	output, err := s.boardService.AddUserToBoard(ctx, input)
 	if err != nil {
-		return errorWorker.ConvertStatusToError(err)
+		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	return nil
+	user.Username = output.Username
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	user.Email = output.Email
+
+	return user,nil
 }
 
 func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
@@ -537,7 +542,7 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 	return nil
 }
 
-func (s *service) AssignUser(request models.TaskAssignerInput) (err error) {
+func (s *service) AssignUser(request models.TaskAssignerInput) (user models.UserOutsideShort, err error) {
 	ctx := context.Background()
 
 	userInput := &protoBoard.TaskAssignerInput{
@@ -548,12 +553,17 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (err error) {
 
 	fmt.Println(userInput)
 
-	_, err = s.boardService.AssignUser(ctx, userInput)
+	output, err := s.boardService.AssignUser(ctx, userInput)
 	if err != nil {
-		return errorWorker.ConvertStatusToError(err)
+		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	return nil
+	user.Username = output.Username
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+	user.Email = output.Email
+
+	return user, nil
 }
 
 func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
