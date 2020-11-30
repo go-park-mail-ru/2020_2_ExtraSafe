@@ -758,6 +758,8 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 		Order: request.Order,
 	}
 
+	fmt.Println(input)
+
 	_, err = s.boardService.DeleteComment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
