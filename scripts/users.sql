@@ -10,8 +10,9 @@ CREATE TABLE users (
     avatar      TEXT
 );
 
-CREATE TABLE social_links (
+/*CREATE TABLE social_links (
     userID      INTEGER REFERENCES users(userID) ON DELETE CASCADE,
     networkName TEXT,
     link TEXT
 );
+*/

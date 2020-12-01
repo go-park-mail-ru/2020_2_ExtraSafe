@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
 
@@ -16,11 +17,11 @@ type Service interface {
 
 type service struct {
 	profileService protoProfile.ProfileClient
-	validator     Validator
+	validator     validation.Service
 }
 
 
-func NewService(profileService protoProfile.ProfileClient, validator Validator) Service {
+func NewService(profileService protoProfile.ProfileClient, validator validation.Service) Service {
 	return &service{
 		profileService: profileService,
 		validator: validator,
