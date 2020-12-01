@@ -5,12 +5,12 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/rs/zerolog"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type Middleware interface {
@@ -28,21 +28,21 @@ type Middleware interface {
 }
 
 type middlew struct {
-	errorWorker errorWorker
+	errorWorker errorWorker.ErrorWorker
 	authService auth.Service
-	authTransport authTransport
+	authTransport auth.Transport
 	boardService boards.Service
-	logger *zerolog.Logger
+	internalLogger logger.Logger
 }
 
-func NewMiddleware(errorWorker errorWorker, authService auth.Service, authTransport authTransport,
-	boardService boards.Service, logger *zerolog.Logger) Middleware {
+func NewMiddleware(errorWorker errorWorker.ErrorWorker, authService auth.Service, authTransport auth.Transport,
+	boardService boards.Service, internalLogger logger.Logger) Middleware {
 	return middlew{
 		errorWorker: errorWorker,
 		authService: authService,
 		authTransport: authTransport,
 		boardService: boardService,
-		logger: logger,
+		internalLogger: internalLogger,
 	}
 }
 
@@ -115,52 +115,7 @@ func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 func (m middlew) Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := next(c)
-
-		if err == nil {
-			infoLog := m.logger.Info()
-			infoLog.
-				Time("Request time",time.Now()).
-				Str("URL", c.Request().RequestURI).
-				Int("Status", c.Response().Status)
-			infoLog.Send()
-			return err
-		}
-
-		servError, ok := err.(models.ServeError)
-		if ok != true {
-			errLog := m.logger.Error()
-			errLog.
-				Time("Request time",time.Now()).
-				Str("URL", c.Request().RequestURI).
-				Int("Status", c.Response().Status).
-				Str("Error ", err.Error())
-			errLog.Send()
-			return err
-		}
-
-		for i, code := range servError.Codes {
-			errLog := m.logger.Error()
-			if len(err.(models.ServeError).Descriptions) == 0 {
-				errLog.
-					Time("Request time",time.Now()).
-					Str("URL", c.Request().RequestURI).
-					Int("Status", c.Response().Status).
-					Str("Error code", code).
-					Str("Error ", err.Error()).
-					Str("In function", err.(models.ServeError).MethodName)
-				errLog.Send()
-			} else {
-				errLog.
-					Time("Request time", time.Now()).
-					Str("URL", c.Request().RequestURI).
-					Int("Status", c.Response().Status).
-					Str("Error code", code).
-					Str("Error ", err.(models.ServeError).Descriptions[i]).
-					Str("In function", err.(models.ServeError).MethodName)
-				errLog.Send()
-			}
-		}
-		return err
+		return m.internalLogger.WriteLog(err, c)
 	}
 }
 

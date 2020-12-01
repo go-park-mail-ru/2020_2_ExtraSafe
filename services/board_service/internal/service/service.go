@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
 	fStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/fileStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"

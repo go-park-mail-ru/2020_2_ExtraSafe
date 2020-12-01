@@ -6,20 +6,21 @@ import (
 	boardsHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/middlewares"
 	profileHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	_"github.com/kelseyhightower/envconfig"
+	_ "github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	_ "github.com/rs/zerolog/log"
-	_"github.com/tarantool/go-tarantool"
+	_ "github.com/tarantool/go-tarantool"
 	"google.golang.org/grpc"
 	"log"
 	"os"
@@ -94,8 +95,9 @@ func main() {
 
 	// =============================
 
-	loggg := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
+	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
+	internalLogger := logger.NewLogger(&zeroLogger)
 	errWorker := errorWorker.NewErrorWorker()
 
 	/*usersStorage := userStorage.NewStorage(db)
@@ -118,7 +120,7 @@ func main() {
 	boardsService := boards.NewService(boardClient, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(errWorker, authService, authTransport, boardsService, &loggg)
+	middlewaresService := middlewares.NewMiddleware(errWorker, authService, authTransport, boardsService, internalLogger)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)

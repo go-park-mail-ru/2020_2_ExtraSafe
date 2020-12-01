@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"github.com/labstack/echo"
