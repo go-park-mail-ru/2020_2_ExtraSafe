@@ -7,7 +7,9 @@ import (
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
 
-type Service interface {
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_profileService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile ServiceProfile
+
+type ServiceProfile interface {
 	Profile(request models.UserInput) (user models.UserOutside, err error)
 	Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error)
 	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
@@ -20,7 +22,7 @@ type service struct {
 }
 
 
-func NewService(profileService protoProfile.ProfileClient, validator Validator) Service {
+func NewService(profileService protoProfile.ProfileClient, validator Validator) ServiceProfile {
 	return &service{
 		profileService: profileService,
 		validator: validator,

@@ -3,6 +3,7 @@ package authHandler
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
@@ -17,44 +18,32 @@ type Handler interface {
 
 type handler struct {
 	authService   auth.ServiceAuth
-	authTransport AuthTransport
-	errorWorker   ErrorWorker
+	authTransport auth.TransportAuth
+	errorWorker   errorWorker.ErrorWorker
 }
 
-func NewHandler(authService auth.ServiceAuth, authTransport AuthTransport, errorWorker ErrorWorker) *handler {
+func NewHandler(authService auth.ServiceAuth, authTransport auth.TransportAuth, errorWorker errorWorker.ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
-		errorWorker:     errorWorker,
+		errorWorker:   errorWorker,
 	}
 }
 
 func (h *handler) Auth(c echo.Context) error {
 	userInput, err := h.authTransport.AuthRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Auth(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
 	token, _ := csrf.GenerateToken(userInput.ID)
 
-	response, err := h.authTransport.AuthWrite(user, token)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	response, _ := h.authTransport.AuthWrite(user, token)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -62,29 +51,17 @@ func (h *handler) Auth(c echo.Context) error {
 func (h *handler) Login(c echo.Context) error {
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Login(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
 	token, _ := csrf.GenerateToken(user.UserID)
 
-	response, err := h.authTransport.LoginWrite(token)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	response, _ := h.authTransport.LoginWrite(token)
 
 	cookie := new(http.Cookie)
 	cookie.Name = "tabutask_id"
@@ -100,10 +77,7 @@ func (h *handler) Login(c echo.Context) error {
 func (h *handler) Logout(c echo.Context) error {
 	err := h.authService.Logout(c)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
 	cookie := new(http.Cookie)
@@ -116,27 +90,15 @@ func (h *handler) Logout(c echo.Context) error {
 func (h *handler) Registration(c echo.Context) error{
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Registration(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.RegWrite()
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	response, _ := h.authTransport.RegWrite()
 
 	cookie := new(http.Cookie)
 	cookie.Name = "tabutask_id"
