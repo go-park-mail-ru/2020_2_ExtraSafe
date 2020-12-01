@@ -100,19 +100,11 @@ func main() {
 	internalLogger := logger.NewLogger(&zeroLogger)
 	errWorker := errorWorker.NewErrorWorker()
 
-	/*usersStorage := userStorage.NewStorage(db)
-	sessionStorage := sessionsStorage.NewStorage(tConn)
-	avatarStorage := imgStorage.NewStorage()
-	cardStorage := cardsStorage.NewStorage(db)
-	taskStorage := tasksStorage.NewStorage(db)
-	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)*/
-
 	boardClient := protoBoard.NewBoardClient(grpcConn3)
 	profileClient := protoProfile.NewProfileClient(grpcConn2)
 	authClient := protoAuth.NewAuthClient(grpcConn1)
 
 	validationService := validation.NewService()
-	//sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(authClient, validationService)
 	authTransport := auth.NewTransport()
 	profileService := profile.NewService(profileClient, validationService)

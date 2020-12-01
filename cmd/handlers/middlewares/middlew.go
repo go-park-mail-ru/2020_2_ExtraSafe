@@ -29,14 +29,14 @@ type Middleware interface {
 
 type middlew struct {
 	errorWorker errorWorker.ErrorWorker
-	authService auth.Service
-	authTransport auth.Transport
-	boardService boards.Service
+	authService auth.ServiceAuth
+	authTransport auth.TransportAuth
+	boardService boards.ServiceBoard
 	internalLogger logger.Logger
 }
 
-func NewMiddleware(errorWorker errorWorker.ErrorWorker, authService auth.Service, authTransport auth.Transport,
-	boardService boards.Service, internalLogger logger.Logger) Middleware {
+func NewMiddleware(errorWorker errorWorker.ErrorWorker, authService auth.ServiceAuth, authTransport auth.TransportAuth,
+	boardService boards.ServiceBoard, internalLogger logger.Logger) Middleware {
 	return middlew{
 		errorWorker: errorWorker,
 		authService: authService,
@@ -52,6 +52,7 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 			"http://95.163.213.142:80",
 			"http://95.163.213.142",
 			"http://127.0.0.1:3033",
+			"http://127.0.0.1:63246",
 			"http://127.0.0.1",
 			"http://tabutask.ru"},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-CSRF-Token"},

@@ -1,19 +1,43 @@
 package middlewares
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/mock"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	logger2 "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
+	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
+	"github.com/rs/zerolog"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 )
 
 func TestMiddlew_CORS(t *testing.T) {
-	m := NewMiddleware()
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardService := mock.NewMockServiceBoard(ctrlBoard)
+
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockServiceAuth(ctrlAuth)
+
+	ctrlTransport := gomock.NewController(t)
+	defer ctrlTransport.Finish()
+	mockTransportService := mock.NewMockTransportAuth(ctrlTransport)
+
+	worker := errorWorker.NewErrorWorker()
+
+	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
+	logger := logger2.NewLogger(&zeroLogger)
+
+	//mockBoardService.EXPECT().CheckBoardPermission().Return()
+
+	m := NewMiddleware(worker, mockAuthService, mockTransportService, mockBoardService, logger)
 	e := echo.New()
-	e.Debug()
-	e.Use(CORS())
-	e.Get("/", test)
-	go e.Run(":63246")
+	e.Use(m.CORS())
+	e.GET("/", test)
+	go e.Start(":63246")
 	time.Sleep(1 * time.Second)
 	res, err := http.Get("http://127.0.0.1:63246")
 	if err != nil {
@@ -22,7 +46,8 @@ func TestMiddlew_CORS(t *testing.T) {
 	if res.StatusCode != 200 {
 		t.Fatal("Wrong status code")
 	}
-	if res.Header.Get("Access-Control-Allow-Origin") != "*" {
-		t.Fatal("Access-Control-Allow-Origin header != *")
-	}
+}
+
+func test(c echo.Context) error {
+	return c.String(http.StatusOK, "test123")
 }

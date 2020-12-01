@@ -7,8 +7,9 @@ import (
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_boardsService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards ServiceBoard
 
-type Service interface {
+type ServiceBoard interface {
 	CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
@@ -58,7 +59,7 @@ type service struct {
 	validator    Validator
 }
 
-func NewService(boardService protoBoard.BoardClient, validator Validator) Service {
+func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
 	return &service{
 		boardService: boardService,
 		validator: validator,
