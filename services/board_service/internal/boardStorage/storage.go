@@ -10,7 +10,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 )
 
-type Storage interface {
+//go:generate mockgen -destination=../../../board_service/internal/service/mock/mock_boardStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage BoardStorage
+
+type BoardStorage interface {
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
@@ -69,7 +71,7 @@ type storage struct {
 	attachmentStorage attachmentStorage.Storage
 }
 
-func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) Storage {
+func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
 	return &storage{
 		db: db,
 		cardsStorage: cardsStorage,

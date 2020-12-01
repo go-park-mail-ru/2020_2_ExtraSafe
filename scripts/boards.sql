@@ -31,7 +31,7 @@ CREATE TABLE board_members (
     boardID  INTEGER REFERENCES boards(boardID) ON DELETE CASCADE,
     userID  INTEGER
 );
-ALTER TABLE IF EXISTS board_members ADD CONSTRAINT uniq UNIQUE (boardID, userID);
+ALTER TABLE IF EXISTS board_members ADD CONSTRAINT uniq_board_members UNIQUE (boardID, userID);
 
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS checklists;
@@ -60,13 +60,13 @@ CREATE TABLE task_members (
     taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
     userID INTEGER
 );
-ALTER TABLE IF EXISTS task_members ADD CONSTRAINT uniq UNIQUE (taskID, userID);
+ALTER TABLE IF EXISTS task_members ADD CONSTRAINT uniq_task_members UNIQUE (taskID, userID);
 
 CREATE TABLE task_tags (
     taskID INTEGER REFERENCES tasks(taskID) ON DELETE CASCADE,
     tagID INTEGER REFERENCES tags(tagID) ON DELETE CASCADE
 );
-ALTER TABLE IF EXISTS task_tags ADD CONSTRAINT uniq UNIQUE (taskID, tagID);
+ALTER TABLE IF EXISTS task_tags ADD CONSTRAINT uniq_task_tags UNIQUE (taskID, tagID);
 
 CREATE TABLE checklists (
     checklistID SERIAL PRIMARY KEY,
