@@ -913,7 +913,7 @@ func TestService_GetCardFail(t *testing.T) {
 		return
 	}
 }
-/*
+
 func TestService_CardOrderChange(t *testing.T) {
 	cards := make([]*protoBoard.CardOrder, 0)
 	card :=  &protoBoard.CardOrder{Order: 1, CardID: 1}
@@ -935,25 +935,312 @@ func TestService_CardOrderChange(t *testing.T) {
 		Cards:  cardOrder,
 	}
 
-	//internal
-}*/
-func TestService_CreateTask(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().ChangeCardOrder(input).Return(nil)
+	_, err := service.CardOrderChange(context.Background(), request)
+	if err != nil {
+		t.Error("unexpected error")
+		return
+	}
+}
+
+func TestService_CardOrderChangeFail(t *testing.T) {
+	cards := make([]*protoBoard.CardOrder, 0)
+	card :=  &protoBoard.CardOrder{Order: 1, CardID: 1}
+	cards = append(cards, card)
+
+	request := &protoBoard.CardsOrderInput{
+		UserID: 1,
+		Cards:  cards,
+	}
+
+	cardOrder := make([]models.CardOrder, 0)
+	cardOrder = append(cardOrder, models.CardOrder{
+		CardID: card.CardID,
+		Order:  card.Order,
+	})
+
+	input := models.CardsOrderInput{
+		UserID: request.UserID,
+		Cards:  cardOrder,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().ChangeCardOrder(input).Return(errStorage)
+	_, err := service.CardOrderChange(context.Background(), request)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+}
+
+func TestService_CreateTask(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+		Name:        "task",
+		Description: "lalala",
+		Order:       1,
+	}
+
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		Name:        request.Name,
+		Order:       request.Order,
+		TaskID:      request.TaskID,
+		Description: request.Description,
+	}
+
+	internal := models.TaskInternalShort{
+		TaskID:      1,
+		Name:        input.Name,
+		Description: input.Description,
+	}
+
+	expect := &protoBoard.TaskOutsideSuperShort{
+		TaskID:      internal.TaskID,
+		Name:        internal.Name,
+		Description: internal.Description,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().CreateTask(input).Return(internal, nil)
+	output, err := service.CreateTask(context.Background(), request)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, output)
+		return
+	}
+}
+
+func TestService_CreateTaskFail(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+		Name:        "task",
+		Description: "lalala",
+		Order:       1,
+	}
+
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		Name:        request.Name,
+		Order:       request.Order,
+		TaskID:      request.TaskID,
+		Description: request.Description,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().CreateTask(input).Return(models.TaskInternalShort{}, errStorage)
+	_, err := service.CreateTask(context.Background(), request)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
 }
 
 func TestService_ChangeTask(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+		Name:        "task",
+		Description: "lalala",
+		Order:       1,
+	}
 
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		Name:        request.Name,
+		Order:       request.Order,
+		TaskID:      request.TaskID,
+		Description: request.Description,
+	}
+
+	internal := models.TaskInternal{
+		TaskID:      1,
+		Name:        input.Name,
+		Description: input.Description,
+	}
+
+	expect := &protoBoard.TaskOutsideSuperShort{
+		TaskID:      internal.TaskID,
+		Name:        internal.Name,
+		Description: internal.Description,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().ChangeTask(input).Return(internal, nil)
+	output, err := service.ChangeTask(context.Background(), request)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, output)
+		return
+	}
+}
+
+func TestService_ChangeTaskFail(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+		Name:        "task",
+		Description: "lalala",
+		Order:       1,
+	}
+
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		Name:        request.Name,
+		Order:       request.Order,
+		TaskID:      request.TaskID,
+		Description: request.Description,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().ChangeTask(input).Return(models.TaskInternal{}, errStorage)
+	_, err := service.ChangeTask(context.Background(), request)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
 }
 
 func TestService_DeleteTask(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+	}
 
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		TaskID:      request.TaskID,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().DeleteTask(input).Return(nil)
+
+	_, err := service.DeleteTask(context.Background(), request)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
 }
+
+func TestService_DeleteTaskFail(t *testing.T) {
+	request := &protoBoard.TaskInput{
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
+	}
+
+	input := models.TaskInput{
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		TaskID:      request.TaskID,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().DeleteTask(input).Return(errStorage)
+
+	_, err := service.DeleteTask(context.Background(), request)
+	if err == nil {
+		t.Errorf("expected err: %s", err)
+		return
+	}
+}
+
 func TestService_GetTask(t *testing.T) {
 
 }
-func TestService_TasksOrderChange(t *testing.T) {
 
+func TestService_TasksOrderChange(t *testing.T) {
+	tasks := make([]*protoBoard.TaskOrder, 0)
+	task :=  &protoBoard.TaskOrder{Order: 1, TaskID: 1}
+	tasks = append(tasks, task)
+	tasksIn := &protoBoard.TasksOrder{CardID: 1, Tasks: tasks}
+	tasksSlice := make([]*protoBoard.TasksOrder, 0)
+	tasksSlice = append(tasksSlice, tasksIn)
+
+
+	request := &protoBoard.TasksOrderInput{
+		UserID: 1,
+		Tasks:  tasksSlice,
+	}
+
+	input := models.CardsOrderInput{
+		UserID: request.UserID,
+		Cards:  cardOrder,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().ChangeCardOrder(input).Return(errStorage)
+	_, err := service.CardOrderChange(context.Background(), request)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
 }
+
 func TestService_AssignUser(t *testing.T) {
 
 }
