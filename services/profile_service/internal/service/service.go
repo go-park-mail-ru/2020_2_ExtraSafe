@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage"
@@ -189,7 +188,6 @@ func (s *service) GetUsersByIDs(_ context.Context, input *protoProfile.UserIDS) 
 }
 
 func (s *service) GetUserByUsername(_ context.Context, input *protoProfile.UserName) (output *protoProfile.UserOutsideShort, err error) {
-	fmt.Println(input)
 	user, err := s.userStorage.GetUserByUsername(input.UserName)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)

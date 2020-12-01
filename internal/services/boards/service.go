@@ -2,7 +2,6 @@ package boards
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
@@ -551,8 +550,6 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 		AssignerName: request.AssignerName,
 	}
 
-	fmt.Println(userInput)
-
 	output, err := s.boardService.AssignUser(ctx, userInput)
 	if err != nil {
 		return user, errorWorker.ConvertStatusToError(err)
@@ -758,8 +755,6 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 		Order: request.Order,
 	}
 
-	fmt.Println(input)
-
 	_, err = s.boardService.DeleteComment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
@@ -865,7 +860,6 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 		Filename: request.Filename,
 		File: request.File,
 	}
-	fmt.Println(input)
 
 	_, err = s.boardService.RemoveAttachment(ctx, input)
 	if err != nil {

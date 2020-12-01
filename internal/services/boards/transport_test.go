@@ -1,7 +1,6 @@
 package boards
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
@@ -30,8 +29,7 @@ func TestTransport_BoardRead(t *testing.T) {
 
 	transp := &transport{}
 
-	userInput, err := transp.BoardRead(c)
-	fmt.Println(err)
+	userInput, _ := transp.BoardRead(c)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
