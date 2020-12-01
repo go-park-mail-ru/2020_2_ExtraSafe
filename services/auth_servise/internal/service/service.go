@@ -14,7 +14,7 @@ import (
 )
 
 type service struct {
-	authStorage authStorage.Storage
+	authStorage authStorage.SessionStorage
 	profileService protoProfile.ProfileClient
 	boardService protoBoard.BoardClient
 }
@@ -22,7 +22,7 @@ type service struct {
 var ServiceName = "AuthService"
 
 
-func NewService(authStorage authStorage.Storage , profileService protoProfile.ProfileClient, boardService protoBoard.BoardClient) *service {
+func NewService(authStorage authStorage.SessionStorage, profileService protoProfile.ProfileClient, boardService protoBoard.BoardClient) *service {
 	return &service{
 		authStorage: authStorage,
 		profileService: profileService,
@@ -84,7 +84,7 @@ func (s *service) Registration(ctx context.Context, input *protoProfile.UserInpu
 	return output, nil
 }
 
-func (s *service)CheckCookie(_ context.Context, input *protoAuth.UserSession) (output *protoProfile.UserID, err error) {
+func (s *service) CheckCookie(_ context.Context, input *protoAuth.UserSession) (output *protoProfile.UserID, err error) {
 	userId, err := s.authStorage.CheckUserSession(input.SessionID)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)

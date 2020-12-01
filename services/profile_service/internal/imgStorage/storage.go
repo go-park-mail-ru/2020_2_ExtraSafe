@@ -15,25 +15,19 @@ import (
 	"time"
 )
 
-type Storage interface {
+//go:generate mockgen -destination=../../../profile_service/internal/service/mock/mock_avatarStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage AvatarStorage
+
+type AvatarStorage interface {
 	UploadAvatar(file []byte, user *models.UserAvatar, isTest bool) error
 }
 
 type storage struct {}
 
-func NewStorage() Storage {
+func NewStorage() AvatarStorage {
 	return &storage{}
 }
 
 func (s *storage) UploadAvatar(file []byte, user *models.UserAvatar, isTest bool) error {
-	/*src, err := file.Open()
-	if err != nil {
-		fmt.Println(err)
-		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
-			MethodName: "UploadAvatar"}
-	}
-	defer src.Close()*/
-
 	oldAvatar := user.Avatar
 	hash := sha256.New()
 
