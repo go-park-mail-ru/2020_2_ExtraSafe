@@ -448,17 +448,14 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	var query string
 
 	if ifAdmin {
-		query = "SELECT B.boardID FROM boards B " +
+		query = "SELECT B.boardID FROM boards B JOIN cards C on C.boardID = B.boardID JOIN tasks T on T.cardID = C.cardID JOIN comments Com on Com.taskID = T.taskID WHERE (B.adminID = $1 OR Com.userID = $1) AND Com.commentID = $2"
+		/*query = "SELECT B.boardID FROM boards B " +
 			"JOIN cards C on C.boardID = B.boardID " +
 			"JOIN tasks T on T.cardID = C.cardID " +
 			"JOIN comments Com on Com.taskID = T.taskID" +
-			"WHERE (B.adminID = 1 OR Com.userID = 1) AND Com.commentID = $2"
+			"WHERE (B.adminID = $1 OR Com.userID = $1) AND Com.commentID = $2"*/
 	} else {
-		query = "SELECT B.boardID FROM boards B " +
-			"JOIN cards C on C.boardID = B.boardID " +
-			"JOIN tasks T on T.cardID = C.cardID " +
-			"JOIN comments Com on Com.taskID = T.taskID" +
-			"WHERE Com.userID = $1 = $1 AND Com.commentID = $2"
+		query = "SELECT B.boardID FROM boards B JOIN cards C on C.boardID = B.boardID JOIN tasks T on T.cardID = C.cardID JOIN comments Com on Com.taskID = T.taskID WHERE Com.userID = $1 AND Com.commentID = $2"
 	}
 
 	err = s.db.QueryRow(query, userID, commentID).Scan(&boardID)

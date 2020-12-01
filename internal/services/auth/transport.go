@@ -56,16 +56,16 @@ func (t transport)AuthWrite(user models.UserBoardsOutside, token string) (respon
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
 	response.Boards = user.Boards
-	return response, err
+	return response, nil
 }
 
 func (t transport)LoginWrite(token string) (response models.ResponseToken, err error)  {
 	response.Status = 200
 	response.Token = token
-	return response, err
+	return response, nil
 }
 
 func (t transport) RegWrite() (response models.ResponseStatus, err error)  {
 	response.Status = 200
-	return response, err
+	return response, nil
 }
