@@ -3,14 +3,16 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"github.com/labstack/echo"
 )
 
-type Service interface {
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_authService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth ServiceAuth
+
+type ServiceAuth interface {
 	CheckCookie(c echo.Context) (int64, error)
 	Logout(c echo.Context) (err error)
 	Auth(request models.UserInput) (response models.UserBoardsOutside, err error)
@@ -23,7 +25,7 @@ type service struct {
 	validator   Validator
 }
 
-func NewService(authService protoAuth.AuthClient, validator Validator) Service {
+func NewService(authService protoAuth.AuthClient, validator Validator) ServiceAuth {
 	return &service{
 		authService: authService,
 		validator: validator,

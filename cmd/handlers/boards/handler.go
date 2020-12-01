@@ -48,12 +48,12 @@ type Handler interface {
 }
 
 type handler struct {
-	boardsService boards.Service
+	boardsService boards.ServiceBoard
 	boardsTransport boards.Transport
 	errorWorker errorWorker
 }
 
-func NewHandler(boardsService boards.Service, boardsTransport boards.Transport, errorWorker errorWorker) *handler {
+func NewHandler(boardsService boards.ServiceBoard, boardsTransport boards.Transport, errorWorker errorWorker) *handler {
 	return &handler{
 		boardsService: boardsService,
 		boardsTransport: boardsTransport,

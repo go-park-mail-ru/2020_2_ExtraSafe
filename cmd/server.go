@@ -6,20 +6,21 @@ import (
 	boardsHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/middlewares"
 	profileHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	_"github.com/kelseyhightower/envconfig"
+	_ "github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	_ "github.com/rs/zerolog/log"
-	_"github.com/tarantool/go-tarantool"
+	_ "github.com/tarantool/go-tarantool"
 	"google.golang.org/grpc"
 	"log"
 	"os"
@@ -94,23 +95,16 @@ func main() {
 
 	// =============================
 
-	loggg := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
+	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
+	internalLogger := logger.NewLogger(&zeroLogger)
 	errWorker := errorWorker.NewErrorWorker()
-
-	/*usersStorage := userStorage.NewStorage(db)
-	sessionStorage := sessionsStorage.NewStorage(tConn)
-	avatarStorage := imgStorage.NewStorage()
-	cardStorage := cardsStorage.NewStorage(db)
-	taskStorage := tasksStorage.NewStorage(db)
-	boardsStorage := boardStorage.NewStorage(db, cardStorage, taskStorage)*/
 
 	boardClient := protoBoard.NewBoardClient(grpcConn3)
 	profileClient := protoProfile.NewProfileClient(grpcConn2)
 	authClient := protoAuth.NewAuthClient(grpcConn1)
 
 	validationService := validation.NewService()
-	//sessionService := sessions.NewService(sessionStorage)
 	authService := auth.NewService(authClient, validationService)
 	authTransport := auth.NewTransport()
 	profileService := profile.NewService(profileClient, validationService)
@@ -118,7 +112,7 @@ func main() {
 	boardsService := boards.NewService(boardClient, validationService)
 	boardsTransport := boards.NewTransport()
 
-	middlewaresService := middlewares.NewMiddleware(errWorker, authService, authTransport, boardsService, &loggg)
+	middlewaresService := middlewares.NewMiddleware(errWorker, authService, authTransport, boardsService, internalLogger)
 
 	aHandler := authHandler.NewHandler(authService, authTransport, errWorker)
 	profHandler := profileHandler.NewHandler(profileService, profileTransport, errWorker)

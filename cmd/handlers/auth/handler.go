@@ -16,12 +16,12 @@ type Handler interface {
 }
 
 type handler struct {
-	authService   auth.Service
+	authService   auth.ServiceAuth
 	authTransport AuthTransport
 	errorWorker   ErrorWorker
 }
 
-func NewHandler(authService auth.Service, authTransport AuthTransport, errorWorker ErrorWorker) *handler {
+func NewHandler(authService auth.ServiceAuth, authTransport AuthTransport, errorWorker ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,

@@ -5,7 +5,8 @@ import (
 	"github.com/labstack/echo"
 )
 
-type Transport interface {
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_authTransport.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth TransportAuth
+type TransportAuth interface {
 	AuthRead(c echo.Context) (request models.UserInput, err error)
 	LoginRead(c echo.Context) (request models.UserInputLogin, err error)
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
@@ -18,7 +19,7 @@ type Transport interface {
 type transport struct {
 }
 
-func NewTransport() Transport {
+func NewTransport() TransportAuth {
 	return &transport{}
 }
 
