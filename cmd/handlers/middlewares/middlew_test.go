@@ -31,8 +31,6 @@ func TestMiddlew_CORS(t *testing.T) {
 	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 	logger := logger2.NewLogger(&zeroLogger)
 
-	//mockBoardService.EXPECT().CheckBoardPermission().Return()
-
 	m := NewMiddleware(worker, mockAuthService, mockTransportService, mockBoardService, logger)
 	e := echo.New()
 	e.Use(m.CORS())
