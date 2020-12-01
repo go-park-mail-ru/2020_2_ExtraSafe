@@ -172,23 +172,6 @@ func TestTransport_ProfileChangeRead(t *testing.T) {
 	}
 }
 
-func TestTransport_ProfileChangeReadFail(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	c.Set("userId", int64(1))
-
-	transp := &transport{}
-
-	_, err := transp.ProfileChangeRead(c)
-
-	if err == nil {
-		t.Errorf("results not match")
-		return
-	}
-}
-
 func fileUploadRequest(params map[string]string, paramName, path string) (io.Reader, *multipart.Writer, error) {
 	file, err := os.Open(path)
 	if err != nil {

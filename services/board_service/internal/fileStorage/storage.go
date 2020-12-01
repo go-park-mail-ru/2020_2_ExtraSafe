@@ -11,14 +11,16 @@ import (
 	"time"
 )
 
-type Storage interface {
+//go:generate mockgen -destination=../../../board_service/internal/service/mock/mock_fileStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/fileStorage FileStorage
+
+type FileStorage interface {
 	UploadFile(file models.AttachmentFileInternal, attachment *models.AttachmentInternal, isTest bool) error
 	DeleteFile(filepath string, isTest bool) error
 }
 
 type storage struct {}
 
-func NewStorage() Storage {
+func NewStorage() FileStorage {
 	return &storage{}
 }
 

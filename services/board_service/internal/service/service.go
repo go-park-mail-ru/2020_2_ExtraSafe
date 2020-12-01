@@ -53,14 +53,14 @@ type Service interface {
 }
 
 type service struct {
-	boardStorage boardStorage.Storage
-	fileStorage fStorage.Storage
+	boardStorage boardStorage.BoardStorage
+	fileStorage fStorage.FileStorage
 	profileService protoProfile.ProfileClient
 }
 
 var NameService = "BoardService"
 
-func NewService(boardStorage boardStorage.Storage, fileStorage fStorage.Storage, profileService protoProfile.ProfileClient) *service {
+func NewService(boardStorage boardStorage.BoardStorage, fileStorage fStorage.FileStorage, profileService protoProfile.ProfileClient) *service {
 	return &service{
 		boardStorage: boardStorage,
 		fileStorage: fileStorage,
