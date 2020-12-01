@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"reflect"
 	"testing"
 )
 
@@ -212,7 +213,7 @@ func TestStorage_GetBoardTagsScanFail(t *testing.T) {
 	mock.
 		ExpectQuery("SELECT tagID, name, color FROM tags").
 		WithArgs(input.BoardID).
-		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color", "taskID"}))
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color", "taskID"}).AddRow(1, "name", "color", 1))
 
 	_, err = storage.GetBoardTags(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -272,7 +273,7 @@ func TestStorage_GetTaskTagsScanFail(t *testing.T) {
 	mock.
 		ExpectQuery("SELECT DISTINCT  T.tagID, T.name, T.color FROM task_tags").
 		WithArgs(input.TaskID).
-		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color", "taskID"}))
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color", "taskID"}).AddRow(1, "name", "color", 1))
 
 	_, err = storage.GetTaskTags(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -284,3 +285,86 @@ func TestStorage_GetTaskTagsScanFail(t *testing.T) {
 		return
 	}
 }
+func TestStorage_GetBoardTags(t *testing.T) {
+	input := models.BoardInput{
+		UserID:  0,
+		BoardID: 1,
+	}
+
+	expect := make([]models.TagOutside, 0)
+	tag := models.TagOutside{
+		TagID: 1,
+		Color: "color",
+		Name:  "name",
+	}
+	expect = append(expect, tag)
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := NewStorage(db)
+
+	mock.
+		ExpectQuery("SELECT tagID, name, color FROM tags").
+		WithArgs(input.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color"}).AddRow(tag.TagID, tag.Name, tag.Color))
+
+	tags, err := storage.GetBoardTags(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(tags, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, tags)
+		return
+	}
+}
+
+func TestStorage_GetTaskTags(t *testing.T) {
+	input := models.TaskInput{
+		UserID:  0,
+		TaskID: 1,
+	}
+	expect := make([]models.TagOutside, 0)
+	tag := models.TagOutside{
+		TagID: 1,
+		Color: "color",
+		Name:  "name",
+	}
+	expect = append(expect, tag)
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := NewStorage(db)
+
+	mock.
+		ExpectQuery("SELECT DISTINCT  T.tagID, T.name, T.color FROM task_tags").
+		WithArgs(input.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color"}).AddRow(tag.TagID, tag.Name, tag.Color))
+
+	tags, err := storage.GetTaskTags(input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(tags, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, tags)
+		return
+	}
+}
+

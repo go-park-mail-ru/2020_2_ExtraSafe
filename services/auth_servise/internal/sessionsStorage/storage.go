@@ -1,12 +1,14 @@
 package sessionsStorage
 
+//go:generate mockgen -destination=../../../mock/mock_sessionsStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/sessionsStorage SessionStorage
+
 import (
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/tarantool/go-tarantool"
 )
 
-type Storage interface {
+type SessionStorage interface {
 	DeleteUserSession(sessionId string) error
 	CreateUserSession(userId int64, SID string) error
 	CheckUserSession(sessionId string) (int64, error)
@@ -16,7 +18,7 @@ type storage struct {
 	Sessions *tarantool.Connection
 }
 
-func NewStorage(sessions *tarantool.Connection) Storage {
+func NewStorage(sessions *tarantool.Connection) SessionStorage {
 	return &storage{
 		Sessions: sessions,
 	}

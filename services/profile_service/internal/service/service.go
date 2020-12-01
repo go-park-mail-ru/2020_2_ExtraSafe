@@ -10,15 +10,25 @@ import (
 	"golang.org/x/net/context"
 )
 
+type Service interface {
+	CheckUser(_ context.Context, input *protoProfile.UserInputLogin) (output *protoProfile.UserID, err error)
+	CreateUser(_ context.Context, input *protoProfile.UserInputReg) (output *protoProfile.UserID, err error)
+	Profile(_ context.Context, input *protoProfile.UserID) (output *protoProfile.UserOutside, err error)
+	Boards(c context.Context, input *protoProfile.UserID) (output *protoProfile.BoardsOutsideShort, err error)
+	ProfileChange(_ context.Context, input *protoProfile.UserInputProfile) (output *protoProfile.UserOutside, err error)
+	PasswordChange(_ context.Context, input *protoProfile.UserInputPassword) (output *protoProfile.UserOutside, err error)
+	GetUsersByIDs(_ context.Context, input *protoProfile.UserIDS) (output *protoProfile.UsersOutsideShort, err error)
+	GetUserByUsername(_ context.Context, input *protoProfile.UserName) (output *protoProfile.UserOutsideShort, err error)
+}
 type service struct {
-	userStorage uStorage.Storage
-	avatarStorage imgStorage.Storage
+	userStorage uStorage.UserStorage
+	avatarStorage imgStorage.AvatarStorage
 	boardService protoBoard.BoardClient
 }
 
 var ServiceName = "ProfileService"
 
-func NewService(userStorage uStorage.Storage, avatarStorage imgStorage.Storage, boardService protoBoard.BoardClient) *service {
+func NewService(userStorage uStorage.UserStorage, avatarStorage imgStorage.AvatarStorage, boardService protoBoard.BoardClient) *service {
 	return &service{
 		userStorage: userStorage,
 		avatarStorage: avatarStorage,

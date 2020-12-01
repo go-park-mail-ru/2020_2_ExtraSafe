@@ -9,7 +9,9 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type Storage interface {
+//go:generate mockgen -destination=../../../profile_service/internal/service/mock/mock_userStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage UserStorage
+
+type UserStorage interface {
 	CheckUser(userInput models.UserInputLogin) (int64, models.UserOutside, error)
 	CreateUser(userInput models.UserInputReg) (int64, models.UserOutside, error)
 
@@ -18,13 +20,11 @@ type Storage interface {
 
 	GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 	GetUserByUsername(username string) (user models.UserInternal, err error)
-	//GetUserByID(userID int64) (models.UserOutsideShort, error)
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 
 	CheckExistingUser(email string, username string) (errors models.MultiErrors)
-	checkExistingUserOnUpdate(email string, username string, userID int64) (errors models.MultiErrors)
 	GetInternalUser(userInput models.UserInput) (models.UserOutside, []byte, error)
 }
 
@@ -32,7 +32,7 @@ type storage struct {
 	db *sql.DB
 }
 
-func NewStorage(db *sql.DB) Storage {
+func NewStorage(db *sql.DB) UserStorage {
 	return &storage{
 		db: db,
 	}

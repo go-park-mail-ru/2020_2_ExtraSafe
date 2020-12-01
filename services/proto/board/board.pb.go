@@ -3339,6 +3339,8 @@ const _ = grpc.SupportPackageIsVersion6
 // BoardClient is the client API for Board service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+
+//go:generate mockgen -destination=../../mock/mock_boardServiceClient.go -package=mock  github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board BoardClient
 type BoardClient interface {
 	GetBoardsList(ctx context.Context, in *profile.UserID, opts ...grpc.CallOption) (*profile.BoardsOutsideShort, error)
 	CreateBoard(ctx context.Context, in *BoardChangeInput, opts ...grpc.CallOption) (*profile.BoardOutsideShort, error)

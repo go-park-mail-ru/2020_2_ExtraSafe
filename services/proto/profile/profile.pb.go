@@ -1195,6 +1195,7 @@ const _ = grpc.SupportPackageIsVersion6
 // ProfileClient is the client API for Profile service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+//go:generate mockgen -destination=../../mock/mock_profileServiceClient.go -package=mock  github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile ProfileClient
 type ProfileClient interface {
 	CheckUser(ctx context.Context, in *UserInputLogin, opts ...grpc.CallOption) (*UserID, error)
 	CreateUser(ctx context.Context, in *UserInputReg, opts ...grpc.CallOption) (*UserID, error)
