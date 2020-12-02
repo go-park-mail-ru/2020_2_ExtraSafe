@@ -32,10 +32,9 @@ func NewService(authService protoAuth.AuthClient, validator Validator) ServiceAu
 	}
 }
 
-func (s *service)CheckCookie(c echo.Context) (int64, error) {
+func (s *service) CheckCookie(c echo.Context) (int64, error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
-		fmt.Println(err)
 		return -1, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCookie"}
 	}
 	ctx := context.Background()
