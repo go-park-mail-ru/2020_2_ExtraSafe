@@ -8,7 +8,6 @@ DROP TABLE IF EXISTS board_members;
 CREATE TABLE users (
   userID      SERIAL PRIMARY KEY,
   email       TEXT,
- -- password    TEXT,
   password    BYTEA,
   username    TEXT,
   fullname    TEXT,
@@ -49,8 +48,3 @@ CREATE TABLE board_members (
     boardID  INTEGER REFERENCES boards(boardID) ON DELETE CASCADE,
     userID  INTEGER REFERENCES users(userID) ON DELETE CASCADE
 );
-
-/*CREATE TABLE board_admins (
-    boardID  BIGSERIAL REFERENCES boards(boardID),
-    adminID  BIGSERIAL REFERENCES users(userID)
-);*/
