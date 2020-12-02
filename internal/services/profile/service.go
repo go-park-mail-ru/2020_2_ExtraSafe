@@ -1,125 +1,126 @@
 package profile
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
+	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
 
-type Service interface {
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_profileService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile ServiceProfile
+
+type ServiceProfile interface {
 	Profile(request models.UserInput) (user models.UserOutside, err error)
-	Accounts(request models.UserInput) (user models.UserOutside, err error)
 	Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error)
 	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
-	AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error)
 	PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error)
 }
 
 type service struct {
-	userStorage   UserStorage
-	avatarStorage AvatarStorage
-	boardStorage  BoardStorage
-	validator     Validator
+	profileService protoProfile.ProfileClient
+	validator     validation.Service
 }
 
-
-func NewService(userStorage UserStorage, avatarStorage AvatarStorage, boardStorage BoardStorage,
-	validator Validator) Service {
+func NewService(profileService protoProfile.ProfileClient, validator validation.Service) ServiceProfile {
 	return &service{
-		userStorage: userStorage,
-		avatarStorage: avatarStorage,
-		boardStorage: boardStorage,
+		profileService: profileService,
 		validator: validator,
 	}
 }
 
 func (s *service) Profile(request models.UserInput) (user models.UserOutside, err error) {
-	user, err = s.userStorage.GetUserProfile(request)
+	ctx := context.Background()
+
+	input := &protoProfile.UserID{ID: request.ID}
+
+	output, err := s.profileService.Profile(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, err
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	return user, err
-}
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
 
-func (s *service) Accounts(request models.UserInput) (user models.UserOutside, err error) {
-	user, err = s.userStorage.GetUserAccounts(request)
-	if err != nil {
-		return models.UserOutside{}, err
-	}
-
-	return user, err
+	return user, nil
 }
 
 func (s *service) Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error) {
-	boards, err = s.boardStorage.GetBoardsList(request)
+	ctx := context.Background()
+
+	input := &protoProfile.UserID{ID: request.ID}
+
+	output, err := s.profileService.Boards(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, errorWorker.ConvertStatusToError(err)
 	}
 
-	return boards, err
+	boards = make([]models.BoardOutsideShort, 0)
+	for _, board := range output.Boards{
+		boards = append(boards, models.BoardOutsideShort{
+			BoardID: board.BoardID,
+			Name:    board.Name,
+			Theme:   board.Theme,
+			Star:    board.Star,
+		})
+	}
+
+	return boards, nil
 }
 
 func (s *service) ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error) {
-	multiErrors := new(models.MultiErrors)
+	ctx := context.Background()
 
 	err = s.validator.ValidateProfile(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
 
-	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: request.ID})
-	if errGetAvatar != nil {
-		return user, errGetAvatar
+	input := &protoProfile.UserInputProfile{
+		ID:       request.ID,
+		Email:    request.Email,
+		Username: request.Username,
+		FullName: request.FullName,
+		Avatar:   request.Avatar,
 	}
 
-	if request.Avatar != nil {
-		errAvatar := s.avatarStorage.UploadAvatar(request.Avatar, &userAvatar)
-		if errAvatar != nil {
-			multiErrors.Codes = append(multiErrors.Codes, errAvatar.(models.ServeError).Codes...)
-			multiErrors.Descriptions = append(multiErrors.Descriptions, errAvatar.(models.ServeError).Descriptions...)
-		}
-	}
-
-	user, errProfile := s.userStorage.ChangeUserProfile(request, userAvatar)
-	if errProfile != nil {
-		if errProfile.(models.ServeError).Codes[0] == models.ServerError {
-			return user, errProfile
-		}
-		multiErrors.Codes = append(multiErrors.Codes, errProfile.(models.ServeError).Codes...)
-		multiErrors.Descriptions = append(multiErrors.Descriptions, errProfile.(models.ServeError).Descriptions...)
-	}
-
-	if len(multiErrors.Codes) != 0 {
-		return models.UserOutside{}, models.ServeError{Codes: multiErrors.Codes, Descriptions: multiErrors.Descriptions,
-			MethodName: "ProfileChange"}
-	}
-
-	return user, err
-}
-
-func (s *service) AccountsChange(request models.UserInputLinks) (user models.UserOutside, err error) {
-	err = s.validator.ValidateLinks(request)
+	output, err := s.profileService.ProfileChange(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, err
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	user, err = s.userStorage.ChangeUserAccounts(request)
-	if err != nil {
-		return models.UserOutside{}, err
-	}
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
 
-	return user, err
+	return user, nil
 }
 
 func (s *service) PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error) {
+	ctx := context.Background()
 	err = s.validator.ValidateChangePassword(request)
 	if err != nil {
 		return models.UserOutside{}, err
 	}
 
-	user, err = s.userStorage.ChangeUserPassword(request)
-	if err != nil {
-		return models.UserOutside{}, err
+	input := &protoProfile.UserInputPassword{
+		ID:          request.ID,
+		OldPassword: request.OldPassword,
+		Password:    request.Password,
 	}
 
-	return user, err
+	output, err := s.profileService.PasswordChange(ctx, input)
+	if err != nil {
+		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	user.Username = output.Username
+	user.Email = output.Email
+	user.FullName = output.FullName
+	user.Avatar = output.Avatar
+
+	return user, nil
 }

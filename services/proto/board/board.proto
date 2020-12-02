@@ -1,0 +1,293 @@
+
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package protoBoard;
+import "profile/profile.proto";
+
+//==========================================
+message BoardChangeInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+  string BoardName = 3;
+  string Theme = 4;
+  bool Star = 5;
+}
+
+message BoardInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+}
+
+message BoardMemberInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+  string MemberName = 3;
+}
+
+message BoardOutside {
+  int64 BoardID = 1;
+  protoProfile.UserOutsideShort Admin = 2;
+  string Name = 3;
+  string Theme = 4;
+  bool Star = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated CardOutside Cards = 7;
+  repeated TagOutside Tags = 8;
+}
+
+//==========================================
+message CardInput {
+  int64 UserID = 1;
+  int64 CardID = 2;
+  int64 BoardID = 3;
+  string Name = 4;
+  int64 Order = 5;
+}
+
+message CardOrder {
+  int64 CardID = 1;
+  int64 Order = 2;
+}
+
+message CardsOrderInput {
+  int64 UserID = 1;
+  repeated CardOrder Cards = 2;
+}
+
+message CardOutside {
+  int64 CardID = 1;
+  string Name = 2;
+  int64 Order = 3;
+  repeated TaskOutsideShort Tasks = 4;
+}
+
+message CardOutsideShort {
+  int64 CardID = 1;
+  string Name = 2;
+}
+
+//==========================================
+message TaskInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 CardID = 3;
+  string Name = 4;
+  string Description = 5;
+  int64 Order = 6;
+}
+
+message TaskOrder {
+  int64 TaskID = 1;
+  int64 Order = 2;
+}
+
+message TasksOrder {
+  int64 CardID = 1;
+  repeated TaskOrder Tasks = 2;
+}
+
+message TasksOrderInput {
+  int64 UserID = 1;
+  repeated TasksOrder Tasks = 2;
+}
+
+message TaskInternal {
+  int64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated int64 Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+  repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
+}
+
+message TaskInternalShort {
+  int64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated int64 Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+}
+
+message TaskAssignerInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  string AssignerName = 3;
+}
+
+message TaskAssignerIDs {
+  repeated int64 assignerIDs = 1;
+}
+
+message TaskOutside {
+  int64 TaskID = 1;
+  string Name = 2;
+  string Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+  repeated CommentOutside Comments = 8;
+  repeated AttachmentOutside Attachments = 9;
+}
+
+message TaskOutsideShort {
+  int64 TaskID = 1;
+  string  Name = 2;
+  string  Description = 3;
+  int64 Order = 4;
+  repeated TagOutside Tags = 5;
+  repeated protoProfile.UserOutsideShort Users = 6;
+  repeated ChecklistOutside Checklists = 7;
+}
+
+message TaskOutsideSuperShort {
+  int64 TaskID = 1;
+  string  Name = 2;
+  string  Description = 3;
+}
+
+//==========================================
+message TagInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 TagID = 3;
+  int64 BoardID = 4;
+  string Color = 5;
+  string Name = 6;
+}
+
+message TaskTagInput {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 TagID = 3;
+}
+
+message TagOutside {
+  int64 TagID = 1;
+  string Color = 2;
+  string Name = 3;
+}
+
+//==========================================
+message CommentInput {
+  int64 CommentID = 1;
+  int64 TaskID = 2;
+  string Message = 3;
+  int64 Order = 4;
+  int64 UserID = 5;
+}
+
+message CommentInternal {
+  int64 CommentID = 1;
+  string Message = 2;
+  int64 Order = 3;
+  int64  UserID = 4;
+}
+
+message CommentOutside {
+  int64 CommentID = 1;
+  string Message = 2;
+  int64 Order = 3;
+  protoProfile.UserOutsideShort User = 4;
+}
+
+//==========================================
+message ChecklistInput {
+  int64 UserID = 1;
+  int64 ChecklistID = 2;
+  int64 TaskID = 3;
+  string Name = 4;
+  bytes Items = 5;
+}
+
+message ChecklistOutside {
+  int64 ChecklistID = 1;
+  string Name = 2;
+  bytes Items = 3;
+}
+
+//==========================================
+message AttachmentInfo {
+  int64 UserID = 1;
+  int64 TaskID = 2;
+  int64 AttachmentID = 3;
+  string Filename = 4;
+}
+
+message AttachmentInput {
+  oneof data {
+    AttachmentInfo info = 1;
+    bytes File = 2;
+  };
+}
+
+message AttachmentOutside {
+  int64 AttachmentID = 1;
+  string Filename = 2;
+  string Filepath = 3;
+}
+
+//==========================================
+message CheckPermissions {
+  int64 UserID = 1;
+  int64 ElementID = 2;
+  bool IfAdmin = 3;
+}
+
+message Nothing {
+  bool dummy = 1;
+}
+
+service Board {
+  rpc GetBoardsList(protoProfile.UserID) returns (protoProfile.BoardsOutsideShort) {}
+
+  rpc CreateBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
+  rpc GetBoard (BoardInput) returns (BoardOutside) {}
+  rpc ChangeBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
+  rpc DeleteBoard (BoardInput) returns (Nothing) {}
+  rpc AddUserToBoard (BoardMemberInput) returns (protoProfile.UserOutsideShort) {}
+  rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
+
+  rpc CreateCard (CardInput) returns (CardOutsideShort) {}
+  rpc GetCard (CardInput) returns (CardOutside) {}
+  rpc ChangeCard (CardInput) returns (CardOutsideShort) {}
+  rpc DeleteCard (CardInput) returns (Nothing) {}
+  rpc CardOrderChange (CardsOrderInput) returns (Nothing) {}
+
+  rpc CreateTask (TaskInput) returns (TaskOutsideSuperShort) {}
+  rpc GetTask (TaskInput) returns (TaskOutside) {}
+  rpc ChangeTask (TaskInput) returns (TaskOutsideSuperShort) {}
+  rpc DeleteTask (TaskInput) returns (Nothing) {}
+  rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
+  rpc AssignUser (TaskAssignerInput) returns (protoProfile.UserOutsideShort) {}
+  rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
+
+  rpc CreateTag (TagInput) returns (TagOutside) {}
+  rpc ChangeTag (TagInput) returns (TagOutside) {}
+  rpc DeleteTag (TagInput) returns (Nothing) {}
+  rpc AddTag (TaskTagInput) returns (Nothing) {}
+  rpc RemoveTag (TaskTagInput) returns (Nothing) {}
+
+  rpc CreateComment (CommentInput) returns (CommentOutside) {}
+  rpc ChangeComment (CommentInput) returns (CommentOutside) {}
+  rpc DeleteComment (CommentInput) returns (Nothing) {}
+
+  rpc CreateChecklist (ChecklistInput) returns (ChecklistOutside) {}
+  rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
+  rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
+
+  rpc AddAttachment (stream AttachmentInput) returns (AttachmentOutside) {}
+  rpc RemoveAttachment (AttachmentInfo) returns (Nothing) {}
+
+  rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckTaskPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckCommentPermission (CheckPermissions) returns (Nothing) {}
+}
