@@ -5,8 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/mailru/easyjson"
 	"net/http"
 	"time"
 )
@@ -46,8 +44,6 @@ func (h *handler) Auth(c echo.Context) error {
 	token, _ := csrf.GenerateToken(userInput.ID)
 
 	response, _ := h.authTransport.AuthWrite(user, token)
-
-	response.MarshalJSON
 
 	return c.JSON(http.StatusOK, response)
 }

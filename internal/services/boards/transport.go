@@ -70,7 +70,8 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	boardID := c.Param("ID")
 	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.BoardChangeInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
 	}
@@ -86,7 +87,8 @@ func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberIn
 	boardID := c.Param("ID")
 	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.BoardMemberInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
 	}
@@ -121,7 +123,8 @@ func (t transport) BoardShortWrite(board models.BoardOutsideShort) (response mod
 func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err error) {
 	userInput := new(models.CardInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.CardInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CardChangeRead"}
 	}
@@ -141,7 +144,8 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 func (t transport) CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderInput, err error) {
 	userInput := new(models.CardsOrderInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.CardsOrderInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CardOrderRead"}
 	}
@@ -212,7 +216,8 @@ func (t transport) TaskSuperShortWrite(task models.TaskOutsideSuperShort) (respo
 func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error) {
 	userInput := new(models.TasksOrderInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.TasksOrderInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TasksOrderRead"}
 	}
@@ -225,7 +230,8 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error) {
 	userInput := new(models.TaskAssignerInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.TaskAssignerInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TasksUserRead"}
 	}
@@ -238,7 +244,8 @@ func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInp
 func (t transport) TagChangeRead(c echo.Context) (request models.TagInput, err error) {
 	userInput := new(models.TagInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.TagInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TagChangeRead"}
 	}
@@ -251,7 +258,8 @@ func (t transport) TagChangeRead(c echo.Context) (request models.TagInput, err e
 func (t transport) TagTaskRead(c echo.Context) (request models.TaskTagInput, err error) {
 	userInput := new(models.TaskTagInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.TaskTagInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "TagTaskRead"}
 	}
@@ -273,7 +281,8 @@ func (t transport) TagWrite(tag models.TagOutside) (response models.ResponseTag,
 func (t transport) CommentChangeRead(c echo.Context) (request models.CommentInput, err error) {
 	userInput := new(models.CommentInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.CommentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CommentChangeRead"}
 	}
@@ -296,7 +305,8 @@ func (t transport) CommentWrite(comment models.CommentOutside) (response models.
 func (t transport) ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error) {
 	userInput := new(models.ChecklistInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.ChecklistInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChecklistChangeRead"}
 	}
@@ -343,7 +353,8 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 func (t transport) AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error) {
 	userInput := new(models.AttachmentInput)
 
-	if err := c.Bind(userInput); err != nil {
+	buf,_ := ioutil.ReadAll(c.Request().Body)
+	if err := userInput.UnmarshalJSON(buf); err != nil {
 		return models.AttachmentInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChecklistChangeRead"}
 	}
