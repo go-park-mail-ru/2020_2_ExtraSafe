@@ -421,30 +421,6 @@ func TestTransport_CardOrderReadFail(t *testing.T) {
 	}
 }
 
-/*
-TaskChangeRead(c echo.Context) (request models.TaskInput, err error)
-TaskWrite(task models.TaskOutside) (response models.ResponseTask, err error)
-TaskSuperShortWrite(task models.TaskOutsideSuperShort) (response models.ResponseTaskSuperShort, err error)
-TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderInput, err error)
-TasksUserRead(c echo.Context) (request models.TaskAssignerInput, err error)
-
-TagChangeRead(c echo.Context) (request models.TagInput, err error)
-TagTaskRead(c echo.Context) (request models.TaskTagInput, err error)
-TagWrite(tag models.TagOutside) (response models.ResponseTag, err error)
-
-CommentChangeRead(c echo.Context) (request models.CommentInput, err error)
-CommentWrite(comment models.CommentOutside) (response models.ResponseComment, err error)
-
-ChecklistChangeRead(c echo.Context) (request models.ChecklistInput, err error)
-ChecklistWrite(checklist models.ChecklistOutside) (response models.ResponseChecklist, err error)
-
-AttachmentAddRead(c echo.Context) (request models.AttachmentInput, err error)
-AttachmentDeleteRead(c echo.Context) (request models.AttachmentInput, err error)
-AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error)
-
-UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error)
-*/
-
 func TestTransport_TaskChangeRead(t *testing.T) {
 	userJSON := `{"taskID":0,"cardID":4,"taskName":"back","taskDescription":"write code","taskOrder":1}`
 
