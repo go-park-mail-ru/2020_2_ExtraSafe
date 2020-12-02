@@ -8,7 +8,7 @@ import (
 )
 
 func TestStorage_CreateUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3302", tarantool.Opts{ User: "guest" })
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func TestStorage_CreateUserSession(t *testing.T) {
 }
 
 func TestStorage_CreateUserSessionFail(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3302", tarantool.Opts{ User: "guest" })
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {
@@ -42,7 +42,7 @@ func TestStorage_CreateUserSessionFail(t *testing.T) {
 }
 
 func TestStorage_CheckUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3302", tarantool.Opts{ User: "guest" })
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {
@@ -59,7 +59,7 @@ func TestStorage_CheckUserSession(t *testing.T) {
 }
 
 func TestStorage_CheckUserSessionFail(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3302", tarantool.Opts{ User: "guest" })
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {
@@ -77,7 +77,7 @@ func TestStorage_CheckUserSessionFail(t *testing.T) {
 }
 
 func TestStorage_DeleteUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3302", tarantool.Opts{ User: "guest" })
+	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
 	defer tConn.Close()
 
 	if err != nil {

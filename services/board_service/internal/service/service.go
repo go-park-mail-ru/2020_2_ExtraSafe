@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
@@ -9,6 +10,7 @@ import (
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
+	"io"
 )
 
 //go:generate mockgen -destination=../../../mock/mock_boardService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service Service
@@ -807,7 +809,80 @@ func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.Checklist
 
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
+const maxImageSize = 1 << 30
 
+func (s *service) AddAttachment(stream protoBoard.Board_AddAttachmentServer) error {
+	req, err := stream.Recv()
+	if err != nil {
+		return errorWorker.ConvertErrorToStatus(models.ServeError{Codes: []string{"606"}, OriginalError: err,
+			MethodName: "UploadFile"}, NameService)
+	}
+
+	fileInput := models.AttachmentFileInternal{
+		UserID:   req.GetInfo().GetUserID(),
+		Filename: req.GetInfo().GetFilename(),
+	}
+
+	userInput := &models.AttachmentInternal{
+		TaskID:       req.GetInfo().GetTaskID(),
+		Filename:     req.GetInfo().GetFilename(),
+	}
+
+	imageData := bytes.Buffer{}
+	imageSize := 0
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return errorWorker.ConvertErrorToStatus(models.ServeError{Codes: []string{"606"}, OriginalError: err,
+				MethodName: "UploadFile"}, NameService)
+		}
+		chunk := req.GetFile()
+		size := len(chunk)
+
+		imageSize += size
+		if imageSize > maxImageSize {
+			return errorWorker.ConvertErrorToStatus(models.ServeError{Codes: []string{"606"}, OriginalError: err,
+				MethodName: "UploadFile"}, NameService)
+		}
+
+		_, err = imageData.Write(chunk)
+		if err != nil {
+			return errorWorker.ConvertErrorToStatus(models.ServeError{Codes: []string{"606"}, OriginalError: err,
+				MethodName: "UploadFile"}, NameService)
+		}
+	}
+
+	fileInput.File = imageData.Bytes()
+
+	err = s.fileStorage.UploadFile(fileInput, userInput, false)
+	if err != nil {
+		return errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	attachment, err := s.boardStorage.AddAttachment(*userInput)
+	if err != nil {
+		return errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	res := &protoBoard.AttachmentOutside{
+		AttachmentID: attachment.AttachmentID,
+		Filename:     attachment.Filename,
+		Filepath:     attachment.Filepath,
+	}
+
+	err = stream.SendAndClose(res)
+	if err != nil {
+		return errorWorker.ConvertErrorToStatus(models.ServeError{Codes: []string{"606"}, OriginalError: err,
+			MethodName: "UploadFile"}, NameService)
+	}
+
+	return nil
+}
+/*
 func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentInput) (output *protoBoard.AttachmentOutside, err error) {
 	fileInput := models.AttachmentFileInternal{
 		UserID:   input.UserID,
@@ -837,9 +912,9 @@ func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentI
 	}
 
 	return output, nil
-}
+}*/
 
-func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInput) (*protoBoard.Nothing, error) {
+func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInfo) (*protoBoard.Nothing, error) {
 	userInput := models.AttachmentInternal{
 		TaskID:       input.TaskID,
 		Filename:     input.Filename,

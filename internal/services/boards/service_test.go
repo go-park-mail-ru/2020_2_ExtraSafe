@@ -1,5 +1,5 @@
 package boards
-
+/*
 import (
 	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
@@ -10,8 +10,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
-)
-
+)*/
+/*
 func TestService_CreateBoard(t *testing.T) {
 	request := &protoBoard.BoardChangeInput{
 		UserID:    1,
@@ -105,4 +105,4 @@ func TestService_ChangeBoard(t *testing.T) {
 
 	mockBoardService.EXPECT().ChangeBoard(context.Background(), request)
 
-}
+}*/

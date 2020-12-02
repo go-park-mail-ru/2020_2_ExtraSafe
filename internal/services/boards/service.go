@@ -1,11 +1,13 @@
 package boards
 
 import (
+	"bytes"
 	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	"io"
 )
 
 //go:generate mockgen -destination=../../../cmd/handlers/mock/mock_boardsService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards ServiceBoard
@@ -829,25 +831,63 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 
 	return nil
 }
-
 func (s *service) CreateAttachment(request models.AttachmentInput) (attachment models.AttachmentOutside, err error) {
 	ctx := context.Background()
 
-	input := &protoBoard.AttachmentInput{
-		UserID: request.UserID,
-		TaskID: request.TaskID,
-		Filename: request.Filename,
-		File: request.File,
-	}
-
-	output, err := s.boardService.AddAttachment(ctx, input)
+	stream, err := s.boardService.AddAttachment(ctx)
 	if err != nil {
-		return models.AttachmentOutside{}, errorWorker.ConvertStatusToError(err)
+		return attachment, errorWorker.ConvertStatusToError(err)
 	}
 
-	attachment.AttachmentID = output.AttachmentID
-	attachment.Filename = output.Filename
-	attachment.Filepath = output.Filepath
+	req := &protoBoard.AttachmentInput{
+		Data: &protoBoard.AttachmentInput_Info{
+			Info: &protoBoard.AttachmentInfo{
+				UserID: request.UserID,
+				TaskID: request.TaskID,
+				Filename: request.Filename,
+			},
+		},
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		stream.RecvMsg(nil)
+		return attachment, errorWorker.ConvertStatusToError(err)
+	}
+
+	reader := bytes.NewReader(request.File)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return attachment, errorWorker.ConvertStatusToError(err)
+		}
+
+		req := &protoBoard.AttachmentInput{
+			Data: &protoBoard.AttachmentInput_File{
+				File: buffer[:n],
+			},
+		}
+
+		err = stream.Send(req)
+		if err != nil {
+			return attachment, errorWorker.ConvertStatusToError(err)
+		}
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		return attachment, errorWorker.ConvertStatusToError(err)
+	}
+
+
+	attachment.AttachmentID = res.AttachmentID
+	attachment.Filename = res.Filename
+	attachment.Filepath = res.Filepath
 
 	return attachment, nil
 }
@@ -855,12 +895,11 @@ func (s *service) CreateAttachment(request models.AttachmentInput) (attachment m
 func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 	ctx := context.Background()
 
-	input := &protoBoard.AttachmentInput{
+	input := &protoBoard.AttachmentInfo{
 		UserID: request.UserID,
 		TaskID: request.TaskID,
 		AttachmentID: request.AttachmentID,
 		Filename: request.Filename,
-		File: request.File,
 	}
 
 	_, err = s.boardService.RemoveAttachment(ctx, input)

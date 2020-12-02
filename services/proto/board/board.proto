@@ -1,3 +1,4 @@
+
 syntax = "proto3";
 
 // protoc --go_out=plugins=grpc:. *.proto
@@ -213,12 +214,18 @@ message ChecklistOutside {
 }
 
 //==========================================
-message AttachmentInput {
+message AttachmentInfo {
   int64 UserID = 1;
   int64 TaskID = 2;
   int64 AttachmentID = 3;
   string Filename = 4;
-  bytes File = 5;
+}
+
+message AttachmentInput {
+  oneof data {
+    AttachmentInfo info = 1;
+    bytes File = 2;
+  };
 }
 
 message AttachmentOutside {
@@ -276,8 +283,8 @@ service Board {
   rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
 
-  rpc AddAttachment(AttachmentInput) returns (AttachmentOutside) {}
-  rpc RemoveAttachment(AttachmentInput) returns (Nothing) {}
+  rpc AddAttachment (stream AttachmentInput) returns (AttachmentOutside) {}
+  rpc RemoveAttachment (AttachmentInfo) returns (Nothing) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}

@@ -37,22 +37,22 @@ func (m *MockBoardClient) EXPECT() *MockBoardClientMockRecorder {
 }
 
 // AddAttachment mocks base method
-func (m *MockBoardClient) AddAttachment(arg0 context.Context, arg1 *protoBoard.AttachmentInput, arg2 ...grpc.CallOption) (*protoBoard.AttachmentOutside, error) {
+func (m *MockBoardClient) AddAttachment(arg0 context.Context, arg1 ...grpc.CallOption) (protoBoard.Board_AddAttachmentClient, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddAttachment", varargs...)
-	ret0, _ := ret[0].(*protoBoard.AttachmentOutside)
+	ret0, _ := ret[0].(protoBoard.Board_AddAttachmentClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // AddAttachment indicates an expected call of AddAttachment
-func (mr *MockBoardClientMockRecorder) AddAttachment(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+func (mr *MockBoardClientMockRecorder) AddAttachment(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAttachment", reflect.TypeOf((*MockBoardClient)(nil).AddAttachment), varargs...)
 }
 
@@ -677,7 +677,7 @@ func (mr *MockBoardClientMockRecorder) GetTask(arg0, arg1 interface{}, arg2 ...i
 }
 
 // RemoveAttachment mocks base method
-func (m *MockBoardClient) RemoveAttachment(arg0 context.Context, arg1 *protoBoard.AttachmentInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) RemoveAttachment(arg0 context.Context, arg1 *protoBoard.AttachmentInfo, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {

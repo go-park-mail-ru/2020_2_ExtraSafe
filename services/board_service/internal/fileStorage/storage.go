@@ -31,7 +31,7 @@ func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *mod
 	formattedID := strconv.FormatInt(file.UserID, 10)
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID+file.Filename)))
 
-	filename, err := saveFile(file.File, name, file.Filename, false)
+	filename, err := saveFile(file.File, name, file.Filename, isTest)
 
 	if err != nil {
 		return models.ServeError{Codes: []string{"600"}, Descriptions: []string{"File error"},
@@ -50,7 +50,7 @@ func saveFile(src []byte, name string, initialName string, isTest bool) (filenam
 	if isTest {
 		dst, err = os.Create("../../../../attachments/" + filename)
 	} else {
-		dst, err = os.Create("../../../../attachments/" + filename)
+		dst, err = os.Create("../../../attachments/" + filename)
 	}
 
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *storage) DeleteFile(filepath string, isTest bool) error {
 	if isTest {
 		os.Remove("../../../../" + filepath)
 	} else {
-		os.Remove("../../../../" + filepath)
+		os.Remove("../../../" + filepath)
 	}
 	return nil
 }
