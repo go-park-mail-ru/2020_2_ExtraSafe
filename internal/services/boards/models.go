@@ -9,7 +9,7 @@ import (
 //go:generate mockgen -destination=./mock/mock_validator.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards Validator
 
 type UserStorage interface {
-	GetBoardMembers(userIDs []uint64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
+	GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
 type BoardStorage interface {
@@ -20,12 +20,13 @@ type BoardStorage interface {
 
 	CreateCard(cardsInput models.CardInput) (models.CardOutside, error)
 	GetCard(cardInput models.CardInput) (models.CardOutside, error)
-	ChangeCard(cardsInput models.CardInput) (models.CardOutside, error)
-	DeleteCard(cardsInput models.CardInput) error
+	ChangeCard(cardInput models.CardInput) (models.CardOutside, error)
+	DeleteCard(cardInput models.CardInput) error
+	ChangeCardOrder(cardInput models.CardsOrderInput) error
 
-	CreateTask(taskInput models.TaskInput) (models.TaskOutside, error)
-	GetTask(taskInput models.TaskInput) (models.TaskOutside, error)
-	ChangeTask(taskInput models.TaskInput) (models.TaskOutside, error)
+	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	GetTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
+	ChangeTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	DeleteTask(taskInput models.TaskInput) error
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 }

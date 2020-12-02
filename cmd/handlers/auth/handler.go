@@ -1,9 +1,12 @@
 package authHandler
 
 import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
 	"net/http"
+	"time"
 )
 
 type Handler interface {
@@ -14,45 +17,33 @@ type Handler interface {
 }
 
 type handler struct {
-	authService   AuthService
-	authTransport AuthTransport
-	authSessions  AuthSessions
-	errorWorker   ErrorWorker
+	authService   auth.ServiceAuth
+	authTransport auth.TransportAuth
+	errorWorker   errorWorker.ErrorWorker
 }
 
-func NewHandler(authService AuthService, authTransport AuthTransport, authSessions AuthSessions, errorWorker ErrorWorker) *handler {
+func NewHandler(authService auth.ServiceAuth, authTransport auth.TransportAuth, errorWorker errorWorker.ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
-		authSessions: authSessions,
-		errorWorker:     errorWorker,
+		errorWorker:   errorWorker,
 	}
 }
 
 func (h *handler) Auth(c echo.Context) error {
 	userInput, err := h.authTransport.AuthRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
 	user, err := h.authService.Auth(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.AuthWrite(user)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	token, _ := csrf.GenerateToken(userInput.ID)
+
+	response, _ := h.authTransport.AuthWrite(user, token)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -60,82 +51,62 @@ func (h *handler) Auth(c echo.Context) error {
 func (h *handler) Login(c echo.Context) error {
 	userInput, err := h.authTransport.LoginRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
-	userID, _, err := h.authService.Login(userInput)
+	user, err := h.authService.Login(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
-	token, _ := csrf.GenerateToken(userID)
+	token, _ := csrf.GenerateToken(user.UserID)
 
-	response, err := h.authTransport.LoginWrite(token)
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	response, _ := h.authTransport.LoginWrite(token)
 
-	if err := h.authSessions.SetCookie(c, userID); err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
-	}
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Value = user.SessionID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Logout(c echo.Context) error {
-	err := h.authSessions.DeleteCookie(c)
+	err := h.authService.Logout(c)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
+
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	c.SetCookie(cookie)
 	return c.NoContent(http.StatusOK)
 }
 
 func (h *handler) Registration(c echo.Context) error{
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.TransportError(c)
 	}
 
-	userID, _, err := h.authService.Registration(userInput)
+	user, err := h.authService.Registration(userInput)
 	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-		return err
+		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.authTransport.RegWrite()
-	if err != nil {
-		if err := h.errorWorker.TransportError(c); err != nil {
-			return err
-		}
-		return err
-	}
+	response, _ := h.authTransport.RegWrite()
 
-	err = h.authSessions.SetCookie(c, userID)
-	if err != nil {
-		if err := h.errorWorker.RespError(c, err); err != nil {
-			return err
-		}
-	}
+	cookie := new(http.Cookie)
+	cookie.Name = "tabutask_id"
+	cookie.Value = user.SessionID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, response)
 }

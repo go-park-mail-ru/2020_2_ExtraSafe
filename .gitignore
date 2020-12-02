@@ -11,16 +11,21 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out*
 *.html
+cover*
 
 /.idea
 /useful
+/attachments
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-*.jpeg
+avatars/*.jpeg
 
 pg_configs
 tarantool_configs
 
 queries.sql
 test_data.sql
+useful
+/test.sql
+

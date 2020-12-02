@@ -5,12 +5,13 @@ import (
 	"github.com/labstack/echo"
 )
 
-type Transport interface {
+//go:generate mockgen -destination=../../../cmd/handlers/mock/mock_authTransport.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth TransportAuth
+type TransportAuth interface {
 	AuthRead(c echo.Context) (request models.UserInput, err error)
 	LoginRead(c echo.Context) (request models.UserInputLogin, err error)
 	RegRead(c echo.Context) (request models.UserInputReg, err error)
 
-	AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)
+	AuthWrite(user models.UserBoardsOutside, token string) (response models.ResponseUserAuth, err error)
 	LoginWrite(token string) (response models.ResponseToken, err error)
 	RegWrite() (response models.ResponseStatus, err error)
 }
@@ -18,13 +19,13 @@ type Transport interface {
 type transport struct {
 }
 
-func NewTransport() Transport {
+func NewTransport() TransportAuth {
 	return &transport{}
 }
 
 func (t transport) AuthRead(c echo.Context) (request models.UserInput, err error)  {
 	userInput := new(models.UserInput)
-	userInput.ID = c.Get("userId").(uint64)
+	userInput.ID = c.Get("userId").(int64)
 	return *userInput, nil
 }
 
@@ -48,24 +49,24 @@ func (t transport) LoginRead(c echo.Context) (request models.UserInputLogin, err
 	return *userInput, nil
 }
 
-func (t transport) AuthWrite(user models.UserBoardsOutside) (response models.ResponseUserAuth, err error)  {
+func (t transport)AuthWrite(user models.UserBoardsOutside, token string) (response models.ResponseUserAuth, err error)  {
 	response.Status = 200
+	response.Token = token
 	response.Email = user.Email
 	response.Username = user.Username
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
-	response.Links = *user.Links
 	response.Boards = user.Boards
-	return response, err
+	return response, nil
 }
 
 func (t transport)LoginWrite(token string) (response models.ResponseToken, err error)  {
 	response.Status = 200
 	response.Token = token
-	return response, err
+	return response, nil
 }
 
 func (t transport) RegWrite() (response models.ResponseStatus, err error)  {
 	response.Status = 200
-	return response, err
+	return response, nil
 }

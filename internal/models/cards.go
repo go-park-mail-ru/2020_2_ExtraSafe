@@ -1,25 +1,51 @@
 package models
 
+
 type Card struct {
-	CardID  uint64 `json:"columnID"`
-	BoardID uint64 `json:"boardID"`
-	Name    string `json:"name"`
-	Order   uint8  `json:"order"`
+	CardID  int64  `json:"columnID"`
+	BoardID int64  `json:"boardID"`
+	Name    string `json:"cardName"`
+	Order   int64  `json:"order"`
 }
 
-type CardOutside struct {
-	CardID uint64        `json:"cardID"`
-	Name   string        `json:"name"`
-	Order  uint8         `json:"order"`
-	Tasks  []TaskOutside `json:"tasks"`
-}
-
+//===================================================<-Input
 type CardInput struct {
-	UserID  uint64 `json:"-"`
-	CardID  uint64 `json:"cardID"`
-	BoardID uint64 `json:"boardID"`
-	Name    string `json:"name"`
-	Order   uint8  `json:"order"`
+	UserID  int64  `json:"-"`
+	CardID  int64  `json:"cardID"`
+	BoardID int64  `json:"boardID"`
+	Name    string `json:"cardName"`
+	Order   int64  `json:"cardOrder"`
 }
 
+type CardOrder struct {
+	CardID int64 `json:"cardID"`
+	Order  int64 `json:"cardOrder"`
+}
 
+type CardsOrderInput struct {
+	UserID int64       `json:"-"`
+	Cards  []CardOrder `json:"cards"`
+}
+
+//===================================================<-Internal
+type CardInternal struct {
+	CardID int64
+	Name   string
+	Order  int64
+	Tasks  []TaskInternalShort
+}
+
+//===================================================<-Outside
+type CardOutside struct {
+	CardID int64              `json:"cardID"`
+	Name   string             `json:"cardName"`
+	Order  int64              `json:"cardOrder"`
+	Tasks  []TaskOutsideShort `json:"cardTasks"`
+}
+
+type CardOutsideShort struct {
+	CardID int64  `json:"cardID"`
+	Name   string `json:"cardName"`
+}
+
+//===================================================<-Other

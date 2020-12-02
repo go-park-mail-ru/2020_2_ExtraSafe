@@ -1,171 +1,227 @@
 package auth
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth/mock"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/mock"
+	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
+	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
-func TestService_Auth(t *testing.T) {
-	ctrlUser := gomock.NewController(t)
-	defer ctrlUser.Finish()
-	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
+func TestService_CheckCookie(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	ctx := e.NewContext(req, httptest.NewRecorder())
 
-	ctrlBoards := gomock.NewController(t)
-	defer ctrlBoards.Finish()
-	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoards)
+	cookie := new(http.Cookie)
+	SID := "ALMoijiomIUHNbgyuygfuyefgKAJmiejcuierhhiauwdh"
 
-	expectedUser := models.UserOutside{
-		Email:    "epridius@gmail.com",
-		Username: "pkaterinaa",
-		FullName: "",
-		Avatar:   "default/default_avatar.png",
+	cookie.Name = "tabutask_id"
+	cookie.Value = SID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	ctx.Request().AddCookie(cookie)
+
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockAuthClient(ctrlAuth)
+
+	service := service{authService: mockAuthService}
+
+	input := &protoAuth.UserSession{
+		SessionID: SID,
+		UserID:    -1,
 	}
 
-	expect := models.UserOutside {
-		Email:    "epridius@gmail.com",
-		Username: "pkaterinaa",
-		FullName: "",
-		Avatar:   "default/default_avatar.png",
-		//Links : &models.UserLinks{},
-	}
-	board1 := models.BoardOutsideShort{
-		BoardID: 1,
-		Name:    "board_1",
-		Theme:   "dark",
-		Star:    false,
-	}
+	mockAuthService.EXPECT().CheckCookie(context.Background(), input).Return(&protoProfile.UserID{ID: int64(1)}, nil)
 
-	board2 := models.BoardOutsideShort{
-		BoardID: 2,
-		Name:    "board_2",
-		Theme:   "light",
-		Star:    false,
-	}
-
-	expectedBoards := make([]models.BoardOutsideShort, 0)
-	expectedBoards = append(expectedBoards, board1, board2)
-
-	userInput := models.UserInput{ID: 1}
-
-	mockUserStorage.EXPECT().GetUserProfile(userInput).Return(expectedUser, nil)
-	mockUserStorage.EXPECT().GetUserAccounts(userInput).Return(expect, nil)
-	mockBoardStorage.EXPECT().GetBoardsList(userInput).Return(expectedBoards, nil)
-
-	service := &service{
-		userStorage: mockUserStorage,
-		boardStorage: mockBoardStorage,
-	}
-
-	expectedResponse := models.UserBoardsOutside{
-		Email:    expectedUser.Email,
-		Username: expectedUser.Username,
-		FullName: expectedUser.FullName,
-		Links:    expectedUser.Links,
-		Avatar:   expectedUser.Avatar,
-		Boards:   expectedBoards,
-	}
-
-	response, err := service.Auth(userInput)
+	userID, err := service.CheckCookie(ctx)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-	if !reflect.DeepEqual(response, expectedResponse) {
-		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedResponse, response)
+	if !reflect.DeepEqual(userID, int64(1)) {
+		t.Errorf("results not match, want %v, have %v", int64(1), userID)
+		return
+	}
+}
+
+func TestService_Auth(t *testing.T) {
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockAuthClient(ctrlAuth)
+
+	service := service{authService: mockAuthService}
+	request := models.UserInput{ID: 1}
+	input := &protoProfile.UserID{ID: request.ID}
+
+	boards := make([]*protoProfile.BoardOutsideShort, 0)
+	boards = append(boards, &protoProfile.BoardOutsideShort{
+		BoardID: 1,
+		Name:    "name",
+		Theme:   "dark",
+		Star:    false,
+	})
+
+	internal := &protoProfile.UserBoardsOutside{
+		Email:    "epridius@gmail",
+		Username: "pkaterinaa",
+		FullName: "lalala",
+		Avatar:   "default",
+		Boards:   boards,
+	}
+
+	responseBoards := make([]models.BoardOutsideShort, 0)
+	responseBoards = append(responseBoards, models.BoardOutsideShort{
+		BoardID: boards[0].BoardID,
+		Name:    boards[0].Name,
+		Theme:   boards[0].Theme,
+		Star:    boards[0].Star,
+	})
+
+	response := models.UserBoardsOutside{
+		Email:    internal.Email,
+		Username: internal.Username,
+		FullName: internal.FullName,
+		Avatar:   internal.Avatar,
+		Boards:   responseBoards,
+	}
+
+	mockAuthService.EXPECT().Auth(context.Background(), input).Return(internal, nil)
+	output, err := service.Auth(request)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, response) {
+		t.Errorf("results not match, want %v, have %v", response, output)
+		return
+	}
+
+}
+
+func TestService_Registration(t *testing.T) {
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockAuthClient(ctrlAuth)
+
+	validator := validation.NewService()
+	service := NewService(mockAuthService, validator)
+
+	request := models.UserInputReg{
+		Email:    "pridiuskate@gmail.com",
+		Username: "pkaterinaa",
+		Password: "12212121",
+	}
+
+	input := &protoProfile.UserInputReg{
+		Email:    request.Email,
+		Username: request.Username,
+		Password: request.Password,
+	}
+
+	session := &protoAuth.UserSession{
+		SessionID: "ansfbaoufnguwqgddobwuyifq",
+		UserID:    1,
+	}
+
+	expect := models.UserSession{
+		SessionID: session.SessionID,
+		UserID:    session.UserID,
+	}
+
+	mockAuthService.EXPECT().Registration(context.Background(), input).Return(session, nil)
+	output, err := service.Registration(request)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, output)
 		return
 	}
 }
 
 func TestService_Login(t *testing.T) {
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockAuthClient(ctrlAuth)
+
+	validator := validation.NewService()
+	service := NewService(mockAuthService, validator)
+
 	request := models.UserInputLogin{
-		Email:    "epridius@yandex.ru",
-		Password: "lalala",
+		Email:    "pridiuskate@gmail.com",
+		Password: "12212121",
 	}
 
-	expectedUser:= models.UserOutside{
+	input := &protoProfile.UserInputLogin{
 		Email:    request.Email,
-		Username: "pkaterinaa",
-		FullName: "",
-		Links:    nil,
-		Avatar:   "default/default_avatar.png",
+		Password: request.Password,
 	}
 
-	ctrlUser := gomock.NewController(t)
-	defer ctrlUser.Finish()
-	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
-
-	ctrlValid := gomock.NewController(t)
-	defer ctrlValid.Finish()
-	mockValidator := mocks.NewMockValidator(ctrlValid)
-
-	service := &service{
-		userStorage: mockUserStorage,
-		validator: mockValidator,
+	session := &protoAuth.UserSession{
+		SessionID: "ansfbaoufnguwqgddobwuyifq",
+		UserID:    1,
 	}
 
-	mockValidator.EXPECT().ValidateLogin(request).Return(nil)
-	mockUserStorage.EXPECT().CheckUser(request).Return(uint64(1), expectedUser, nil)
+	expect := models.UserSession{
+		SessionID: session.SessionID,
+		UserID:    session.UserID,
+	}
 
-	userID, user, err := service.Login(request)
+	mockAuthService.EXPECT().Login(context.Background(), input).Return(session, nil)
+	output, err := service.Login(request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-	if !reflect.DeepEqual(user, expectedUser) {
-		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedUser, user)
-		return
-	}
-	if userID != 1 {
-		t.Errorf("result ID not match, \nhave \n%v", userID)
+	if !reflect.DeepEqual(output, expect) {
+		t.Errorf("results not match, want %v, have %v", expect, output)
 		return
 	}
 }
 
-func TestService_Registration(t *testing.T) {
-	request := models.UserInputReg{
-		Email:    "epridius@yandex.ru",
-		Username: "pkaterinaa",
-		Password: "lalala",
+func TestService_Logout(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	ctx := e.NewContext(req, httptest.NewRecorder())
+
+	cookie := new(http.Cookie)
+	SID := "ALMoijiomIUHNbgyuygfuyefgKAJmiejcuierhhiauwdh"
+
+	cookie.Name = "tabutask_id"
+	cookie.Value = SID
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	ctx.Request().AddCookie(cookie)
+
+	ctrlAuth := gomock.NewController(t)
+	defer ctrlAuth.Finish()
+	mockAuthService := mock.NewMockAuthClient(ctrlAuth)
+
+	service := service{authService: mockAuthService}
+
+	input := &protoAuth.UserSession{
+		SessionID: SID,
+		UserID:    -1,
 	}
 
-	expectedUser:= models.UserOutside{
-		Email:    request.Email,
-		Username: request.Username,
-		FullName: "",
-		Links:    nil,
-		Avatar:   "default/default_avatar.png",
-	}
+	mockAuthService.EXPECT().DeleteCookie(context.Background(), input).Return(&protoAuth.Nothing{Dummy: true}, nil)
 
-	ctrlUser := gomock.NewController(t)
-	defer ctrlUser.Finish()
-	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
-
-	ctrlValid := gomock.NewController(t)
-	defer ctrlValid.Finish()
-	mockValidator := mocks.NewMockValidator(ctrlValid)
-
-	service := &service{
-		userStorage: mockUserStorage,
-		validator: mockValidator,
-	}
-
-	mockValidator.EXPECT().ValidateRegistration(request).Return(nil)
-	mockUserStorage.EXPECT().CreateUser(request).Return(uint64(1), expectedUser, nil)
-
-	userID, user, err := service.Registration(request)
+	err := service.Logout(ctx)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
-		return
-	}
-	if !reflect.DeepEqual(user, expectedUser) {
-		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedUser, user)
-		return
-	}
-	if userID != 1 {
-		t.Errorf("result ID not match, \nhave \n%v", userID)
 		return
 	}
 }

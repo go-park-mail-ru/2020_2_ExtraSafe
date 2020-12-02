@@ -16,12 +16,11 @@ type UserStorage interface {
 	GetUserAvatar(userInput models.UserInput) (models.UserAvatar, error)
 
 	ChangeUserProfile(userInput models.UserInputProfile, userAvatar models.UserAvatar) (models.UserOutside, error)
-	ChangeUserAccounts(userInput models.UserInputLinks) (models.UserOutside, error)
 	ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error)
 }
 
 type AvatarStorage interface {
-	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar) error
+	UploadAvatar(file *multipart.FileHeader, user *models.UserAvatar, isTest bool) error
 }
 
 type BoardStorage interface {
@@ -31,5 +30,4 @@ type BoardStorage interface {
 type Validator interface {
 	ValidateProfile(request models.UserInputProfile) (err error)
 	ValidateChangePassword(request models.UserInputPassword) (err error)
-	ValidateLinks(request models.UserInputLinks) (err error)
 }
