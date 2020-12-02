@@ -2,7 +2,6 @@ package cardsStorage
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -33,7 +32,6 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 								cardInput.BoardID, cardInput.Name, cardInput.Order).Scan(&cardID)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.CardOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateCard"}
 	}
@@ -64,7 +62,6 @@ func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, e
 func (s *storage) DeleteCard(cardInput models.CardInput) error {
 	_, err := s.db.Exec("DELETE FROM cards WHERE cardID = $1", cardInput.CardID)
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteCard"}
 	}
 
@@ -103,7 +100,6 @@ func (s *storage) GetCardByID(cardInput models.CardInput) (models.CardInternal, 
 					Scan(&card.Name, &card.Order)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetCardByID"}
 	}
@@ -117,7 +113,6 @@ func (s *storage) ChangeCardOrder(cardInput models.CardsOrderInput) error {
 				card.Order, card.CardID)
 
 			if err != nil {
-				fmt.Println(err)
 				return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "ChangeCardOrder"}
 		}
 	}

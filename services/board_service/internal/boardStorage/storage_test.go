@@ -3,7 +3,6 @@ package boardStorage
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
@@ -254,7 +253,6 @@ func TestStorage_GetBoard(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)
@@ -520,7 +518,6 @@ func TestStorage_GetBoardTasksFail(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)
@@ -586,7 +583,6 @@ func TestStorage_GetBoardTaskTagsFail(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)
@@ -681,7 +677,6 @@ func TestStorage_GetBoardTaskAssignersFail(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)
@@ -777,7 +772,6 @@ func TestStorage_GetBoardTags(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)
@@ -883,7 +877,6 @@ func TestStorage_GetBoardChecklists(t *testing.T) {
 
 	mockCards := mocks.NewMockCardsStorage(ctrlCards)
 
-	fmt.Println("expected cards ", expectedCards)
 	mockCards.EXPECT().GetCardsByBoard(models.BoardInput{BoardID: boardInput.BoardID}).Times(1).Return(expectedCards, nil)
 
 	expectedTasks := make([]models.TaskInternalShort, 0)

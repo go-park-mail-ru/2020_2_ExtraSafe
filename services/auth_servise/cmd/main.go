@@ -19,6 +19,7 @@ func main() {
 	defer tConn.Close()
 	if err != nil {
 		fmt.Println("Connection refused")
+		return
 	}
 
 	authStorage := sessionsStorage.NewStorage(tConn)

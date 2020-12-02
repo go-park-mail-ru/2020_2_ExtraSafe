@@ -2,7 +2,6 @@ package tasksStorage
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -37,7 +36,6 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalSho
 								taskInput.CardID, taskInput.Name, taskInput.Description, taskInput.Order).Scan(&taskID)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.TaskInternalShort{} ,models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateTask"}
 	}
@@ -72,7 +70,6 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, e
 func (s *storage) DeleteTask(taskInput models.TaskInput) error {
 	_, err := s.db.Exec("DELETE FROM tasks WHERE taskID = $1", taskInput.TaskID)
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteTask"}
 	}
 
@@ -112,7 +109,6 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, 
 				Scan(&task.Name, &task.Description, &task.Order)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.TaskInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetTaskByID"}
 	}
@@ -127,7 +123,6 @@ func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 				card.CardID, task.Order, task.TaskID)
 
 			if err != nil {
-				fmt.Println(err)
 				return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "ChangeTaskOrder"}
 			}
 		}

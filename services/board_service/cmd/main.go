@@ -23,7 +23,6 @@ import (
 func main() {
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_boards")
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -32,7 +31,6 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -45,27 +43,6 @@ func main() {
 	bStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage, attachStorage)
 
 	fileStorage := fStorage.NewStorage()
-
-	/*// =============================
-
-	grpcConn := new(grpc.ClientConn)
-	go func(conn *grpc.ClientConn) *grpc.ClientConn {
-		for  {
-			conn, err = grpc.Dial(
-				"127.0.0.1:9082",
-				grpc.WithInsecure(),
-			)
-			if err != nil {
-				fmt.Println("cant connect to grpc")
-				continue
-			}
-			fmt.Println("Connect")
-			return conn
-		}
-	}(grpcConn)
-
-	defer grpcConn.Close()
-	// =============================*/
 
 	// =============================
 
@@ -94,6 +71,5 @@ func main() {
 	protoBoard.RegisterBoardServer(server, handler)
 
 	fmt.Println("starting server at :9083")
-	//fmt.Println(server.GetServiceInfo())
 	server.Serve(lis)
 }

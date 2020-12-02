@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"golang.org/x/crypto/argon2"
 )
@@ -142,7 +141,6 @@ func (s *storage) GetUserProfile(userInput models.UserInput) (models.UserOutside
 
 	if err != sql.ErrNoRows {
 		if err != nil {
-			fmt.Println(err)
 			return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetUserProfile"}
 		}
@@ -177,7 +175,6 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 	_, err := s.db.Exec("UPDATE users SET email = $1, username = $2, fullname = $3, avatar = $4 WHERE userID = $5",
 		userInput.Email, userInput.Username, userInput.FullName, userAvatar.Avatar, userInput.ID)
 	if err != nil {
-		fmt.Println(err)
 		return models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeUserProfile"}
 	}
@@ -195,7 +192,6 @@ func (s *storage) ChangeUserProfile(userInput models.UserInputProfile, userAvata
 func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models.UserOutside, error) {
 	user, password, err := s.GetInternalUser(models.UserInput{ ID : userInput.ID})
 	if err != nil {
-		fmt.Println(err)
 		return models.UserOutside{}, err
 	}
 
@@ -211,7 +207,6 @@ func (s *storage) ChangeUserPassword(userInput models.UserInputPassword) (models
 
 	_, err = s.db.Exec("UPDATE users SET password = $1 WHERE userID = $2", userPassHash, userInput.ID)
 	if err != nil {
-		fmt.Println(err)
 		return  models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeUserPassword"}
 	}

@@ -326,7 +326,6 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 	userInput.Filename = formParams.Get("attachmentFileName")
 	userInput.TaskID, _ = strconv.ParseInt(formParams.Get("taskID"), 10, 64)
 
-	//TODO какая то фигня
 	file, err := c.FormFile("file")
 	if err == nil {
 		fileContent, _ := file.Open()

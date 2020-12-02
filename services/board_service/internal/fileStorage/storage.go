@@ -54,14 +54,12 @@ func saveFile(src []byte, name string, initialName string, isTest bool) (filenam
 	}
 
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	defer dst.Close()
 
 	_, err = dst.Write(src)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 

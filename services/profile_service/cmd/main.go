@@ -17,7 +17,6 @@ import (
 func main() {
 	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -26,10 +25,8 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
-
 
 	profileStorage := userStorage.NewStorage(db)
 	avatarStorage := imgStorage.NewStorage()
@@ -56,20 +53,12 @@ func main() {
 
 	server := grpc.NewServer()
 
-	fmt.Println(grpcConn.GetState())
 	boardService := protoBoard.NewBoardClient(grpcConn)
-/*
-	_, err = boardService.GetBoard(context.Background(), &protoBoard.BoardInput{
-		UserID:  2,
-		BoardID: 2,
-	})
-	fmt.Println(err)*/
 
 	handler := profile.NewService(profileStorage, avatarStorage, boardService)
 
 	protoProfile.RegisterProfileServer(server, handler)
 
 	fmt.Println("starting server at :9082")
-	//fmt.Println(server.GetServiceInfo())
 	server.Serve(lis)
 }

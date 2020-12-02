@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	_ "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
@@ -109,10 +108,8 @@ var (
 
 func (s *service) SetCookie(userID int64) (cookieValue string, err error) {
 	cookieValue = RandStringRunes(32)
-	fmt.Println(cookieValue)
 
 	if err := s.authStorage.CreateUserSession(userID, cookieValue); err != nil {
-		fmt.Println(err)
 		return cookieValue, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 

@@ -41,7 +41,6 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 	userInput.Email = formParams.Get("email")
 	userInput.FullName = formParams.Get("fullName")
 
-	//TODO какая то фигня
 	file, err := c.FormFile("avatar")
 	if err == nil {
 		fileContent, _ := file.Open()

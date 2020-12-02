@@ -2,7 +2,6 @@ package boardStorage
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
@@ -142,7 +141,6 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 				Scan(&board.AdminID, &board.Name, &board.Theme, &board.Star)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetBoard"}
 	}
@@ -296,7 +294,6 @@ func (s *storage) GetCard(cardInput models.CardInput) (models.CardInternal, erro
 		return models.CardInternal{}, err
 	}
 
-	//FIXME добавить сбор фич для тасок
 	card.Tasks = append(card.Tasks, tasks...)
 	return card, nil
 }
@@ -380,7 +377,6 @@ func (s *storage) checkBoardAdminPermission(userID int64, boardID int64) (flag b
 	var ID int64
 	err = s.db.QueryRow("SELECT boardID FROM boards WHERE boardID = $1 AND adminID = $2", boardID, userID).Scan(&ID)
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println(err)
 		return false, err
 	}
 

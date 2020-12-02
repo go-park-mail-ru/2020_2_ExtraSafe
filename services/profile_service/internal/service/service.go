@@ -110,7 +110,6 @@ func (s *service) ProfileChange(_ context.Context, input *protoProfile.UserInput
 		Avatar:   input.Avatar,
 	}
 
-	// TODO - работа с аватаром
 	userAvatar, errGetAvatar := s.userStorage.GetUserAvatar(models.UserInput{ID: input.ID})
 	if errGetAvatar != nil {
 		return output, errGetAvatar

@@ -27,35 +27,6 @@ import (
 )
 
 func main() {
-	/*var cfg config
-	err := envconfig.Process("", &cfg)
-	if err != nil {
-		return
-	}
-
-	//TODO строку подключения в конфиг
-
-	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	db.SetMaxIdleConns(3)
-	db.SetMaxOpenConns(10)
-
-	err = db.Ping()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-
-	if err != nil {
-		fmt.Println("Connection refused")
-	}
-	defer tConn.Close()*/
 
 	// =============================
 

@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
@@ -244,13 +243,10 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 }
 
 func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoProfile.UserOutsideShort, err error) {
-	fmt.Println(input.MemberName)
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
 		return output, err
 	}
-
-	fmt.Println(user.ID)
 
 	userInput := models.BoardMember{
 		UserID:    input.UserID,

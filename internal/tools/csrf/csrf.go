@@ -1,7 +1,6 @@
 package csrf
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"strconv"
@@ -30,7 +29,6 @@ func CheckToken(userID int64, tokenString string) (err error) {
 		return mySigningKey, nil
 	})
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"777"}, Descriptions: []string{"Token is not valid"},
 			MethodName: "CheckToken"}
 	}

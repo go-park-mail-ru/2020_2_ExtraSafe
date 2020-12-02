@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
@@ -132,7 +131,6 @@ func (s *service) Registration(request models.UserInputReg) (userSession models.
 func (s *service) Logout(c echo.Context) (err error) {
 	session, err := c.Cookie("tabutask_id")
 	if err != nil {
-		fmt.Println(err)
 		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCookie"}
 	}
 	ctx := context.Background()
