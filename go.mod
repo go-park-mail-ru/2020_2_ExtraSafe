@@ -13,6 +13,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/lib/pq v1.8.0
+	github.com/mailru/easyjson v0.7.6
 	github.com/rs/zerolog v1.20.0
 	github.com/stretchr/testify v1.6.1
 	github.com/tarantool/go-tarantool v0.0.0-20200816172506-a535b8e0224a
