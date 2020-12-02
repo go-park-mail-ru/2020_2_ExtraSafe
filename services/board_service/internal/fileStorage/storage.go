@@ -1,7 +1,7 @@
 package fileStorage
 
 import (
-	"crypto/sha256"
+	"crypto/md5"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"os"
@@ -25,7 +25,7 @@ func NewStorage() FileStorage {
 }
 
 func (s *storage) UploadFile(file models.AttachmentFileInternal, attachment *models.AttachmentInternal, isTest bool) error {
-	hash := sha256.New()
+	hash := md5.New()
 
 	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
 	formattedID := strconv.FormatInt(file.UserID, 10)
