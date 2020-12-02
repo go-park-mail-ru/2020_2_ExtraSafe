@@ -123,8 +123,7 @@ func (t transport) BoardShortWrite(board models.BoardOutsideShort) (response mod
 func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err error) {
 	userInput := new(models.CardInput)
 
-	buf,_ := ioutil.ReadAll(c.Request().Body)
-	if err := userInput.UnmarshalJSON(buf); err != nil {
+	if err := c.Bind(userInput); err != nil {
 		return models.CardInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CardChangeRead"}
 	}
