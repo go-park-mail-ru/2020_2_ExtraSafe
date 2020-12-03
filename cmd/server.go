@@ -30,39 +30,36 @@ func main() {
 
 	// =============================
 
-	grpcConn3, err := grpc.Dial(
+	grpcConnBoard, err := grpc.Dial(
 		"127.0.0.1:9083",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn3.Close()
+	defer grpcConnBoard.Close()
 
 	// =============================
-	// =============================
 
-	grpcConn2, err := grpc.Dial(
+	grpcConnProfile, err := grpc.Dial(
 		"127.0.0.1:9082",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn2.Close()
+	defer grpcConnProfile.Close()
 
 	// =============================
 
-	// =============================
-
-	grpcConn1, err := grpc.Dial(
+	grpcConnAuth, err := grpc.Dial(
 		"127.0.0.1:9081",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn1.Close()
+	defer grpcConnAuth.Close()
 
 	// =============================
 
@@ -71,9 +68,9 @@ func main() {
 	internalLogger := logger.NewLogger(&zeroLogger)
 	errWorker := errorWorker.NewErrorWorker()
 
-	boardClient := protoBoard.NewBoardClient(grpcConn3)
-	profileClient := protoProfile.NewProfileClient(grpcConn2)
-	authClient := protoAuth.NewAuthClient(grpcConn1)
+	boardClient := protoBoard.NewBoardClient(grpcConnBoard)
+	profileClient := protoProfile.NewProfileClient(grpcConnProfile)
+	authClient := protoAuth.NewAuthClient(grpcConnAuth)
 
 	validationService := validation.NewService()
 	authService := auth.NewService(authClient, validationService)

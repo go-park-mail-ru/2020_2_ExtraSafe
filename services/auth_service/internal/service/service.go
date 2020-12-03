@@ -4,12 +4,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	_ "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
-	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/sessionsStorage"
+	authStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/sessionsStorage"
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
 	"math/rand"
+	"time"
 )
 
 type service struct {
@@ -118,6 +119,7 @@ func (s *service) SetCookie(userID int64) (cookieValue string, err error) {
 
 func RandStringRunes(n int) string {
 	b := make([]rune, n)
+	rand.Seed(time.Now().UnixNano())
 	for i := range b {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}

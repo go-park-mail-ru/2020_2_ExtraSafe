@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_servise/internal/sessionsStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/service"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
