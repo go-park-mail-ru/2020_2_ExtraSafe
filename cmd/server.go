@@ -15,6 +15,7 @@ import (
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	"github.com/joho/godotenv"
 	_ "github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
@@ -26,12 +27,36 @@ import (
 	"os"
 )
 
-func main() {
+func init() {
+	if err := godotenv.Load("../config.env"); err != nil {
+		log.Print("No .env file found")
+	}
+}
 
+func main() {
+	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	authServiceAddr, ok := os.LookupEnv("AUTH_SERVICE_ADDR")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	mainServiceAddr, ok := os.LookupEnv("TABUTASK_SERVER_ADDR")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
 	// =============================
 
 	grpcConnBoard, err := grpc.Dial(
-		"127.0.0.1:9083",
+		boardServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -42,7 +67,7 @@ func main() {
 	// =============================
 
 	grpcConnProfile, err := grpc.Dial(
-		"127.0.0.1:9082",
+		profileServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -53,7 +78,7 @@ func main() {
 	// =============================
 
 	grpcConnAuth, err := grpc.Dial(
-		"127.0.0.1:9081",
+		authServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -92,5 +117,5 @@ func main() {
 
 	handlers.Router(e, profHandler, aHandler, boardHandler, middlewaresService)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(mainServiceAddr))
 }

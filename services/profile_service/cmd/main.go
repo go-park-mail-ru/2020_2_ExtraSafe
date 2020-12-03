@@ -8,16 +8,46 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"strings"
 )
 
+func init() {
+	if err := godotenv.Load("../../../config.env"); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
-	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
+	driverName, ok := os.LookupEnv("TABUTASK_USERS_DRIVER")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	userName, ok := os.LookupEnv("TABUTASK_USERS_USER")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	password, ok := os.LookupEnv("TABUTASK_USERS_PASSWORD")
+	if !ok {
+		log.Fatalf("Cannot get env parameter")
+	}
+
+	dbName, ok := os.LookupEnv("TABUTASK_USERS_NAME")
+	if !ok {
+		log.Fatalf("")
+	}
+
+	connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
+	db, err := sql.Open(driverName, connections)
 	if err != nil {
-		return
+		log.Fatalf("Cannot connect to database")
 	}
 
 	db.SetMaxIdleConns(3)
@@ -33,8 +63,13 @@ func main() {
 
 	// =============================
 
+	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
+	if !ok {
+		log.Fatalf("")
+	}
+
 	grpcConn, err := grpc.Dial(
-		"127.0.0.1:9083",
+		boardServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -44,9 +79,14 @@ func main() {
 
 	// =============================
 
-	lis, err := net.Listen("tcp", ":9082")
+	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
+	if !ok {
+		log.Fatalf("")
+	}
+
+	lis, err := net.Listen("tcp", profileServiceAddr)
 	if err != nil {
-		log.Fatalln("cant listet port", err)
+		log.Fatalln("cant listen port", err)
 	}
 
 	// =============================
