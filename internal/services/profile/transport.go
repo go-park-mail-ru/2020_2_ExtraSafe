@@ -58,8 +58,7 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error) {
 	userInput := new(models.UserInputPassword)
 
-	buf,_ := ioutil.ReadAll(c.Request().Body)
-	if err := userInput.UnmarshalJSON(buf); err != nil {
+	if err := c.Bind(userInput); err != nil {
 		return models.UserInputPassword{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "PasswordChangeRead"}
 	}
