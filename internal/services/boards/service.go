@@ -5,8 +5,10 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/websocket"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
+	"github.com/labstack/echo"
 	"io"
 )
 
@@ -14,7 +16,7 @@ import (
 
 type ServiceBoard interface {
 	CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
-	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
+	GetBoard(request models.BoardInput, c echo.Context) (board models.BoardOutside, err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	DeleteBoard(request models.BoardInput) (err error)
 	AddMember(request models.BoardMemberInput) (user models.UserOutsideShort, err error)
@@ -60,6 +62,7 @@ type ServiceBoard interface {
 type service struct {
 	boardService protoBoard.BoardClient
 	validator    Validator
+	hubs         map[int64]*websocket.Hub
 }
 
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
@@ -93,7 +96,7 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
-func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {
+func (s *service) GetBoard(request models.BoardInput, c echo.Context) (board models.BoardOutside, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.BoardInput{
@@ -156,6 +159,15 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 	board.Tags = convertTags(boardInternal.Tags)
 	board.Users = convertUsers(boardInternal.Users)
 
+	var hub *websocket.Hub
+	if h, ok := s.hubs[request.BoardID]; ok {
+		hub = h
+	} else {
+		hub = s.createHub(request.BoardID)
+	}
+
+	websocket.ServeWs(hub, c, request.UserID)
+
 	return board, nil
 }
 
@@ -205,6 +217,11 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	board.Theme = boardInternal.Theme
 	board.Star = boardInternal.Star
 
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		message, _ := board.MarshalJSON()
+		hub.Broadcast(message)
+	}
+
 	return board, nil
 }
 
@@ -243,6 +260,8 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
+	// websocket - ?
+
 	return user,nil
 }
 
@@ -259,6 +278,8 @@ func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket - ?
 
 	return nil
 }
@@ -281,6 +302,8 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutsideS
 
 	card.CardID = output.CardID
 	card.Name = output.Name
+
+	// websocket
 
 	return card, nil
 }
@@ -337,6 +360,8 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutsideS
 	card.CardID = output.CardID
 	card.Name = output.Name
 
+	// websocket
+
 	return card, nil
 }
 
@@ -354,6 +379,8 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -378,6 +405,8 @@ func (s *service) CardOrderChange(request models.CardsOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
+	// websocket
+
 	return nil
 }
 
@@ -401,6 +430,8 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
+
+	// websocket
 
 	return task, nil
 }
@@ -492,6 +523,8 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutsideS
 	task.Description = output.Description
 	task.Name = output.Name
 
+	// websocket
+
 	return task, nil
 }
 
@@ -511,6 +544,8 @@ func (s *service) DeleteTask(request models.TaskInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -542,6 +577,8 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
+	// websocket
+
 	return nil
 }
 
@@ -564,6 +601,8 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
+	// websocket
+
 	return user, nil
 }
 
@@ -580,6 +619,8 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -605,6 +646,8 @@ func (s *service) CreateTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
+	// websocket
+
 	return tag, nil
 }
 
@@ -629,6 +672,8 @@ func (s *service) ChangeTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
+	// websocket
+
 	return tag, nil
 }
 
@@ -649,6 +694,8 @@ func (s *service) DeleteTag(request models.TagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
+	// websocket
+
 	return nil
 }
 
@@ -666,6 +713,8 @@ func (s *service) AddTag(request models.TaskTagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
+	// websocket
+
 	return nil
 }
 
@@ -682,6 +731,8 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -714,6 +765,8 @@ func (s *service) CreateComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
+	// websocket
+
 	return comment, nil
 }
 
@@ -745,6 +798,8 @@ func (s *service) ChangeComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
+	// websocket
+
 	return comment, nil
 }
 
@@ -763,6 +818,8 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -787,6 +844,8 @@ func (s *service) CreateChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
+	// websocket
+
 	return checklist, nil
 }
 
@@ -810,6 +869,8 @@ func (s *service) ChangeChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
+	// websocket
+
 	return checklist, nil
 }
 
@@ -828,6 +889,8 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket
 
 	return nil
 }
@@ -889,6 +952,8 @@ func (s *service) CreateAttachment(request models.AttachmentInput) (attachment m
 	attachment.Filename = res.Filename
 	attachment.Filepath = res.Filepath
 
+	// websocket - ?
+
 	return attachment, nil
 }
 
@@ -906,6 +971,8 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	// websocket - ?
 
 	return nil
 }
@@ -974,4 +1041,16 @@ func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	}
 
 	return nil
+}
+
+func (s *service) createHub(boardID int64) *websocket.Hub {
+	hub := websocket.NewHub()
+	s.hubs[boardID] = hub
+	go hub.Run()
+	return hub
+}
+
+func (s *service) deleteHub(boardID int64) {
+	s.hubs[boardID].StopHub()
+	delete(s.hubs, boardID)
 }
