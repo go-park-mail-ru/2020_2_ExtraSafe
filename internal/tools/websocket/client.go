@@ -46,6 +46,7 @@ func (c *Client) writePump() {
 		c.conn.Close()
 	}()
 	for {
+		//TODO - разобраться с ping pong
 		select {
 		case message, ok := <-c.send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
@@ -89,5 +90,6 @@ func ServeWs(hub *Hub, c echo.Context, userID int64) {
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), ID: userID}
 	client.hub.register <- client
 
+	//go проверки соединения read из примера
 	go client.writePump()
 }
