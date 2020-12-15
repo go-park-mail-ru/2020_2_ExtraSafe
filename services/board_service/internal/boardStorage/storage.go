@@ -7,6 +7,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
+	"hash/adler32"
+	"strconv"
+	"time"
 )
 
 //go:generate mockgen -destination=../../../board_service/internal/service/mock/mock_boardStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage BoardStorage
@@ -34,7 +37,7 @@ type BoardStorage interface {
 	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
-	//GetSharedURL(boardInput models.BoardInput) (string, error)
+	GetSharedURL(boardInput models.BoardInput) (string, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
@@ -112,11 +115,14 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
 	var boardID int64
 
-	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
+	url := createSharedUrl(boardInput.UserID, boardInput.BoardName)
+	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star, shared_url) VALUES ($1, $2, $3, $4, $5) RETURNING boardID",
 		boardInput.UserID,
 		boardInput.BoardName,
 		boardInput.Theme,
-		boardInput.Star).Scan(&boardID)
+		boardInput.Star,
+		url).
+		Scan(&boardID)
 
 	if err != nil {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -470,4 +476,22 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	}
 
 	return nil
+}
+
+func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
+	var url int
+	err := s.db.QueryRow("SELECT shared_url FROM boards WHERE boardID = $1", boardInput.BoardID).Scan(&url)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", models.ServeError{Codes: []string{"400"}, OriginalError: err, MethodName: "GetSharedURL"}
+		}
+		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetSharedURL"}
+	}
+
+	return strconv.Itoa(url), nil
+}
+
+func createSharedUrl(adminID int64, boardName string) uint32 {
+	data := []byte(strconv.FormatInt(adminID, 10) + boardName + time.Now().String())
+	return adler32.Checksum(data)
 }
