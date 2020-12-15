@@ -34,6 +34,8 @@ type BoardStorage interface {
 	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
+	//GetSharedURL(boardInput models.BoardInput) (string, error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)

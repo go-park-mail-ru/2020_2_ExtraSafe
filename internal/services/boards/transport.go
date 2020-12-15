@@ -40,6 +40,8 @@ type Transport interface {
 	AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error)
 
 	UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error)
+
+	URLWrite(url string) (response models.ResponseURL, err error)
 }
 
 type transport struct {
@@ -368,5 +370,11 @@ func (t transport) UserShortWrite(user models.UserOutsideShort) (response models
 	response.Username = user.Username
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
-	return response, err
+	return response, nil
+}
+
+func (t transport) URLWrite(url string) (response models.ResponseURL, err error) {
+	response.Status = 200
+	response.URL = url
+	return response, nil
 }

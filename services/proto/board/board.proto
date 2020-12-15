@@ -37,6 +37,10 @@ message BoardOutside {
   repeated TagOutside Tags = 8;
 }
 
+message SharedURL {
+  string url = 1;
+}
+
 //==========================================
 message CardInput {
   int64 UserID = 1;
@@ -285,6 +289,8 @@ service Board {
 
   rpc AddAttachment (stream AttachmentInput) returns (AttachmentOutside) {}
   rpc RemoveAttachment (AttachmentInfo) returns (Nothing) {}
+
+  rpc GetSharedURL (BoardInput) returns (SharedURL) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}

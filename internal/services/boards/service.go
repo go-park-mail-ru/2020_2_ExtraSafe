@@ -51,6 +51,8 @@ type ServiceBoard interface {
 	CreateAttachment(request models.AttachmentInput) (task models.AttachmentOutside, err error)
 	DeleteAttachment(request models.AttachmentInput) (err error)
 
+	GetSharedURL(request models.BoardInput) (url string, err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
@@ -908,6 +910,22 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 	}
 
 	return nil
+}
+
+func (s *service) GetSharedURL(request models.BoardInput) (url string, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+	}
+
+	output, err := s.boardService.GetSharedURL(ctx, input)
+	if err != nil {
+		return url, errorWorker.ConvertStatusToError(err)
+	}
+
+	return output.Url, nil
 }
 
 func (s *service) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error) {
