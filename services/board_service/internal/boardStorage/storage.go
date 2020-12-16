@@ -508,5 +508,10 @@ func (s *storage) GetBoardByURL(boardInput models.BoardInviteInput) (models.Boar
 			MethodName: "GetBoardByURL"}
 	}
 
+	_, err = s.db.Exec("INSERT INTO board_members (boardID, userID) VALUES ($1, $2)", boardInput.BoardID, boardInput.UserID)
+	if err != nil {
+		return models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "AddUser"}
+	}
+
 	return board, nil
 }
