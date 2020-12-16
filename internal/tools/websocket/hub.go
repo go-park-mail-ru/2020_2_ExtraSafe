@@ -28,7 +28,9 @@ func (h *Hub) Run() {
 			if _, ok := h.users[client.ID]; ok {
 				delete(h.users, client.ID)
 				close(client.send)
-				//TODO - проверять кол-во юзеров, если их 0, закрывать hub
+			}
+			if len(h.users) == 0 {
+				return
 			}
 		case message := <-h.broadcast:
 			for id, user := range h.users {
