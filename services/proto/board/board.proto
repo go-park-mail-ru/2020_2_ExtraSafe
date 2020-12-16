@@ -26,6 +26,12 @@ message BoardMemberInput {
   string MemberName = 3;
 }
 
+message BoardInviteInput {
+  int64 UserID = 1;
+  int64 BoardID = 2;
+  string UrlHash = 3;
+}
+
 message BoardOutside {
   int64 BoardID = 1;
   protoProfile.UserOutsideShort Admin = 2;
@@ -35,6 +41,10 @@ message BoardOutside {
   repeated protoProfile.UserOutsideShort Users = 6;
   repeated CardOutside Cards = 7;
   repeated TagOutside Tags = 8;
+}
+
+message SharedURL {
+  string url = 1;
 }
 
 //==========================================
@@ -285,6 +295,9 @@ service Board {
 
   rpc AddAttachment (stream AttachmentInput) returns (AttachmentOutside) {}
   rpc RemoveAttachment (AttachmentInfo) returns (Nothing) {}
+
+  rpc GetSharedURL (BoardInput) returns (SharedURL) {}
+  rpc InviteUserToBoard (BoardInviteInput) returns (protoProfile.BoardOutsideShort) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
   rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}

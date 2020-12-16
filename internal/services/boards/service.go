@@ -53,6 +53,9 @@ type ServiceBoard interface {
 	CreateAttachment(request models.AttachmentInput) (task models.AttachmentOutside, err error)
 	DeleteAttachment(request models.AttachmentInput) (err error)
 
+	GetSharedURL(request models.BoardInput) (url string, err error)
+	InviteUserToBoard(request models.BoardInviteInput) (board models.BoardOutsideShort, err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
 	CheckTaskPermission(userID int64, taskID int64) (err error)
@@ -975,6 +978,46 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 	// websocket - ?
 
 	return nil
+}
+
+func (s *service) GetSharedURL(request models.BoardInput) (url string, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+	}
+
+	output, err := s.boardService.GetSharedURL(ctx, input)
+	if err != nil {
+		return url, errorWorker.ConvertStatusToError(err)
+	}
+
+	return output.Url, nil
+}
+
+func (s *service) InviteUserToBoard(request models.BoardInviteInput) (board models.BoardOutsideShort, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardInviteInput{
+		UserID:  request.UserID,
+		BoardID: request.BoardID,
+		UrlHash: request.UrlHash,
+	}
+
+	output, err := s.boardService.InviteUserToBoard(ctx, input)
+	if err != nil {
+		return board, errorWorker.ConvertStatusToError(err)
+	}
+
+	board = models.BoardOutsideShort{
+		BoardID: output.BoardID,
+		Name:    output.Name,
+		Theme:   output.Theme,
+		Star:    output.Star,
+	}
+
+	return board, nil
 }
 
 func (s *service) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error) {

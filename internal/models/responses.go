@@ -56,6 +56,11 @@ type ResponseBoards struct {
 	Boards []BoardOutsideShort `json:"boards"`
 }
 
+type ResponseURL struct {
+	Status int    `json:"status"`
+	URL    string `json:"sharedURL"`
+}
+
 //===================================================<-Card
 type ResponseCardShort struct {
 	Status int           `json:"status"`

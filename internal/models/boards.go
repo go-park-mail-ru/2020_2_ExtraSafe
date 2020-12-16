@@ -30,6 +30,12 @@ type BoardMemberInput struct {
 	MemberName string `json:"memberUsername"`
 }
 
+type BoardInviteInput struct {
+	UserID  int64
+	BoardID int64
+	UrlHash string
+}
+
 //===================================================<-Internal
 type BoardInternal struct {
 	BoardID  int64          `json:"boardID"`

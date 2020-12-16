@@ -878,37 +878,6 @@ func (s *service) AddAttachment(stream protoBoard.Board_AddAttachmentServer) err
 
 	return nil
 }
-/*
-func (s *service) AddAttachment(_ context.Context, input *protoBoard.AttachmentInput) (output *protoBoard.AttachmentOutside, err error) {
-	fileInput := models.AttachmentFileInternal{
-		UserID:   input.UserID,
-		Filename: input.Filename,
-		File:     input.File,
-	}
-
-	userInput := &models.AttachmentInternal{
-		TaskID:       input.TaskID,
-		Filename:     input.Filename,
-	}
-
-	err = s.fileStorage.UploadFile(fileInput, userInput, false)
-	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
-	}
-
-	attachment, err := s.boardStorage.AddAttachment(*userInput)
-	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
-	}
-
-	output = &protoBoard.AttachmentOutside{
-		AttachmentID: attachment.AttachmentID,
-		Filename:     attachment.Filename,
-		Filepath:     attachment.Filepath,
-	}
-
-	return output, nil
-}*/
 
 func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInfo) (*protoBoard.Nothing, error) {
 	userInput := models.AttachmentInternal{
@@ -928,6 +897,44 @@ func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.Attachme
 	}
 
 	return &protoBoard.Nothing{Dummy: true}, nil
+}
+
+func (s *service) GetSharedURL(_ context.Context, input *protoBoard.BoardInput) (output *protoBoard.SharedURL, err error) {
+	userInput := models.BoardInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+	}
+
+	url, err := s.boardStorage.GetSharedURL(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	output = &protoBoard.SharedURL{Url: url}
+
+	return output, nil
+}
+
+func (s *service) InviteUserToBoard(_ context.Context, input *protoBoard.BoardInviteInput) (output *protoProfile.BoardOutsideShort, err error) {
+	userInput := models.BoardInviteInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+		UrlHash: input.UrlHash,
+	}
+
+	board, err := s.boardStorage.GetBoardByURL(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	output = &protoProfile.BoardOutsideShort{
+		BoardID: board.BoardID,
+		Name:    board.Name,
+		Theme:   board.Theme,
+		Star:    board.Star,
+	}
+
+	return output, nil
 }
 
 func (s *service) CheckBoardPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
