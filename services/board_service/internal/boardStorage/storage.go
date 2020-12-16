@@ -76,10 +76,6 @@ type storage struct {
 	attachmentStorage attachmentStorage.Storage
 }
 
-func (s *storage) GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error) {
-	panic("implement me")
-}
-
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
 	return &storage{
 		db: db,
@@ -499,4 +495,18 @@ func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
 func createSharedUrl(adminID int64, boardName string) uint32 {
 	data := []byte(strconv.FormatInt(adminID, 10) + boardName + time.Now().String())
 	return adler32.Checksum(data)
+}
+
+func (s *storage) GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error) {
+	board := models.BoardOutsideShort{}
+
+	err := s.db.QueryRow("SELECT boardID, boardName, theme, star FROM boards WHERE shared_url = $1", boardInput.UrlHash).
+		Scan(&board.BoardID, &board.Name, &board.Theme, &board.Star)
+
+	if err != nil {
+		return models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoardByURL"}
+	}
+
+	return board, nil
 }
