@@ -48,6 +48,7 @@ type Handler interface {
 	AttachmentDelete(c echo.Context) error
 
 	SharedURL(c echo.Context) error
+	BoardInvite(c echo.Context) error
 }
 
 type handler struct {
@@ -540,12 +541,28 @@ func (h *handler) SharedURL(c echo.Context) error {
 		return h.errorWorker.TransportError(c)
 	}
 
-	tag, err := h.boardsService.GetSharedURL(userInput)
+	url, err := h.boardsService.GetSharedURL(userInput)
 	if err != nil {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, err := h.boardsTransport.URLWrite(tag)
+	response, err := h.boardsTransport.URLWrite(url)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardInvite(c echo.Context) error {
+	userInput, err := h.boardsTransport.URLRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	board, err := h.boardsService.InviteUserToBoard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.BoardShortWrite(board)
 
 	return c.JSON(http.StatusOK, response)
 }

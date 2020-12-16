@@ -66,4 +66,5 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.DELETE("/attachment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.AttachmentDelete))))
 
 	e.GET("/shared-url/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.SharedURL))))
+	e.GET("/invite/board/:ID/:url", middle.CookieSession(board.BoardInvite))
 }

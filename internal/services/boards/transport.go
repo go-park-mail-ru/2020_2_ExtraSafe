@@ -41,6 +41,7 @@ type Transport interface {
 
 	UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error)
 
+	URLRead(c echo.Context) (response models.BoardInviteInput, err error)
 	URLWrite(url string) (response models.ResponseURL, err error)
 }
 
@@ -371,6 +372,25 @@ func (t transport) UserShortWrite(user models.UserOutsideShort) (response models
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
 	return response, nil
+}
+
+func (t transport) URLRead(c echo.Context) (response models.BoardInviteInput, err error) {
+	userInput := new(models.BoardInviteInput)
+
+	bid := c.Param("ID")
+	boardID, err := strconv.ParseInt(bid, 10, 64)
+	if err != nil {
+		return models.BoardInviteInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "URLRead"}
+	}
+
+	url := c.Param("url")
+
+	userInput.BoardID = boardID
+	userInput.UrlHash = url
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
 }
 
 func (t transport) URLWrite(url string) (response models.ResponseURL, err error) {

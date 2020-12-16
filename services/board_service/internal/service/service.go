@@ -900,7 +900,7 @@ func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.Attachme
 }
 
 func (s *service) GetSharedURL(_ context.Context, input *protoBoard.BoardInput) (output *protoBoard.SharedURL, err error) {
-	/*userInput := models.BoardInput{
+	userInput := models.BoardInput{
 		UserID:  input.UserID,
 		BoardID: input.BoardID,
 	}
@@ -908,11 +908,31 @@ func (s *service) GetSharedURL(_ context.Context, input *protoBoard.BoardInput) 
 	url, err := s.boardStorage.GetSharedURL(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
-	}*/
-
-	url := "test/test"
+	}
 
 	output = &protoBoard.SharedURL{Url: url}
+
+	return output, nil
+}
+
+func (s *service) InviteUserToBoard(_ context.Context, input *protoBoard.BoardInviteInput) (output *protoProfile.BoardOutsideShort, err error) {
+	userInput := models.BoardInviteInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+		UrlHash: input.UrlHash,
+	}
+
+	board, err := s.boardStorage.GetBoardByURL(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	output = &protoProfile.BoardOutsideShort{
+		BoardID: board.BoardID,
+		Name:    board.Name,
+		Theme:   board.Theme,
+		Star:    board.Star,
+	}
 
 	return output, nil
 }

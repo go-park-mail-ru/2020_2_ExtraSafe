@@ -230,6 +230,69 @@ func (x *BoardMemberInput) GetMemberName() string {
 	return ""
 }
 
+type BoardInviteInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserID  int64  `protobuf:"varint,1,opt,name=UserID,json=userID,proto3" json:"UserID,omitempty"`
+	BoardID int64  `protobuf:"varint,2,opt,name=BoardID,json=boardID,proto3" json:"BoardID,omitempty"`
+	UrlHash string `protobuf:"bytes,3,opt,name=UrlHash,json=urlHash,proto3" json:"UrlHash,omitempty"`
+}
+
+func (x *BoardInviteInput) Reset() {
+	*x = BoardInviteInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_board_board_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoardInviteInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoardInviteInput) ProtoMessage() {}
+
+func (x *BoardInviteInput) ProtoReflect() protoreflect.Message {
+	mi := &file_board_board_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoardInviteInput.ProtoReflect.Descriptor instead.
+func (*BoardInviteInput) Descriptor() ([]byte, []int) {
+	return file_board_board_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *BoardInviteInput) GetUserID() int64 {
+	if x != nil {
+		return x.UserID
+	}
+	return 0
+}
+
+func (x *BoardInviteInput) GetBoardID() int64 {
+	if x != nil {
+		return x.BoardID
+	}
+	return 0
+}
+
+func (x *BoardInviteInput) GetUrlHash() string {
+	if x != nil {
+		return x.UrlHash
+	}
+	return ""
+}
+
 type BoardOutside struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -248,7 +311,7 @@ type BoardOutside struct {
 func (x *BoardOutside) Reset() {
 	*x = BoardOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[3]
+		mi := &file_board_board_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -261,7 +324,7 @@ func (x *BoardOutside) String() string {
 func (*BoardOutside) ProtoMessage() {}
 
 func (x *BoardOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[3]
+	mi := &file_board_board_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -274,7 +337,7 @@ func (x *BoardOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BoardOutside.ProtoReflect.Descriptor instead.
 func (*BoardOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{3}
+	return file_board_board_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *BoardOutside) GetBoardID() int64 {
@@ -344,7 +407,7 @@ type SharedURL struct {
 func (x *SharedURL) Reset() {
 	*x = SharedURL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[4]
+		mi := &file_board_board_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -357,7 +420,7 @@ func (x *SharedURL) String() string {
 func (*SharedURL) ProtoMessage() {}
 
 func (x *SharedURL) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[4]
+	mi := &file_board_board_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -370,7 +433,7 @@ func (x *SharedURL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SharedURL.ProtoReflect.Descriptor instead.
 func (*SharedURL) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{4}
+	return file_board_board_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SharedURL) GetUrl() string {
@@ -396,7 +459,7 @@ type CardInput struct {
 func (x *CardInput) Reset() {
 	*x = CardInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[5]
+		mi := &file_board_board_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -409,7 +472,7 @@ func (x *CardInput) String() string {
 func (*CardInput) ProtoMessage() {}
 
 func (x *CardInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[5]
+	mi := &file_board_board_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -422,7 +485,7 @@ func (x *CardInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardInput.ProtoReflect.Descriptor instead.
 func (*CardInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{5}
+	return file_board_board_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CardInput) GetUserID() int64 {
@@ -472,7 +535,7 @@ type CardOrder struct {
 func (x *CardOrder) Reset() {
 	*x = CardOrder{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[6]
+		mi := &file_board_board_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -485,7 +548,7 @@ func (x *CardOrder) String() string {
 func (*CardOrder) ProtoMessage() {}
 
 func (x *CardOrder) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[6]
+	mi := &file_board_board_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -498,7 +561,7 @@ func (x *CardOrder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardOrder.ProtoReflect.Descriptor instead.
 func (*CardOrder) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{6}
+	return file_board_board_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *CardOrder) GetCardID() int64 {
@@ -527,7 +590,7 @@ type CardsOrderInput struct {
 func (x *CardsOrderInput) Reset() {
 	*x = CardsOrderInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[7]
+		mi := &file_board_board_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -540,7 +603,7 @@ func (x *CardsOrderInput) String() string {
 func (*CardsOrderInput) ProtoMessage() {}
 
 func (x *CardsOrderInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[7]
+	mi := &file_board_board_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -553,7 +616,7 @@ func (x *CardsOrderInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardsOrderInput.ProtoReflect.Descriptor instead.
 func (*CardsOrderInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{7}
+	return file_board_board_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CardsOrderInput) GetUserID() int64 {
@@ -584,7 +647,7 @@ type CardOutside struct {
 func (x *CardOutside) Reset() {
 	*x = CardOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[8]
+		mi := &file_board_board_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -597,7 +660,7 @@ func (x *CardOutside) String() string {
 func (*CardOutside) ProtoMessage() {}
 
 func (x *CardOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[8]
+	mi := &file_board_board_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,7 +673,7 @@ func (x *CardOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardOutside.ProtoReflect.Descriptor instead.
 func (*CardOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{8}
+	return file_board_board_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CardOutside) GetCardID() int64 {
@@ -653,7 +716,7 @@ type CardOutsideShort struct {
 func (x *CardOutsideShort) Reset() {
 	*x = CardOutsideShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[9]
+		mi := &file_board_board_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -666,7 +729,7 @@ func (x *CardOutsideShort) String() string {
 func (*CardOutsideShort) ProtoMessage() {}
 
 func (x *CardOutsideShort) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[9]
+	mi := &file_board_board_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -679,7 +742,7 @@ func (x *CardOutsideShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardOutsideShort.ProtoReflect.Descriptor instead.
 func (*CardOutsideShort) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{9}
+	return file_board_board_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CardOutsideShort) GetCardID() int64 {
@@ -713,7 +776,7 @@ type TaskInput struct {
 func (x *TaskInput) Reset() {
 	*x = TaskInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[10]
+		mi := &file_board_board_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -726,7 +789,7 @@ func (x *TaskInput) String() string {
 func (*TaskInput) ProtoMessage() {}
 
 func (x *TaskInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[10]
+	mi := &file_board_board_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +802,7 @@ func (x *TaskInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskInput.ProtoReflect.Descriptor instead.
 func (*TaskInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{10}
+	return file_board_board_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *TaskInput) GetUserID() int64 {
@@ -796,7 +859,7 @@ type TaskOrder struct {
 func (x *TaskOrder) Reset() {
 	*x = TaskOrder{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[11]
+		mi := &file_board_board_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -809,7 +872,7 @@ func (x *TaskOrder) String() string {
 func (*TaskOrder) ProtoMessage() {}
 
 func (x *TaskOrder) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[11]
+	mi := &file_board_board_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -822,7 +885,7 @@ func (x *TaskOrder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskOrder.ProtoReflect.Descriptor instead.
 func (*TaskOrder) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{11}
+	return file_board_board_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *TaskOrder) GetTaskID() int64 {
@@ -851,7 +914,7 @@ type TasksOrder struct {
 func (x *TasksOrder) Reset() {
 	*x = TasksOrder{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[12]
+		mi := &file_board_board_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -864,7 +927,7 @@ func (x *TasksOrder) String() string {
 func (*TasksOrder) ProtoMessage() {}
 
 func (x *TasksOrder) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[12]
+	mi := &file_board_board_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -877,7 +940,7 @@ func (x *TasksOrder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TasksOrder.ProtoReflect.Descriptor instead.
 func (*TasksOrder) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{12}
+	return file_board_board_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TasksOrder) GetCardID() int64 {
@@ -906,7 +969,7 @@ type TasksOrderInput struct {
 func (x *TasksOrderInput) Reset() {
 	*x = TasksOrderInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[13]
+		mi := &file_board_board_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -919,7 +982,7 @@ func (x *TasksOrderInput) String() string {
 func (*TasksOrderInput) ProtoMessage() {}
 
 func (x *TasksOrderInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[13]
+	mi := &file_board_board_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -932,7 +995,7 @@ func (x *TasksOrderInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TasksOrderInput.ProtoReflect.Descriptor instead.
 func (*TasksOrderInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{13}
+	return file_board_board_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *TasksOrderInput) GetUserID() int64 {
@@ -968,7 +1031,7 @@ type TaskInternal struct {
 func (x *TaskInternal) Reset() {
 	*x = TaskInternal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[14]
+		mi := &file_board_board_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -981,7 +1044,7 @@ func (x *TaskInternal) String() string {
 func (*TaskInternal) ProtoMessage() {}
 
 func (x *TaskInternal) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[14]
+	mi := &file_board_board_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -994,7 +1057,7 @@ func (x *TaskInternal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskInternal.ProtoReflect.Descriptor instead.
 func (*TaskInternal) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{14}
+	return file_board_board_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *TaskInternal) GetTaskID() int64 {
@@ -1077,7 +1140,7 @@ type TaskInternalShort struct {
 func (x *TaskInternalShort) Reset() {
 	*x = TaskInternalShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[15]
+		mi := &file_board_board_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1090,7 +1153,7 @@ func (x *TaskInternalShort) String() string {
 func (*TaskInternalShort) ProtoMessage() {}
 
 func (x *TaskInternalShort) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[15]
+	mi := &file_board_board_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1103,7 +1166,7 @@ func (x *TaskInternalShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskInternalShort.ProtoReflect.Descriptor instead.
 func (*TaskInternalShort) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{15}
+	return file_board_board_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *TaskInternalShort) GetTaskID() int64 {
@@ -1168,7 +1231,7 @@ type TaskAssignerInput struct {
 func (x *TaskAssignerInput) Reset() {
 	*x = TaskAssignerInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[16]
+		mi := &file_board_board_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1181,7 +1244,7 @@ func (x *TaskAssignerInput) String() string {
 func (*TaskAssignerInput) ProtoMessage() {}
 
 func (x *TaskAssignerInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[16]
+	mi := &file_board_board_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1194,7 +1257,7 @@ func (x *TaskAssignerInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskAssignerInput.ProtoReflect.Descriptor instead.
 func (*TaskAssignerInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{16}
+	return file_board_board_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *TaskAssignerInput) GetUserID() int64 {
@@ -1229,7 +1292,7 @@ type TaskAssignerIDs struct {
 func (x *TaskAssignerIDs) Reset() {
 	*x = TaskAssignerIDs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[17]
+		mi := &file_board_board_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1242,7 +1305,7 @@ func (x *TaskAssignerIDs) String() string {
 func (*TaskAssignerIDs) ProtoMessage() {}
 
 func (x *TaskAssignerIDs) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[17]
+	mi := &file_board_board_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1255,7 +1318,7 @@ func (x *TaskAssignerIDs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskAssignerIDs.ProtoReflect.Descriptor instead.
 func (*TaskAssignerIDs) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{17}
+	return file_board_board_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *TaskAssignerIDs) GetAssignerIDs() []int64 {
@@ -1284,7 +1347,7 @@ type TaskOutside struct {
 func (x *TaskOutside) Reset() {
 	*x = TaskOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[18]
+		mi := &file_board_board_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1297,7 +1360,7 @@ func (x *TaskOutside) String() string {
 func (*TaskOutside) ProtoMessage() {}
 
 func (x *TaskOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[18]
+	mi := &file_board_board_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1310,7 +1373,7 @@ func (x *TaskOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskOutside.ProtoReflect.Descriptor instead.
 func (*TaskOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{18}
+	return file_board_board_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *TaskOutside) GetTaskID() int64 {
@@ -1393,7 +1456,7 @@ type TaskOutsideShort struct {
 func (x *TaskOutsideShort) Reset() {
 	*x = TaskOutsideShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[19]
+		mi := &file_board_board_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1406,7 +1469,7 @@ func (x *TaskOutsideShort) String() string {
 func (*TaskOutsideShort) ProtoMessage() {}
 
 func (x *TaskOutsideShort) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[19]
+	mi := &file_board_board_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1419,7 +1482,7 @@ func (x *TaskOutsideShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskOutsideShort.ProtoReflect.Descriptor instead.
 func (*TaskOutsideShort) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{19}
+	return file_board_board_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *TaskOutsideShort) GetTaskID() int64 {
@@ -1484,7 +1547,7 @@ type TaskOutsideSuperShort struct {
 func (x *TaskOutsideSuperShort) Reset() {
 	*x = TaskOutsideSuperShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[20]
+		mi := &file_board_board_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1497,7 +1560,7 @@ func (x *TaskOutsideSuperShort) String() string {
 func (*TaskOutsideSuperShort) ProtoMessage() {}
 
 func (x *TaskOutsideSuperShort) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[20]
+	mi := &file_board_board_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1510,7 +1573,7 @@ func (x *TaskOutsideSuperShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskOutsideSuperShort.ProtoReflect.Descriptor instead.
 func (*TaskOutsideSuperShort) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{20}
+	return file_board_board_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TaskOutsideSuperShort) GetTaskID() int64 {
@@ -1551,7 +1614,7 @@ type TagInput struct {
 func (x *TagInput) Reset() {
 	*x = TagInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[21]
+		mi := &file_board_board_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1564,7 +1627,7 @@ func (x *TagInput) String() string {
 func (*TagInput) ProtoMessage() {}
 
 func (x *TagInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[21]
+	mi := &file_board_board_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1577,7 +1640,7 @@ func (x *TagInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagInput.ProtoReflect.Descriptor instead.
 func (*TagInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{21}
+	return file_board_board_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TagInput) GetUserID() int64 {
@@ -1635,7 +1698,7 @@ type TaskTagInput struct {
 func (x *TaskTagInput) Reset() {
 	*x = TaskTagInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[22]
+		mi := &file_board_board_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1648,7 +1711,7 @@ func (x *TaskTagInput) String() string {
 func (*TaskTagInput) ProtoMessage() {}
 
 func (x *TaskTagInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[22]
+	mi := &file_board_board_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1661,7 +1724,7 @@ func (x *TaskTagInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskTagInput.ProtoReflect.Descriptor instead.
 func (*TaskTagInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{22}
+	return file_board_board_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TaskTagInput) GetUserID() int64 {
@@ -1698,7 +1761,7 @@ type TagOutside struct {
 func (x *TagOutside) Reset() {
 	*x = TagOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[23]
+		mi := &file_board_board_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1711,7 +1774,7 @@ func (x *TagOutside) String() string {
 func (*TagOutside) ProtoMessage() {}
 
 func (x *TagOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[23]
+	mi := &file_board_board_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1724,7 +1787,7 @@ func (x *TagOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagOutside.ProtoReflect.Descriptor instead.
 func (*TagOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{23}
+	return file_board_board_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *TagOutside) GetTagID() int64 {
@@ -1764,7 +1827,7 @@ type CommentInput struct {
 func (x *CommentInput) Reset() {
 	*x = CommentInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[24]
+		mi := &file_board_board_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1777,7 +1840,7 @@ func (x *CommentInput) String() string {
 func (*CommentInput) ProtoMessage() {}
 
 func (x *CommentInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[24]
+	mi := &file_board_board_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1790,7 +1853,7 @@ func (x *CommentInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommentInput.ProtoReflect.Descriptor instead.
 func (*CommentInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{24}
+	return file_board_board_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CommentInput) GetCommentID() int64 {
@@ -1842,7 +1905,7 @@ type CommentInternal struct {
 func (x *CommentInternal) Reset() {
 	*x = CommentInternal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[25]
+		mi := &file_board_board_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1855,7 +1918,7 @@ func (x *CommentInternal) String() string {
 func (*CommentInternal) ProtoMessage() {}
 
 func (x *CommentInternal) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[25]
+	mi := &file_board_board_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1868,7 +1931,7 @@ func (x *CommentInternal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommentInternal.ProtoReflect.Descriptor instead.
 func (*CommentInternal) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{25}
+	return file_board_board_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *CommentInternal) GetCommentID() int64 {
@@ -1913,7 +1976,7 @@ type CommentOutside struct {
 func (x *CommentOutside) Reset() {
 	*x = CommentOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[26]
+		mi := &file_board_board_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1926,7 +1989,7 @@ func (x *CommentOutside) String() string {
 func (*CommentOutside) ProtoMessage() {}
 
 func (x *CommentOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[26]
+	mi := &file_board_board_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1939,7 +2002,7 @@ func (x *CommentOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommentOutside.ProtoReflect.Descriptor instead.
 func (*CommentOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{26}
+	return file_board_board_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *CommentOutside) GetCommentID() int64 {
@@ -1986,7 +2049,7 @@ type ChecklistInput struct {
 func (x *ChecklistInput) Reset() {
 	*x = ChecklistInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[27]
+		mi := &file_board_board_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1999,7 +2062,7 @@ func (x *ChecklistInput) String() string {
 func (*ChecklistInput) ProtoMessage() {}
 
 func (x *ChecklistInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[27]
+	mi := &file_board_board_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2012,7 +2075,7 @@ func (x *ChecklistInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChecklistInput.ProtoReflect.Descriptor instead.
 func (*ChecklistInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{27}
+	return file_board_board_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ChecklistInput) GetUserID() int64 {
@@ -2063,7 +2126,7 @@ type ChecklistOutside struct {
 func (x *ChecklistOutside) Reset() {
 	*x = ChecklistOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[28]
+		mi := &file_board_board_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2076,7 +2139,7 @@ func (x *ChecklistOutside) String() string {
 func (*ChecklistOutside) ProtoMessage() {}
 
 func (x *ChecklistOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[28]
+	mi := &file_board_board_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2089,7 +2152,7 @@ func (x *ChecklistOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChecklistOutside.ProtoReflect.Descriptor instead.
 func (*ChecklistOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{28}
+	return file_board_board_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ChecklistOutside) GetChecklistID() int64 {
@@ -2128,7 +2191,7 @@ type AttachmentInfo struct {
 func (x *AttachmentInfo) Reset() {
 	*x = AttachmentInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[29]
+		mi := &file_board_board_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2141,7 +2204,7 @@ func (x *AttachmentInfo) String() string {
 func (*AttachmentInfo) ProtoMessage() {}
 
 func (x *AttachmentInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[29]
+	mi := &file_board_board_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2154,7 +2217,7 @@ func (x *AttachmentInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachmentInfo.ProtoReflect.Descriptor instead.
 func (*AttachmentInfo) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{29}
+	return file_board_board_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *AttachmentInfo) GetUserID() int64 {
@@ -2199,7 +2262,7 @@ type AttachmentInput struct {
 func (x *AttachmentInput) Reset() {
 	*x = AttachmentInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[30]
+		mi := &file_board_board_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2212,7 +2275,7 @@ func (x *AttachmentInput) String() string {
 func (*AttachmentInput) ProtoMessage() {}
 
 func (x *AttachmentInput) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[30]
+	mi := &file_board_board_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2225,7 +2288,7 @@ func (x *AttachmentInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachmentInput.ProtoReflect.Descriptor instead.
 func (*AttachmentInput) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{30}
+	return file_board_board_proto_rawDescGZIP(), []int{31}
 }
 
 func (m *AttachmentInput) GetData() isAttachmentInput_Data {
@@ -2278,7 +2341,7 @@ type AttachmentOutside struct {
 func (x *AttachmentOutside) Reset() {
 	*x = AttachmentOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[31]
+		mi := &file_board_board_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2291,7 +2354,7 @@ func (x *AttachmentOutside) String() string {
 func (*AttachmentOutside) ProtoMessage() {}
 
 func (x *AttachmentOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[31]
+	mi := &file_board_board_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2304,7 +2367,7 @@ func (x *AttachmentOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachmentOutside.ProtoReflect.Descriptor instead.
 func (*AttachmentOutside) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{31}
+	return file_board_board_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *AttachmentOutside) GetAttachmentID() int64 {
@@ -2342,7 +2405,7 @@ type CheckPermissions struct {
 func (x *CheckPermissions) Reset() {
 	*x = CheckPermissions{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[32]
+		mi := &file_board_board_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2355,7 +2418,7 @@ func (x *CheckPermissions) String() string {
 func (*CheckPermissions) ProtoMessage() {}
 
 func (x *CheckPermissions) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[32]
+	mi := &file_board_board_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2368,7 +2431,7 @@ func (x *CheckPermissions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPermissions.ProtoReflect.Descriptor instead.
 func (*CheckPermissions) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{32}
+	return file_board_board_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *CheckPermissions) GetUserID() int64 {
@@ -2403,7 +2466,7 @@ type Nothing struct {
 func (x *Nothing) Reset() {
 	*x = Nothing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_board_board_proto_msgTypes[33]
+		mi := &file_board_board_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2416,7 +2479,7 @@ func (x *Nothing) String() string {
 func (*Nothing) ProtoMessage() {}
 
 func (x *Nothing) ProtoReflect() protoreflect.Message {
-	mi := &file_board_board_proto_msgTypes[33]
+	mi := &file_board_board_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2429,7 +2492,7 @@ func (x *Nothing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Nothing.ProtoReflect.Descriptor instead.
 func (*Nothing) Descriptor() ([]byte, []int) {
-	return file_board_board_proto_rawDescGZIP(), []int{33}
+	return file_board_board_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *Nothing) GetDummy() bool {
@@ -2464,7 +2527,13 @@ var file_board_board_proto_rawDesc = []byte{
 	0x44, 0x12, 0x18, 0x0a, 0x07, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x03, 0x52, 0x07, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x44, 0x12, 0x1e, 0x0a, 0x0a, 0x4d,
 	0x65, 0x6d, 0x62, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0a, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0xad, 0x02, 0x0a, 0x0c,
+	0x0a, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x5e, 0x0a, 0x10, 0x42,
+	0x6f, 0x61, 0x72, 0x64, 0x49, 0x6e, 0x76, 0x69, 0x74, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12,
+	0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x12, 0x18, 0x0a, 0x07, 0x42, 0x6f, 0x61, 0x72, 0x64,
+	0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x07, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x49,
+	0x44, 0x12, 0x18, 0x0a, 0x07, 0x55, 0x72, 0x6c, 0x48, 0x61, 0x73, 0x68, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x75, 0x72, 0x6c, 0x48, 0x61, 0x73, 0x68, 0x22, 0xad, 0x02, 0x0a, 0x0c,
 	0x42, 0x6f, 0x61, 0x72, 0x64, 0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07,
 	0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x07, 0x62,
 	0x6f, 0x61, 0x72, 0x64, 0x49, 0x44, 0x12, 0x34, 0x0a, 0x05, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x18,
@@ -2727,7 +2796,7 @@ var file_board_board_proto_rawDesc = []byte{
 	0x6d, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x69, 0x66, 0x41, 0x64, 0x6d,
 	0x69, 0x6e, 0x22, 0x1f, 0x0a, 0x07, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x12, 0x14, 0x0a,
 	0x05, 0x64, 0x75, 0x6d, 0x6d, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x64, 0x75,
-	0x6d, 0x6d, 0x79, 0x32, 0xb1, 0x14, 0x0a, 0x05, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x12, 0x49, 0x0a,
+	0x6d, 0x6d, 0x79, 0x32, 0x87, 0x15, 0x0a, 0x05, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x12, 0x49, 0x0a,
 	0x0d, 0x47, 0x65, 0x74, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x14,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x55, 0x73,
 	0x65, 0x72, 0x49, 0x44, 0x1a, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x72, 0x6f, 0x66,
@@ -2871,26 +2940,32 @@ var file_board_board_proto_rawDesc = []byte{
 	0x52, 0x4c, 0x12, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e,
 	0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x1a, 0x15, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x55, 0x52,
-	0x4c, 0x22, 0x00, 0x12, 0x4b, 0x0a, 0x14, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x42, 0x6f, 0x61, 0x72,
-	0x64, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65,
-	0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00,
-	0x12, 0x4a, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43, 0x61, 0x72, 0x64, 0x50, 0x65, 0x72,
-	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42,
-	0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61,
-	0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x12, 0x4a, 0x0a, 0x13,
-	0x43, 0x68, 0x65, 0x63, 0x6b, 0x54, 0x61, 0x73, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
-	0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64,
-	0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e,
-	0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x12, 0x4d, 0x0a, 0x16, 0x43, 0x68, 0x65, 0x63,
-	0x6b, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e,
-	0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73,
-	0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f,
-	0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x4c, 0x22, 0x00, 0x12, 0x54, 0x0a, 0x11, 0x49, 0x6e, 0x76, 0x69, 0x74, 0x65, 0x55, 0x73, 0x65,
+	0x72, 0x54, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x49, 0x6e, 0x76, 0x69, 0x74,
+	0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x1a, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x72,
+	0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x4f, 0x75, 0x74, 0x73, 0x69,
+	0x64, 0x65, 0x53, 0x68, 0x6f, 0x72, 0x74, 0x22, 0x00, 0x12, 0x4b, 0x0a, 0x14, 0x43, 0x68, 0x65,
+	0x63, 0x6b, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43,
+	0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a,
+	0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74,
+	0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x12, 0x4a, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43,
+	0x61, 0x72, 0x64, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b,
+	0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67,
+	0x22, 0x00, 0x12, 0x4a, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x54, 0x61, 0x73, 0x6b, 0x50,
+	0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d,
+	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42,
+	0x6f, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x12, 0x4d,
+	0x0a, 0x16, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x50, 0x65,
+	0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x42, 0x6f, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x65, 0x72, 0x6d, 0x69,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x42, 0x6f,
+	0x61, 0x72, 0x64, 0x2e, 0x4e, 0x6f, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x22, 0x00, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2905,148 +2980,151 @@ func file_board_board_proto_rawDescGZIP() []byte {
 	return file_board_board_proto_rawDescData
 }
 
-var file_board_board_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_board_board_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_board_board_proto_goTypes = []interface{}{
 	(*BoardChangeInput)(nil),           // 0: protoBoard.BoardChangeInput
 	(*BoardInput)(nil),                 // 1: protoBoard.BoardInput
 	(*BoardMemberInput)(nil),           // 2: protoBoard.BoardMemberInput
-	(*BoardOutside)(nil),               // 3: protoBoard.BoardOutside
-	(*SharedURL)(nil),                  // 4: protoBoard.SharedURL
-	(*CardInput)(nil),                  // 5: protoBoard.CardInput
-	(*CardOrder)(nil),                  // 6: protoBoard.CardOrder
-	(*CardsOrderInput)(nil),            // 7: protoBoard.CardsOrderInput
-	(*CardOutside)(nil),                // 8: protoBoard.CardOutside
-	(*CardOutsideShort)(nil),           // 9: protoBoard.CardOutsideShort
-	(*TaskInput)(nil),                  // 10: protoBoard.TaskInput
-	(*TaskOrder)(nil),                  // 11: protoBoard.TaskOrder
-	(*TasksOrder)(nil),                 // 12: protoBoard.TasksOrder
-	(*TasksOrderInput)(nil),            // 13: protoBoard.TasksOrderInput
-	(*TaskInternal)(nil),               // 14: protoBoard.TaskInternal
-	(*TaskInternalShort)(nil),          // 15: protoBoard.TaskInternalShort
-	(*TaskAssignerInput)(nil),          // 16: protoBoard.TaskAssignerInput
-	(*TaskAssignerIDs)(nil),            // 17: protoBoard.TaskAssignerIDs
-	(*TaskOutside)(nil),                // 18: protoBoard.TaskOutside
-	(*TaskOutsideShort)(nil),           // 19: protoBoard.TaskOutsideShort
-	(*TaskOutsideSuperShort)(nil),      // 20: protoBoard.TaskOutsideSuperShort
-	(*TagInput)(nil),                   // 21: protoBoard.TagInput
-	(*TaskTagInput)(nil),               // 22: protoBoard.TaskTagInput
-	(*TagOutside)(nil),                 // 23: protoBoard.TagOutside
-	(*CommentInput)(nil),               // 24: protoBoard.CommentInput
-	(*CommentInternal)(nil),            // 25: protoBoard.CommentInternal
-	(*CommentOutside)(nil),             // 26: protoBoard.CommentOutside
-	(*ChecklistInput)(nil),             // 27: protoBoard.ChecklistInput
-	(*ChecklistOutside)(nil),           // 28: protoBoard.ChecklistOutside
-	(*AttachmentInfo)(nil),             // 29: protoBoard.AttachmentInfo
-	(*AttachmentInput)(nil),            // 30: protoBoard.AttachmentInput
-	(*AttachmentOutside)(nil),          // 31: protoBoard.AttachmentOutside
-	(*CheckPermissions)(nil),           // 32: protoBoard.CheckPermissions
-	(*Nothing)(nil),                    // 33: protoBoard.Nothing
-	(*profile.UserOutsideShort)(nil),   // 34: protoProfile.UserOutsideShort
-	(*profile.UserID)(nil),             // 35: protoProfile.UserID
-	(*profile.BoardsOutsideShort)(nil), // 36: protoProfile.BoardsOutsideShort
-	(*profile.BoardOutsideShort)(nil),  // 37: protoProfile.BoardOutsideShort
+	(*BoardInviteInput)(nil),           // 3: protoBoard.BoardInviteInput
+	(*BoardOutside)(nil),               // 4: protoBoard.BoardOutside
+	(*SharedURL)(nil),                  // 5: protoBoard.SharedURL
+	(*CardInput)(nil),                  // 6: protoBoard.CardInput
+	(*CardOrder)(nil),                  // 7: protoBoard.CardOrder
+	(*CardsOrderInput)(nil),            // 8: protoBoard.CardsOrderInput
+	(*CardOutside)(nil),                // 9: protoBoard.CardOutside
+	(*CardOutsideShort)(nil),           // 10: protoBoard.CardOutsideShort
+	(*TaskInput)(nil),                  // 11: protoBoard.TaskInput
+	(*TaskOrder)(nil),                  // 12: protoBoard.TaskOrder
+	(*TasksOrder)(nil),                 // 13: protoBoard.TasksOrder
+	(*TasksOrderInput)(nil),            // 14: protoBoard.TasksOrderInput
+	(*TaskInternal)(nil),               // 15: protoBoard.TaskInternal
+	(*TaskInternalShort)(nil),          // 16: protoBoard.TaskInternalShort
+	(*TaskAssignerInput)(nil),          // 17: protoBoard.TaskAssignerInput
+	(*TaskAssignerIDs)(nil),            // 18: protoBoard.TaskAssignerIDs
+	(*TaskOutside)(nil),                // 19: protoBoard.TaskOutside
+	(*TaskOutsideShort)(nil),           // 20: protoBoard.TaskOutsideShort
+	(*TaskOutsideSuperShort)(nil),      // 21: protoBoard.TaskOutsideSuperShort
+	(*TagInput)(nil),                   // 22: protoBoard.TagInput
+	(*TaskTagInput)(nil),               // 23: protoBoard.TaskTagInput
+	(*TagOutside)(nil),                 // 24: protoBoard.TagOutside
+	(*CommentInput)(nil),               // 25: protoBoard.CommentInput
+	(*CommentInternal)(nil),            // 26: protoBoard.CommentInternal
+	(*CommentOutside)(nil),             // 27: protoBoard.CommentOutside
+	(*ChecklistInput)(nil),             // 28: protoBoard.ChecklistInput
+	(*ChecklistOutside)(nil),           // 29: protoBoard.ChecklistOutside
+	(*AttachmentInfo)(nil),             // 30: protoBoard.AttachmentInfo
+	(*AttachmentInput)(nil),            // 31: protoBoard.AttachmentInput
+	(*AttachmentOutside)(nil),          // 32: protoBoard.AttachmentOutside
+	(*CheckPermissions)(nil),           // 33: protoBoard.CheckPermissions
+	(*Nothing)(nil),                    // 34: protoBoard.Nothing
+	(*profile.UserOutsideShort)(nil),   // 35: protoProfile.UserOutsideShort
+	(*profile.UserID)(nil),             // 36: protoProfile.UserID
+	(*profile.BoardsOutsideShort)(nil), // 37: protoProfile.BoardsOutsideShort
+	(*profile.BoardOutsideShort)(nil),  // 38: protoProfile.BoardOutsideShort
 }
 var file_board_board_proto_depIdxs = []int32{
-	34, // 0: protoBoard.BoardOutside.Admin:type_name -> protoProfile.UserOutsideShort
-	34, // 1: protoBoard.BoardOutside.Users:type_name -> protoProfile.UserOutsideShort
-	8,  // 2: protoBoard.BoardOutside.Cards:type_name -> protoBoard.CardOutside
-	23, // 3: protoBoard.BoardOutside.Tags:type_name -> protoBoard.TagOutside
-	6,  // 4: protoBoard.CardsOrderInput.Cards:type_name -> protoBoard.CardOrder
-	19, // 5: protoBoard.CardOutside.Tasks:type_name -> protoBoard.TaskOutsideShort
-	11, // 6: protoBoard.TasksOrder.Tasks:type_name -> protoBoard.TaskOrder
-	12, // 7: protoBoard.TasksOrderInput.Tasks:type_name -> protoBoard.TasksOrder
-	23, // 8: protoBoard.TaskInternal.Tags:type_name -> protoBoard.TagOutside
-	28, // 9: protoBoard.TaskInternal.Checklists:type_name -> protoBoard.ChecklistOutside
-	26, // 10: protoBoard.TaskInternal.Comments:type_name -> protoBoard.CommentOutside
-	31, // 11: protoBoard.TaskInternal.Attachments:type_name -> protoBoard.AttachmentOutside
-	23, // 12: protoBoard.TaskInternalShort.Tags:type_name -> protoBoard.TagOutside
-	28, // 13: protoBoard.TaskInternalShort.Checklists:type_name -> protoBoard.ChecklistOutside
-	23, // 14: protoBoard.TaskOutside.Tags:type_name -> protoBoard.TagOutside
-	34, // 15: protoBoard.TaskOutside.Users:type_name -> protoProfile.UserOutsideShort
-	28, // 16: protoBoard.TaskOutside.Checklists:type_name -> protoBoard.ChecklistOutside
-	26, // 17: protoBoard.TaskOutside.Comments:type_name -> protoBoard.CommentOutside
-	31, // 18: protoBoard.TaskOutside.Attachments:type_name -> protoBoard.AttachmentOutside
-	23, // 19: protoBoard.TaskOutsideShort.Tags:type_name -> protoBoard.TagOutside
-	34, // 20: protoBoard.TaskOutsideShort.Users:type_name -> protoProfile.UserOutsideShort
-	28, // 21: protoBoard.TaskOutsideShort.Checklists:type_name -> protoBoard.ChecklistOutside
-	34, // 22: protoBoard.CommentOutside.User:type_name -> protoProfile.UserOutsideShort
-	29, // 23: protoBoard.AttachmentInput.info:type_name -> protoBoard.AttachmentInfo
-	35, // 24: protoBoard.Board.GetBoardsList:input_type -> protoProfile.UserID
+	35, // 0: protoBoard.BoardOutside.Admin:type_name -> protoProfile.UserOutsideShort
+	35, // 1: protoBoard.BoardOutside.Users:type_name -> protoProfile.UserOutsideShort
+	9,  // 2: protoBoard.BoardOutside.Cards:type_name -> protoBoard.CardOutside
+	24, // 3: protoBoard.BoardOutside.Tags:type_name -> protoBoard.TagOutside
+	7,  // 4: protoBoard.CardsOrderInput.Cards:type_name -> protoBoard.CardOrder
+	20, // 5: protoBoard.CardOutside.Tasks:type_name -> protoBoard.TaskOutsideShort
+	12, // 6: protoBoard.TasksOrder.Tasks:type_name -> protoBoard.TaskOrder
+	13, // 7: protoBoard.TasksOrderInput.Tasks:type_name -> protoBoard.TasksOrder
+	24, // 8: protoBoard.TaskInternal.Tags:type_name -> protoBoard.TagOutside
+	29, // 9: protoBoard.TaskInternal.Checklists:type_name -> protoBoard.ChecklistOutside
+	27, // 10: protoBoard.TaskInternal.Comments:type_name -> protoBoard.CommentOutside
+	32, // 11: protoBoard.TaskInternal.Attachments:type_name -> protoBoard.AttachmentOutside
+	24, // 12: protoBoard.TaskInternalShort.Tags:type_name -> protoBoard.TagOutside
+	29, // 13: protoBoard.TaskInternalShort.Checklists:type_name -> protoBoard.ChecklistOutside
+	24, // 14: protoBoard.TaskOutside.Tags:type_name -> protoBoard.TagOutside
+	35, // 15: protoBoard.TaskOutside.Users:type_name -> protoProfile.UserOutsideShort
+	29, // 16: protoBoard.TaskOutside.Checklists:type_name -> protoBoard.ChecklistOutside
+	27, // 17: protoBoard.TaskOutside.Comments:type_name -> protoBoard.CommentOutside
+	32, // 18: protoBoard.TaskOutside.Attachments:type_name -> protoBoard.AttachmentOutside
+	24, // 19: protoBoard.TaskOutsideShort.Tags:type_name -> protoBoard.TagOutside
+	35, // 20: protoBoard.TaskOutsideShort.Users:type_name -> protoProfile.UserOutsideShort
+	29, // 21: protoBoard.TaskOutsideShort.Checklists:type_name -> protoBoard.ChecklistOutside
+	35, // 22: protoBoard.CommentOutside.User:type_name -> protoProfile.UserOutsideShort
+	30, // 23: protoBoard.AttachmentInput.info:type_name -> protoBoard.AttachmentInfo
+	36, // 24: protoBoard.Board.GetBoardsList:input_type -> protoProfile.UserID
 	0,  // 25: protoBoard.Board.CreateBoard:input_type -> protoBoard.BoardChangeInput
 	1,  // 26: protoBoard.Board.GetBoard:input_type -> protoBoard.BoardInput
 	0,  // 27: protoBoard.Board.ChangeBoard:input_type -> protoBoard.BoardChangeInput
 	1,  // 28: protoBoard.Board.DeleteBoard:input_type -> protoBoard.BoardInput
 	2,  // 29: protoBoard.Board.AddUserToBoard:input_type -> protoBoard.BoardMemberInput
 	2,  // 30: protoBoard.Board.RemoveUserToBoard:input_type -> protoBoard.BoardMemberInput
-	5,  // 31: protoBoard.Board.CreateCard:input_type -> protoBoard.CardInput
-	5,  // 32: protoBoard.Board.GetCard:input_type -> protoBoard.CardInput
-	5,  // 33: protoBoard.Board.ChangeCard:input_type -> protoBoard.CardInput
-	5,  // 34: protoBoard.Board.DeleteCard:input_type -> protoBoard.CardInput
-	7,  // 35: protoBoard.Board.CardOrderChange:input_type -> protoBoard.CardsOrderInput
-	10, // 36: protoBoard.Board.CreateTask:input_type -> protoBoard.TaskInput
-	10, // 37: protoBoard.Board.GetTask:input_type -> protoBoard.TaskInput
-	10, // 38: protoBoard.Board.ChangeTask:input_type -> protoBoard.TaskInput
-	10, // 39: protoBoard.Board.DeleteTask:input_type -> protoBoard.TaskInput
-	13, // 40: protoBoard.Board.TasksOrderChange:input_type -> protoBoard.TasksOrderInput
-	16, // 41: protoBoard.Board.AssignUser:input_type -> protoBoard.TaskAssignerInput
-	16, // 42: protoBoard.Board.DismissUser:input_type -> protoBoard.TaskAssignerInput
-	21, // 43: protoBoard.Board.CreateTag:input_type -> protoBoard.TagInput
-	21, // 44: protoBoard.Board.ChangeTag:input_type -> protoBoard.TagInput
-	21, // 45: protoBoard.Board.DeleteTag:input_type -> protoBoard.TagInput
-	22, // 46: protoBoard.Board.AddTag:input_type -> protoBoard.TaskTagInput
-	22, // 47: protoBoard.Board.RemoveTag:input_type -> protoBoard.TaskTagInput
-	24, // 48: protoBoard.Board.CreateComment:input_type -> protoBoard.CommentInput
-	24, // 49: protoBoard.Board.ChangeComment:input_type -> protoBoard.CommentInput
-	24, // 50: protoBoard.Board.DeleteComment:input_type -> protoBoard.CommentInput
-	27, // 51: protoBoard.Board.CreateChecklist:input_type -> protoBoard.ChecklistInput
-	27, // 52: protoBoard.Board.ChangeChecklist:input_type -> protoBoard.ChecklistInput
-	27, // 53: protoBoard.Board.DeleteChecklist:input_type -> protoBoard.ChecklistInput
-	30, // 54: protoBoard.Board.AddAttachment:input_type -> protoBoard.AttachmentInput
-	29, // 55: protoBoard.Board.RemoveAttachment:input_type -> protoBoard.AttachmentInfo
+	6,  // 31: protoBoard.Board.CreateCard:input_type -> protoBoard.CardInput
+	6,  // 32: protoBoard.Board.GetCard:input_type -> protoBoard.CardInput
+	6,  // 33: protoBoard.Board.ChangeCard:input_type -> protoBoard.CardInput
+	6,  // 34: protoBoard.Board.DeleteCard:input_type -> protoBoard.CardInput
+	8,  // 35: protoBoard.Board.CardOrderChange:input_type -> protoBoard.CardsOrderInput
+	11, // 36: protoBoard.Board.CreateTask:input_type -> protoBoard.TaskInput
+	11, // 37: protoBoard.Board.GetTask:input_type -> protoBoard.TaskInput
+	11, // 38: protoBoard.Board.ChangeTask:input_type -> protoBoard.TaskInput
+	11, // 39: protoBoard.Board.DeleteTask:input_type -> protoBoard.TaskInput
+	14, // 40: protoBoard.Board.TasksOrderChange:input_type -> protoBoard.TasksOrderInput
+	17, // 41: protoBoard.Board.AssignUser:input_type -> protoBoard.TaskAssignerInput
+	17, // 42: protoBoard.Board.DismissUser:input_type -> protoBoard.TaskAssignerInput
+	22, // 43: protoBoard.Board.CreateTag:input_type -> protoBoard.TagInput
+	22, // 44: protoBoard.Board.ChangeTag:input_type -> protoBoard.TagInput
+	22, // 45: protoBoard.Board.DeleteTag:input_type -> protoBoard.TagInput
+	23, // 46: protoBoard.Board.AddTag:input_type -> protoBoard.TaskTagInput
+	23, // 47: protoBoard.Board.RemoveTag:input_type -> protoBoard.TaskTagInput
+	25, // 48: protoBoard.Board.CreateComment:input_type -> protoBoard.CommentInput
+	25, // 49: protoBoard.Board.ChangeComment:input_type -> protoBoard.CommentInput
+	25, // 50: protoBoard.Board.DeleteComment:input_type -> protoBoard.CommentInput
+	28, // 51: protoBoard.Board.CreateChecklist:input_type -> protoBoard.ChecklistInput
+	28, // 52: protoBoard.Board.ChangeChecklist:input_type -> protoBoard.ChecklistInput
+	28, // 53: protoBoard.Board.DeleteChecklist:input_type -> protoBoard.ChecklistInput
+	31, // 54: protoBoard.Board.AddAttachment:input_type -> protoBoard.AttachmentInput
+	30, // 55: protoBoard.Board.RemoveAttachment:input_type -> protoBoard.AttachmentInfo
 	1,  // 56: protoBoard.Board.GetSharedURL:input_type -> protoBoard.BoardInput
-	32, // 57: protoBoard.Board.CheckBoardPermission:input_type -> protoBoard.CheckPermissions
-	32, // 58: protoBoard.Board.CheckCardPermission:input_type -> protoBoard.CheckPermissions
-	32, // 59: protoBoard.Board.CheckTaskPermission:input_type -> protoBoard.CheckPermissions
-	32, // 60: protoBoard.Board.CheckCommentPermission:input_type -> protoBoard.CheckPermissions
-	36, // 61: protoBoard.Board.GetBoardsList:output_type -> protoProfile.BoardsOutsideShort
-	37, // 62: protoBoard.Board.CreateBoard:output_type -> protoProfile.BoardOutsideShort
-	3,  // 63: protoBoard.Board.GetBoard:output_type -> protoBoard.BoardOutside
-	37, // 64: protoBoard.Board.ChangeBoard:output_type -> protoProfile.BoardOutsideShort
-	33, // 65: protoBoard.Board.DeleteBoard:output_type -> protoBoard.Nothing
-	34, // 66: protoBoard.Board.AddUserToBoard:output_type -> protoProfile.UserOutsideShort
-	33, // 67: protoBoard.Board.RemoveUserToBoard:output_type -> protoBoard.Nothing
-	9,  // 68: protoBoard.Board.CreateCard:output_type -> protoBoard.CardOutsideShort
-	8,  // 69: protoBoard.Board.GetCard:output_type -> protoBoard.CardOutside
-	9,  // 70: protoBoard.Board.ChangeCard:output_type -> protoBoard.CardOutsideShort
-	33, // 71: protoBoard.Board.DeleteCard:output_type -> protoBoard.Nothing
-	33, // 72: protoBoard.Board.CardOrderChange:output_type -> protoBoard.Nothing
-	20, // 73: protoBoard.Board.CreateTask:output_type -> protoBoard.TaskOutsideSuperShort
-	18, // 74: protoBoard.Board.GetTask:output_type -> protoBoard.TaskOutside
-	20, // 75: protoBoard.Board.ChangeTask:output_type -> protoBoard.TaskOutsideSuperShort
-	33, // 76: protoBoard.Board.DeleteTask:output_type -> protoBoard.Nothing
-	33, // 77: protoBoard.Board.TasksOrderChange:output_type -> protoBoard.Nothing
-	34, // 78: protoBoard.Board.AssignUser:output_type -> protoProfile.UserOutsideShort
-	33, // 79: protoBoard.Board.DismissUser:output_type -> protoBoard.Nothing
-	23, // 80: protoBoard.Board.CreateTag:output_type -> protoBoard.TagOutside
-	23, // 81: protoBoard.Board.ChangeTag:output_type -> protoBoard.TagOutside
-	33, // 82: protoBoard.Board.DeleteTag:output_type -> protoBoard.Nothing
-	33, // 83: protoBoard.Board.AddTag:output_type -> protoBoard.Nothing
-	33, // 84: protoBoard.Board.RemoveTag:output_type -> protoBoard.Nothing
-	26, // 85: protoBoard.Board.CreateComment:output_type -> protoBoard.CommentOutside
-	26, // 86: protoBoard.Board.ChangeComment:output_type -> protoBoard.CommentOutside
-	33, // 87: protoBoard.Board.DeleteComment:output_type -> protoBoard.Nothing
-	28, // 88: protoBoard.Board.CreateChecklist:output_type -> protoBoard.ChecklistOutside
-	28, // 89: protoBoard.Board.ChangeChecklist:output_type -> protoBoard.ChecklistOutside
-	33, // 90: protoBoard.Board.DeleteChecklist:output_type -> protoBoard.Nothing
-	31, // 91: protoBoard.Board.AddAttachment:output_type -> protoBoard.AttachmentOutside
-	33, // 92: protoBoard.Board.RemoveAttachment:output_type -> protoBoard.Nothing
-	4,  // 93: protoBoard.Board.GetSharedURL:output_type -> protoBoard.SharedURL
-	33, // 94: protoBoard.Board.CheckBoardPermission:output_type -> protoBoard.Nothing
-	33, // 95: protoBoard.Board.CheckCardPermission:output_type -> protoBoard.Nothing
-	33, // 96: protoBoard.Board.CheckTaskPermission:output_type -> protoBoard.Nothing
-	33, // 97: protoBoard.Board.CheckCommentPermission:output_type -> protoBoard.Nothing
-	61, // [61:98] is the sub-list for method output_type
-	24, // [24:61] is the sub-list for method input_type
+	3,  // 57: protoBoard.Board.InviteUserToBoard:input_type -> protoBoard.BoardInviteInput
+	33, // 58: protoBoard.Board.CheckBoardPermission:input_type -> protoBoard.CheckPermissions
+	33, // 59: protoBoard.Board.CheckCardPermission:input_type -> protoBoard.CheckPermissions
+	33, // 60: protoBoard.Board.CheckTaskPermission:input_type -> protoBoard.CheckPermissions
+	33, // 61: protoBoard.Board.CheckCommentPermission:input_type -> protoBoard.CheckPermissions
+	37, // 62: protoBoard.Board.GetBoardsList:output_type -> protoProfile.BoardsOutsideShort
+	38, // 63: protoBoard.Board.CreateBoard:output_type -> protoProfile.BoardOutsideShort
+	4,  // 64: protoBoard.Board.GetBoard:output_type -> protoBoard.BoardOutside
+	38, // 65: protoBoard.Board.ChangeBoard:output_type -> protoProfile.BoardOutsideShort
+	34, // 66: protoBoard.Board.DeleteBoard:output_type -> protoBoard.Nothing
+	35, // 67: protoBoard.Board.AddUserToBoard:output_type -> protoProfile.UserOutsideShort
+	34, // 68: protoBoard.Board.RemoveUserToBoard:output_type -> protoBoard.Nothing
+	10, // 69: protoBoard.Board.CreateCard:output_type -> protoBoard.CardOutsideShort
+	9,  // 70: protoBoard.Board.GetCard:output_type -> protoBoard.CardOutside
+	10, // 71: protoBoard.Board.ChangeCard:output_type -> protoBoard.CardOutsideShort
+	34, // 72: protoBoard.Board.DeleteCard:output_type -> protoBoard.Nothing
+	34, // 73: protoBoard.Board.CardOrderChange:output_type -> protoBoard.Nothing
+	21, // 74: protoBoard.Board.CreateTask:output_type -> protoBoard.TaskOutsideSuperShort
+	19, // 75: protoBoard.Board.GetTask:output_type -> protoBoard.TaskOutside
+	21, // 76: protoBoard.Board.ChangeTask:output_type -> protoBoard.TaskOutsideSuperShort
+	34, // 77: protoBoard.Board.DeleteTask:output_type -> protoBoard.Nothing
+	34, // 78: protoBoard.Board.TasksOrderChange:output_type -> protoBoard.Nothing
+	35, // 79: protoBoard.Board.AssignUser:output_type -> protoProfile.UserOutsideShort
+	34, // 80: protoBoard.Board.DismissUser:output_type -> protoBoard.Nothing
+	24, // 81: protoBoard.Board.CreateTag:output_type -> protoBoard.TagOutside
+	24, // 82: protoBoard.Board.ChangeTag:output_type -> protoBoard.TagOutside
+	34, // 83: protoBoard.Board.DeleteTag:output_type -> protoBoard.Nothing
+	34, // 84: protoBoard.Board.AddTag:output_type -> protoBoard.Nothing
+	34, // 85: protoBoard.Board.RemoveTag:output_type -> protoBoard.Nothing
+	27, // 86: protoBoard.Board.CreateComment:output_type -> protoBoard.CommentOutside
+	27, // 87: protoBoard.Board.ChangeComment:output_type -> protoBoard.CommentOutside
+	34, // 88: protoBoard.Board.DeleteComment:output_type -> protoBoard.Nothing
+	29, // 89: protoBoard.Board.CreateChecklist:output_type -> protoBoard.ChecklistOutside
+	29, // 90: protoBoard.Board.ChangeChecklist:output_type -> protoBoard.ChecklistOutside
+	34, // 91: protoBoard.Board.DeleteChecklist:output_type -> protoBoard.Nothing
+	32, // 92: protoBoard.Board.AddAttachment:output_type -> protoBoard.AttachmentOutside
+	34, // 93: protoBoard.Board.RemoveAttachment:output_type -> protoBoard.Nothing
+	5,  // 94: protoBoard.Board.GetSharedURL:output_type -> protoBoard.SharedURL
+	38, // 95: protoBoard.Board.InviteUserToBoard:output_type -> protoProfile.BoardOutsideShort
+	34, // 96: protoBoard.Board.CheckBoardPermission:output_type -> protoBoard.Nothing
+	34, // 97: protoBoard.Board.CheckCardPermission:output_type -> protoBoard.Nothing
+	34, // 98: protoBoard.Board.CheckTaskPermission:output_type -> protoBoard.Nothing
+	34, // 99: protoBoard.Board.CheckCommentPermission:output_type -> protoBoard.Nothing
+	62, // [62:100] is the sub-list for method output_type
+	24, // [24:62] is the sub-list for method input_type
 	24, // [24:24] is the sub-list for extension type_name
 	24, // [24:24] is the sub-list for extension extendee
 	0,  // [0:24] is the sub-list for field type_name
@@ -3095,7 +3173,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BoardOutside); i {
+			switch v := v.(*BoardInviteInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3107,7 +3185,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SharedURL); i {
+			switch v := v.(*BoardOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3119,7 +3197,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CardInput); i {
+			switch v := v.(*SharedURL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3131,7 +3209,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CardOrder); i {
+			switch v := v.(*CardInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3143,7 +3221,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CardsOrderInput); i {
+			switch v := v.(*CardOrder); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3155,7 +3233,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CardOutside); i {
+			switch v := v.(*CardsOrderInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3167,7 +3245,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CardOutsideShort); i {
+			switch v := v.(*CardOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3179,7 +3257,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskInput); i {
+			switch v := v.(*CardOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3191,7 +3269,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskOrder); i {
+			switch v := v.(*TaskInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3203,7 +3281,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TasksOrder); i {
+			switch v := v.(*TaskOrder); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3215,7 +3293,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TasksOrderInput); i {
+			switch v := v.(*TasksOrder); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3227,7 +3305,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskInternal); i {
+			switch v := v.(*TasksOrderInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3239,7 +3317,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskInternalShort); i {
+			switch v := v.(*TaskInternal); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3251,7 +3329,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskAssignerInput); i {
+			switch v := v.(*TaskInternalShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3263,7 +3341,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskAssignerIDs); i {
+			switch v := v.(*TaskAssignerInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3275,7 +3353,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskOutside); i {
+			switch v := v.(*TaskAssignerIDs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3287,7 +3365,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskOutsideShort); i {
+			switch v := v.(*TaskOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3299,7 +3377,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskOutsideSuperShort); i {
+			switch v := v.(*TaskOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3311,7 +3389,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TagInput); i {
+			switch v := v.(*TaskOutsideSuperShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3323,7 +3401,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskTagInput); i {
+			switch v := v.(*TagInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3335,7 +3413,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TagOutside); i {
+			switch v := v.(*TaskTagInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3347,7 +3425,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CommentInput); i {
+			switch v := v.(*TagOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3359,7 +3437,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CommentInternal); i {
+			switch v := v.(*CommentInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3371,7 +3449,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CommentOutside); i {
+			switch v := v.(*CommentInternal); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3383,7 +3461,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChecklistInput); i {
+			switch v := v.(*CommentOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3395,7 +3473,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChecklistOutside); i {
+			switch v := v.(*ChecklistInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3407,7 +3485,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AttachmentInfo); i {
+			switch v := v.(*ChecklistOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3419,7 +3497,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AttachmentInput); i {
+			switch v := v.(*AttachmentInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3431,7 +3509,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AttachmentOutside); i {
+			switch v := v.(*AttachmentInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3443,7 +3521,7 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CheckPermissions); i {
+			switch v := v.(*AttachmentOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3455,6 +3533,18 @@ func file_board_board_proto_init() {
 			}
 		}
 		file_board_board_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CheckPermissions); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_board_board_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Nothing); i {
 			case 0:
 				return &v.state
@@ -3467,7 +3557,7 @@ func file_board_board_proto_init() {
 			}
 		}
 	}
-	file_board_board_proto_msgTypes[30].OneofWrappers = []interface{}{
+	file_board_board_proto_msgTypes[31].OneofWrappers = []interface{}{
 		(*AttachmentInput_Info)(nil),
 		(*AttachmentInput_File)(nil),
 	}
@@ -3477,7 +3567,7 @@ func file_board_board_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_board_board_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   34,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -3536,6 +3626,7 @@ type BoardClient interface {
 	AddAttachment(ctx context.Context, opts ...grpc.CallOption) (Board_AddAttachmentClient, error)
 	RemoveAttachment(ctx context.Context, in *AttachmentInfo, opts ...grpc.CallOption) (*Nothing, error)
 	GetSharedURL(ctx context.Context, in *BoardInput, opts ...grpc.CallOption) (*SharedURL, error)
+	InviteUserToBoard(ctx context.Context, in *BoardInviteInput, opts ...grpc.CallOption) (*profile.BoardOutsideShort, error)
 	CheckBoardPermission(ctx context.Context, in *CheckPermissions, opts ...grpc.CallOption) (*Nothing, error)
 	CheckCardPermission(ctx context.Context, in *CheckPermissions, opts ...grpc.CallOption) (*Nothing, error)
 	CheckTaskPermission(ctx context.Context, in *CheckPermissions, opts ...grpc.CallOption) (*Nothing, error)
@@ -3872,6 +3963,15 @@ func (c *boardClient) GetSharedURL(ctx context.Context, in *BoardInput, opts ...
 	return out, nil
 }
 
+func (c *boardClient) InviteUserToBoard(ctx context.Context, in *BoardInviteInput, opts ...grpc.CallOption) (*profile.BoardOutsideShort, error) {
+	out := new(profile.BoardOutsideShort)
+	err := c.cc.Invoke(ctx, "/protoBoard.Board/InviteUserToBoard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *boardClient) CheckBoardPermission(ctx context.Context, in *CheckPermissions, opts ...grpc.CallOption) (*Nothing, error) {
 	out := new(Nothing)
 	err := c.cc.Invoke(ctx, "/protoBoard.Board/CheckBoardPermission", in, out, opts...)
@@ -3943,6 +4043,7 @@ type BoardServer interface {
 	AddAttachment(Board_AddAttachmentServer) error
 	RemoveAttachment(context.Context, *AttachmentInfo) (*Nothing, error)
 	GetSharedURL(context.Context, *BoardInput) (*SharedURL, error)
+	InviteUserToBoard(context.Context, *BoardInviteInput) (*profile.BoardOutsideShort, error)
 	CheckBoardPermission(context.Context, *CheckPermissions) (*Nothing, error)
 	CheckCardPermission(context.Context, *CheckPermissions) (*Nothing, error)
 	CheckTaskPermission(context.Context, *CheckPermissions) (*Nothing, error)
@@ -4051,6 +4152,9 @@ func (*UnimplementedBoardServer) RemoveAttachment(context.Context, *AttachmentIn
 }
 func (*UnimplementedBoardServer) GetSharedURL(context.Context, *BoardInput) (*SharedURL, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSharedURL not implemented")
+}
+func (*UnimplementedBoardServer) InviteUserToBoard(context.Context, *BoardInviteInput) (*profile.BoardOutsideShort, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InviteUserToBoard not implemented")
 }
 func (*UnimplementedBoardServer) CheckBoardPermission(context.Context, *CheckPermissions) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckBoardPermission not implemented")
@@ -4671,6 +4775,24 @@ func _Board_GetSharedURL_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Board_InviteUserToBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardInviteInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BoardServer).InviteUserToBoard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protoBoard.Board/InviteUserToBoard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BoardServer).InviteUserToBoard(ctx, req.(*BoardInviteInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Board_CheckBoardPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckPermissions)
 	if err := dec(in); err != nil {
@@ -4874,6 +4996,10 @@ var _Board_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSharedURL",
 			Handler:    _Board_GetSharedURL_Handler,
+		},
+		{
+			MethodName: "InviteUserToBoard",
+			Handler:    _Board_InviteUserToBoard_Handler,
 		},
 		{
 			MethodName: "CheckBoardPermission",

@@ -38,6 +38,7 @@ type BoardStorage interface {
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
 	GetSharedURL(boardInput models.BoardInput) (string, error)
+	GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (err error)
@@ -73,6 +74,10 @@ type storage struct {
 	commentStorage commentStorage.Storage
 	checklistStorage checklistStorage.Storage
 	attachmentStorage attachmentStorage.Storage
+}
+
+func (s *storage) GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error) {
+	panic("implement me")
 }
 
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
