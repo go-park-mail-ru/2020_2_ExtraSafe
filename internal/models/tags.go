@@ -9,12 +9,13 @@ type Tag struct {
 
 //===================================================<-Input
 type TagInput struct {
-	UserID  int64  `json:"-"`
-	TaskID  int64  `json:"taskID"`
-	TagID   int64  `json:"tagID"`
-	BoardID int64  `json:"boardID"`
-	Color   string `json:"tagColor"`
-	Name    string `json:"tagName"`
+	SessionID string `json:"-"`
+	UserID    int64  `json:"-"`
+	TaskID    int64  `json:"taskID"`
+	TagID     int64  `json:"tagID"`
+	BoardID   int64  `json:"boardID"`
+	Color     string `json:"tagColor"`
+	Name      string `json:"tagName"`
 }
 
 //===================================================<-Internal

@@ -1,5 +1,7 @@
 package websocket
 
+import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+
 type Hub struct {
 	boardID int64
 	users map[string]*Client
@@ -40,6 +42,9 @@ func (h *Hub) Run() {
 
 		case message := <-h.broadcast:
 			for id, user := range h.users {
+				if id == message.(models.WS).SessionID {
+					continue
+				}
 				select {
 				case user.send <- message:
 				default:

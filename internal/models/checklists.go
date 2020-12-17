@@ -11,6 +11,7 @@ type Checklist struct {
 
 //===================================================<-Input
 type ChecklistInput struct {
+	SessionID   string          `json:"-"`
 	UserID      int64           `json:"-"`
 	BoardID     int64           `json:"-"`
 	ChecklistID int64           `json:"checklistID"`

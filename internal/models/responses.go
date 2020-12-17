@@ -132,7 +132,8 @@ type ResponseAttachment struct {
 
 //===================================================<-WebSocket
 type WS struct {
-	Method string      `json:"method"`
-	Body   interface{} `json:"body"`
+	SessionID string      `json:"-"`
+	Method    string      `json:"method"`
+	Body      interface{} `json:"body"`
 }
 

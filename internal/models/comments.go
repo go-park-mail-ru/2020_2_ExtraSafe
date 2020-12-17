@@ -17,6 +17,7 @@ type CommentInput struct {
 	Order     int64  `json:"commentOrder"`
 	BoardID   int64  `json:"-"`
 	UserID    int64  `json:"-"`
+	SessionID string `json:"-"`
 }
 
 //===================================================<-Internal

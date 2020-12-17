@@ -225,13 +225,7 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	board.Theme = boardInternal.Theme
 	board.Star = boardInternal.Star
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeBoard",
-			Body:   board,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{Method: "ChangeBoard", SessionID: request.SessionID, Body: board}, request.BoardID)
 
 	return board, nil
 }
@@ -249,13 +243,11 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteBoard",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteBoard",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -279,13 +271,11 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "AddMember",
-			Body:   user,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "AddMember",
+		SessionID: request.SessionID,
+		Body:   user,
+	}, request.BoardID)
 
 	return user,nil
 }
@@ -304,13 +294,11 @@ func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "RemoveMember",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "RemoveMember",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -334,13 +322,11 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutsideS
 	card.CardID = output.CardID
 	card.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateCard",
-			Body:   card,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CreateCard",
+		SessionID: request.SessionID,
+		Body:   card,
+	}, request.BoardID)
 
 	return card, nil
 }
@@ -397,13 +383,11 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutsideS
 	card.CardID = output.CardID
 	card.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeCard",
-			Body:   card,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "ChangeCard",
+		SessionID: request.SessionID,
+		Body:   card,
+	}, request.BoardID)
 
 	return card, nil
 }
@@ -423,13 +407,11 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteCard",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteCard",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -454,13 +436,11 @@ func (s *service) CardOrderChange(request models.CardsOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CardOrderChange",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CardOrderChange",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -486,13 +466,11 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	task.Description = output.Description
 	task.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateTask",
-			Body:   task,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast( models.WS{
+		Method: "CreateTask",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID )
 
 	return task, nil
 }
@@ -584,13 +562,11 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutsideS
 	task.Description = output.Description
 	task.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeTask",
-			Body:   task,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "ChangeTask",
+		SessionID: request.SessionID,
+		Body:   task,
+	}, request.BoardID)
 
 	return task, nil
 }
@@ -612,13 +588,11 @@ func (s *service) DeleteTask(request models.TaskInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteTask",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteTask",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -650,13 +624,11 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "TasksOrderChange",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "TasksOrderChange",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -680,13 +652,11 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "AssignUser",
-			Body:   user,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "AssignUser",
+		SessionID: request.SessionID,
+		Body:   user,
+	}, request.BoardID)
 
 	return user, nil
 }
@@ -705,13 +675,11 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DismissUser",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DismissUser",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -737,13 +705,11 @@ func (s *service) CreateTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateTag",
-			Body:   tag,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CreateTag",
+		SessionID: request.SessionID,
+		Body:   tag,
+	}, request.BoardID)
 
 	return tag, nil
 }
@@ -769,13 +735,11 @@ func (s *service) ChangeTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeTag",
-			Body:   tag,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "ChangeTag",
+		SessionID: request.SessionID,
+		Body:   tag,
+	}, request.BoardID)
 
 	return tag, nil
 }
@@ -797,13 +761,11 @@ func (s *service) DeleteTag(request models.TagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteTag",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteTag",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -822,13 +784,11 @@ func (s *service) AddTag(request models.TaskTagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "AddTag",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "AddTag",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -847,13 +807,11 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "RemoveTag",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "RemoveTag",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -886,13 +844,11 @@ func (s *service) CreateComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateComment",
-			Body:   comment,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CreateComment",
+		SessionID: request.SessionID,
+		Body:   comment,
+	}, request.BoardID)
 
 	return comment, nil
 }
@@ -925,13 +881,11 @@ func (s *service) ChangeComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeComment",
-			Body:   comment,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "ChangeComment",
+		SessionID: request.SessionID,
+		Body:   comment,
+	}, request.BoardID)
 
 	return comment, nil
 }
@@ -952,13 +906,11 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteComment",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteComment",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -983,13 +935,11 @@ func (s *service) CreateChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateChecklist",
-			Body:   checklist,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CreateChecklist",
+		SessionID: request.SessionID,
+		Body:   checklist,
+	}, request.BoardID)
 
 	return checklist, nil
 }
@@ -1014,13 +964,11 @@ func (s *service) ChangeChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "ChangeChecklist",
-			Body:   checklist,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "ChangeChecklist",
+		SessionID: request.SessionID,
+		Body:   checklist,
+	}, request.BoardID)
 
 	return checklist, nil
 }
@@ -1041,13 +989,11 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteChecklist",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteChecklist",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -1109,13 +1055,11 @@ func (s *service) CreateAttachment(request models.AttachmentInput) (attachment m
 	attachment.Filename = res.Filename
 	attachment.Filepath = res.Filepath
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "CreateAttachment",
-			Body:   attachment,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "CreateAttachment",
+		SessionID: request.SessionID,
+		Body:   attachment,
+	}, request.BoardID)
 
 	return attachment, nil
 }
@@ -1135,13 +1079,11 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	if hub, ok := s.hubs[request.BoardID]; ok {
-		some := models.WS{
-			Method: "DeleteAttachment",
-			Body:   request,
-		}
-		hub.Broadcast(some)
-	}
+	s.broadcast(models.WS{
+		Method: "DeleteAttachment",
+		SessionID: request.SessionID,
+		Body:   request,
+	}, request.BoardID)
 
 	return nil
 }
@@ -1262,4 +1204,10 @@ func (s *service) createHub(boardID int64) *websocket.Hub {
 func (s *service) deleteHub(boardID int64) {
 	s.hubs[boardID].StopHub()
 	delete(s.hubs, boardID)
+}
+
+func (s *service) broadcast(message models.WS, boardID int64) {
+	if hub, ok := s.hubs[boardID]; ok {
+		hub.Broadcast(message)
+	}
 }

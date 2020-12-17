@@ -80,6 +80,7 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -96,6 +97,7 @@ func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberIn
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -138,6 +140,7 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -189,6 +192,7 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -225,6 +229,7 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -239,6 +244,7 @@ func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInp
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -252,6 +258,7 @@ func (t transport) TagChangeRead(c echo.Context) (request models.TagInput, err e
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -266,6 +273,7 @@ func (t transport) TagTaskRead(c echo.Context) (request models.TaskTagInput, err
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -289,6 +297,7 @@ func (t transport) CommentChangeRead(c echo.Context) (request models.CommentInpu
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -313,6 +322,7 @@ func (t transport) ChecklistChangeRead(c echo.Context) (request models.Checklist
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -348,6 +358,7 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -362,6 +373,7 @@ func (t transport) AttachmentDeleteRead(c echo.Context) (request models.Attachme
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
