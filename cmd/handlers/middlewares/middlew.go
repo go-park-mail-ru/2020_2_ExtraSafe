@@ -138,7 +138,7 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 			return err
 		}
 
-		c.Set("boardID", bid)
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -162,7 +162,7 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 			return err
 		}
 
-		c.Set("boardID", bid)
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -178,13 +178,15 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCardPermission(userID, cardID)
+		boardID, err := m.boardService.CheckCardPermission(userID, cardID)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -200,13 +202,15 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckTaskPermission(userID, taskID)
+		boardID, err := m.boardService.CheckTaskPermission(userID, taskID)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -222,13 +226,15 @@ func (m middlew) CheckCommentUpdateUserPermission(next echo.HandlerFunc) echo.Ha
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCommentPermission(userID, commentID, false)
+		boardID, err := m.boardService.CheckCommentPermission(userID, commentID, false)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -244,13 +250,15 @@ func (m middlew) CheckCommentDeleteUserPermission(next echo.HandlerFunc) echo.Ha
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCommentPermission(userID, commentID, true)
+		boardID, err := m.boardService.CheckCommentPermission(userID, commentID, true)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}

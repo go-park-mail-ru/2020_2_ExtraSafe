@@ -11,6 +11,7 @@ import (
 type Handler interface {
 	BoardCreate(c echo.Context) error
 	Board(c echo.Context) error
+	BoardWS(c echo.Context) error
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
 	BoardAddMember(c echo.Context) error
@@ -95,6 +96,17 @@ func (h *handler) Board(c echo.Context) error {
 	response, err := h.boardsTransport.BoardWrite(board)
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardWS(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	_ = h.boardsService.WebSocketBoard(userInput, c)
+
+	return nil
 }
 
 func (h *handler) BoardChange(c echo.Context) error {

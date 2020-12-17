@@ -32,6 +32,10 @@ message BoardInviteInput {
   string UrlHash = 3;
 }
 
+message BoardID {
+  int64 BoardID = 1;
+}
+
 message BoardOutside {
   int64 BoardID = 1;
   protoProfile.UserOutsideShort Admin = 2;
@@ -300,7 +304,7 @@ service Board {
   rpc InviteUserToBoard (BoardInviteInput) returns (protoProfile.BoardOutsideShort) {}
 
   rpc CheckBoardPermission (CheckPermissions) returns (Nothing) {}
-  rpc CheckCardPermission (CheckPermissions) returns (Nothing) {}
-  rpc CheckTaskPermission (CheckPermissions) returns (Nothing) {}
-  rpc CheckCommentPermission (CheckPermissions) returns (Nothing) {}
+  rpc CheckCardPermission (CheckPermissions) returns (BoardID) {}
+  rpc CheckTaskPermission (CheckPermissions) returns (BoardID) {}
+  rpc CheckCommentPermission (CheckPermissions) returns (BoardID) {}
 }

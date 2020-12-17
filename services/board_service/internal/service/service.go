@@ -946,29 +946,29 @@ func (s *service) CheckBoardPermission(_ context.Context, input *protoBoard.Chec
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) CheckCardPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
-	err := s.boardStorage.CheckCardPermission(input.UserID, input.ElementID)
+func (s *service) CheckCardPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.BoardID, error) {
+	boardID, err := s.boardStorage.CheckCardPermission(input.UserID, input.ElementID)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.BoardID{BoardID: 0}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	return &protoBoard.BoardID{BoardID: boardID}, nil
 }
 
-func (s *service) CheckTaskPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
-	err := s.boardStorage.CheckTaskPermission(input.UserID, input.ElementID)
+func (s *service) CheckTaskPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.BoardID, error) {
+	boardID, err := s.boardStorage.CheckTaskPermission(input.UserID, input.ElementID)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.BoardID{BoardID: 0}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	return &protoBoard.BoardID{BoardID: boardID}, nil
 }
 
-func (s *service) CheckCommentPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.Nothing, error) {
-	err := s.boardStorage.CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin)
+func (s *service) CheckCommentPermission(_ context.Context, input *protoBoard.CheckPermissions) (*protoBoard.BoardID, error) {
+	boardID, err := s.boardStorage.CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.BoardID{BoardID: 0}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	return &protoBoard.BoardID{BoardID: boardID}, nil
 }

@@ -16,7 +16,8 @@ import (
 
 type ServiceBoard interface {
 	CreateBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
-	GetBoard(request models.BoardInput, c echo.Context) (board models.BoardOutside, err error)
+	GetBoard(request models.BoardInput) (board models.BoardOutside, err error)
+	WebSocketBoard(request models.BoardInput, c echo.Context) (err error)
 	ChangeBoard(request models.BoardChangeInput) (board models.BoardOutsideShort, err error)
 	DeleteBoard(request models.BoardInput) (err error)
 	AddMember(request models.BoardMemberInput) (user models.UserOutsideShort, err error)
@@ -57,9 +58,9 @@ type ServiceBoard interface {
 	InviteUserToBoard(request models.BoardInviteInput) (board models.BoardOutsideShort, err error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
-	CheckCardPermission(userID int64, cardID int64) (err error)
-	CheckTaskPermission(userID int64, taskID int64) (err error)
-	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
+	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
+	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error)
 }
 
 type service struct {
@@ -71,7 +72,8 @@ type service struct {
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
 	return &service{
 		boardService: boardService,
-		validator: validator,
+		validator:    validator,
+		hubs:         make(map[int64]*websocket.Hub, 0),
 	}
 }
 
@@ -99,7 +101,7 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	return board, err
 }
 
-func (s *service) GetBoard(request models.BoardInput, c echo.Context) (board models.BoardOutside, err error) {
+func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.BoardInput{
@@ -162,6 +164,10 @@ func (s *service) GetBoard(request models.BoardInput, c echo.Context) (board mod
 	board.Tags = convertTags(boardInternal.Tags)
 	board.Users = convertUsers(boardInternal.Users)
 
+	return board, nil
+}
+
+func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err error) {
 	var hub *websocket.Hub
 	if h, ok := s.hubs[request.BoardID]; ok {
 		hub = h
@@ -170,8 +176,7 @@ func (s *service) GetBoard(request models.BoardInput, c echo.Context) (board mod
 	}
 
 	websocket.ServeWs(hub, c, request.UserID)
-
-	return board, nil
+	return nil
 }
 
 func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
@@ -221,8 +226,11 @@ func (s *service) ChangeBoard(request models.BoardChangeInput) (board models.Boa
 	board.Star = boardInternal.Star
 
 	if hub, ok := s.hubs[request.BoardID]; ok {
-		message, _ := board.MarshalJSON()
-		hub.Broadcast(message)
+		some := models.WS{
+			Method: "ChangeBoard",
+			Body:   board,
+		}
+		hub.Broadcast(some)
 	}
 
 	return board, nil
@@ -239,6 +247,14 @@ func (s *service) DeleteBoard(request models.BoardInput) (err error) {
 	_, err = s.boardService.DeleteBoard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteBoard",
+			Body:   request,
+		}
+		hub.Broadcast(some)
 	}
 
 	return nil
@@ -263,7 +279,13 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
-	// websocket - ?
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "AddMember",
+			Body:   user,
+		}
+		hub.Broadcast(some)
+	}
 
 	return user,nil
 }
@@ -282,7 +304,13 @@ func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket - ?
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "RemoveMember",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -306,7 +334,13 @@ func (s *service) CreateCard(request models.CardInput) (card models.CardOutsideS
 	card.CardID = output.CardID
 	card.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateCard",
+			Body:   card,
+		}
+		hub.Broadcast(some)
+	}
 
 	return card, nil
 }
@@ -363,7 +397,13 @@ func (s *service) ChangeCard(request models.CardInput) (card models.CardOutsideS
 	card.CardID = output.CardID
 	card.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "ChangeCard",
+			Body:   card,
+		}
+		hub.Broadcast(some)
+	}
 
 	return card, nil
 }
@@ -383,7 +423,13 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteCard",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -408,7 +454,13 @@ func (s *service) CardOrderChange(request models.CardsOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CardOrderChange",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -434,7 +486,13 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	task.Description = output.Description
 	task.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateTask",
+			Body:   task,
+		}
+		hub.Broadcast(some)
+	}
 
 	return task, nil
 }
@@ -526,7 +584,13 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutsideS
 	task.Description = output.Description
 	task.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "ChangeTask",
+			Body:   task,
+		}
+		hub.Broadcast(some)
+	}
 
 	return task, nil
 }
@@ -548,7 +612,13 @@ func (s *service) DeleteTask(request models.TaskInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteTask",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -580,7 +650,13 @@ func (s *service) TasksOrderChange(request models.TasksOrderInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "TasksOrderChange",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -604,7 +680,13 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "AssignUser",
+			Body:   user,
+		}
+		hub.Broadcast(some)
+	}
 
 	return user, nil
 }
@@ -623,7 +705,13 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DismissUser",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -649,7 +737,13 @@ func (s *service) CreateTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateTag",
+			Body:   tag,
+		}
+		hub.Broadcast(some)
+	}
 
 	return tag, nil
 }
@@ -675,7 +769,13 @@ func (s *service) ChangeTag(request models.TagInput) (tag models.TagOutside, err
 	tag.Color = output.Color
 	tag.Name = output.Name
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "ChangeTag",
+			Body:   tag,
+		}
+		hub.Broadcast(some)
+	}
 
 	return tag, nil
 }
@@ -697,7 +797,13 @@ func (s *service) DeleteTag(request models.TagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteTag",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -716,7 +822,13 @@ func (s *service) AddTag(request models.TaskTagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "AddTag",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -735,7 +847,13 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "RemoveTag",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -768,7 +886,13 @@ func (s *service) CreateComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateComment",
+			Body:   comment,
+		}
+		hub.Broadcast(some)
+	}
 
 	return comment, nil
 }
@@ -801,7 +925,13 @@ func (s *service) ChangeComment(request models.CommentInput) (comment models.Com
 	comment.Order = output.Order
 	comment.User = user
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "ChangeComment",
+			Body:   comment,
+		}
+		hub.Broadcast(some)
+	}
 
 	return comment, nil
 }
@@ -822,7 +952,13 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteComment",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -847,7 +983,13 @@ func (s *service) CreateChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateChecklist",
+			Body:   checklist,
+		}
+		hub.Broadcast(some)
+	}
 
 	return checklist, nil
 }
@@ -872,7 +1014,13 @@ func (s *service) ChangeChecklist(request models.ChecklistInput) (checklist mode
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "ChangeChecklist",
+			Body:   checklist,
+		}
+		hub.Broadcast(some)
+	}
 
 	return checklist, nil
 }
@@ -893,7 +1041,13 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteChecklist",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -955,7 +1109,13 @@ func (s *service) CreateAttachment(request models.AttachmentInput) (attachment m
 	attachment.Filename = res.Filename
 	attachment.Filepath = res.Filepath
 
-	// websocket - ?
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "CreateAttachment",
+			Body:   attachment,
+		}
+		hub.Broadcast(some)
+	}
 
 	return attachment, nil
 }
@@ -975,7 +1135,13 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	// websocket - ?
+	if hub, ok := s.hubs[request.BoardID]; ok {
+		some := models.WS{
+			Method: "DeleteAttachment",
+			Body:   request,
+		}
+		hub.Broadcast(some)
+	}
 
 	return nil
 }
@@ -1037,7 +1203,7 @@ func (s *service) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool
 	return nil
 }
 
-func (s *service) CheckCardPermission(userID int64, cardID int64) (err error) {
+func (s *service) CheckCardPermission(userID int64, cardID int64) (boardID int64, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.CheckPermissions{
@@ -1045,15 +1211,15 @@ func (s *service) CheckCardPermission(userID int64, cardID int64) (err error) {
 		ElementID: cardID,
 	}
 
-	_, err = s.boardService.CheckCardPermission(ctx, input)
+	output, err := s.boardService.CheckCardPermission(ctx, input)
 	if err != nil {
-		return errorWorker.ConvertStatusToError(err)
+		return 0, errorWorker.ConvertStatusToError(err)
 	}
 
-	return nil
+	return output.BoardID, nil
 }
 
-func (s *service) CheckTaskPermission(userID int64, taskID int64) (err error) {
+func (s *service) CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.CheckPermissions{
@@ -1061,15 +1227,15 @@ func (s *service) CheckTaskPermission(userID int64, taskID int64) (err error) {
 		ElementID: taskID,
 	}
 
-	_, err = s.boardService.CheckTaskPermission(ctx, input)
+	output, err := s.boardService.CheckTaskPermission(ctx, input)
 	if err != nil {
-		return errorWorker.ConvertStatusToError(err)
+		return 0, errorWorker.ConvertStatusToError(err)
 	}
 
-	return nil
+	return output.BoardID, nil
 }
 
-func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error) {
+func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error) {
 	ctx := context.Background()
 
 	input := &protoBoard.CheckPermissions{
@@ -1078,16 +1244,16 @@ func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 		IfAdmin: ifAdmin,
 	}
 
-	_, err = s.boardService.CheckCommentPermission(ctx, input)
+	output, err := s.boardService.CheckCommentPermission(ctx, input)
 	if err != nil {
-		return errorWorker.ConvertStatusToError(err)
+		return 0, errorWorker.ConvertStatusToError(err)
 	}
 
-	return nil
+	return output.BoardID, nil
 }
 
 func (s *service) createHub(boardID int64) *websocket.Hub {
-	hub := websocket.NewHub()
+	hub := websocket.NewHub(boardID, &s.hubs)
 	s.hubs[boardID] = hub
 	go hub.Run()
 	return hub

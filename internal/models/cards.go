@@ -23,8 +23,9 @@ type CardOrder struct {
 }
 
 type CardsOrderInput struct {
-	UserID int64       `json:"-"`
-	Cards  []CardOrder `json:"cards"`
+	UserID  int64       `json:"-"`
+	BoardID int64       `json:"-"`
+	Cards   []CardOrder `json:"cards"`
 }
 
 //===================================================<-Internal

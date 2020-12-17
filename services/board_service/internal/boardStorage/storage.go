@@ -41,9 +41,9 @@ type BoardStorage interface {
 	GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error)
 
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
-	CheckCardPermission(userID int64, cardID int64) (err error)
-	CheckTaskPermission(userID int64, taskID int64) (err error)
-	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
+	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
+	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error)
 
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
@@ -410,28 +410,24 @@ func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bo
 	return true, nil
 }
 
-func (s *storage) CheckCardPermission(userID int64, cardID int64) (err error) {
-	var boardID int64
-
+func (s *storage) CheckCardPermission(userID int64, cardID int64) (boardID int64, err error) {
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
 								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
 								"WHERE (B.adminID = $1 OR M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckCardPermission"}
 	}
 
-	return nil
+	return boardID, nil
 }
 
-func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
-	var boardID int64
-
+func (s *storage) CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error) {
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
 								"JOIN tasks T on T.cardID = C.cardID " +
@@ -439,19 +435,18 @@ func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
 								"WHERE (B.adminID = $1 OR M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckTaskPermission"}
 	}
 
-	return nil
+	return boardID, nil
 }
 
-func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error) {
-	var boardID int64
+func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error) {
 	var query string
 
 	if ifAdmin {
@@ -468,15 +463,15 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	err = s.db.QueryRow(query, userID, commentID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckCommentPermission"}
 	}
 
-	return nil
+	return boardID, nil
 }
 
 func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {

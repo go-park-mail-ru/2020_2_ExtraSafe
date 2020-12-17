@@ -15,6 +15,7 @@ type CommentInput struct {
 	TaskID    int64  `json:"taskID"`
 	Message   string `json:"commentMessage"`
 	Order     int64  `json:"commentOrder"`
+	BoardID   int64  `json:"-"`
 	UserID    int64  `json:"-"`
 }
 

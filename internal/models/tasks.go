@@ -11,6 +11,7 @@ type Task struct {
 
 //===================================================<-Input
 type TaskInput struct {
+	BoardID     int64  `json:"-"`
 	UserID      int64  `json:"-"`
 	TaskID      int64  `json:"taskID"`
 	CardID      int64  `json:"cardID"`
@@ -30,18 +31,21 @@ type TasksOrder struct {
 }
 
 type TasksOrderInput struct {
-	UserID int64        `json:"-"`
-	Tasks  []TasksOrder `json:"cards"`
+	UserID  int64        `json:"-"`
+	BoardID int64        `json:"-"`
+	Tasks   []TasksOrder `json:"cards"`
 }
 
 type TaskTagInput struct {
-	UserID int64 `json:"-"`
-	TaskID int64 `json:"taskID"`
-	TagID  int64 `json:"tagID"`
+	UserID  int64 `json:"-"`
+	BoardID int64 `json:"-"`
+	TaskID  int64 `json:"taskID"`
+	TagID   int64 `json:"tagID"`
 }
 
 type TaskAssignerInput struct {
 	UserID       int64  `json:"-"`
+	BoardID      int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
 	AssignerName string `json:"assignerUsername"`
 }

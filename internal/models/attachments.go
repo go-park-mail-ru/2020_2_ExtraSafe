@@ -7,6 +7,7 @@ type Attachment struct {
 }
 
 type AttachmentInput struct {
+	BoardID      int64  `json:"-"`
 	UserID       int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
 	AttachmentID int64  `json:"attachmentID"`

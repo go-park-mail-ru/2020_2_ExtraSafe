@@ -129,3 +129,10 @@ type ResponseAttachment struct {
 	Filename     string `json:"attachmentFileName"`
 	Filepath     string `json:"attachmentFilePath"`
 }
+
+//===================================================<-WebSocket
+type WS struct {
+	Method string      `json:"method"`
+	Body   interface{} `json:"body"`
+}
+
