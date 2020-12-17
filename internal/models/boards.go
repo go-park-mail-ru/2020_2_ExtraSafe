@@ -12,8 +12,9 @@ type Board struct {
 
 //===================================================<-Input
 type BoardInput struct {
-	UserID  int64 `json:"-"`
-	BoardID int64 `json:"boardID"`
+	UserID    int64  `json:"-"`
+	SessionID string `json:"-"`
+	BoardID   int64  `json:"boardID"`
 }
 
 type BoardChangeInput struct {

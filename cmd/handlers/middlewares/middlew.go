@@ -69,14 +69,19 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			return err
 		}
+
+		session, _ := c.Cookie("tabutask_id")
+
 		c.Set("userId", userId)
+		c.Set("sessionID", session.Value)
+
 		return next(c)
 	}
 }
 
 func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userId, err := m.authService.CheckCookie(c)
+	userId, err := m.authService.CheckCookie(c)
 		if err == nil {
 			userInput := new(models.UserInput)
 			userInput.ID = userId

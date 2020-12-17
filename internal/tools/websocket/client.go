@@ -35,7 +35,8 @@ type Client struct {
 	hub *Hub
 	conn *websocket.Conn
 	send chan interface{}
-	ID int64
+	userID int64
+	sessionID string
 }
 
 func (c *Client) readPump() {
@@ -94,13 +95,13 @@ func (c *Client) writePump() {
 	}
 }
 
-func ServeWs(hub *Hub, c echo.Context, userID int64) {
+func ServeWs(hub *Hub, c echo.Context, sessionID string, userID int64) {
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan interface{}), ID: userID}
+	client := &Client{hub: hub, conn: conn, send: make(chan interface{}), userID: userID, sessionID: sessionID}
 
 	hub.register <- client
 

@@ -175,7 +175,7 @@ func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err
 		hub = s.createHub(request.BoardID)
 	}
 
-	websocket.ServeWs(hub, c, request.UserID)
+	websocket.ServeWs(hub, c, request.SessionID, request.UserID)
 	return nil
 }
 

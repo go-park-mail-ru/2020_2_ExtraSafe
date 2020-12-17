@@ -2,7 +2,7 @@ package websocket
 
 type Hub struct {
 	boardID int64
-	users map[int64]*Client
+	users map[string]*Client
 	broadcast chan interface{}
 	register chan *Client
 	unregister chan *Client
@@ -16,7 +16,7 @@ func NewHub(boardID int64, hubs *map[int64]*Hub) *Hub {
 		broadcast:  make(chan interface{}),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		users: make(map[int64]*Client),
+		users: make(map[string]*Client),
 		stop: make(chan bool),
 		hubs: hubs,
 	}
@@ -26,11 +26,11 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.users[client.ID] = client
+			h.users[client.sessionID] = client
 
 		case client := <-h.unregister:
-			if _, ok := h.users[client.ID]; ok {
-				delete(h.users, client.ID)
+			if _, ok := h.users[client.sessionID]; ok {
+				delete(h.users, client.sessionID)
 				close(client.send)
 			}
 			if len(h.users) == 0 {
@@ -60,8 +60,8 @@ func (h *Hub) StopHub() {
 	h.stop <- true
 }
 
-func (h * Hub) CheckUser(userID int64) bool {
-	if _, ok := h.users[userID]; ok {
+func (h * Hub) CheckUser(sessionID string) bool {
+	if _, ok := h.users[sessionID]; ok {
 		return true
 	}
 	return false

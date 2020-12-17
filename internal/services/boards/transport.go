@@ -63,6 +63,7 @@ func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
