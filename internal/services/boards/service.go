@@ -469,6 +469,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
+	task.CardID = output.CardID
 
 	s.broadcast( models.WS{
 		Method: "CreateTask",
