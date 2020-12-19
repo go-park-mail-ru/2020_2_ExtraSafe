@@ -402,9 +402,13 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 		Order:   request.Order,
 	}
 
-	card, err := s.boardService.DeleteCard(ctx, input)
+	output, err := s.boardService.DeleteCard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	card := models.CardOutsideShort{
+		CardID: output.CardID,
 	}
 
 	s.broadcast(models.WS{
