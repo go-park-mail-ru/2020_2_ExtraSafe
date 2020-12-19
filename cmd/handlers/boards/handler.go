@@ -51,7 +51,7 @@ type Handler interface {
 	SharedURL(c echo.Context) error
 	BoardInvite(c echo.Context) error
 
-	//Notification(c echo.Context) error
+	Notification(c echo.Context) error
 }
 
 type handler struct {
@@ -98,17 +98,6 @@ func (h *handler) Board(c echo.Context) error {
 	response, err := h.boardsTransport.BoardWrite(board)
 
 	return c.JSON(http.StatusOK, response)
-}
-
-func (h *handler) BoardWS(c echo.Context) error {
-	userInput, err := h.boardsTransport.BoardRead(c)
-	if err != nil {
-		return h.errorWorker.TransportError(c)
-	}
-
-	_ = h.boardsService.WebSocketBoard(userInput, c)
-
-	return nil
 }
 
 func (h *handler) BoardChange(c echo.Context) error {
@@ -579,4 +568,26 @@ func (h *handler) BoardInvite(c echo.Context) error {
 	response, err := h.boardsTransport.BoardShortWrite(board)
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardWS(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	_ = h.boardsService.WebSocketBoard(userInput, c)
+
+	return nil
+}
+
+func (h *handler) Notification(c echo.Context) error  {
+	userInput := models.UserInput{
+		ID: c.Get("userId").(int64),
+		SessionID: c.Get("sessionID").(string),
+	}
+
+	_ = h.boardsService.WebSocketNotification(userInput, c)
+
+	return nil
 }

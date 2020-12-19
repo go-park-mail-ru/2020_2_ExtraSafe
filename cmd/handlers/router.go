@@ -26,7 +26,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.Static("/avatar", "../")
 	e.Static("/files", "../")
 
-	//e.GET("/notification-ws/", middle.CookieSession(board.Notification))
+	e.GET("/notification-ws/", middle.CookieSession(board.Notification))
 	e.GET("/board-ws/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.BoardWS)))
 
 	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.Board)))

@@ -714,7 +714,12 @@ func easyjson9e1087fdEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels8(ou
 	_ = first
 	{
 		const prefix string = ",\"id\":"
-		out.RawString(prefix[1:])
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int64(int64(in.ID))
 	}
 	out.RawByte('}')

@@ -137,3 +137,7 @@ type WS struct {
 	Body      interface{} `json:"body"`
 }
 
+type NotificationMessage struct {
+	UserID int64       `json:"-"`
+	Body   interface{} `json:"body"`
+}

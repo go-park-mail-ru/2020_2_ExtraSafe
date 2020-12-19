@@ -57,6 +57,8 @@ type ServiceBoard interface {
 	GetSharedURL(request models.BoardInput) (url string, err error)
 	InviteUserToBoard(request models.BoardInviteInput) (board models.BoardOutsideShort, err error)
 
+	WebSocketNotification(request models.UserInput, c echo.Context) (err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
 	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
@@ -66,14 +68,16 @@ type ServiceBoard interface {
 type service struct {
 	boardService protoBoard.BoardClient
 	validator    Validator
-	hubs         map[int64]*websocket.Hub
+	hubs         map[int64]*websocket.BoardHub
+	mainHub      *websocket.NotificationHub
 }
 
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
 	return &service{
+		mainHub: websocket.NewNotificationHub(),
 		boardService: boardService,
 		validator:    validator,
-		hubs:         make(map[int64]*websocket.Hub, 0),
+		hubs:         make(map[int64]*websocket.BoardHub, 0),
 	}
 }
 
@@ -168,7 +172,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 }
 
 func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err error) {
-	var hub *websocket.Hub
+	var hub *websocket.BoardHub
 	if h, ok := s.hubs[request.BoardID]; ok {
 		hub = h
 	} else {
@@ -179,17 +183,10 @@ func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err
 	return nil
 }
 
-/*func (s *service) WebSocketNotification(request models.UserInput, c echo.Context) (err error) {
-	var hub *websocket.Hub
-	if h, ok := s.hubs[request.BoardID]; ok {
-		hub = h
-	} else {
-		hub = s.createHub(request.BoardID)
-	}
-
-	websocket.ServeWs(hub, c, request.SessionID, request.UserID)
+func (s *service) WebSocketNotification(request models.UserInput, c echo.Context) (err error) {
+	websocket.ServeWs(s.mainHub, c, request.SessionID, request.ID)
 	return nil
-}*/
+}
 
 func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
 	output = make([]models.TagOutside, 0)
@@ -289,6 +286,13 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 		Body:   user,
 	}, request.BoardID)
 
+	note := models.NotificationMessage{
+		UserID: output.ID,
+		Body:   "AddMember",
+	}
+
+	s.notification(note)
+
 	return user,nil
 }
 
@@ -311,6 +315,13 @@ func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
 		SessionID: request.SessionID,
 		Body:   request,
 	}, request.BoardID)
+
+	note := models.NotificationMessage{
+		UserID: request.UserID,
+		Body:   "RemoveMember",
+	}
+
+	s.notification(note)
 
 	return nil
 }
@@ -478,7 +489,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 		return models.TaskOutsideSuperShort{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	taskRR := models.TaskOutsideSuperShort{
+	task = models.TaskOutsideSuperShort{
 		TaskID:      output.TaskID,
 		Name:        output.Name,
 		CardID:      request.CardID,
@@ -488,7 +499,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	s.broadcast( models.WS{
 		Method: "CreateTask",
 		SessionID: request.SessionID,
-		Body:   taskRR,
+		Body:   task,
 	}, request.BoardID )
 
 	return task, nil
@@ -1280,7 +1291,7 @@ func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	return output.BoardID, nil
 }
 
-func (s *service) createHub(boardID int64) *websocket.Hub {
+func (s *service) createHub(boardID int64) *websocket.BoardHub {
 	hub := websocket.NewHub(boardID, &s.hubs)
 	s.hubs[boardID] = hub
 	go hub.Run()
@@ -1297,4 +1308,8 @@ func (s *service) broadcast(message models.WS, boardID int64) {
 		//hub.GetClients()
 		hub.Broadcast(message)
 	}
+}
+
+func (s *service) notification(message models.NotificationMessage) {
+	s.mainHub.Send(message)
 }

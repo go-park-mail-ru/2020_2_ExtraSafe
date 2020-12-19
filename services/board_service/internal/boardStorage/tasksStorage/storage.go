@@ -78,8 +78,8 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) (models.TaskInternalSho
 	}
 
 	task := models.TaskInternalShort{
-		TaskID:      cardID,
-		CardID:      taskInput.TaskID,
+		TaskID:      taskInput.TaskID,
+		CardID:      cardID,
 	}
 
 	return task, nil

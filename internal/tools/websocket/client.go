@@ -32,7 +32,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type Client struct {
-	hub *Hub
+	hub Hub
 	conn *websocket.Conn
 	send chan interface{}
 	userID int64
@@ -41,7 +41,7 @@ type Client struct {
 
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
+		c.hub.Unregister(c)
 		c.conn.Close()
 	}()
 
@@ -95,7 +95,7 @@ func (c *Client) writePump() {
 	}
 }
 
-func ServeWs(hub *Hub, c echo.Context, sessionID string, userID int64) {
+func ServeWs(hub Hub, c echo.Context, sessionID string, userID int64) {
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Println(err)
@@ -103,7 +103,7 @@ func ServeWs(hub *Hub, c echo.Context, sessionID string, userID int64) {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan interface{}), userID: userID, sessionID: sessionID}
 
-	hub.register <- client
+	hub.Register(client)
 
 	go client.readPump()
 	go client.writePump()

@@ -12,7 +12,8 @@ type User struct {
 
 //===================================================<-Input
 type UserInput struct {
-	ID int64 `json:"id"`
+	SessionID string `json:"-"`
+	ID        int64  `json:"id"`
 }
 
 type UserInputLogin struct {
