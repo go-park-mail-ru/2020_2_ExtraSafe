@@ -473,7 +473,7 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 	s.broadcast( models.WS{
 		Method: "CreateTask",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   task,
 	}, request.BoardID )
 
 	return task, nil
