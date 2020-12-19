@@ -24,8 +24,8 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateComment(input models.CommentInput) (comment models.CommentOutside, err error) {
-	err = s.db.QueryRow("INSERT INTO comments (message, taskID, commentOrder, userID) VALUES ($1, $2, $3, $4) RETURNING commentID, taskID, cardID",
-						input.Message, input.TaskID, input.Order, input.UserID).Scan(&comment.CommentID, &comment.TaskID, &comment.CardID)
+	err = s.db.QueryRow("INSERT INTO comments (message, taskID, commentOrder, userID) VALUES ($1, $2, $3, $4) RETURNING commentID, taskID",
+						input.Message, input.TaskID, input.Order, input.UserID).Scan(&comment.CommentID, &comment.TaskID)
 	if err != nil {
 		return comment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateComment"}
@@ -37,8 +37,8 @@ func (s *storage) CreateComment(input models.CommentInput) (comment models.Comme
 }
 
 func (s *storage) UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error) {
-	err = s.db.QueryRow("UPDATE comments SET message = $1 WHERE commentID = $2 RETURNING taskID, cardID", input.Message, input.CommentID).
-		Scan(&comment.TaskID, &comment.CardID)
+	err = s.db.QueryRow("UPDATE comments SET message = $1 WHERE commentID = $2 RETURNING taskID", input.Message, input.CommentID).
+		Scan(&comment.TaskID)
 	if err!= nil {
 		return comment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "UpdateComment"}
@@ -52,8 +52,8 @@ func (s *storage) DeleteComment(input models.CommentInput) (comment models.Comme
 	comment = models.CommentOutside{
 		CommentID: input.CommentID,
 	}
-	err = s.db.QueryRow("DELETE FROM comments WHERE commentID = $1 RETURNING taskID, cardID", input.CommentID).
-		Scan(&comment.TaskID, &comment.CardID)
+	err = s.db.QueryRow("DELETE FROM comments WHERE commentID = $1 RETURNING taskID", input.CommentID).
+		Scan(&comment.TaskID)
 	if err!= nil {
 		return models.CommentOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "DeleteComment"}

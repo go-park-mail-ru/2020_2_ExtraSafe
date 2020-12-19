@@ -38,6 +38,10 @@ func easyjsonD09abad2DecodeGithubComGoParkMailRu20202ExtraSafeInternalModels(in 
 		switch key {
 		case "commentID":
 			out.CommentID = int64(in.Int64())
+		case "taskID":
+			out.TaskID = int64(in.Int64())
+		case "cardID":
+			out.CardID = int64(in.Int64())
 		case "commentMessage":
 			out.Message = string(in.String())
 		case "commentOrder":
@@ -58,24 +62,60 @@ func easyjsonD09abad2EncodeGithubComGoParkMailRu20202ExtraSafeInternalModels(out
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.CommentID != 0 {
 		const prefix string = ",\"commentID\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int64(int64(in.CommentID))
 	}
-	{
+	if in.TaskID != 0 {
+		const prefix string = ",\"taskID\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.Int64(int64(in.TaskID))
+	}
+	if in.CardID != 0 {
+		const prefix string = ",\"cardID\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.Int64(int64(in.CardID))
+	}
+	if in.Message != "" {
 		const prefix string = ",\"commentMessage\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.Message))
 	}
-	{
+	if in.Order != 0 {
 		const prefix string = ",\"commentOrder\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Int64(int64(in.Order))
 	}
-	{
+	if true {
 		const prefix string = ",\"commentAuthor\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		(in.User).MarshalEasyJSON(out)
 	}
 	out.RawByte('}')
@@ -125,6 +165,10 @@ func easyjsonD09abad2DecodeGithubComGoParkMailRu20202ExtraSafeInternalModels1(in
 		switch key {
 		case "CommentID":
 			out.CommentID = int64(in.Int64())
+		case "CardID":
+			out.CardID = int64(in.Int64())
+		case "TaskID":
+			out.TaskID = int64(in.Int64())
 		case "Message":
 			out.Message = string(in.String())
 		case "Order":
@@ -149,6 +193,16 @@ func easyjsonD09abad2EncodeGithubComGoParkMailRu20202ExtraSafeInternalModels1(ou
 		const prefix string = ",\"CommentID\":"
 		out.RawString(prefix[1:])
 		out.Int64(int64(in.CommentID))
+	}
+	{
+		const prefix string = ",\"CardID\":"
+		out.RawString(prefix)
+		out.Int64(int64(in.CardID))
+	}
+	{
+		const prefix string = ",\"TaskID\":"
+		out.RawString(prefix)
+		out.Int64(int64(in.TaskID))
 	}
 	{
 		const prefix string = ",\"Message\":"

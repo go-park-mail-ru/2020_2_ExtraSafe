@@ -10,8 +10,8 @@ type Storage interface {
 	UpdateTag(input models.TagInput) (tag models.TagOutside, err error)
 	DeleteTag(input models.TagInput) (err error)
 
-	AddTag(input models.TaskTagInput) (err error)
-	RemoveTag(input models.TaskTagInput) (err error)
+	AddTag(input models.TaskTagInput) (tag models.TagOutside, err error)
+	RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 
 	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
 	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
@@ -62,21 +62,25 @@ func (s *storage) DeleteTag(input models.TagInput) (err error) {
 }
 
 // assign tag to task
-func (s *storage) AddTag(input models.TaskTagInput) (err error) {
+func (s *storage) AddTag(input models.TaskTagInput) (tag models.TagOutside, err error) {
 	_, err = s.db.Exec("INSERT INTO task_tags (taskID, tagID) VALUES ($1, $2)", input.TaskID, input.TagID)
 	if err != nil {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return tag, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "AddTag"}
 	}
+	tag.TagID = input.TagID
+	tag.TaskID = input.TaskID
 	return
 }
 
-func (s *storage) RemoveTag(input models.TaskTagInput) (err error) {
+func (s *storage) RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error) {
 	_, err = s.db.Exec("DELETE FROM task_tags WHERE taskID = $1 AND tagID = $2", input.TaskID, input.TagID)
 	if err != nil {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return tag, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "RemoveTag"}
 	}
+	tag.TagID = input.TagID
+	tag.TaskID = input.TaskID
 	return
 }
 

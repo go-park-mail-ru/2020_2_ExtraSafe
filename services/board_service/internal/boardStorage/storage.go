@@ -45,14 +45,14 @@ type BoardStorage interface {
 	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
 	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error)
 
-	AssignUser(input models.TaskAssigner) (err error)
-	DismissUser(input models.TaskAssigner) (err error)
+	AssignUser(input models.TaskAssigner) (task models.TaskAssignUserOutside, err error)
+	DismissUser(input models.TaskAssigner) (task models.TaskAssignUserOutside, err error)
 
 	CreateTag(input models.TagInput) (tag models.TagOutside, err error)
 	UpdateTag(input models.TagInput) (tag models.TagOutside, err error)
 	DeleteTag(input models.TagInput) (err error)
-	AddTag(input models.TaskTagInput) (err error)
-	RemoveTag(input models.TaskTagInput) (err error)
+	AddTag(input models.TaskTagInput) (tag models.TagOutside, err error)
+	RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)

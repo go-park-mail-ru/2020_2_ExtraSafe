@@ -12,6 +12,7 @@ type Storage interface {
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
+	GetCardIDByTask(taskInput int64) (cardID int64, err error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
 	AssignUser(input models.TaskAssigner) (err error)
@@ -171,6 +172,16 @@ func (s *storage) GetAssigners(input models.TaskInput) (assignerIDs []int64, err
 		}
 
 		assignerIDs = append(assignerIDs, assignerID)
+	}
+
+	return
+}
+
+func (s storage) GetCardIDByTask(taskID int64) (cardID int64, err error) {
+	err = s.db.QueryRow("SELECT cardID FROM tasks WHERE taskID = $1", taskID).Scan(&cardID)
+	if err != nil {
+		return cardID, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetCardIDByTask"}
 	}
 
 	return

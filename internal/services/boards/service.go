@@ -179,6 +179,18 @@ func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err
 	return nil
 }
 
+/*func (s *service) WebSocketNotification(request models.UserInput, c echo.Context) (err error) {
+	var hub *websocket.Hub
+	if h, ok := s.hubs[request.BoardID]; ok {
+		hub = h
+	} else {
+		hub = s.createHub(request.BoardID)
+	}
+
+	websocket.ServeWs(hub, c, request.SessionID, request.UserID)
+	return nil
+}*/
+
 func convertTags(tags []*protoBoard.TagOutside) (output []models.TagOutside) {
 	output = make([]models.TagOutside, 0)
 	for _, tag := range tags {
@@ -466,15 +478,17 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 		return models.TaskOutsideSuperShort{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	task.TaskID = output.TaskID
-	task.Description = output.Description
-	task.Name = output.Name
-	task.CardID = output.CardID
+	taskRR := models.TaskOutsideSuperShort{
+		TaskID:      output.TaskID,
+		Name:        output.Name,
+		CardID:      request.CardID,
+		Description: output.Description,
+	}
 
 	s.broadcast( models.WS{
 		Method: "CreateTask",
 		SessionID: request.SessionID,
-		Body:   task,
+		Body:   taskRR,
 	}, request.BoardID )
 
 	return task, nil
@@ -658,20 +672,24 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	user.Username = output.Username
-	user.FullName = output.FullName
-	user.Avatar = output.Avatar
-	user.Email = output.Email
-
-	//TODO - добавить cardID taskID
+	task := models.TaskAssignUserOutside{
+		UserOutsideShort: models.UserOutsideShort{
+			Username: output.Assigner.Username,
+			FullName: output.Assigner.FullName,
+			Avatar:   output.Assigner.Avatar,
+			Email:    output.Assigner.Email,
+		},
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+	}
 
 	s.broadcast(models.WS{
 		Method: "AssignUser",
 		SessionID: request.SessionID,
-		Body:   user,
+		Body:   task,
 	}, request.BoardID)
 
-	return user, nil
+	return task.UserOutsideShort, nil
 }
 
 func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
@@ -683,17 +701,26 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 		AssignerName: request.AssignerName,
 	}
 
-	_, err = s.boardService.DismissUser(ctx, userInput)
+	output, err := s.boardService.DismissUser(ctx, userInput)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	//TODO - добавить cardID taskID
+	task := models.TaskAssignUserOutside{
+		UserOutsideShort: models.UserOutsideShort{
+			Username: output.Assigner.Username,
+			FullName: output.Assigner.FullName,
+			Avatar:   output.Assigner.Avatar,
+			Email:    output.Assigner.Email,
+		},
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+	}
 
 	s.broadcast(models.WS{
 		Method: "DismissUser",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   task,
 	}, request.BoardID)
 
 	return nil
@@ -794,15 +821,23 @@ func (s *service) AddTag(request models.TaskTagInput) (err error) {
 		TagID:      request.TagID,
 	}
 
-	_, err = s.boardService.AddTag(ctx, input)
+	output, err := s.boardService.AddTag(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	tag := models.TagOutside{
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+		TagID: output.TagID,
+		Color: output.Color,
+		Name:  output.Name,
 	}
 
 	s.broadcast(models.WS{
 		Method: "AddTag",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   tag,
 	}, request.BoardID)
 
 	return nil
@@ -817,15 +852,23 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 		TagID:      request.TagID,
 	}
 
-	_, err = s.boardService.RemoveTag(ctx, input)
+	output, err := s.boardService.RemoveTag(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	tag := models.TagOutside{
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+		TagID: output.TagID,
+		Color: output.Color,
+		Name:  output.Name,
 	}
 
 	s.broadcast(models.WS{
 		Method: "RemoveTag",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   tag,
 	}, request.BoardID)
 
 	return nil

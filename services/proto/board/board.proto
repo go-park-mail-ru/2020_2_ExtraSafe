@@ -168,6 +168,12 @@ message TaskOutsideSuperShort {
   string  Description = 4;
 }
 
+message TaskAssignUserOutside {
+  int64 TaskID = 1;
+  int64 CardID = 2;
+  protoProfile.UserOutsideShort Assigner = 3;
+}
+
 //==========================================
 message TagInput {
   int64 UserID = 1;
@@ -188,6 +194,8 @@ message TagOutside {
   int64 TagID = 1;
   string Color = 2;
   string Name = 3;
+  int64 CardID = 4;
+  int64 TaskID = 5;
 }
 
 //==========================================
@@ -287,14 +295,14 @@ service Board {
   rpc ChangeTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc DeleteTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
-  rpc AssignUser (TaskAssignerInput) returns (protoProfile.UserOutsideShort) {}
-  rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
+  rpc AssignUser (TaskAssignerInput) returns (TaskAssignUserOutside) {}
+  rpc DismissUser (TaskAssignerInput) returns (TaskAssignUserOutside) {}
 
   rpc CreateTag (TagInput) returns (TagOutside) {}
   rpc ChangeTag (TagInput) returns (TagOutside) {}
   rpc DeleteTag (TagInput) returns (Nothing) {}
-  rpc AddTag (TaskTagInput) returns (Nothing) {}
-  rpc RemoveTag (TaskTagInput) returns (Nothing) {}
+  rpc AddTag (TaskTagInput) returns (TagOutside) {}
+  rpc RemoveTag (TaskTagInput) returns (TagOutside) {}
 
   rpc CreateComment (CommentInput) returns (CommentOutside) {}
   rpc ChangeComment (CommentInput) returns (CommentOutside) {}

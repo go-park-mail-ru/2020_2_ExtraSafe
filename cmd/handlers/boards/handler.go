@@ -50,6 +50,8 @@ type Handler interface {
 
 	SharedURL(c echo.Context) error
 	BoardInvite(c echo.Context) error
+
+	//Notification(c echo.Context) error
 }
 
 type handler struct {

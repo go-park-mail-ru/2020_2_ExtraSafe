@@ -32,12 +32,13 @@ func (s *storage) CreateChecklist(input models.ChecklistInput) (checklist models
 	}
 	checklist.Items = input.Items
 	checklist.Name = input.Name
+	checklist.TaskID = input.TaskID
 	return
 }
 
 func (s *storage) UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
-	err = s.db.QueryRow("UPDATE checklists SET name = $1, items = $2 WHERE checklistID = $3 RETURNING taskID, cardID", input.Name, input.Items, input.ChecklistID).
-		Scan(&checklist.TaskID, &checklist.CardID)
+	err = s.db.QueryRow("UPDATE checklists SET name = $1, items = $2 WHERE checklistID = $3 RETURNING taskID", input.Name, input.Items, input.ChecklistID).
+		Scan(&checklist.TaskID)
 	if err != nil {
 		return checklist, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "UpdateChecklist"}
@@ -49,8 +50,8 @@ func (s *storage) UpdateChecklist(input models.ChecklistInput) (checklist models
 }
 
 func (s *storage) DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
-	err = s.db.QueryRow("DELETE FROM checklists WHERE checklistID = $1 RETURNING taskID, cardID", input.ChecklistID).
-		Scan(&checklist.TaskID, &checklist.CardID)
+	err = s.db.QueryRow("DELETE FROM checklists WHERE checklistID = $1 RETURNING taskID", input.ChecklistID).
+		Scan(&checklist.TaskID)
 	if err != nil {
 		return checklist, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "DeleteChecklist"}
