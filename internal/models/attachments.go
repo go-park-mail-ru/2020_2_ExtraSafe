@@ -30,7 +30,9 @@ type AttachmentFileInternal struct {
 }
 
 type AttachmentOutside struct {
-	AttachmentID int64  `json:"attachmentID"`
-	Filename     string `json:"attachmentFileName"`
-	Filepath     string `json:"attachmentFilePath"`
+	AttachmentID int64  `json:"attachmentID,omitempty"`
+	TaskID       int64  `json:"taskID,omitempty"`
+	CardID       int64  `json:"cardID,omitempty"`
+	Filename     string `json:"attachmentFileName,omitempty"`
+	Filepath     string `json:"attachmentFilePath,omitempty"`
 }

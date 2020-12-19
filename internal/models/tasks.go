@@ -42,6 +42,7 @@ type TaskTagInput struct {
 	SessionID string `json:"-"`
 	UserID    int64  `json:"-"`
 	BoardID   int64  `json:"-"`
+	CardID    int64  `json:"cardID"`
 	TaskID    int64  `json:"taskID"`
 	TagID     int64  `json:"tagID"`
 }
@@ -57,6 +58,7 @@ type TaskAssignerInput struct {
 //===================================================<-Internal
 type TaskInternalShort struct {
 	TaskID      int64
+	CardID      int64
 	Name        string
 	Description string
 	Order       int64
@@ -67,6 +69,7 @@ type TaskInternalShort struct {
 
 type TaskInternal struct {
 	TaskID      int64
+	CardID      int64
 	Name        string
 	Description string
 	Order       int64
@@ -101,9 +104,10 @@ type TaskOutsideShort struct {
 }
 
 type TaskOutsideSuperShort struct {
-	TaskID      int64  `json:"taskID"`
-	Name        string `json:"taskName"`
-	Description string `json:"taskDescription"`
+	TaskID      int64  `json:"taskID,omitempty"`
+	CardID      int64  `json:"cardID,omitempty"`
+	Name        string `json:"taskName,omitempty"`
+	Description string `json:"taskDescription,omitempty"`
 }
 
 //===================================================<-Other

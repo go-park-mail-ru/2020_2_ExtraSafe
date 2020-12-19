@@ -350,19 +350,23 @@ func (s *service) ChangeCard(_ context.Context, input *protoBoard.CardInput) (ou
 	return output, nil
 }
 
-func (s *service) DeleteCard(_ context.Context, input *protoBoard.CardInput) (*protoBoard.Nothing, error) {
+func (s *service) DeleteCard(_ context.Context, input *protoBoard.CardInput) (output *protoBoard.CardOutsideShort, err error) {
 	userInput := models.CardInput{
 		UserID:    input.UserID,
 		CardID:   input.CardID,
 		BoardID: input.BoardID,
 	}
 
-	err := s.boardStorage.DeleteCard(userInput)
+	err = s.boardStorage.DeleteCard(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.CardOutsideShort{
+		CardID: input.CardID,
+	}
+
+	return output, nil
 }
 
 func (s *service) CardOrderChange(_ context.Context, input *protoBoard.CardsOrderInput) (*protoBoard.Nothing, error) {
@@ -487,6 +491,7 @@ func (s *service) ChangeTask(_ context.Context, input *protoBoard.TaskInput) (ou
 
 	output = &protoBoard.TaskOutsideSuperShort{
 		TaskID: task.TaskID,
+		CardID: task.CardID,
 		Name:   task.Name,
 		Description:  task.Description,
 	}
@@ -494,19 +499,24 @@ func (s *service) ChangeTask(_ context.Context, input *protoBoard.TaskInput) (ou
 	return output, nil
 }
 
-func (s *service) DeleteTask(_ context.Context, input *protoBoard.TaskInput) (*protoBoard.Nothing, error) {
+func (s *service) DeleteTask(_ context.Context, input *protoBoard.TaskInput) (output *protoBoard.TaskOutsideSuperShort, err error) {
 	userInput := models.TaskInput{
 		UserID:    input.UserID,
 		TaskID:   input.TaskID,
 		CardID: input.CardID,
 	}
 
-	err := s.boardStorage.DeleteTask(userInput)
+	task, err := s.boardStorage.DeleteTask(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.TaskOutsideSuperShort{
+		TaskID: task.TaskID,
+		CardID:   task.CardID,
+	}
+
+	return output, nil
 }
 
 func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrderInput) (*protoBoard.Nothing, error) {
@@ -689,6 +699,8 @@ func (s *service) CreateComment(ctx context.Context, input *protoBoard.CommentIn
 
 	output = &protoBoard.CommentOutside{
 		CommentID: comment.CommentID,
+		TaskID: comment.TaskID,
+		CardID: comment.CardID,
 		Message:   comment.Message,
 		Order:     comment.Order,
 		User:      user.Users[0],
@@ -718,6 +730,8 @@ func (s *service) ChangeComment(ctx context.Context, input *protoBoard.CommentIn
 
 	output = &protoBoard.CommentOutside{
 		CommentID: comment.CommentID,
+		TaskID: comment.TaskID,
+		CardID: comment.CardID,
 		Message:   comment.Message,
 		Order:     comment.Order,
 		User:      user.Users[0],
@@ -726,7 +740,7 @@ func (s *service) ChangeComment(ctx context.Context, input *protoBoard.CommentIn
 	return output, nil
 }
 
-func (s *service) DeleteComment(_ context.Context, input *protoBoard.CommentInput) (*protoBoard.Nothing, error) {
+func (s *service) DeleteComment(_ context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error) {
 	userInput := models.CommentInput{
 		CommentID: input.CommentID,
 		UserID:  input.UserID,
@@ -735,12 +749,18 @@ func (s *service) DeleteComment(_ context.Context, input *protoBoard.CommentInpu
 		Order: input.Order,
 	}
 
-	err := s.boardStorage.DeleteComment(userInput)
+	comment, err := s.boardStorage.DeleteComment(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.CommentOutside{
+		CommentID: comment.CommentID,
+		CardID: comment.CardID,
+		TaskID: comment.TaskID,
+	}
+
+	return output, nil
 }
 
 func (s *service) CreateChecklist(_ context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error) {
@@ -759,6 +779,8 @@ func (s *service) CreateChecklist(_ context.Context, input *protoBoard.Checklist
 
 	output = &protoBoard.ChecklistOutside{
 		ChecklistID: checklist.ChecklistID,
+		CardID: checklist.CardID,
+		TaskID: checklist.TaskID,
 		Name:   checklist.Name,
 		Items: checklist.Items,
 	}
@@ -782,6 +804,8 @@ func (s *service) ChangeChecklist(_ context.Context, input *protoBoard.Checklist
 
 	output = &protoBoard.ChecklistOutside{
 		ChecklistID: checklist.ChecklistID,
+		CardID: checklist.CardID,
+		TaskID: checklist.TaskID,
 		Name:   checklist.Name,
 		Items: checklist.Items,
 	}
@@ -789,7 +813,7 @@ func (s *service) ChangeChecklist(_ context.Context, input *protoBoard.Checklist
 	return output, nil
 }
 
-func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.ChecklistInput) (*protoBoard.Nothing, error) {
+func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.ChecklistInput) (output *protoBoard.ChecklistOutside, err error) {
 	userInput := models.ChecklistInput{
 		UserID: input.UserID,
 		ChecklistID: input.ChecklistID,
@@ -798,13 +822,22 @@ func (s *service) DeleteChecklist(_ context.Context, input *protoBoard.Checklist
 		Items: input.Items,
 	}
 
-	err := s.boardStorage.DeleteChecklist(userInput)
+	checklist, err := s.boardStorage.DeleteChecklist(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.ChecklistOutside{
+		ChecklistID: checklist.ChecklistID,
+		CardID: checklist.CardID,
+		TaskID: checklist.TaskID,
+		Name:   checklist.Name,
+		Items: checklist.Items,
+	}
+
+	return output, nil
 }
+
 const maxImageSize = 1 << 30
 
 func (s *service) AddAttachment(stream protoBoard.Board_AddAttachmentServer) error {
@@ -865,6 +898,8 @@ func (s *service) AddAttachment(stream protoBoard.Board_AddAttachmentServer) err
 	}
 
 	res := &protoBoard.AttachmentOutside{
+		CardID: attachment.CardID,
+		TaskID: attachment.TaskID,
 		AttachmentID: attachment.AttachmentID,
 		Filename:     attachment.Filename,
 		Filepath:     attachment.Filepath,
@@ -879,24 +914,30 @@ func (s *service) AddAttachment(stream protoBoard.Board_AddAttachmentServer) err
 	return nil
 }
 
-func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInfo) (*protoBoard.Nothing, error) {
+func (s *service) RemoveAttachment(_ context.Context, input *protoBoard.AttachmentInfo) (output *protoBoard.AttachmentOutside, err error) {
 	userInput := models.AttachmentInternal{
 		TaskID:       input.TaskID,
 		Filename:     input.Filename,
 		AttachmentID: input.AttachmentID,
 	}
 
-	err := s.boardStorage.RemoveAttachment(userInput)
+	attachment, err := s.boardStorage.RemoveAttachment(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
 	err = s.fileStorage.DeleteFile(userInput.Filename, false)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.AttachmentOutside{
+		AttachmentID: attachment.AttachmentID,
+		CardID:       attachment.CardID,
+		TaskID:       attachment.TaskID,
+	}
+
+	return output, nil
 }
 
 func (s *service) GetSharedURL(_ context.Context, input *protoBoard.BoardInput) (output *protoBoard.SharedURL, err error) {

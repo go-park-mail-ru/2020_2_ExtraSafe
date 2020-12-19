@@ -402,7 +402,7 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 		Order:   request.Order,
 	}
 
-	_, err = s.boardService.DeleteCard(ctx, input)
+	card, err := s.boardService.DeleteCard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
@@ -410,7 +410,7 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 	s.broadcast(models.WS{
 		Method: "DeleteCard",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   card,
 	}, request.BoardID)
 
 	return nil
@@ -561,6 +561,7 @@ func (s *service) ChangeTask(request models.TaskInput) (task models.TaskOutsideS
 	task.TaskID = output.TaskID
 	task.Description = output.Description
 	task.Name = output.Name
+	task.CardID = output.CardID
 
 	s.broadcast(models.WS{
 		Method: "ChangeTask",
@@ -583,15 +584,20 @@ func (s *service) DeleteTask(request models.TaskInput) (err error) {
 		Order:       request.Order,
 	}
 
-	_, err = s.boardService.DeleteTask(ctx, input)
+	output, err := s.boardService.DeleteTask(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	task := models.TaskOutsideSuperShort{
+		TaskID:      output.TaskID,
+		CardID:      output.CardID,
 	}
 
 	s.broadcast(models.WS{
 		Method: "DeleteTask",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   task,
 	}, request.BoardID)
 
 	return nil
@@ -652,6 +658,8 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 	user.Avatar = output.Avatar
 	user.Email = output.Email
 
+	//TODO - добавить cardID taskID
+
 	s.broadcast(models.WS{
 		Method: "AssignUser",
 		SessionID: request.SessionID,
@@ -674,6 +682,8 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
+
+	//TODO - добавить cardID taskID
 
 	s.broadcast(models.WS{
 		Method: "DismissUser",
@@ -840,6 +850,8 @@ func (s *service) CreateComment(request models.CommentInput) (comment models.Com
 	}
 
 	comment.CommentID = output.CommentID
+	comment.CardID = output.CardID
+	comment.TaskID = output.TaskID
 	comment.Message = output.Message
 	comment.Order = output.Order
 	comment.User = user
@@ -877,6 +889,8 @@ func (s *service) ChangeComment(request models.CommentInput) (comment models.Com
 	}
 
 	comment.CommentID = output.CommentID
+	comment.CardID = output.CardID
+	comment.TaskID = output.TaskID
 	comment.Message = output.Message
 	comment.Order = output.Order
 	comment.User = user
@@ -901,15 +915,21 @@ func (s *service) DeleteComment(request models.CommentInput) (err error) {
 		Order: request.Order,
 	}
 
-	_, err = s.boardService.DeleteComment(ctx, input)
+	output, err := s.boardService.DeleteComment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	comment := models.CommentOutside{
+		CommentID: output.CommentID,
+		CardID: output.CardID,
+		TaskID: output.TaskID,
 	}
 
 	s.broadcast(models.WS{
 		Method: "DeleteComment",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   comment,
 	}, request.BoardID)
 
 	return nil
@@ -932,6 +952,8 @@ func (s *service) CreateChecklist(request models.ChecklistInput) (checklist mode
 	}
 
 	checklist.ChecklistID = output.ChecklistID
+	checklist.CardID = output.CardID
+	checklist.TaskID = output.TaskID
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
@@ -961,6 +983,8 @@ func (s *service) ChangeChecklist(request models.ChecklistInput) (checklist mode
 	}
 
 	checklist.ChecklistID = output.ChecklistID
+	checklist.CardID = output.CardID
+	checklist.TaskID = output.TaskID
 	checklist.Name = output.Name
 	checklist.Items = output.Items
 
@@ -984,15 +1008,21 @@ func (s *service) DeleteChecklist(request models.ChecklistInput) (err error) {
 		Items: request.Items,
 	}
 
-	_, err = s.boardService.DeleteChecklist(ctx, input)
+	output, err := s.boardService.DeleteChecklist(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	checklist := models.ChecklistOutside{
+		ChecklistID: output.ChecklistID,
+		TaskID:      output.TaskID,
+		CardID:      output.CardID,
 	}
 
 	s.broadcast(models.WS{
 		Method: "DeleteChecklist",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   checklist,
 	}, request.BoardID)
 
 	return nil
@@ -1052,6 +1082,8 @@ func (s *service) CreateAttachment(request models.AttachmentInput) (attachment m
 
 
 	attachment.AttachmentID = res.AttachmentID
+	attachment.CardID = res.CardID
+	attachment.TaskID = res.TaskID
 	attachment.Filename = res.Filename
 	attachment.Filepath = res.Filepath
 
@@ -1074,15 +1106,21 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 		Filename: request.Filename,
 	}
 
-	_, err = s.boardService.RemoveAttachment(ctx, input)
+	output, err := s.boardService.RemoveAttachment(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	attachment := models.AttachmentOutside{
+		AttachmentID: output.AttachmentID,
+		TaskID:       output.CardID,
+		CardID:       output.TaskID,
 	}
 
 	s.broadcast(models.WS{
 		Method: "DeleteAttachment",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   attachment,
 	}, request.BoardID)
 
 	return nil
@@ -1208,6 +1246,7 @@ func (s *service) deleteHub(boardID int64) {
 
 func (s *service) broadcast(message models.WS, boardID int64) {
 	if hub, ok := s.hubs[boardID]; ok {
+		//hub.GetClients()
 		hub.Broadcast(message)
 	}
 }

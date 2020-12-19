@@ -1,6 +1,9 @@
 package websocket
 
-import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+import (
+	"fmt"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+)
 
 type Hub struct {
 	boardID int64
@@ -74,4 +77,8 @@ func (h * Hub) CheckUser(sessionID string) bool {
 
 func (h * Hub) Broadcast(message interface{}) {
 	h.broadcast <- message
+}
+
+func (h * Hub) GetClients() {
+	fmt.Println(h.users)
 }

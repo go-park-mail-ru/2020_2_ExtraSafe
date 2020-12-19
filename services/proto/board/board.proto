@@ -163,8 +163,9 @@ message TaskOutsideShort {
 
 message TaskOutsideSuperShort {
   int64 TaskID = 1;
-  string  Name = 2;
-  string  Description = 3;
+  int64 CardID = 2;
+  string  Name = 3;
+  string  Description = 4;
 }
 
 //==========================================
@@ -207,9 +208,11 @@ message CommentInternal {
 
 message CommentOutside {
   int64 CommentID = 1;
-  string Message = 2;
-  int64 Order = 3;
-  protoProfile.UserOutsideShort User = 4;
+  int64 CardID = 2;
+  int64 TaskID = 3;
+  string Message = 4;
+  int64 Order = 5;
+  protoProfile.UserOutsideShort User = 6;
 }
 
 //==========================================
@@ -223,8 +226,10 @@ message ChecklistInput {
 
 message ChecklistOutside {
   int64 ChecklistID = 1;
-  string Name = 2;
-  bytes Items = 3;
+  int64 CardID = 2;
+  int64 TaskID = 3;
+  string Name = 4;
+  bytes Items = 5;
 }
 
 //==========================================
@@ -244,8 +249,10 @@ message AttachmentInput {
 
 message AttachmentOutside {
   int64 AttachmentID = 1;
-  string Filename = 2;
-  string Filepath = 3;
+  int64 CardID = 2;
+  int64 TaskID = 3;
+  string Filename = 4;
+  string Filepath = 5;
 }
 
 //==========================================
@@ -272,13 +279,13 @@ service Board {
   rpc CreateCard (CardInput) returns (CardOutsideShort) {}
   rpc GetCard (CardInput) returns (CardOutside) {}
   rpc ChangeCard (CardInput) returns (CardOutsideShort) {}
-  rpc DeleteCard (CardInput) returns (Nothing) {}
+  rpc DeleteCard (CardInput) returns (CardOutsideShort) {}
   rpc CardOrderChange (CardsOrderInput) returns (Nothing) {}
 
   rpc CreateTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc GetTask (TaskInput) returns (TaskOutside) {}
   rpc ChangeTask (TaskInput) returns (TaskOutsideSuperShort) {}
-  rpc DeleteTask (TaskInput) returns (Nothing) {}
+  rpc DeleteTask (TaskInput) returns (TaskOutsideSuperShort) {}
   rpc TasksOrderChange (TasksOrderInput) returns (Nothing) {}
   rpc AssignUser (TaskAssignerInput) returns (protoProfile.UserOutsideShort) {}
   rpc DismissUser (TaskAssignerInput) returns (Nothing) {}
@@ -291,14 +298,14 @@ service Board {
 
   rpc CreateComment (CommentInput) returns (CommentOutside) {}
   rpc ChangeComment (CommentInput) returns (CommentOutside) {}
-  rpc DeleteComment (CommentInput) returns (Nothing) {}
+  rpc DeleteComment (CommentInput) returns (CommentOutside) {}
 
   rpc CreateChecklist (ChecklistInput) returns (ChecklistOutside) {}
   rpc ChangeChecklist (ChecklistInput) returns (ChecklistOutside) {}
-  rpc DeleteChecklist (ChecklistInput) returns (Nothing) {}
+  rpc DeleteChecklist (ChecklistInput) returns (ChecklistOutside) {}
 
   rpc AddAttachment (stream AttachmentInput) returns (AttachmentOutside) {}
-  rpc RemoveAttachment (AttachmentInfo) returns (Nothing) {}
+  rpc RemoveAttachment (AttachmentInfo) returns (AttachmentOutside) {}
 
   rpc GetSharedURL (BoardInput) returns (SharedURL) {}
   rpc InviteUserToBoard (BoardInviteInput) returns (protoProfile.BoardOutsideShort) {}

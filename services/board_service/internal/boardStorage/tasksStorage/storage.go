@@ -8,7 +8,7 @@ import (
 type Storage interface {
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
-	DeleteTask(taskInput models.TaskInput) error
+	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
@@ -51,8 +51,9 @@ func (s *storage) CreateTask(taskInput models.TaskInput) (models.TaskInternalSho
 }
 
 func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error) {
-	_, err := s.db.Exec("UPDATE tasks SET taskName = $1, description = $2 WHERE taskID = $3",
-								taskInput.Name, taskInput.Description, taskInput.TaskID)
+	var cardID int64
+	err := s.db.QueryRow("UPDATE tasks SET taskName = $1, description = $2 WHERE taskID = $3 RETURNING cardID",
+								taskInput.Name, taskInput.Description, taskInput.TaskID).Scan(&cardID)
 	if err != nil {
 		return models.TaskInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeTask"}
@@ -60,6 +61,7 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, e
 
 	task := models.TaskInternal{
 		TaskID:      taskInput.TaskID,
+		CardID:      cardID,
 		Name:        taskInput.Name,
 		Description: taskInput.Description,
 	}
@@ -67,13 +69,19 @@ func (s *storage) ChangeTask(taskInput models.TaskInput) (models.TaskInternal, e
 	return task, nil
 }
 
-func (s *storage) DeleteTask(taskInput models.TaskInput) error {
-	_, err := s.db.Exec("DELETE FROM tasks WHERE taskID = $1", taskInput.TaskID)
+func (s *storage) DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error) {
+	var cardID int64
+	err := s.db.QueryRow("DELETE FROM tasks WHERE taskID = $1 RETURNING cardID", taskInput.TaskID).Scan(&cardID)
 	if err != nil {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteTask"}
+		return models.TaskInternalShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "DeleteTask"}
 	}
 
-	return nil
+	task := models.TaskInternalShort{
+		TaskID:      cardID,
+		CardID:      taskInput.TaskID,
+	}
+
+	return task, nil
 }
 
 func (s *storage) GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error) {

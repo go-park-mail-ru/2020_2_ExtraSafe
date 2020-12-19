@@ -27,7 +27,7 @@ type BoardStorage interface {
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
-	DeleteTask(taskInput models.TaskInput) error
+	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	AddUser(input models.BoardMember) (err error)
 	RemoveUser(input models.BoardMember) (err error)
@@ -56,14 +56,14 @@ type BoardStorage interface {
 
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)
-	DeleteComment(input models.CommentInput) (err error)
+	DeleteComment(input models.CommentInput) (comment models.CommentOutside, err error)
 
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
-	DeleteChecklist(input models.ChecklistInput) (err error)
+	DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 
 	AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
-	RemoveAttachment(input models.AttachmentInternal) (err error)
+	RemoveAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
 }
 
 type storage struct {
@@ -288,7 +288,7 @@ func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	return s.tasksStorage.ChangeTaskOrder(taskInput)
 }
 
-func (s *storage) DeleteTask(taskInput models.TaskInput) error {
+func (s *storage) DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error) {
 	return s.tasksStorage.DeleteTask(taskInput)
 }
 

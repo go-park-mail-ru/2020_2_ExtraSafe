@@ -38,7 +38,7 @@ func (s *storage) UpdateComment(input models.CommentInput) (comment models.Comme
 	return s.commentStorage.UpdateComment(input)
 }
 
-func (s *storage) DeleteComment(input models.CommentInput) (err error){
+func (s *storage) DeleteComment(input models.CommentInput) (comment models.CommentOutside, err error){
 	return s.commentStorage.DeleteComment(input)
 }
 
@@ -50,7 +50,7 @@ func (s *storage) UpdateChecklist(input models.ChecklistInput) (checklist models
 	return s.checklistStorage.UpdateChecklist(input)
 }
 
-func (s *storage) DeleteChecklist(input models.ChecklistInput) (err error){
+func (s *storage) DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error){
 	return s.checklistStorage.DeleteChecklist(input)
 }
 
@@ -58,6 +58,6 @@ func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment mod
 	return s.attachmentStorage.AddAttachment(input)
 }
 
-func (s *storage) RemoveAttachment(input models.AttachmentInternal) (err error) {
+func (s *storage) RemoveAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error) {
 	return s.attachmentStorage.RemoveAttachment(input)
 }

@@ -140,6 +140,7 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
 	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
