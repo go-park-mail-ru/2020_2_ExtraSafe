@@ -14,7 +14,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/service"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"log"
@@ -22,15 +21,19 @@ import (
 	"os"
 	"strings"
 )
-
+/*
 func init() {
 	if err := godotenv.Load("../../../config.env"); err != nil {
 		log.Print("No .env file found")
 	}
 }
-
+*/
 func main() {
-	driverName, ok := os.LookupEnv("TABUTASK_BOARDS_DRIVER")
+	driverName:= os.Getenv("TABUTASK_BOARDS_DRIVER")
+	userName:= os.Getenv("TABUTASK_BOARDS_USER")
+	password:= os.Getenv("TABUTASK_BOARDS_PASSWORD")
+	dbName:= os.Getenv("TABUTASK_BOARDS_NAME")
+	/*driverName, ok := os.LookupEnv("TABUTASK_BOARDS_DRIVER")
 	if !ok {
 		log.Fatalf("Cannot find driver name")
 	}
@@ -48,7 +51,7 @@ func main() {
 	dbName, ok := os.LookupEnv("TABUTASK_BOARDS_NAME")
 	if !ok {
 		log.Fatalf("Cannot find db name")
-	}
+	}*/
 
 	connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
 	db, err := sql.Open(driverName, connections)
@@ -76,10 +79,11 @@ func main() {
 
 	// =============================
 
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
+	profileServiceAddr:= os.Getenv("PROFILE_SERVICE_ADDR")
+	/*profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
 	if !ok {
 		log.Fatalf("")
-	}
+	}*/
 
 	grpcConn, err := grpc.Dial(
 		profileServiceAddr,
@@ -92,10 +96,11 @@ func main() {
 
 	// =============================
 
-	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
+	boardServiceAddr:= os.Getenv("BOARDS_SERVICE_ADDR")
+	/*boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
 	if !ok {
 		log.Fatalf("")
-	}
+	}*/
 
 	lis, err := net.Listen("tcp", boardServiceAddr)
 	if err != nil {
