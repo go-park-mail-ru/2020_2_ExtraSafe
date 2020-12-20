@@ -73,8 +73,10 @@ type service struct {
 }
 
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
+	mHub := websocket.NewNotificationHub()
+	go mHub.Run()
 	return &service{
-		mainHub: websocket.NewNotificationHub(),
+		mainHub: mHub,
 		boardService: boardService,
 		validator:    validator,
 		hubs:         make(map[int64]*websocket.BoardHub, 0),
@@ -185,6 +187,7 @@ func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err
 
 func (s *service) WebSocketNotification(request models.UserInput, c echo.Context) (err error) {
 	websocket.ServeWs(s.mainHub, c, request.SessionID, request.ID)
+	s.mainHub.GetClients()
 	return nil
 }
 
@@ -275,10 +278,16 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	user.Username = output.Username
-	user.FullName = output.FullName
-	user.Avatar = output.Avatar
-	user.Email = output.Email
+	user.Username = output.User.Username
+	user.FullName = output.User.FullName
+	user.Avatar = output.User.Avatar
+	user.Email = output.User.Email
+
+	boardMember := models.BoardMemberOutside{
+		BoardName: output.Board.Name,
+		UserOutsideShort:  user,
+		Initiator:         output.Initiator,
+	}
 
 	s.broadcast(models.WS{
 		Method: "AddMember",
@@ -287,8 +296,11 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 	}, request.BoardID)
 
 	note := models.NotificationMessage{
-		UserID: output.ID,
-		Body:   "AddMember",
+		UserID: output.User.ID,
+		Body:   models.WS{
+			Method:    "AddMemberNotification",
+			Body:      boardMember,
+		},
 	}
 
 	s.notification(note)
@@ -315,13 +327,6 @@ func (s *service) RemoveMember(request models.BoardMemberInput) (err error) {
 		SessionID: request.SessionID,
 		Body:   request,
 	}, request.BoardID)
-
-	note := models.NotificationMessage{
-		UserID: request.UserID,
-		Body:   "RemoveMember",
-	}
-
-	s.notification(note)
 
 	return nil
 }
@@ -692,6 +697,8 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 		},
 		TaskID: output.TaskID,
 		CardID: output.CardID,
+		TaskName: output.TaskName,
+		Initiator: output.Initiator,
 	}
 
 	s.broadcast(models.WS{
@@ -699,6 +706,14 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 		SessionID: request.SessionID,
 		Body:   task,
 	}, request.BoardID)
+
+	s.notification(models.NotificationMessage{
+		UserID: output.Assigner.ID,
+		Body:   models.WS{
+			Method:    "AssignUserNotification",
+			Body:      task,
+		},
+	})
 
 	return task.UserOutsideShort, nil
 }
@@ -1305,7 +1320,6 @@ func (s *service) deleteHub(boardID int64) {
 
 func (s *service) broadcast(message models.WS, boardID int64) {
 	if hub, ok := s.hubs[boardID]; ok {
-		//hub.GetClients()
 		hub.Broadcast(message)
 	}
 }

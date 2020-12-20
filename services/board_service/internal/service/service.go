@@ -242,7 +242,7 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoProfile.UserOutsideShort, err error) {
+func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoBoard.BoardMemberOutside, err error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
 		return output, err
@@ -254,12 +254,33 @@ func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMembe
 		MemberID:  user.ID,
 	}
 
+	initiator, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, err
+	}
+
 	err = s.boardStorage.AddUser(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return user, nil
+	board, err := s.boardStorage.GetBoardShort(models.BoardInput{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+	})
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	boardOutside := &protoProfile.BoardOutsideShort{Name: board.Name}
+
+	output = &protoBoard.BoardMemberOutside{
+		Board:     boardOutside,
+		User:      user,
+		Initiator: initiator.Users[0].Username,
+	}
+
+	return output, nil
 }
 
 func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
@@ -565,10 +586,17 @@ func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerIn
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
+	initiator, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, err
+	}
+
 	output = &protoBoard.TaskAssignUserOutside{
 		Assigner: user,
 		TaskID:   task.TaskID,
 		CardID:   task.CardID,
+		Initiator: initiator.Users[0].Username,
+		TaskName: task.TaskName,
 	}
 
 	return output, nil

@@ -95,7 +95,7 @@ func (h * NotificationHub) Unregister(client *Client) {
 }
 
 func (h *NotificationHub) Send(message models.NotificationMessage) {
-	h.broadcast <- message
+	h.notification <- message
 }
 
 func (h * NotificationHub) GetClients() {

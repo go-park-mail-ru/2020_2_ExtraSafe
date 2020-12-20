@@ -112,8 +112,10 @@ type TaskOutsideSuperShort struct {
 
 type TaskAssignUserOutside struct {
 	UserOutsideShort
-	TaskID int64 `json:"taskID"`
-	CardID int64 `json:"cardID"`
+	Initiator string `json:"initiator"`
+	TaskName  string `json:"taskName"`
+	TaskID    int64  `json:"taskID"`
+	CardID    int64  `json:"cardID"`
 }
 
 //===================================================<-Other

@@ -1929,13 +1929,7 @@ func easyjson559270aeDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels17(i
 		}
 		switch key {
 		case "body":
-			if m, ok := out.Body.(easyjson.Unmarshaler); ok {
-				m.UnmarshalEasyJSON(in)
-			} else if m, ok := out.Body.(json.Unmarshaler); ok {
-				_ = m.UnmarshalJSON(in.Raw())
-			} else {
-				out.Body = in.Interface()
-			}
+			(out.Body).UnmarshalEasyJSON(in)
 		default:
 			in.SkipRecursive()
 		}
@@ -1958,13 +1952,7 @@ func easyjson559270aeEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels17(o
 		} else {
 			out.RawString(prefix)
 		}
-		if m, ok := in.Body.(easyjson.Marshaler); ok {
-			m.MarshalEasyJSON(out)
-		} else if m, ok := in.Body.(json.Marshaler); ok {
-			out.Raw(m.MarshalJSON())
-		} else {
-			out.Raw(json.Marshal(in.Body))
-		}
+		(in.Body).MarshalEasyJSON(out)
 	}
 	out.RawByte('}')
 }

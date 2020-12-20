@@ -47,6 +47,12 @@ message BoardOutside {
   repeated TagOutside Tags = 8;
 }
 
+message BoardMemberOutside {
+  protoProfile.BoardOutsideShort Board = 1;
+  protoProfile.UserOutsideShort User = 2;
+  string Initiator = 3;
+}
+
 message SharedURL {
   string url = 1;
 }
@@ -171,7 +177,9 @@ message TaskOutsideSuperShort {
 message TaskAssignUserOutside {
   int64 TaskID = 1;
   int64 CardID = 2;
-  protoProfile.UserOutsideShort Assigner = 3;
+  string Initiator = 3;
+  string TaskName = 4;
+  protoProfile.UserOutsideShort Assigner = 5;
 }
 
 //==========================================
@@ -281,7 +289,7 @@ service Board {
   rpc GetBoard (BoardInput) returns (BoardOutside) {}
   rpc ChangeBoard (BoardChangeInput) returns (protoProfile.BoardOutsideShort) {}
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
-  rpc AddUserToBoard (BoardMemberInput) returns (protoProfile.UserOutsideShort) {}
+  rpc AddUserToBoard (BoardMemberInput) returns (BoardMemberOutside) {}
   rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
 
   rpc CreateCard (CardInput) returns (CardOutsideShort) {}

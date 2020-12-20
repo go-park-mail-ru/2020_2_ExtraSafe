@@ -11,6 +11,7 @@ type Storage interface {
 	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
+	GetTaskName(taskInput models.TaskInput) (string, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
 	GetCardIDByTask(taskInput int64) (cardID int64, err error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
@@ -123,6 +124,18 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, 
 	}
 
 	return task, nil
+}
+
+func (s *storage) GetTaskName(taskInput models.TaskInput) (string, error) {
+	var taskName string
+
+	err := s.db.QueryRow("SELECT taskName FROM tasks WHERE taskID = $1", taskInput.TaskID).Scan(&taskName)
+	if err != nil {
+		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTaskName"}
+	}
+
+	return taskName, nil
 }
 
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {

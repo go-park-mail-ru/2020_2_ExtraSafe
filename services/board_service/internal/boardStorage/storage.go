@@ -33,6 +33,7 @@ type BoardStorage interface {
 	RemoveUser(input models.BoardMember) (err error)
 
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
+	GetBoardShort(boardInput models.BoardInput) (models.BoardOutsideShort, error)
 	GetCard(cardInput models.CardInput) (models.CardInternal, error)
 	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
@@ -204,6 +205,19 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 		return models.BoardInternal{}, err
 	}
 	board.Tags = append(board.Tags, tags...)
+
+	return board, nil
+}
+
+func (s *storage) GetBoardShort(boardInput models.BoardInput) (models.BoardOutsideShort, error) {
+	board := models.BoardOutsideShort{}
+
+	err := s.db.QueryRow("SELECT boardID, boardName, theme, star FROM boards WHERE boardID = $1", boardInput.BoardID).
+		Scan(&board.BoardID, &board.Name, &board.Theme, &board.Star)
+	if err != nil {
+		return board, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoardShort"}
+	}
 
 	return board, nil
 }

@@ -70,7 +70,6 @@ func (c *Client) writePump() {
 		c.conn.Close()
 	}()
 	for {
-		//TODO - разобраться с ping pong
 		select {
 		case message, ok := <-c.send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
@@ -102,9 +101,7 @@ func ServeWs(hub Hub, c echo.Context, sessionID string, userID int64) {
 		return
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan interface{}), userID: userID, sessionID: sessionID}
-
 	hub.Register(client)
-
 	go client.readPump()
 	go client.writePump()
 }

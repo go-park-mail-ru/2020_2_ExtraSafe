@@ -139,5 +139,5 @@ type WS struct {
 
 type NotificationMessage struct {
 	UserID int64       `json:"-"`
-	Body   interface{} `json:"body"`
+	Body   WS `json:"body"`
 }

@@ -1748,6 +1748,10 @@ func easyjsonE1b3f808DecodeGithubComGoParkMailRu20202ExtraSafeInternalModels12(i
 			continue
 		}
 		switch key {
+		case "initiator":
+			out.Initiator = string(in.String())
+		case "taskName":
+			out.TaskName = string(in.String())
 		case "taskID":
 			out.TaskID = int64(in.Int64())
 		case "cardID":
@@ -1775,8 +1779,18 @@ func easyjsonE1b3f808EncodeGithubComGoParkMailRu20202ExtraSafeInternalModels12(o
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"taskID\":"
+		const prefix string = ",\"initiator\":"
 		out.RawString(prefix[1:])
+		out.String(string(in.Initiator))
+	}
+	{
+		const prefix string = ",\"taskName\":"
+		out.RawString(prefix)
+		out.String(string(in.TaskName))
+	}
+	{
+		const prefix string = ",\"taskID\":"
+		out.RawString(prefix)
 		out.Int64(int64(in.TaskID))
 	}
 	{
