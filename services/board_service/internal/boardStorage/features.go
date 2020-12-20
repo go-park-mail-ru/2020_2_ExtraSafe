@@ -51,7 +51,7 @@ func (s *storage) AddTag(input models.TaskTagInput) (tag models.TagOutside, err 
 	if err != nil {
 		return
 	}
-	tag, err = s.tagStorage.GetTag(input)
+	tag, err = s.tagStorage.GetTag(tag.TagID)
 	if err != nil {
 		return
 	}

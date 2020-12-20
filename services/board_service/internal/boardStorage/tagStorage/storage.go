@@ -2,6 +2,7 @@ package tagStorage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
@@ -13,7 +14,7 @@ type Storage interface {
 	AddTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 	RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 
-	GetTag(input models.TaskTagInput) (tag models.TagOutside, err error)
+	GetTag(tagID int64) (tag models.TagOutside, err error)
 	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
 	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
 }
@@ -85,8 +86,9 @@ func (s *storage) RemoveTag(input models.TaskTagInput) (tag models.TagOutside, e
 	return
 }
 
-func (s *storage) GetTag(input models.TaskTagInput) (tag models.TagOutside, err error) {
-	err = s.db.QueryRow("SELECT tagID, name, color FROM tags WHERE tagID = $1", input.TagID).
+func (s *storage) GetTag(tagID int64) (tag models.TagOutside, err error) {
+	fmt.Println(tagID)
+	err = s.db.QueryRow("SELECT tagID, name, color FROM tags WHERE tagID = $1", tagID).
 		Scan(&tag.TagID, &tag.Name, &tag.Color)
 	if err != nil {
 		return tag, models.ServeError{Codes: []string{"500"}, OriginalError: err,
