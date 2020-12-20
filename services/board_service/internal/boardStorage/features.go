@@ -1,6 +1,8 @@
 package boardStorage
 
-import "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+import (
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+)
 
 func (s *storage) AssignUser(input models.TaskAssigner) (task models.TaskAssignUserOutside, err error) {
 	err = s.tasksStorage.AssignUser(input)
@@ -55,10 +57,11 @@ func (s *storage) AddTag(input models.TaskTagInput) (tag models.TagOutside, err 
 	if err != nil {
 		return
 	}
-	cardID, err := s.tasksStorage.GetCardIDByTask(tag.TaskID)
+	cardID, err := s.tasksStorage.GetCardIDByTask(input.TaskID)
 	if err != nil {
 		return
 	}
+	tag.TaskID  = input.TaskID
 	tag.CardID = cardID
 	return
 }
