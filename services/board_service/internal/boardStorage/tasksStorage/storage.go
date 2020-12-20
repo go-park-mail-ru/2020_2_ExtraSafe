@@ -11,7 +11,9 @@ type Storage interface {
 	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
+	GetTaskName(taskInput models.TaskInput) (string, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
+	GetCardIDByTask(taskInput int64) (cardID int64, err error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
 	AssignUser(input models.TaskAssigner) (err error)
@@ -77,8 +79,8 @@ func (s *storage) DeleteTask(taskInput models.TaskInput) (models.TaskInternalSho
 	}
 
 	task := models.TaskInternalShort{
-		TaskID:      cardID,
-		CardID:      taskInput.TaskID,
+		TaskID:      taskInput.TaskID,
+		CardID:      cardID,
 	}
 
 	return task, nil
@@ -122,6 +124,18 @@ func (s *storage) GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, 
 	}
 
 	return task, nil
+}
+
+func (s *storage) GetTaskName(taskInput models.TaskInput) (string, error) {
+	var taskName string
+
+	err := s.db.QueryRow("SELECT taskName FROM tasks WHERE taskID = $1", taskInput.TaskID).Scan(&taskName)
+	if err != nil {
+		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTaskName"}
+	}
+
+	return taskName, nil
 }
 
 func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
@@ -171,6 +185,16 @@ func (s *storage) GetAssigners(input models.TaskInput) (assignerIDs []int64, err
 		}
 
 		assignerIDs = append(assignerIDs, assignerID)
+	}
+
+	return
+}
+
+func (s storage) GetCardIDByTask(taskID int64) (cardID int64, err error) {
+	err = s.db.QueryRow("SELECT cardID FROM tasks WHERE taskID = $1", taskID).Scan(&cardID)
+	if err != nil {
+		return cardID, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetCardIDByTask"}
 	}
 
 	return

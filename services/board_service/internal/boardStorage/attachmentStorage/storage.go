@@ -23,8 +23,8 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error) {
-	err = s.db.QueryRow("INSERT INTO attachments (taskID, filename, filepath) VALUES ($1, $2, $3) RETURNING attachmentID, taskID, cardID", input.TaskID, input.Filename, input.Filepath).
-				Scan(&attachment.AttachmentID, &attachment.TaskID, &attachment.CardID)
+	err = s.db.QueryRow("INSERT INTO attachments (taskID, filename, filepath) VALUES ($1, $2, $3) RETURNING attachmentID, taskID", input.TaskID, input.Filename, input.Filepath).
+				Scan(&attachment.AttachmentID, &attachment.TaskID)
 	if err != nil {
 		return attachment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "AddAttachment"}
@@ -36,8 +36,8 @@ func (s *storage) AddAttachment(input models.AttachmentInternal) (attachment mod
 }
 
 func (s *storage) RemoveAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error) {
-	err = s.db.QueryRow("DELETE FROM attachments WHERE attachmentID = $1 RETURNING attachmentID, taskID, cardID", input.AttachmentID).
-		Scan(&attachment.AttachmentID, &attachment.TaskID, &attachment.CardID)
+	err = s.db.QueryRow("DELETE FROM attachments WHERE attachmentID = $1 RETURNING attachmentID, taskID", input.AttachmentID).
+		Scan(&attachment.AttachmentID, &attachment.TaskID)
 	if err != nil {
 		return attachment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "RemoveAttachment"}

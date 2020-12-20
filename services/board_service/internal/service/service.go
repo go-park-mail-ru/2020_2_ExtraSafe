@@ -242,7 +242,7 @@ func (s *service) DeleteBoard(_ context.Context, input *protoBoard.BoardInput) (
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoProfile.UserOutsideShort, err error) {
+func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (output *protoBoard.BoardMemberOutside, err error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
 		return output, err
@@ -254,12 +254,33 @@ func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMembe
 		MemberID:  user.ID,
 	}
 
+	initiator, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, err
+	}
+
 	err = s.boardStorage.AddUser(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return user, nil
+	board, err := s.boardStorage.GetBoardShort(models.BoardInput{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+	})
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	boardOutside := &protoProfile.BoardOutsideShort{Name: board.Name}
+
+	output = &protoBoard.BoardMemberOutside{
+		Board:     boardOutside,
+		User:      user,
+		Initiator: initiator.Users[0].Username,
+	}
+
+	return output, nil
 }
 
 func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
@@ -548,7 +569,7 @@ func (s *service) TasksOrderChange(_ context.Context, input *protoBoard.TasksOrd
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (output *protoProfile.UserOutsideShort, err error) {
+func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerInput) (output *protoBoard.TaskAssignUserOutside, err error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
 		return output, err
@@ -560,18 +581,31 @@ func (s *service) AssignUser(c context.Context, input *protoBoard.TaskAssignerIn
 		AssignerID: user.ID,
 	}
 
-	err = s.boardStorage.AssignUser(userInput)
+	task, err := s.boardStorage.AssignUser(userInput)
 	if err != nil {
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return user, nil
+	initiator, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: []int64{input.UserID}})
+	if err != nil {
+		return output, err
+	}
+
+	output = &protoBoard.TaskAssignUserOutside{
+		Assigner: user,
+		TaskID:   task.TaskID,
+		CardID:   task.CardID,
+		Initiator: initiator.Users[0].Username,
+		TaskName: task.TaskName,
+	}
+
+	return output, nil
 }
 
-func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (*protoBoard.Nothing, error) {
+func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerInput) (output *protoBoard.TaskAssignUserOutside, err error) {
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.AssignerName})
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, err
+		return output, err
 	}
 
 	userInput := models.TaskAssigner{
@@ -580,12 +614,18 @@ func (s *service) DismissUser(c context.Context, input *protoBoard.TaskAssignerI
 		AssignerID: user.ID,
 	}
 
-	err = s.boardStorage.DismissUser(userInput)
+	task, err := s.boardStorage.DismissUser(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.TaskAssignUserOutside{
+		Assigner: user,
+		TaskID:   task.TaskID,
+		CardID:   task.CardID,
+	}
+
+	return output, nil
 }
 
 func (s *service) CreateTag(_ context.Context, input *protoBoard.TagInput) (output *protoBoard.TagOutside, err error) {
@@ -648,34 +688,50 @@ func (s *service) DeleteTag(_ context.Context, input *protoBoard.TagInput) (*pro
 	return &protoBoard.Nothing{Dummy: true}, nil
 }
 
-func (s *service) AddTag(_ context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error) {
+func (s *service) AddTag(_ context.Context, input *protoBoard.TaskTagInput) (output *protoBoard.TagOutside, err error) {
 	userInput := models.TaskTagInput{
 		UserID:  input.UserID,
 		TagID: input.TagID,
 		TaskID: input.TaskID,
 	}
 
-	err := s.boardStorage.AddTag(userInput)
+	tag, err := s.boardStorage.AddTag(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.TagOutside{}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.TagOutside{
+		TaskID: tag.TaskID,
+		CardID: tag.CardID,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
+	return output, nil
 }
 
-func (s *service) RemoveTag(_ context.Context, input *protoBoard.TaskTagInput) (*protoBoard.Nothing, error) {
+func (s *service) RemoveTag(_ context.Context, input *protoBoard.TaskTagInput) (output *protoBoard.TagOutside, err error) {
 	userInput := models.TaskTagInput{
 		UserID:  input.UserID,
 		TagID: input.TagID,
 		TaskID: input.TaskID,
 	}
 
-	err := s.boardStorage.RemoveTag(userInput)
+	tag, err := s.boardStorage.RemoveTag(userInput)
 	if err != nil {
-		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+		return &protoBoard.TagOutside{}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
-	return &protoBoard.Nothing{Dummy: true}, nil
+	output = &protoBoard.TagOutside{
+		TaskID: tag.TaskID,
+		CardID: tag.CardID,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
+	return output, nil
 }
 
 func (s *service) CreateComment(ctx context.Context, input *protoBoard.CommentInput) (output *protoBoard.CommentOutside, err error) {

@@ -57,6 +57,8 @@ type ServiceBoard interface {
 	GetSharedURL(request models.BoardInput) (url string, err error)
 	InviteUserToBoard(request models.BoardInviteInput) (board models.BoardOutsideShort, err error)
 
+	WebSocketNotification(request models.UserInput, c echo.Context) (err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
 	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
@@ -66,14 +68,18 @@ type ServiceBoard interface {
 type service struct {
 	boardService protoBoard.BoardClient
 	validator    Validator
-	hubs         map[int64]*websocket.Hub
+	hubs         map[int64]*websocket.BoardHub
+	mainHub      *websocket.NotificationHub
 }
 
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
+	mHub := websocket.NewNotificationHub()
+	go mHub.Run()
 	return &service{
+		mainHub: mHub,
 		boardService: boardService,
 		validator:    validator,
-		hubs:         make(map[int64]*websocket.Hub, 0),
+		hubs:         make(map[int64]*websocket.BoardHub, 0),
 	}
 }
 
@@ -168,7 +174,7 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 }
 
 func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err error) {
-	var hub *websocket.Hub
+	var hub *websocket.BoardHub
 	if h, ok := s.hubs[request.BoardID]; ok {
 		hub = h
 	} else {
@@ -176,6 +182,12 @@ func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err
 	}
 
 	websocket.ServeWs(hub, c, request.SessionID, request.UserID)
+	return nil
+}
+
+func (s *service) WebSocketNotification(request models.UserInput, c echo.Context) (err error) {
+	websocket.ServeWs(s.mainHub, c, request.SessionID, request.ID)
+	s.mainHub.GetClients()
 	return nil
 }
 
@@ -266,16 +278,32 @@ func (s *service) AddMember(request models.BoardMemberInput) (user models.UserOu
 		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	user.Username = output.Username
-	user.FullName = output.FullName
-	user.Avatar = output.Avatar
-	user.Email = output.Email
+	user.Username = output.User.Username
+	user.FullName = output.User.FullName
+	user.Avatar = output.User.Avatar
+	user.Email = output.User.Email
+
+	boardMember := models.BoardMemberOutside{
+		BoardName: output.Board.Name,
+		UserOutsideShort:  user,
+		Initiator:         output.Initiator,
+	}
 
 	s.broadcast(models.WS{
 		Method: "AddMember",
 		SessionID: request.SessionID,
 		Body:   user,
 	}, request.BoardID)
+
+	note := models.NotificationMessage{
+		UserID: output.User.ID,
+		Body:   models.WS{
+			Method:    "AddMemberNotification",
+			Body:      boardMember,
+		},
+	}
+
+	s.notification(note)
 
 	return user,nil
 }
@@ -402,9 +430,13 @@ func (s *service) DeleteCard(request models.CardInput) (err error) {
 		Order:   request.Order,
 	}
 
-	card, err := s.boardService.DeleteCard(ctx, input)
+	output, err := s.boardService.DeleteCard(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	card := models.CardOutsideShort{
+		CardID: output.CardID,
 	}
 
 	s.broadcast(models.WS{
@@ -462,14 +494,17 @@ func (s *service) CreateTask(request models.TaskInput) (task models.TaskOutsideS
 		return models.TaskOutsideSuperShort{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	task.TaskID = output.TaskID
-	task.Description = output.Description
-	task.Name = output.Name
+	task = models.TaskOutsideSuperShort{
+		TaskID:      output.TaskID,
+		Name:        output.Name,
+		CardID:      request.CardID,
+		Description: output.Description,
+	}
 
 	s.broadcast( models.WS{
 		Method: "CreateTask",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   task,
 	}, request.BoardID )
 
 	return task, nil
@@ -653,20 +688,34 @@ func (s *service) AssignUser(request models.TaskAssignerInput) (user models.User
 		return user, errorWorker.ConvertStatusToError(err)
 	}
 
-	user.Username = output.Username
-	user.FullName = output.FullName
-	user.Avatar = output.Avatar
-	user.Email = output.Email
-
-	//TODO - добавить cardID taskID
+	task := models.TaskAssignUserOutside{
+		UserOutsideShort: models.UserOutsideShort{
+			Username: output.Assigner.Username,
+			FullName: output.Assigner.FullName,
+			Avatar:   output.Assigner.Avatar,
+			Email:    output.Assigner.Email,
+		},
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+		TaskName: output.TaskName,
+		Initiator: output.Initiator,
+	}
 
 	s.broadcast(models.WS{
 		Method: "AssignUser",
 		SessionID: request.SessionID,
-		Body:   user,
+		Body:   task,
 	}, request.BoardID)
 
-	return user, nil
+	s.notification(models.NotificationMessage{
+		UserID: output.Assigner.ID,
+		Body:   models.WS{
+			Method:    "AssignUserNotification",
+			Body:      task,
+		},
+	})
+
+	return task.UserOutsideShort, nil
 }
 
 func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
@@ -678,17 +727,26 @@ func (s *service) DismissUser(request models.TaskAssignerInput) (err error) {
 		AssignerName: request.AssignerName,
 	}
 
-	_, err = s.boardService.DismissUser(ctx, userInput)
+	output, err := s.boardService.DismissUser(ctx, userInput)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
 	}
 
-	//TODO - добавить cardID taskID
+	task := models.TaskAssignUserOutside{
+		UserOutsideShort: models.UserOutsideShort{
+			Username: output.Assigner.Username,
+			FullName: output.Assigner.FullName,
+			Avatar:   output.Assigner.Avatar,
+			Email:    output.Assigner.Email,
+		},
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+	}
 
 	s.broadcast(models.WS{
 		Method: "DismissUser",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   task,
 	}, request.BoardID)
 
 	return nil
@@ -789,15 +847,23 @@ func (s *service) AddTag(request models.TaskTagInput) (err error) {
 		TagID:      request.TagID,
 	}
 
-	_, err = s.boardService.AddTag(ctx, input)
+	output, err := s.boardService.AddTag(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	tag := models.TagOutside{
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+		TagID: output.TagID,
+		Color: output.Color,
+		Name:  output.Name,
 	}
 
 	s.broadcast(models.WS{
 		Method: "AddTag",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   tag,
 	}, request.BoardID)
 
 	return nil
@@ -812,15 +878,23 @@ func (s *service) RemoveTag(request models.TaskTagInput) (err error) {
 		TagID:      request.TagID,
 	}
 
-	_, err = s.boardService.RemoveTag(ctx, input)
+	output, err := s.boardService.RemoveTag(ctx, input)
 	if err != nil {
 		return errorWorker.ConvertStatusToError(err)
+	}
+
+	tag := models.TagOutside{
+		TaskID: output.TaskID,
+		CardID: output.CardID,
+		TagID: output.TagID,
+		Color: output.Color,
+		Name:  output.Name,
 	}
 
 	s.broadcast(models.WS{
 		Method: "RemoveTag",
 		SessionID: request.SessionID,
-		Body:   request,
+		Body:   tag,
 	}, request.BoardID)
 
 	return nil
@@ -1113,8 +1187,8 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 
 	attachment := models.AttachmentOutside{
 		AttachmentID: output.AttachmentID,
-		TaskID:       output.CardID,
-		CardID:       output.TaskID,
+		TaskID:       output.TaskID,
+		CardID:       output.CardID,
 	}
 
 	s.broadcast(models.WS{
@@ -1232,7 +1306,7 @@ func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	return output.BoardID, nil
 }
 
-func (s *service) createHub(boardID int64) *websocket.Hub {
+func (s *service) createHub(boardID int64) *websocket.BoardHub {
 	hub := websocket.NewHub(boardID, &s.hubs)
 	s.hubs[boardID] = hub
 	go hub.Run()
@@ -1246,7 +1320,10 @@ func (s *service) deleteHub(boardID int64) {
 
 func (s *service) broadcast(message models.WS, boardID int64) {
 	if hub, ok := s.hubs[boardID]; ok {
-		//hub.GetClients()
 		hub.Broadcast(message)
 	}
+}
+
+func (s *service) notification(message models.NotificationMessage) {
+	s.mainHub.Send(message)
 }

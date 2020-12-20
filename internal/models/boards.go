@@ -70,6 +70,12 @@ type BoardOutsideShort struct {
 	Star    bool   `json:"boardStar"`
 }
 
+type BoardMemberOutside struct {
+	BoardName string `json:"boardName"`
+	UserOutsideShort
+	Initiator string `json:"initiator"`
+}
+
 //===================================================<-Other
 type BoardMember struct {
 	UserID   int64

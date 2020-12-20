@@ -105,9 +105,17 @@ type TaskOutsideShort struct {
 
 type TaskOutsideSuperShort struct {
 	TaskID      int64  `json:"taskID,omitempty"`
-	CardID      int64  `json:"cardID,omitempty"`
 	Name        string `json:"taskName,omitempty"`
+	CardID      int64  `json:"cardID,omitempty"`
 	Description string `json:"taskDescription,omitempty"`
+}
+
+type TaskAssignUserOutside struct {
+	UserOutsideShort
+	Initiator string `json:"initiator"`
+	TaskName  string `json:"taskName"`
+	TaskID    int64  `json:"taskID"`
+	CardID    int64  `json:"cardID"`
 }
 
 //===================================================<-Other

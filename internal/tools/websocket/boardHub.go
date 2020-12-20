@@ -5,18 +5,18 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 )
 
-type Hub struct {
+type BoardHub struct {
 	boardID int64
 	users map[string]*Client
 	broadcast chan interface{}
 	register chan *Client
 	unregister chan *Client
 	stop chan bool
-	hubs *map[int64]*Hub
+	hubs *map[int64]*BoardHub
 }
 
-func NewHub(boardID int64, hubs *map[int64]*Hub) *Hub {
-	return &Hub{
+func NewHub(boardID int64, hubs *map[int64]*BoardHub) *BoardHub {
+	return &BoardHub{
 		boardID: boardID,
 		broadcast:  make(chan interface{}),
 		register:   make(chan *Client),
@@ -27,7 +27,7 @@ func NewHub(boardID int64, hubs *map[int64]*Hub) *Hub {
 	}
 }
 
-func (h *Hub) Run() {
+func (h *BoardHub) Run() {
 	for {
 		select {
 		case client := <-h.register:
@@ -64,21 +64,33 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) StopHub() {
+func (h *BoardHub) StopHub() {
 	h.stop <- true
 }
 
-func (h * Hub) CheckUser(sessionID string) bool {
+func (h *BoardHub) CheckUser(sessionID string) bool {
 	if _, ok := h.users[sessionID]; ok {
 		return true
 	}
 	return false
 }
 
-func (h * Hub) Broadcast(message interface{}) {
+func (h *BoardHub) Broadcast(message interface{}) {
 	h.broadcast <- message
 }
 
-func (h * Hub) GetClients() {
+func (h * BoardHub) Register(client *Client) {
+	h.register <- client
+}
+
+func (h * BoardHub) Unregister(client *Client) {
+	h.unregister <- client
+}
+
+func (h *BoardHub) Send(message models.NotificationMessage) {
+	h.broadcast <- message
+}
+
+func (h *BoardHub) GetClients() {
 	fmt.Println(h.users)
 }

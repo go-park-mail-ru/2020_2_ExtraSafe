@@ -27,4 +27,6 @@ type TasksStorage interface {
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
 	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
+
+	GetCardIDByTask(taskInput int64) (cardID int64, err error)
 }

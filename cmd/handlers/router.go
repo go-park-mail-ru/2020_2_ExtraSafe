@@ -26,8 +26,10 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.Static("/avatar", "../")
 	e.Static("/files", "../")
 
-	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.Board)))
+	e.GET("/notification-ws/", middle.CookieSession(board.Notification))
 	e.GET("/board-ws/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.BoardWS)))
+
+	e.GET("/board/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.Board)))
 	e.POST("/board/", middle.CookieSession(middle.CSRFToken(board.BoardCreate)))
 	e.PUT("/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardChange))))
 	e.DELETE("/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardDelete))))
@@ -67,5 +69,5 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.DELETE("/attachment/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckTaskUserPermission(board.AttachmentDelete))))
 
 	e.GET("/shared-url/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.SharedURL))))
-	e.GET("/invite/board/:ID/:url", middle.CookieSession(board.BoardInvite))
+	e.GET("/invite/board/:ID/:url/", middle.CookieSession(board.BoardInvite))
 }
