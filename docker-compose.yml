@@ -1,9 +1,33 @@
 version: "3.7"
 
 services:
+  tarantool:
+    image: keithzetterstrom/teamproject_tarantool_image
+    ports:
+      - 3301:3301
+    volumes:
+      - /home/ubuntu/data/tarantool:/var/lib/tarantool
   auth:
     build:
       context: .
       dockerfile: ./build/dockerFiles/auth.Dockerfile
+    restart: always
+    env_file:
+      - config.env
+    depends_on:
+      - tarantool
+  board:
+    build:
+      context: .
+      dockerfile: ./build/dockerFiles/board.Dockerfile
+    restart: always
+    env_file:
+      - config.env
+
+  profile:
+    build:
+      context: .
+      dockerfile: ./build/dockerFiles/profile.Dockerfile
+    restart: always
     env_file:
       - config.env
