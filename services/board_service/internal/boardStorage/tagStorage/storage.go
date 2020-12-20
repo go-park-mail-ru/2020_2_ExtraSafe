@@ -13,6 +13,7 @@ type Storage interface {
 	AddTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 	RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 
+	GetTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 	GetBoardTags(input models.BoardInput) (tags []models.TagOutside, err error)
 	GetTaskTags(input models.TaskInput) (tags []models.TagOutside, err error)
 }
@@ -81,6 +82,17 @@ func (s *storage) RemoveTag(input models.TaskTagInput) (tag models.TagOutside, e
 	}
 	tag.TagID = input.TagID
 	tag.TaskID = input.TaskID
+	return
+}
+
+func (s *storage) GetTag(input models.TaskTagInput) (tag models.TagOutside, err error) {
+	err = s.db.QueryRow("SELECT tagID, name, color FROM tags WHERE tagID = $1", input.TagID).
+		Scan(&tag.TagID, &tag.Name, &tag.Color)
+	if err != nil {
+		return tag, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTag"}
+	}
+
 	return
 }
 

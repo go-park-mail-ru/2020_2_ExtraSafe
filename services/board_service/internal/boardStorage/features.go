@@ -51,6 +51,10 @@ func (s *storage) AddTag(input models.TaskTagInput) (tag models.TagOutside, err 
 	if err != nil {
 		return
 	}
+	tag, err = s.tagStorage.GetTag(input)
+	if err != nil {
+		return
+	}
 	cardID, err := s.tasksStorage.GetCardIDByTask(tag.TaskID)
 	if err != nil {
 		return

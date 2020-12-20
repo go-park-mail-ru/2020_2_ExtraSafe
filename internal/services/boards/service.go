@@ -1187,8 +1187,8 @@ func (s *service) DeleteAttachment(request models.AttachmentInput) (err error) {
 
 	attachment := models.AttachmentOutside{
 		AttachmentID: output.AttachmentID,
-		TaskID:       output.CardID,
-		CardID:       output.TaskID,
+		TaskID:       output.TaskID,
+		CardID:       output.CardID,
 	}
 
 	s.broadcast(models.WS{
