@@ -29,6 +29,8 @@ func init() {
 }
 */
 func main() {
+	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
+	dbPort := os.Getenv("TABUTASK_DB_PORT")
 	driverName:= os.Getenv("TABUTASK_BOARDS_DRIVER")
 	userName:= os.Getenv("TABUTASK_BOARDS_USER")
 	password:= os.Getenv("TABUTASK_BOARDS_PASSWORD")
@@ -53,7 +55,8 @@ func main() {
 		log.Fatalf("Cannot find db name")
 	}*/
 
-	connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
+	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
+	//connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
 		log.Fatalf("Cannot connect to database", err)
@@ -64,7 +67,7 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		return
+		log.Fatalf("Cannot connect to database", err)
 	}
 
 	taskStorage := tasksStorage.NewStorage(db)
@@ -115,6 +118,6 @@ func main() {
 
 	protoBoard.RegisterBoardServer(server, handler)
 
-	fmt.Println("starting server at :9083")
+	fmt.Println("starting server at : ", server.GetServiceInfo())
 	server.Serve(lis)
 }

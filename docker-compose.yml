@@ -7,6 +7,7 @@ services:
       - 3301:3301
     volumes:
       - /home/ubuntu/data/tarantool:/var/lib/tarantool
+
   auth:
     build:
       context: .
@@ -19,6 +20,15 @@ services:
     depends_on:
       - tarantool
 
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
+    ports:
+      - 5432:5432
+    env_file:
+      - database.env
+
   board:
     build:
       context: .
@@ -28,6 +38,8 @@ services:
       - 9083:9083
     env_file:
       - config.env
+    depends_on:
+      - postgres
 
   profile:
     build:
@@ -36,5 +48,18 @@ services:
     restart: always
     ports:
       - 9082:9082
+    env_file:
+      - config.env
+    depends_on:
+      - postgres
+
+  main:
+    build:
+      context: .
+      dockerfile: ./build/dockerFiles/main.Dockerfile
+    restart: always
+    network_mode: host
+    ports:
+      - 8080:8080
     env_file:
       - config.env

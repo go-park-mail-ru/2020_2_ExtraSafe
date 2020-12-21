@@ -105,6 +105,6 @@ func main() {
 
 	protoAuth.RegisterAuthServer(server, handler)
 
-	fmt.Println("starting server at :9081")
+	fmt.Println("starting server at : ", server)
 	server.Serve(lis)
 }

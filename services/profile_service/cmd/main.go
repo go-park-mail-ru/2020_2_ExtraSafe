@@ -23,6 +23,8 @@ func init() {
 }
 */
 func main() {
+	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
+	dbPort := os.Getenv("TABUTASK_DB_PORT")
 	driverName:= os.Getenv("TABUTASK_USERS_DRIVER")
 	userName:= os.Getenv("TABUTASK_USERS_USER")
 	password:= os.Getenv("TABUTASK_USERS_PASSWORD")
@@ -48,10 +50,11 @@ func main() {
 		log.Fatalf("")
 	}*/
 
-	connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
+	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
+	//connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
-		log.Fatalf("Cannot connect to database")
+		log.Fatalf("Cannot connect to database", err)
 	}
 
 	db.SetMaxIdleConns(3)
@@ -59,7 +62,7 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		return
+		log.Fatalf("Cannot ping to database", err)
 	}
 
 	profileStorage := userStorage.NewStorage(db)
@@ -106,6 +109,6 @@ func main() {
 
 	protoProfile.RegisterProfileServer(server, handler)
 
-	fmt.Println("starting server at :9082")
+	fmt.Println("starting server at : ", server.GetServiceInfo())
 	server.Serve(lis)
 }
