@@ -94,6 +94,7 @@ func main() {
 		log.Fatalf("")
 	}
 */
+	//lis, err := net.Listen("tcp", "0.0.0.0:9082")
 	lis, err := net.Listen("tcp", profileServiceAddr)
 	if err != nil {
 		log.Fatalln("cant listen port", err)
@@ -109,6 +110,10 @@ func main() {
 
 	protoProfile.RegisterProfileServer(server, handler)
 
-	fmt.Println("starting server at : ", server.GetServiceInfo())
-	server.Serve(lis)
+	fmt.Println("starting server at : ", lis.Addr())
+
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

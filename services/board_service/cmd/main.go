@@ -105,6 +105,7 @@ func main() {
 		log.Fatalf("")
 	}*/
 
+	//lis, err := net.Listen("tcp", "0.0.0.0:9083")
 	lis, err := net.Listen("tcp", boardServiceAddr)
 	if err != nil {
 		log.Fatalln("cant listen port", err)
@@ -118,6 +119,10 @@ func main() {
 
 	protoBoard.RegisterBoardServer(server, handler)
 
-	fmt.Println("starting server at : ", server.GetServiceInfo())
-	server.Serve(lis)
+	fmt.Println("starting server at : ", lis.Addr())
+
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

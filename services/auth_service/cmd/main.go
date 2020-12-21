@@ -68,6 +68,7 @@ func main() {
 	}
 */
 	lis, err := net.Listen("tcp", authServiceAddr)
+	//lis, err := net.Listen("tcp", "0.0.0.0:9081")
 	if err != nil {
 		log.Fatalln("cant listet port", err)
 	}
@@ -105,6 +106,11 @@ func main() {
 
 	protoAuth.RegisterAuthServer(server, handler)
 
-	fmt.Println("starting server at : ", server)
-	server.Serve(lis)
+	fmt.Println(authServiceAddr)
+
+	fmt.Println("starting server at : ", lis.Addr())
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

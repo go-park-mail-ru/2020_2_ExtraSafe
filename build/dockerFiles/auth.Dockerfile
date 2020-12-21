@@ -10,3 +10,5 @@ WORKDIR /app
 COPY --from=builder /app/authService /app/
 RUN chmod +x /app/authService
 ENTRYPOINT /app/authService
+
+EXPOSE 9081
