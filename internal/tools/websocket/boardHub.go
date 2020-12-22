@@ -3,6 +3,7 @@ package websocket
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
+	"sync"
 )
 
 type BoardHub struct {
@@ -12,10 +13,10 @@ type BoardHub struct {
 	register chan *Client
 	unregister chan *Client
 	stop chan bool
-	hubs *map[int64]*BoardHub
+	hubs *sync.Map
 }
 
-func NewHub(boardID int64, hubs *map[int64]*BoardHub) *BoardHub {
+func NewHub(boardID int64, hubs *sync.Map) *BoardHub {
 	return &BoardHub{
 		boardID: boardID,
 		broadcast:  make(chan interface{}),
@@ -39,7 +40,7 @@ func (h *BoardHub) Run() {
 				close(client.send)
 			}
 			if len(h.users) == 0 {
-				delete(*h.hubs, h.boardID)
+				h.hubs.Delete(h.boardID)
 				return
 			}
 

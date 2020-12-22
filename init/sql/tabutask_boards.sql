@@ -9,7 +9,7 @@ CREATE TABLE boards (
     boardName    TEXT,
     theme        TEXT,
     star         BOOLEAN,
-    shared_url  INTEGER
+    shared_url  TEXT
 );
 
 CREATE TABLE cards (
