@@ -65,5 +65,8 @@ services:
     restart: always
     ports:
       - 8080:8080
+    volumes:
+      - ./avatars:/avatars
+      - ./default:/default
     env_file:
       - config.env
