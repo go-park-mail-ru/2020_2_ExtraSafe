@@ -1,13 +1,8 @@
 version: "3.7"
 
-networks:
-  uniting_net:
-
 services:
   tarantool:
     image: keithzetterstrom/teamproject_tarantool_image
-    networks:
-      - uniting_net
     ports:
       - 3301:3301
     volumes:
@@ -18,8 +13,6 @@ services:
       context: .
       dockerfile: ./build/dockerFiles/auth.Dockerfile
     restart: always
-    networks:
-      - uniting_net
     ports:
       - 9081:9081
     env_file:
@@ -32,8 +25,6 @@ services:
 #      context: .
 #      dockerfile: ./build/dockerFiles/postgres.Dockerfile
     image: postgres
-    networks:
-      - uniting_net
     ports:
       - 5432:5432
     env_file:
@@ -46,8 +37,6 @@ services:
       context: .
       dockerfile: ./build/dockerFiles/board.Dockerfile
     restart: always
-    networks:
-      - uniting_net
     ports:
       - 9083:9083
     env_file:
@@ -60,8 +49,6 @@ services:
       context: .
       dockerfile: ./build/dockerFiles/profile.Dockerfile
     restart: always
-    networks:
-      - uniting_net
     ports:
       - 9082:9082
     env_file:
@@ -74,9 +61,7 @@ services:
       context: .
       dockerfile: ./build/dockerFiles/main.Dockerfile
     restart: always
-    networks:
-      - uniting_net
-    #network_mode: host
+    network_mode: host
     ports:
       - 8080:8080
     env_file:
