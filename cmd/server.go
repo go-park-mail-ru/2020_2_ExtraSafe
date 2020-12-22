@@ -7,7 +7,6 @@ import (
 	boardsHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/middlewares"
 	profileHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
@@ -37,8 +36,8 @@ import (
 func main() {
 	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
 	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
-	//authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
-	//mainServiceAddr := os.Getenv("TABUTASK_SERVER_ADDR")
+	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
+	mainServiceAddr := os.Getenv("TABUTASK_SERVER_ADDR")
 	/*boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
 	if !ok {
 		log.Fatalf("Cannot get env parameter")
@@ -83,7 +82,7 @@ func main() {
 	// =============================
 
 	grpcConnAuth, err := grpc.Dial(
-		"auth:9081",
+		authServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -126,12 +125,5 @@ func main() {
 	fmt.Println("profileServiceAddr1", grpcConnProfile.Target())
 	fmt.Println("authServiceAddr1", grpcConnAuth.Target())
 
-	_, err = profileService.Boards(models.UserInput{
-		ID:        1,
-	})
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	e.Logger.Fatal(e.Start("127.0.0.1:8080"))
+	e.Logger.Fatal(e.Start(mainServiceAddr))
 }

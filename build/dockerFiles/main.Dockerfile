@@ -9,5 +9,4 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /app/mainService /app/
 RUN chmod +x /app/mainService
-EXPOSE 8080
 ENTRYPOINT /app/mainService
