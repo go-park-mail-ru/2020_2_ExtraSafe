@@ -23,11 +23,11 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.POST("/api/profile/", middle.CookieSession(middle.CSRFToken(profile.ProfileChange)))
 	e.POST("/api/password/", middle.CookieSession(middle.CSRFToken(profile.PasswordChange)))
 
-	e.Static("/avatar", "../")
-	e.Static("/files", "../")
+	e.Static("/static/avatar", "../")
+	e.Static("/static/files", "../")
 
-	e.GET("/api/notification-ws/", middle.CookieSession(board.Notification))
-	e.GET("/api/board-ws/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.BoardWS)))
+	e.GET("/api/ws/notification/", middle.CookieSession(board.Notification))
+	e.GET("/api/ws/board/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.BoardWS)))
 
 	e.GET("/api/board/:ID/", middle.CookieSession(middle.CheckBoardUserPermission(board.Board)))
 	e.POST("/api/board/", middle.CookieSession(middle.CSRFToken(board.BoardCreate)))
