@@ -55,8 +55,8 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 			"http://127.0.0.1:63246",
 			"http://127.0.0.1",
 			"http://tabutask.ru",
-			"https://tabutask.ru:443",
-			"https://127.0.0.1:443"},
+			"https://tabutask.ru",
+			"https://127.0.0.1"},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-CSRF-Token"},
 		AllowCredentials: true,
 	})
