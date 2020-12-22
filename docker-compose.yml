@@ -38,6 +38,8 @@ services:
       - 9083
     env_file:
       - config.env
+    volumes:
+      - ./attachments:/attachments
     depends_on:
       - postgres
 
@@ -50,6 +52,9 @@ services:
       - 9082
     env_file:
       - config.env
+    volumes:
+      - ./avatars:/avatars
+      - ./default:/default
     depends_on:
       - postgres
 

@@ -21,13 +21,8 @@ import (
 	"os"
 	"strings"
 )
-/*
-func init() {
-	if err := godotenv.Load("../../../config.env"); err != nil {
-		log.Print("No .env file found")
-	}
-}
-*/
+
+
 func main() {
 	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
 	dbPort := os.Getenv("TABUTASK_DB_PORT")
@@ -35,28 +30,8 @@ func main() {
 	userName:= os.Getenv("TABUTASK_BOARDS_USER")
 	password:= os.Getenv("TABUTASK_BOARDS_PASSWORD")
 	dbName:= os.Getenv("TABUTASK_BOARDS_NAME")
-	/*driverName, ok := os.LookupEnv("TABUTASK_BOARDS_DRIVER")
-	if !ok {
-		log.Fatalf("Cannot find driver name")
-	}
-
-	userName, ok := os.LookupEnv("TABUTASK_BOARDS_USER")
-	if !ok {
-		log.Fatalf("Cannot find user name")
-	}
-
-	password, ok := os.LookupEnv("TABUTASK_BOARDS_PASSWORD")
-	if !ok {
-		log.Fatalf("Cannot find password")
-	}
-
-	dbName, ok := os.LookupEnv("TABUTASK_BOARDS_NAME")
-	if !ok {
-		log.Fatalf("Cannot find db name")
-	}*/
 
 	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
-	//connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
 		log.Fatalf("Cannot connect to database", err)
@@ -83,10 +58,6 @@ func main() {
 	// =============================
 
 	profileServiceAddr:= os.Getenv("PROFILE_SERVICE_ADDR")
-	/*profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("")
-	}*/
 
 	grpcConn, err := grpc.Dial(
 		profileServiceAddr,
@@ -100,12 +71,7 @@ func main() {
 	// =============================
 
 	boardServiceAddr:= os.Getenv("BOARDS_SERVICE_ADDR")
-	/*boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("")
-	}*/
 
-	//lis, err := net.Listen("tcp", "0.0.0.0:9083")
 	lis, err := net.Listen("tcp", boardServiceAddr)
 	if err != nil {
 		log.Fatalln("cant listen port", err)

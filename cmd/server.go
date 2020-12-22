@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers"
 	authHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/auth"
 	boardsHandler "github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/boards"
@@ -27,36 +26,13 @@ import (
 	"os"
 )
 
-//func init() {
-//	if err := godotenv.Load("../config.env"); err != nil {
-//		log.Print("No .env file found")
-//	}
-//}
 
 func main() {
 	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
 	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
 	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
 	mainServiceAddr := os.Getenv("TABUTASK_SERVER_ADDR")
-	/*boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
 
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	authServiceAddr, ok := os.LookupEnv("AUTH_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	mainServiceAddr, ok := os.LookupEnv("TABUTASK_SERVER_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}*/
 	// =============================
 
 	grpcConnBoard, err := grpc.Dial(
@@ -120,10 +96,6 @@ func main() {
 	e.Use(middlewaresService.CORS())
 
 	handlers.Router(e, profHandler, aHandler, boardHandler, middlewaresService)
-
-	fmt.Println("boardServiceAddr1", grpcConnBoard.Target())
-	fmt.Println("profileServiceAddr1", grpcConnProfile.Target())
-	fmt.Println("authServiceAddr1", grpcConnAuth.Target())
 
 	e.Logger.Fatal(e.Start(mainServiceAddr))
 }

@@ -13,30 +13,13 @@ import (
 	"net"
 	"os"
 )
-/*
-func init() {
-//	if err := os.get
-	if err := godotenv.Load("../../../config.env"); err != nil {
-	//if err := godotenv.Load("config.env"); err != nil {
-		log.Print("No .env file found")
-	}
-}
-*/
+
+
 func main() {
 	// =============================
 	userName:= os.Getenv("TABUTASK_SESSIONS_USER")
-	//userName, ok := os.LookupEnv("TABUTASK_SESSIONS_USER")
-	/*if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}*/
-
 	addr := os.Getenv("TABUTASK_SESSIONS_ADDR")
-	/*addr, ok := os.LookupEnv("TABUTASK_SESSIONS_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-*/
-	fmt.Println(addr)
+
 	tConn, err := tarantool.Connect(addr, tarantool.Opts{ User: userName })
 	if err != nil {
 		fmt.Println("Connection refused", err)
@@ -52,23 +35,8 @@ func main() {
 	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
 	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
 	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
-	/*boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
 
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	authServiceAddr, ok := os.LookupEnv("AUTH_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-*/
 	lis, err := net.Listen("tcp", authServiceAddr)
-	//lis, err := net.Listen("tcp", "0.0.0.0:9081")
 	if err != nil {
 		log.Fatalln("cant listet port", err)
 	}
