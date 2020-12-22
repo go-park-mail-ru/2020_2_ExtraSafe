@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	_ "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
@@ -53,6 +54,7 @@ func (s *service) Auth(ctx context.Context, input *protoProfile.UserID) (output 
 }
 
 func (s *service) Login(ctx context.Context, input *protoProfile.UserInputLogin) (output *protoAuth.UserSession, err error) {
+	fmt.Println("login", input)
 	user, err := s.profileService.CheckUser(ctx, input)
 	if err != nil {
 		return output, err
