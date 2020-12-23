@@ -20,7 +20,12 @@ jobs:
           sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
           sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
           sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool
+          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool &&
+          sudo docker tag keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} keithzetterstrom/tabutask_auth:latest &&
+          sudo docker tag keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} keithzetterstrom/tabutask_profile:latest &&
+          sudo docker tag keithzetterstrom/tabutask_board:${GITHUB_SHA::8} keithzetterstrom/tabutask_board:latest &&
+          sudo docker tag keithzetterstrom/tabutask_main:${GITHUB_SHA::8} keithzetterstrom/tabutask_main:latest &&
+          sudo docker tag keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} keithzetterstrom/tabutask_tarantool:latest
 
       - name: Push Docker images
         run: docker push keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
@@ -64,11 +69,11 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
             export PATH=/snap/bin:$PATH
-            docker pull keithzetterstrom/tabutask_auth:${GITHUB_SHA::8}
-            docker pull keithzetterstrom/tabutask_profile:${GITHUB_SHA::8}
-            docker pull keithzetterstrom/tabutask_main:${GITHUB_SHA::8}
-            docker pull keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8}
-            docker pull keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
+            docker pull keithzetterstrom/tabutask_auth:latest
+            docker pull keithzetterstrom/tabutask_profile:latest
+            docker pull keithzetterstrom/tabutask_main:latest
+            docker pull keithzetterstrom/tabutask_tarantool:latest
+            docker pull keithzetterstrom/tabutask_board:latest
 
       - name: Run backend
         uses: appleboy/ssh-action@master
