@@ -28,11 +28,11 @@ jobs:
           sudo docker tag keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} keithzetterstrom/tabutask_tarantool:latest
 
       - name: Push Docker images
-        run: docker push keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
-          docker push keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} &&
-          docker push keithzetterstrom/tabutask_main:${GITHUB_SHA::8} &&
-          docker push keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} &&
-          docker push keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
+        run: docker push keithzetterstrom/tabutask_auth &&
+          docker push keithzetterstrom/tabutask_profile &&
+          docker push keithzetterstrom/tabutask_main &&
+          docker push keithzetterstrom/tabutask_tarantool &&
+          docker push keithzetterstrom/tabutask_board
 
       - name: Upload dependencies
         uses: actions/upload-artifact@v2
@@ -63,7 +63,6 @@ jobs:
       - name: Pull Docker images
         uses: appleboy/ssh-action@master
         with:
-          envs: GITHUB_SHA
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
