@@ -56,7 +56,7 @@ func TestStorage_UpdateComment(t *testing.T) {
 	storage := &storage{db: db}
 
 	mock.
-		ExpectExec("UPDATE comments SET").
+		ExpectQuery("UPDATE comments SET").
 		WithArgs(input.Message, input.CommentID).
 		WillReturnError(errors.New(""))
 
@@ -85,7 +85,7 @@ func TestStorage_DeleteComment(t *testing.T) {
 	storage := &storage{db: db}
 
 	mock.
-		ExpectExec("DELETE FROM comments").
+		ExpectQuery("DELETE FROM comments").
 		WithArgs(input.CommentID).
 		WillReturnError(errors.New(""))
 

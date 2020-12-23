@@ -55,7 +55,7 @@ func TestStorage_RemoveAttachment(t *testing.T) {
 	storage := &storage{db: db}
 
 	mock.
-		ExpectExec("DELETE FROM attachments").
+		ExpectQuery("DELETE FROM attachments").
 		WithArgs(input.AttachmentID).
 		WillReturnError(errors.New(""))
 

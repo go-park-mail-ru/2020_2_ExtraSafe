@@ -106,12 +106,13 @@ func TestStorage_ChangeTask(t *testing.T) {
 		TaskID: 1,
 		Name:   taskInput.Name,
 		Description: taskInput.Description,
+		CardID: 1,
 	}
 
 	mock.
-		ExpectExec("UPDATE tasks SET").
+		ExpectQuery("UPDATE tasks SET").
 		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"cardID"}).AddRow(expectTaskOutside.CardID))
 
 	task, err := storage.ChangeTask(taskInput)
 	if err != nil {
@@ -144,7 +145,7 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 	}
 
 	mock.
-		ExpectExec("UPDATE tasks SET").
+		ExpectQuery("UPDATE tasks SET").
 		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
 		WillReturnError(errors.New("fail update exec"))
 
@@ -171,9 +172,9 @@ func TestStorage_DeleteTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID:  1 }
 
 	mock.
-		ExpectExec("DELETE FROM tasks WHERE taskID").
+		ExpectQuery("DELETE FROM tasks WHERE taskID").
 		WithArgs(taskInput.TaskID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"cardID"}).AddRow(int64(1)))
 
 	_, err = storage.DeleteTask(taskInput)
 	if err != nil {
@@ -198,7 +199,7 @@ func TestStorage_DeleteTaskFail(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID:  1 }
 
 	mock.
-		ExpectExec("DELETE FROM tasks WHERE taskID").
+		ExpectQuery("DELETE FROM tasks WHERE taskID").
 		WithArgs(taskInput.TaskID).
 		WillReturnError(errors.New("fail deleting exec"))
 

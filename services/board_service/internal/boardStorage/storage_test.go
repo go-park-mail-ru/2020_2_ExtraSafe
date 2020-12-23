@@ -33,7 +33,12 @@ func TestStorage_CreateBoard(t *testing.T) {
 		Theme:     "dark",
 		Star:      false,
 	}
+
 	url := createSharedUrl(boardInput.UserID, boardInput.BoardName)
+	if url == 0 {
+		t.Errorf("cannot get url")
+	}
+//	urlString := strconv.FormatUint(uint64(url), 10)
 
 	expectBoardOutside := models.BoardInternal{
 		BoardID:  1,
@@ -47,7 +52,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 
 	mock.
 		ExpectQuery("INSERT INTO boards").
-		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star, url).
+		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star, sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
 	board, err := storage.CreateBoard(boardInput)
@@ -85,7 +90,7 @@ func TestStorage_CreateBoardFail(t *testing.T) {
 
 	mock.
 		ExpectQuery("INSERT INTO boards").
-		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star).
+		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star, sqlmock.AnyArg()).
 		WillReturnError(sql.ErrNoRows)
 
 	_, err = storage.CreateBoard(boardInput)
@@ -1805,12 +1810,17 @@ func TestStorage_ChangeTask(t *testing.T) {
 
 func TestStorage_DeleteTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID: 1 }
+	
+	output := models.TaskInternalShort{
+		TaskID: 1,
+		CardID: 1,
+	}
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().DeleteTask(taskInput).Times(1).Return(nil)
+	mockTasks.EXPECT().DeleteTask(taskInput).Times(1).Return(output, nil)
 
 	storage := &storage{
 		tasksStorage: mockTasks,
@@ -2497,11 +2507,17 @@ func TestStorage_AssignUser(t *testing.T) {
 		AssignerID: 2,
 	}
 
+	output := models.TaskInternalShort{
+		TaskID: input.TaskID,
+		CardID: 1,
+	}
+
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().AssignUser(input).Times(1).Return(nil)
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Times(1).Return(output.CardID, nil)
 
 	storage := &storage{tasksStorage: mockTasks}
 
@@ -2519,11 +2535,17 @@ func TestStorage_DismissUser(t *testing.T) {
 		AssignerID: 2,
 	}
 
+	output := models.TaskInternalShort{
+		TaskID: input.TaskID,
+		CardID: 1,
+	}
+
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().DismissUser(input).Times(1).Return(nil)
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Times(1).Return(output.CardID, nil)
 
 	storage := &storage{tasksStorage: mockTasks}
 
