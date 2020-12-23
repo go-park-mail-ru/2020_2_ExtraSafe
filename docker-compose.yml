@@ -3,6 +3,7 @@ version: "3.7"
 services:
   tarantool:
     image: keithzetterstrom/teamproject_tarantool_image
+    container_name: tabutask_tarantool
     expose:
       - 3301
     volumes:
@@ -12,6 +13,7 @@ services:
     build:
       context: .
       dockerfile: ./build/dockerFiles/auth.Dockerfile
+    container_name: tabutask_auth
     restart: always
     expose:
       - 9081
@@ -22,6 +24,7 @@ services:
 
   postgres:
     image: postgres
+    container_name: tabutask_postgres
     expose:
       - 5432
     env_file:
@@ -33,6 +36,7 @@ services:
     build:
       context: .
       dockerfile: ./build/dockerFiles/board.Dockerfile
+    container_name: tabutask_board
     restart: always
     expose:
       - 9083
@@ -47,6 +51,7 @@ services:
     build:
       context: .
       dockerfile: ./build/dockerFiles/profile.Dockerfile
+    container_name: tabutask_profile
     restart: always
     expose:
       - 9082
@@ -62,6 +67,7 @@ services:
     build:
       context: .
       dockerfile: ./build/dockerFiles/main.Dockerfile
+    container_name: tabutask_main
     restart: always
     ports:
       - 8080:8080
