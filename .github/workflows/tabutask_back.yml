@@ -62,11 +62,11 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          script: cd /home/ubuntu/Tabutask/Backend &&
-            docker pull keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
-            docker pull keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} &&
-            docker pull keithzetterstrom/tabutask_main:${GITHUB_SHA::8} &&
-            docker pull keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} &&
+          script: |
+            docker pull keithzetterstrom/tabutask_auth:${GITHUB_SHA::8}
+            docker pull keithzetterstrom/tabutask_profile:${GITHUB_SHA::8}
+            docker pull keithzetterstrom/tabutask_main:${GITHUB_SHA::8}
+            docker pull keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8}
             docker pull keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
 
       - name: Run backend
