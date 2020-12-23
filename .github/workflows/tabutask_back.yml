@@ -1,0 +1,86 @@
+name: Build and deploy Tabutask backend
+
+on:
+  push:
+    branches:
+      - ci/cd
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: sudo docker build -t keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} -f ./build/dockerFiles/auth.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile .
+
+      - name: Push the image
+        run: docker push keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
+          docker push keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} &&
+          docker push keithzetterstrom/tabutask_main:${GITHUB_SHA::8} &&
+          docker push keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} &&
+          docker push keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
+
+      - name: Upload docker-compose.yml
+          uses: actions/upload-artifact@master
+          with:
+            name: Backend
+            path: |
+            ./docker-compose.yml
+            ./init
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download docker-compose.yml
+        uses: actions/download-artifact@master
+        with:
+          name: docker-compose
+
+      - name: Transfer docker-compose.yml to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "Backend"
+          target: "/home/ubuntu/Tabutask"
+
+      - name: Pull Docker images
+        uses: appleboy/ssh-action@master
+        with:
+          envs: GITHUB_SHA
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: cd /home/ubuntu/Tabutask/Backend &&
+            docker pull keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
+            docker pull keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} &&
+            docker pull keithzetterstrom/tabutask_main:${GITHUB_SHA::8} &&
+            docker pull keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} &&
+            docker pull keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
+
+      - name: Run backend
+        uses: appleboy/ssh-action@master
+        with:
+          envs: GITHUB_SHA
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/Tabutask/Backend
+            echo "${{ secrets.CONFIG_ENV }}" > config.env
+            cd init
+            echo "${{ secrets.DATABASE_ENV }}" > database.env
+            cd ..
+            mkdir -p attachments
+            mkdir -p avatars
+            docker rm -vf $(docker ps -a -q)
+            docker-compose up
