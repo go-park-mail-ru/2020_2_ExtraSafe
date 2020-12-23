@@ -13,6 +13,10 @@ func (s *storage) AssignUser(input models.TaskAssigner) (task models.TaskAssignU
 	if err != nil {
 		return
 	}
+	task.TaskName, err = s.tasksStorage.GetTaskNameByID(input.TaskID)
+	if err != nil {
+		return
+	}
 
 	task.CardID = cardID
 	task.TaskID = input.TaskID
