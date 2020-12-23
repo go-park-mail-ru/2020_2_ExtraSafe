@@ -54,7 +54,9 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 			"http://127.0.0.1:3033",
 			"http://127.0.0.1:63246",
 			"http://127.0.0.1",
-			"http://tabutask.ru"},
+			"http://tabutask.ru",
+			"https://tabutask.ru",
+			"https://127.0.0.1"},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-CSRF-Token"},
 		AllowCredentials: true,
 	})
@@ -69,14 +71,19 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			return err
 		}
+
+		session, _ := c.Cookie("tabutask_id")
+
 		c.Set("userId", userId)
+		c.Set("sessionID", session.Value)
+
 		return next(c)
 	}
 }
 
 func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userId, err := m.authService.CheckCookie(c)
+	userId, err := m.authService.CheckCookie(c)
 		if err == nil {
 			userInput := new(models.UserInput)
 			userInput.ID = userId
@@ -97,7 +104,7 @@ func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token := c.Request().Header.Get("X-CSRF-Token")
+		/*token := c.Request().Header.Get("X-CSRF-Token")
 		userID := c.Get("userId").(int64)
 
 		err := csrf.CheckToken(userID, token)
@@ -107,7 +114,7 @@ func (m middlew) CSRFToken(next echo.HandlerFunc) echo.HandlerFunc {
 				return err
 			}
 			return err
-		}
+		}*/
 
 		return next(c)
 	}
@@ -138,7 +145,7 @@ func (m middlew) CheckBoardUserPermission(next echo.HandlerFunc) echo.HandlerFun
 			return err
 		}
 
-		c.Set("boardID", bid)
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -162,7 +169,7 @@ func (m middlew) CheckBoardAdminPermission(next echo.HandlerFunc) echo.HandlerFu
 			return err
 		}
 
-		c.Set("boardID", bid)
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -178,13 +185,15 @@ func (m middlew) CheckCardUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCardPermission(userID, cardID)
+		boardID, err := m.boardService.CheckCardPermission(userID, cardID)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -200,13 +209,15 @@ func (m middlew) CheckTaskUserPermission(next echo.HandlerFunc) echo.HandlerFunc
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckTaskPermission(userID, taskID)
+		boardID, err := m.boardService.CheckTaskPermission(userID, taskID)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -222,13 +233,15 @@ func (m middlew) CheckCommentUpdateUserPermission(next echo.HandlerFunc) echo.Ha
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCommentPermission(userID, commentID, false)
+		boardID, err := m.boardService.CheckCommentPermission(userID, commentID, false)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}
@@ -244,13 +257,15 @@ func (m middlew) CheckCommentDeleteUserPermission(next echo.HandlerFunc) echo.Ha
 
 		userID := c.Get("userId").(int64)
 
-		err = m.boardService.CheckCommentPermission(userID, commentID, true)
+		boardID, err := m.boardService.CheckCommentPermission(userID, commentID, true)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
 			}
 			return err
 		}
+
+		c.Set("boardID", boardID)
 
 		return next(c)
 	}

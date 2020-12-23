@@ -12,12 +12,14 @@ type Board struct {
 
 //===================================================<-Input
 type BoardInput struct {
-	UserID  int64 `json:"-"`
-	BoardID int64 `json:"boardID"`
+	UserID    int64  `json:"-"`
+	SessionID string `json:"-"`
+	BoardID   int64  `json:"boardID"`
 }
 
 type BoardChangeInput struct {
 	UserID    int64  `json:"-"`
+	SessionID string `json:"-"`
 	BoardID   int64  `json:"boardID"`
 	BoardName string `json:"boardName"`
 	Theme     string `json:"boardTheme"`
@@ -26,8 +28,15 @@ type BoardChangeInput struct {
 
 type BoardMemberInput struct {
 	UserID     int64  `json:"-"`
+	SessionID  string `json:"-"`
 	BoardID    int64  `json:"boardID"`
 	MemberName string `json:"memberUsername"`
+}
+
+type BoardInviteInput struct {
+	UserID  int64
+	BoardID int64
+	UrlHash string
 }
 
 //===================================================<-Internal
@@ -59,6 +68,12 @@ type BoardOutsideShort struct {
 	Name    string `json:"boardName"`
 	Theme   string `json:"boardTheme"`
 	Star    bool   `json:"boardStar"`
+}
+
+type BoardMemberOutside struct {
+	BoardName string `json:"boardName"`
+	UserOutsideShort
+	Initiator string `json:"initiator"`
 }
 
 //===================================================<-Other

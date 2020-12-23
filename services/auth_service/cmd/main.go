@@ -7,7 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	"github.com/joho/godotenv"
 	"github.com/tarantool/go-tarantool"
 	"google.golang.org/grpc"
 	"log"
@@ -15,49 +14,27 @@ import (
 	"os"
 )
 
-func init() {
-	if err := godotenv.Load("../../../config.env"); err != nil {
-		log.Print("No .env file found")
-	}
-}
 
 func main() {
 	// =============================
-	userName, ok := os.LookupEnv("TABUTASK_SESSIONS_USER")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	addr, ok := os.LookupEnv("TABUTASK_SESSIONS_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
+	userName:= os.Getenv("TABUTASK_SESSIONS_USER")
+	addr := os.Getenv("TABUTASK_SESSIONS_ADDR")
 
 	tConn, err := tarantool.Connect(addr, tarantool.Opts{ User: userName })
-	defer tConn.Close()
 	if err != nil {
-		fmt.Println("Connection refused")
+		fmt.Println("Connection refused", err)
 		return
 	}
+
+	defer tConn.Close()
 
 	authStorage := sessionsStorage.NewStorage(tConn)
 
 	// =============================
 
-	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	authServiceAddr, ok := os.LookupEnv("AUTH_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
+	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
 
 	lis, err := net.Listen("tcp", authServiceAddr)
 	if err != nil {
@@ -97,6 +74,11 @@ func main() {
 
 	protoAuth.RegisterAuthServer(server, handler)
 
-	fmt.Println("starting server at :9081")
-	server.Serve(lis)
+	fmt.Println(authServiceAddr)
+
+	fmt.Println("starting server at : ", lis.Addr())
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

@@ -15,7 +15,6 @@ import (
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	"github.com/joho/godotenv"
 	_ "github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	_ "github.com/lib/pq"
@@ -27,32 +26,13 @@ import (
 	"os"
 )
 
-func init() {
-	if err := godotenv.Load("../config.env"); err != nil {
-		log.Print("No .env file found")
-	}
-}
 
 func main() {
-	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
+	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
+	mainServiceAddr := os.Getenv("TABUTASK_SERVER_ADDR")
 
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	authServiceAddr, ok := os.LookupEnv("AUTH_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	mainServiceAddr, ok := os.LookupEnv("TABUTASK_SERVER_ADDR")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
 	// =============================
 
 	grpcConnBoard, err := grpc.Dial(

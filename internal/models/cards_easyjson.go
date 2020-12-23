@@ -235,7 +235,7 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels2(in
 				}
 				for !in.IsDelim(']') {
 					var v4 TaskOutsideShort
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(in, &v4)
+					(v4).UnmarshalEasyJSON(in)
 					out.Tasks = append(out.Tasks, v4)
 					in.WantComma()
 				}
@@ -281,7 +281,7 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels2(ou
 				if v5 > 0 {
 					out.RawByte(',')
 				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(out, v6)
+				(v6).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -312,301 +312,7 @@ func (v *CardOutside) UnmarshalJSON(data []byte) error {
 func (v *CardOutside) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels2(l, v)
 }
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(in *jlexer.Lexer, out *TaskOutsideShort) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "taskID":
-			out.TaskID = int64(in.Int64())
-		case "taskName":
-			out.Name = string(in.String())
-		case "taskDescription":
-			out.Description = string(in.String())
-		case "taskOrder":
-			out.Order = int64(in.Int64())
-		case "taskTags":
-			if in.IsNull() {
-				in.Skip()
-				out.Tags = nil
-			} else {
-				in.Delim('[')
-				if out.Tags == nil {
-					if !in.IsDelim(']') {
-						out.Tags = make([]TagOutside, 0, 1)
-					} else {
-						out.Tags = []TagOutside{}
-					}
-				} else {
-					out.Tags = (out.Tags)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v7 TagOutside
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(in, &v7)
-					out.Tags = append(out.Tags, v7)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "taskAssigners":
-			if in.IsNull() {
-				in.Skip()
-				out.Users = nil
-			} else {
-				in.Delim('[')
-				if out.Users == nil {
-					if !in.IsDelim(']') {
-						out.Users = make([]UserOutsideShort, 0, 0)
-					} else {
-						out.Users = []UserOutsideShort{}
-					}
-				} else {
-					out.Users = (out.Users)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v8 UserOutsideShort
-					(v8).UnmarshalEasyJSON(in)
-					out.Users = append(out.Users, v8)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "taskChecklists":
-			if in.IsNull() {
-				in.Skip()
-				out.Checklists = nil
-			} else {
-				in.Delim('[')
-				if out.Checklists == nil {
-					if !in.IsDelim(']') {
-						out.Checklists = make([]ChecklistOutside, 0, 1)
-					} else {
-						out.Checklists = []ChecklistOutside{}
-					}
-				} else {
-					out.Checklists = (out.Checklists)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v9 ChecklistOutside
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(in, &v9)
-					out.Checklists = append(out.Checklists, v9)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(out *jwriter.Writer, in TaskOutsideShort) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"taskID\":"
-		out.RawString(prefix[1:])
-		out.Int64(int64(in.TaskID))
-	}
-	{
-		const prefix string = ",\"taskName\":"
-		out.RawString(prefix)
-		out.String(string(in.Name))
-	}
-	{
-		const prefix string = ",\"taskDescription\":"
-		out.RawString(prefix)
-		out.String(string(in.Description))
-	}
-	{
-		const prefix string = ",\"taskOrder\":"
-		out.RawString(prefix)
-		out.Int64(int64(in.Order))
-	}
-	{
-		const prefix string = ",\"taskTags\":"
-		out.RawString(prefix)
-		if in.Tags == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v10, v11 := range in.Tags {
-				if v10 > 0 {
-					out.RawByte(',')
-				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(out, v11)
-			}
-			out.RawByte(']')
-		}
-	}
-	{
-		const prefix string = ",\"taskAssigners\":"
-		out.RawString(prefix)
-		if in.Users == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v12, v13 := range in.Users {
-				if v12 > 0 {
-					out.RawByte(',')
-				}
-				(v13).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	{
-		const prefix string = ",\"taskChecklists\":"
-		out.RawString(prefix)
-		if in.Checklists == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v14, v15 := range in.Checklists {
-				if v14 > 0 {
-					out.RawByte(',')
-				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(out, v15)
-			}
-			out.RawByte(']')
-		}
-	}
-	out.RawByte('}')
-}
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(in *jlexer.Lexer, out *ChecklistOutside) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "checklistID":
-			out.ChecklistID = int64(in.Int64())
-		case "checklistName":
-			out.Name = string(in.String())
-		case "checklistItems":
-			if data := in.Raw(); in.Ok() {
-				in.AddError((out.Items).UnmarshalJSON(data))
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(out *jwriter.Writer, in ChecklistOutside) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"checklistID\":"
-		out.RawString(prefix[1:])
-		out.Int64(int64(in.ChecklistID))
-	}
-	{
-		const prefix string = ",\"checklistName\":"
-		out.RawString(prefix)
-		out.String(string(in.Name))
-	}
-	{
-		const prefix string = ",\"checklistItems\":"
-		out.RawString(prefix)
-		out.Raw((in.Items).MarshalJSON())
-	}
-	out.RawByte('}')
-}
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(in *jlexer.Lexer, out *TagOutside) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "tagID":
-			out.TagID = int64(in.Int64())
-		case "tagColor":
-			out.Color = string(in.String())
-		case "tagName":
-			out.Name = string(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(out *jwriter.Writer, in TagOutside) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"tagID\":"
-		out.RawString(prefix[1:])
-		out.Int64(int64(in.TagID))
-	}
-	{
-		const prefix string = ",\"tagColor\":"
-		out.RawString(prefix)
-		out.String(string(in.Color))
-	}
-	{
-		const prefix string = ",\"tagName\":"
-		out.RawString(prefix)
-		out.String(string(in.Name))
-	}
-	out.RawByte('}')
-}
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(in *jlexer.Lexer, out *CardOrder) {
+func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(in *jlexer.Lexer, out *CardOrder) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -639,7 +345,7 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(in
 		in.Consumed()
 	}
 }
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(out *jwriter.Writer, in CardOrder) {
+func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(out *jwriter.Writer, in CardOrder) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -659,27 +365,27 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(ou
 // MarshalJSON supports json.Marshaler interface
 func (v CardOrder) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(&w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v CardOrder) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *CardOrder) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(&r, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *CardOrder) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(l, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels3(l, v)
 }
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(in *jlexer.Lexer, out *CardInternal) {
+func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(in *jlexer.Lexer, out *CardInternal) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -720,9 +426,9 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(in
 					out.Tasks = (out.Tasks)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v16 TaskInternalShort
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels8(in, &v16)
-					out.Tasks = append(out.Tasks, v16)
+					var v7 TaskInternalShort
+					(v7).UnmarshalEasyJSON(in)
+					out.Tasks = append(out.Tasks, v7)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -737,7 +443,7 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(in
 		in.Consumed()
 	}
 }
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(out *jwriter.Writer, in CardInternal) {
+func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(out *jwriter.Writer, in CardInternal) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -763,11 +469,11 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(ou
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v17, v18 := range in.Tasks {
-				if v17 > 0 {
+			for v8, v9 := range in.Tasks {
+				if v8 > 0 {
 					out.RawByte(',')
 				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels8(out, v18)
+				(v9).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -778,207 +484,27 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(ou
 // MarshalJSON supports json.Marshaler interface
 func (v CardInternal) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(&w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v CardInternal) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *CardInternal) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(&r, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *CardInternal) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels7(l, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(l, v)
 }
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels8(in *jlexer.Lexer, out *TaskInternalShort) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "TaskID":
-			out.TaskID = int64(in.Int64())
-		case "Name":
-			out.Name = string(in.String())
-		case "Description":
-			out.Description = string(in.String())
-		case "Order":
-			out.Order = int64(in.Int64())
-		case "Tags":
-			if in.IsNull() {
-				in.Skip()
-				out.Tags = nil
-			} else {
-				in.Delim('[')
-				if out.Tags == nil {
-					if !in.IsDelim(']') {
-						out.Tags = make([]TagOutside, 0, 1)
-					} else {
-						out.Tags = []TagOutside{}
-					}
-				} else {
-					out.Tags = (out.Tags)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v19 TagOutside
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(in, &v19)
-					out.Tags = append(out.Tags, v19)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "Users":
-			if in.IsNull() {
-				in.Skip()
-				out.Users = nil
-			} else {
-				in.Delim('[')
-				if out.Users == nil {
-					if !in.IsDelim(']') {
-						out.Users = make([]int64, 0, 8)
-					} else {
-						out.Users = []int64{}
-					}
-				} else {
-					out.Users = (out.Users)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v20 int64
-					v20 = int64(in.Int64())
-					out.Users = append(out.Users, v20)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		case "Checklists":
-			if in.IsNull() {
-				in.Skip()
-				out.Checklists = nil
-			} else {
-				in.Delim('[')
-				if out.Checklists == nil {
-					if !in.IsDelim(']') {
-						out.Checklists = make([]ChecklistOutside, 0, 1)
-					} else {
-						out.Checklists = []ChecklistOutside{}
-					}
-				} else {
-					out.Checklists = (out.Checklists)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v21 ChecklistOutside
-					easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(in, &v21)
-					out.Checklists = append(out.Checklists, v21)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels8(out *jwriter.Writer, in TaskInternalShort) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"TaskID\":"
-		out.RawString(prefix[1:])
-		out.Int64(int64(in.TaskID))
-	}
-	{
-		const prefix string = ",\"Name\":"
-		out.RawString(prefix)
-		out.String(string(in.Name))
-	}
-	{
-		const prefix string = ",\"Description\":"
-		out.RawString(prefix)
-		out.String(string(in.Description))
-	}
-	{
-		const prefix string = ",\"Order\":"
-		out.RawString(prefix)
-		out.Int64(int64(in.Order))
-	}
-	{
-		const prefix string = ",\"Tags\":"
-		out.RawString(prefix)
-		if in.Tags == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v22, v23 := range in.Tags {
-				if v22 > 0 {
-					out.RawByte(',')
-				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(out, v23)
-			}
-			out.RawByte(']')
-		}
-	}
-	{
-		const prefix string = ",\"Users\":"
-		out.RawString(prefix)
-		if in.Users == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v24, v25 := range in.Users {
-				if v24 > 0 {
-					out.RawByte(',')
-				}
-				out.Int64(int64(v25))
-			}
-			out.RawByte(']')
-		}
-	}
-	{
-		const prefix string = ",\"Checklists\":"
-		out.RawString(prefix)
-		if in.Checklists == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v26, v27 := range in.Checklists {
-				if v26 > 0 {
-					out.RawByte(',')
-				}
-				easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(out, v27)
-			}
-			out.RawByte(']')
-		}
-	}
-	out.RawByte('}')
-}
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(in *jlexer.Lexer, out *CardInput) {
+func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(in *jlexer.Lexer, out *CardInput) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1015,7 +541,7 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(in
 		in.Consumed()
 	}
 }
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(out *jwriter.Writer, in CardInput) {
+func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(out *jwriter.Writer, in CardInput) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1050,27 +576,27 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(ou
 // MarshalJSON supports json.Marshaler interface
 func (v CardInput) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(&w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v CardInput) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *CardInput) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(&r, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *CardInput) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels9(l, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels5(l, v)
 }
-func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(in *jlexer.Lexer, out *Card) {
+func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(in *jlexer.Lexer, out *Card) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1107,7 +633,7 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(i
 		in.Consumed()
 	}
 }
-func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(out *jwriter.Writer, in Card) {
+func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(out *jwriter.Writer, in Card) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1137,23 +663,23 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(o
 // MarshalJSON supports json.Marshaler interface
 func (v Card) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(&w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Card) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(w, v)
+	easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Card) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(&r, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Card) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels10(l, v)
+	easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels6(l, v)
 }

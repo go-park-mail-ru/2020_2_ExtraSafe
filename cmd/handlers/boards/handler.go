@@ -11,6 +11,7 @@ import (
 type Handler interface {
 	BoardCreate(c echo.Context) error
 	Board(c echo.Context) error
+	BoardWS(c echo.Context) error
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
 	BoardAddMember(c echo.Context) error
@@ -46,6 +47,11 @@ type Handler interface {
 
 	AttachmentCreate(c echo.Context) error
 	AttachmentDelete(c echo.Context) error
+
+	SharedURL(c echo.Context) error
+	BoardInvite(c echo.Context) error
+
+	Notification(c echo.Context) error
 }
 
 type handler struct {
@@ -530,4 +536,58 @@ func (h *handler) AttachmentDelete(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) SharedURL(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	url, err := h.boardsService.GetSharedURL(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.URLWrite(url)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardInvite(c echo.Context) error {
+	userInput, err := h.boardsTransport.URLRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	board, err := h.boardsService.InviteUserToBoard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.BoardShortWrite(board)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardWS(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	_ = h.boardsService.WebSocketBoard(userInput, c)
+
+	return nil
+}
+
+func (h *handler) Notification(c echo.Context) error  {
+	userInput := models.UserInput{
+		ID: c.Get("userId").(int64),
+		SessionID: c.Get("sessionID").(string),
+	}
+
+	_ = h.boardsService.WebSocketNotification(userInput, c)
+
+	return nil
 }

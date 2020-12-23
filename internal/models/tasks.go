@@ -11,6 +11,8 @@ type Task struct {
 
 //===================================================<-Input
 type TaskInput struct {
+	SessionID   string `json:"-"`
+	BoardID     int64  `json:"-"`
 	UserID      int64  `json:"-"`
 	TaskID      int64  `json:"taskID"`
 	CardID      int64  `json:"cardID"`
@@ -30,18 +32,25 @@ type TasksOrder struct {
 }
 
 type TasksOrderInput struct {
-	UserID int64        `json:"-"`
-	Tasks  []TasksOrder `json:"cards"`
+	SessionID string       `json:"-"`
+	UserID    int64        `json:"-"`
+	BoardID   int64        `json:"-"`
+	Tasks     []TasksOrder `json:"cards"`
 }
 
 type TaskTagInput struct {
-	UserID int64 `json:"-"`
-	TaskID int64 `json:"taskID"`
-	TagID  int64 `json:"tagID"`
+	SessionID string `json:"-"`
+	UserID    int64  `json:"-"`
+	BoardID   int64  `json:"-"`
+	CardID    int64  `json:"cardID"`
+	TaskID    int64  `json:"taskID"`
+	TagID     int64  `json:"tagID"`
 }
 
 type TaskAssignerInput struct {
+	SessionID    string `json:"-"`
 	UserID       int64  `json:"-"`
+	BoardID      int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
 	AssignerName string `json:"assignerUsername"`
 }
@@ -49,6 +58,7 @@ type TaskAssignerInput struct {
 //===================================================<-Internal
 type TaskInternalShort struct {
 	TaskID      int64
+	CardID      int64
 	Name        string
 	Description string
 	Order       int64
@@ -59,6 +69,7 @@ type TaskInternalShort struct {
 
 type TaskInternal struct {
 	TaskID      int64
+	CardID      int64
 	Name        string
 	Description string
 	Order       int64
@@ -93,9 +104,18 @@ type TaskOutsideShort struct {
 }
 
 type TaskOutsideSuperShort struct {
-	TaskID      int64  `json:"taskID"`
-	Name        string `json:"taskName"`
-	Description string `json:"taskDescription"`
+	TaskID      int64  `json:"taskID,omitempty"`
+	Name        string `json:"taskName,omitempty"`
+	CardID      int64  `json:"cardID,omitempty"`
+	Description string `json:"taskDescription,omitempty"`
+}
+
+type TaskAssignUserOutside struct {
+	UserOutsideShort
+	Initiator string `json:"initiator"`
+	TaskName  string `json:"taskName"`
+	TaskID    int64  `json:"taskID"`
+	CardID    int64  `json:"cardID"`
 }
 
 //===================================================<-Other

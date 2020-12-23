@@ -8,7 +8,7 @@ import (
 type Storage interface {
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
-	DeleteChecklist(input models.ChecklistInput) (err error)
+	DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 
 	GetChecklistsByTask(input models.TaskInput) (checklists []models.ChecklistOutside, err error)
 }
@@ -32,11 +32,13 @@ func (s *storage) CreateChecklist(input models.ChecklistInput) (checklist models
 	}
 	checklist.Items = input.Items
 	checklist.Name = input.Name
+	checklist.TaskID = input.TaskID
 	return
 }
 
 func (s *storage) UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
-	_, err = s.db.Exec("UPDATE checklists SET name = $1, items = $2 WHERE checklistID = $3", input.Name, input.Items, input.ChecklistID)
+	err = s.db.QueryRow("UPDATE checklists SET name = $1, items = $2 WHERE checklistID = $3 RETURNING taskID", input.Name, input.Items, input.ChecklistID).
+		Scan(&checklist.TaskID)
 	if err != nil {
 		return checklist, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "UpdateChecklist"}
@@ -47,12 +49,14 @@ func (s *storage) UpdateChecklist(input models.ChecklistInput) (checklist models
 	return
 }
 
-func (s *storage) DeleteChecklist(input models.ChecklistInput) (err error) {
-	_, err = s.db.Exec("DELETE FROM checklists WHERE checklistID = $1", input.ChecklistID)
+func (s *storage) DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error) {
+	err = s.db.QueryRow("DELETE FROM checklists WHERE checklistID = $1 RETURNING taskID", input.ChecklistID).
+		Scan(&checklist.TaskID)
 	if err != nil {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return checklist, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "DeleteChecklist"}
 	}
+	checklist.ChecklistID = input.ChecklistID
 	return
 }
 

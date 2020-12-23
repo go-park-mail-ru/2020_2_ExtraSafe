@@ -36,6 +36,10 @@ func easyjson2aad9953DecodeGithubComGoParkMailRu20202ExtraSafeInternalModels(in 
 			continue
 		}
 		switch key {
+		case "cardID":
+			out.CardID = int64(in.Int64())
+		case "taskID":
+			out.TaskID = int64(in.Int64())
 		case "tagID":
 			out.TagID = int64(in.Int64())
 		case "tagColor":
@@ -57,8 +61,18 @@ func easyjson2aad9953EncodeGithubComGoParkMailRu20202ExtraSafeInternalModels(out
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"tagID\":"
+		const prefix string = ",\"cardID\":"
 		out.RawString(prefix[1:])
+		out.Int64(int64(in.CardID))
+	}
+	{
+		const prefix string = ",\"taskID\":"
+		out.RawString(prefix)
+		out.Int64(int64(in.TaskID))
+	}
+	{
+		const prefix string = ",\"tagID\":"
+		out.RawString(prefix)
 		out.Int64(int64(in.TagID))
 	}
 	{

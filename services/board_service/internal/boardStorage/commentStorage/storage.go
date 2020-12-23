@@ -8,7 +8,7 @@ import (
 type Storage interface {
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)
-	DeleteComment(input models.CommentInput) (err error)
+	DeleteComment(input models.CommentInput) (comment models.CommentOutside, err error)
 
 	GetCommentsByTask(input models.TaskInput) (comments []models.CommentOutside, userIDS[] int64, err error)
 }
@@ -24,8 +24,8 @@ func NewStorage(db *sql.DB) Storage {
 }
 
 func (s *storage) CreateComment(input models.CommentInput) (comment models.CommentOutside, err error) {
-	err = s.db.QueryRow("INSERT INTO comments (message, taskID, commentOrder, userID) VALUES ($1, $2, $3, $4) RETURNING commentID",
-						input.Message, input.TaskID, input.Order, input.UserID).Scan(&comment.CommentID)
+	err = s.db.QueryRow("INSERT INTO comments (message, taskID, commentOrder, userID) VALUES ($1, $2, $3, $4) RETURNING commentID, taskID",
+						input.Message, input.TaskID, input.Order, input.UserID).Scan(&comment.CommentID, &comment.TaskID)
 	if err != nil {
 		return comment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateComment"}
@@ -37,7 +37,8 @@ func (s *storage) CreateComment(input models.CommentInput) (comment models.Comme
 }
 
 func (s *storage) UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error) {
-	_, err = s.db.Exec("UPDATE comments SET message = $1 WHERE commentID = $2", input.Message, input.CommentID)
+	err = s.db.QueryRow("UPDATE comments SET message = $1 WHERE commentID = $2 RETURNING taskID", input.Message, input.CommentID).
+		Scan(&comment.TaskID)
 	if err!= nil {
 		return comment, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "UpdateComment"}
@@ -47,10 +48,14 @@ func (s *storage) UpdateComment(input models.CommentInput) (comment models.Comme
 	return
 }
 
-func (s *storage) DeleteComment(input models.CommentInput) (err error) {
-	_, err = s.db.Exec("DELETE FROM comments WHERE commentID = $1", input.CommentID)
+func (s *storage) DeleteComment(input models.CommentInput) (comment models.CommentOutside, err error) {
+	comment = models.CommentOutside{
+		CommentID: input.CommentID,
+	}
+	err = s.db.QueryRow("DELETE FROM comments WHERE commentID = $1 RETURNING taskID", input.CommentID).
+		Scan(&comment.TaskID)
 	if err!= nil {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err,
+		return models.CommentOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "DeleteComment"}
 	}
 	return

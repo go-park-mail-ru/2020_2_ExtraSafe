@@ -40,6 +40,9 @@ type Transport interface {
 	AttachmentWrite(attachment models.AttachmentOutside) (response models.ResponseAttachment, err error)
 
 	UserShortWrite(user models.UserOutsideShort) (response models.ResponseUser, err error)
+
+	URLRead(c echo.Context) (response models.BoardInviteInput, err error)
+	URLWrite(url string) (response models.ResponseURL, err error)
 }
 
 type transport struct {
@@ -60,6 +63,7 @@ func (t transport) BoardRead(c echo.Context) (request models.BoardInput, err err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -76,6 +80,7 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -92,6 +97,7 @@ func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberIn
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -134,6 +140,8 @@ func (t transport) CardChangeRead(c echo.Context) (request models.CardInput, err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -147,6 +155,7 @@ func (t transport) CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderIn
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
 
 	return *userInput, nil
 }
@@ -183,6 +192,8 @@ func (t transport) TaskChangeRead(c echo.Context) (request models.TaskInput, err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -218,6 +229,8 @@ func (t transport) TasksOrderRead(c echo.Context) (tasksOrder models.TasksOrderI
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -231,6 +244,8 @@ func (t transport) TasksUserRead(c echo.Context) (request models.TaskAssignerInp
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -244,6 +259,7 @@ func (t transport) TagChangeRead(c echo.Context) (request models.TagInput, err e
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -257,6 +273,8 @@ func (t transport) TagTaskRead(c echo.Context) (request models.TaskTagInput, err
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -279,6 +297,8 @@ func (t transport) CommentChangeRead(c echo.Context) (request models.CommentInpu
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -302,6 +322,8 @@ func (t transport) ChecklistChangeRead(c echo.Context) (request models.Checklist
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -336,6 +358,8 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -349,6 +373,8 @@ func (t transport) AttachmentDeleteRead(c echo.Context) (request models.Attachme
 	}
 
 	userInput.UserID = c.Get("userId").(int64)
+	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
@@ -368,5 +394,30 @@ func (t transport) UserShortWrite(user models.UserOutsideShort) (response models
 	response.Username = user.Username
 	response.FullName = user.FullName
 	response.Avatar = user.Avatar
-	return response, err
+	return response, nil
+}
+
+func (t transport) URLRead(c echo.Context) (response models.BoardInviteInput, err error) {
+	userInput := new(models.BoardInviteInput)
+
+	bid := c.Param("ID")
+	boardID, err := strconv.ParseInt(bid, 10, 64)
+	if err != nil {
+		return models.BoardInviteInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "URLRead"}
+	}
+
+	url := c.Param("url")
+
+	userInput.BoardID = boardID
+	userInput.UrlHash = url
+	userInput.UserID = c.Get("userId").(int64)
+
+	return *userInput, nil
+}
+
+func (t transport) URLWrite(url string) (response models.ResponseURL, err error) {
+	response.Status = 200
+	response.URL = url
+	return response, nil
 }

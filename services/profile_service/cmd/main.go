@@ -8,7 +8,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"log"
@@ -17,37 +16,19 @@ import (
 	"strings"
 )
 
-func init() {
-	if err := godotenv.Load("../../../config.env"); err != nil {
-		log.Print("No .env file found")
-	}
-}
 
 func main() {
-	driverName, ok := os.LookupEnv("TABUTASK_USERS_DRIVER")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
+	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
+	dbPort := os.Getenv("TABUTASK_DB_PORT")
+	driverName:= os.Getenv("TABUTASK_USERS_DRIVER")
+	userName:= os.Getenv("TABUTASK_USERS_USER")
+	password:= os.Getenv("TABUTASK_USERS_PASSWORD")
+	dbName:= os.Getenv("TABUTASK_USERS_NAME")
 
-	userName, ok := os.LookupEnv("TABUTASK_USERS_USER")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	password, ok := os.LookupEnv("TABUTASK_USERS_PASSWORD")
-	if !ok {
-		log.Fatalf("Cannot get env parameter")
-	}
-
-	dbName, ok := os.LookupEnv("TABUTASK_USERS_NAME")
-	if !ok {
-		log.Fatalf("")
-	}
-
-	connections := strings.Join([]string{"user=", userName, "password=", password, "dbname=", dbName}, " ")
+	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
-		log.Fatalf("Cannot connect to database")
+		log.Fatalf("Cannot connect to database", err)
 	}
 
 	db.SetMaxIdleConns(3)
@@ -55,7 +36,7 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		return
+		log.Fatalf("Cannot ping to database", err)
 	}
 
 	profileStorage := userStorage.NewStorage(db)
@@ -63,10 +44,7 @@ func main() {
 
 	// =============================
 
-	boardServiceAddr, ok := os.LookupEnv("BOARDS_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("")
-	}
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
 
 	grpcConn, err := grpc.Dial(
 		boardServiceAddr,
@@ -78,11 +56,7 @@ func main() {
 	defer grpcConn.Close()
 
 	// =============================
-
-	profileServiceAddr, ok := os.LookupEnv("PROFILE_SERVICE_ADDR")
-	if !ok {
-		log.Fatalf("")
-	}
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
 
 	lis, err := net.Listen("tcp", profileServiceAddr)
 	if err != nil {
@@ -99,6 +73,10 @@ func main() {
 
 	protoProfile.RegisterProfileServer(server, handler)
 
-	fmt.Println("starting server at :9082")
-	server.Serve(lis)
+	fmt.Println("starting server at : ", lis.Addr())
+
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

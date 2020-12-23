@@ -7,6 +7,8 @@ type Attachment struct {
 }
 
 type AttachmentInput struct {
+	SessionID    string `json:"-"`
+	BoardID      int64  `json:"-"`
 	UserID       int64  `json:"-"`
 	TaskID       int64  `json:"taskID"`
 	AttachmentID int64  `json:"attachmentID"`
@@ -28,7 +30,9 @@ type AttachmentFileInternal struct {
 }
 
 type AttachmentOutside struct {
-	AttachmentID int64  `json:"attachmentID"`
-	Filename     string `json:"attachmentFileName"`
-	Filepath     string `json:"attachmentFilePath"`
+	AttachmentID int64  `json:"attachmentID,omitempty"`
+	TaskID       int64  `json:"taskID,omitempty"`
+	CardID       int64  `json:"cardID,omitempty"`
+	Filename     string `json:"attachmentFileName,omitempty"`
+	Filepath     string `json:"attachmentFilePath,omitempty"`
 }
