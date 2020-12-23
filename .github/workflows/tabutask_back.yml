@@ -34,8 +34,8 @@ jobs:
         with:
           name: Backend
           path: |
-          ./docker-compose.yml
-          ./init
+            ./docker-compose.yml
+            ./init
 
   deploy:
     runs-on: ubuntu-latest
