@@ -20,7 +20,7 @@ jobs:
           sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
           sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
           sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile .
+          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool
 
       - name: Push the image
         run: docker push keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
