@@ -81,7 +81,7 @@ func TestHandler_ProfileFail(t *testing.T) {
 
 	err := profileHandler.Profile(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -171,7 +171,7 @@ func TestHandler_ProfileChangeFail(t *testing.T) {
 
 	err := profileHandler.ProfileChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -257,7 +257,7 @@ func TestHandler_PasswordChangeFail(t *testing.T) {
 
 	err := profileHandler.PasswordChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -317,7 +317,7 @@ func TestHandler_BoardsFail(t *testing.T) {
 
 	err := profileHandler.Boards(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}

@@ -19,6 +19,7 @@ func TestHandler_Board(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardInput{
+		SessionID: "13",
 		UserID:  1,
 		BoardID: 4,
 	}
@@ -48,6 +49,7 @@ func TestHandler_Board(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -66,6 +68,7 @@ func TestHandler_BoardFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardInput{
+		SessionID: "13",
 		UserID:  1,
 		BoardID: 4,
 	}
@@ -95,13 +98,14 @@ func TestHandler_BoardFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.Board(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -113,6 +117,7 @@ func TestHandler_BoardCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardChangeInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 		BoardName: "vs",
@@ -143,6 +148,7 @@ func TestHandler_BoardCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -161,6 +167,7 @@ func TestHandler_BoardCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardChangeInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 		BoardName: "vs",
@@ -191,6 +198,7 @@ func TestHandler_BoardCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -209,6 +217,7 @@ func TestHandler_BoardChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardChangeInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 		BoardName: "vs",
@@ -239,6 +248,7 @@ func TestHandler_BoardChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -257,6 +267,7 @@ func TestHandler_BoardChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardChangeInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 		BoardName: "vs",
@@ -287,6 +298,7 @@ func TestHandler_BoardChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -305,6 +317,7 @@ func TestHandler_BoardDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 	}
@@ -323,6 +336,7 @@ func TestHandler_BoardDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -341,6 +355,7 @@ func TestHandler_BoardDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardInput{
+		SessionID: "13",
 		UserID:    1,
 		BoardID:   4,
 	}
@@ -359,6 +374,7 @@ func TestHandler_BoardDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -377,6 +393,7 @@ func TestHandler_BoardAddMember(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
+		SessionID: "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -406,6 +423,7 @@ func TestHandler_BoardAddMember(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -424,6 +442,7 @@ func TestHandler_BoardAddMemberFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
+		SessionID: "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -453,6 +472,7 @@ func TestHandler_BoardAddMemberFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -471,6 +491,7 @@ func TestHandler_BoardRemoveMember(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
+		SessionID: "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -492,6 +513,7 @@ func TestHandler_BoardRemoveMember(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -510,6 +532,7 @@ func TestHandler_BoardRemoveMemberFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
+		SessionID: "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -531,6 +554,7 @@ func TestHandler_BoardRemoveMemberFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/board/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -549,6 +573,7 @@ func TestHandler_Card(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 	}
@@ -576,6 +601,8 @@ func TestHandler_Card(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(1))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -594,6 +621,7 @@ func TestHandler_CardFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 	}
@@ -621,6 +649,8 @@ func TestHandler_CardFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(1))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -639,6 +669,7 @@ func TestHandler_CardCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -667,6 +698,8 @@ func TestHandler_CardCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(1))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -685,6 +718,7 @@ func TestHandler_CardCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -713,6 +747,8 @@ func TestHandler_CardCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(1))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -731,6 +767,7 @@ func TestHandler_CardChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -759,6 +796,7 @@ func TestHandler_CardChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -777,6 +815,7 @@ func TestHandler_CardChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -805,6 +844,7 @@ func TestHandler_CardChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -823,6 +863,7 @@ func TestHandler_CardDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -846,6 +887,7 @@ func TestHandler_CardDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -864,6 +906,7 @@ func TestHandler_CardDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardInput{
+		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
 		BoardID: 4,
@@ -887,6 +930,7 @@ func TestHandler_CardDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -905,6 +949,7 @@ func TestHandler_CardOrder(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardsOrderInput{
+		SessionID: "13",
 		UserID: 1,
 		Cards:  []models.CardOrder{},
 	}
@@ -925,6 +970,7 @@ func TestHandler_CardOrder(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -943,6 +989,7 @@ func TestHandler_CardOrderFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CardsOrderInput{
+		SessionID: "13",
 		UserID: 1,
 		Cards:  []models.CardOrder{},
 	}
@@ -963,6 +1010,7 @@ func TestHandler_CardOrderFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -981,6 +1029,7 @@ func TestHandler_Task(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1013,6 +1062,7 @@ func TestHandler_Task(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1031,6 +1081,7 @@ func TestHandler_TaskFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1063,6 +1114,7 @@ func TestHandler_TaskFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1081,6 +1133,7 @@ func TestHandler_TaskCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1107,6 +1160,7 @@ func TestHandler_TaskCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1125,6 +1179,7 @@ func TestHandler_TaskCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1151,6 +1206,7 @@ func TestHandler_TaskCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1169,6 +1225,7 @@ func TestHandler_TaskChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1195,6 +1252,7 @@ func TestHandler_TaskChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1213,6 +1271,7 @@ func TestHandler_TaskChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1239,6 +1298,7 @@ func TestHandler_TaskChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1257,6 +1317,7 @@ func TestHandler_TaskDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
+		SessionID: "13",
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1277,6 +1338,7 @@ func TestHandler_TaskDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1315,6 +1377,7 @@ func TestHandler_TaskDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1333,6 +1396,7 @@ func TestHandler_TaskOrder(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TasksOrderInput{
+		SessionID: "13",
 		UserID: 1,
 		Tasks:  nil,
 	}
@@ -1353,6 +1417,7 @@ func TestHandler_TaskOrder(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1371,6 +1436,7 @@ func TestHandler_TaskOrderFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TasksOrderInput{
+		SessionID: "13",
 		UserID: 1,
 		Tasks:  nil,
 	}
@@ -1391,6 +1457,7 @@ func TestHandler_TaskOrderFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1409,6 +1476,7 @@ func TestHandler_TaskUserAdd(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1438,6 +1506,7 @@ func TestHandler_TaskUserAdd(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1456,6 +1525,7 @@ func TestHandler_TaskUserAddFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1485,6 +1555,7 @@ func TestHandler_TaskUserAddFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1503,6 +1574,7 @@ func TestHandler_TaskUserRemove(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1524,6 +1596,7 @@ func TestHandler_TaskUserRemove(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1542,6 +1615,7 @@ func TestHandler_TaskUserRemoveFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1563,6 +1637,7 @@ func TestHandler_TaskUserRemoveFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1581,6 +1656,7 @@ func TestHandler_TagCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1611,6 +1687,7 @@ func TestHandler_TagCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1629,6 +1706,7 @@ func TestHandler_TagCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1659,6 +1737,7 @@ func TestHandler_TagCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1677,6 +1756,7 @@ func TestHandler_TagChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1707,6 +1787,7 @@ func TestHandler_TagChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1725,6 +1806,7 @@ func TestHandler_TagChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1755,6 +1837,7 @@ func TestHandler_TagChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1773,6 +1856,7 @@ func TestHandler_TagDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1797,6 +1881,7 @@ func TestHandler_TagDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1815,6 +1900,7 @@ func TestHandler_TagDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TagInput{
+		SessionID: "13",
 		UserID:  1,
 		TaskID:  4,
 		TagID:   4,
@@ -1839,6 +1925,7 @@ func TestHandler_TagDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1857,6 +1944,7 @@ func TestHandler_TagAdd(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskTagInput{
+		SessionID: "13",
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -1878,6 +1966,7 @@ func TestHandler_TagAdd(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1896,6 +1985,7 @@ func TestHandler_TagAddFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskTagInput{
+		SessionID: "13",
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -1917,6 +2007,7 @@ func TestHandler_TagAddFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1935,6 +2026,7 @@ func TestHandler_TagRemove(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskTagInput{
+		SessionID: "13",
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -1956,6 +2048,7 @@ func TestHandler_TagRemove(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1974,6 +2067,7 @@ func TestHandler_TagRemoveFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskTagInput{
+		SessionID: "13",
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -1995,6 +2089,7 @@ func TestHandler_TagRemoveFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2013,6 +2108,7 @@ func TestHandler_CommentCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2043,6 +2139,7 @@ func TestHandler_CommentCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2061,6 +2158,7 @@ func TestHandler_CommentCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2091,6 +2189,7 @@ func TestHandler_CommentCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2109,6 +2208,7 @@ func TestHandler_CommentChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2139,6 +2239,7 @@ func TestHandler_CommentChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2157,6 +2258,7 @@ func TestHandler_CommentChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2187,6 +2289,7 @@ func TestHandler_CommentChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2205,6 +2308,7 @@ func TestHandler_CommentDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2228,6 +2332,7 @@ func TestHandler_CommentDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2246,6 +2351,7 @@ func TestHandler_CommentDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.CommentInput{
+		SessionID: "13",
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2269,6 +2375,7 @@ func TestHandler_CommentDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2287,6 +2394,7 @@ func TestHandler_ChecklistCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2316,6 +2424,7 @@ func TestHandler_ChecklistCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2334,6 +2443,7 @@ func TestHandler_ChecklistCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2363,6 +2473,7 @@ func TestHandler_ChecklistCreateFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2381,6 +2492,7 @@ func TestHandler_ChecklistChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2410,6 +2522,7 @@ func TestHandler_ChecklistChange(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2428,6 +2541,7 @@ func TestHandler_ChecklistChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2457,6 +2571,7 @@ func TestHandler_ChecklistChangeFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2475,6 +2590,7 @@ func TestHandler_ChecklistDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2498,6 +2614,7 @@ func TestHandler_ChecklistDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2516,6 +2633,7 @@ func TestHandler_ChecklistDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
+		SessionID: "13",
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2539,6 +2657,7 @@ func TestHandler_ChecklistDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2565,6 +2684,7 @@ func TestHandler_AttachmentDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.AttachmentInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2587,6 +2707,7 @@ func TestHandler_AttachmentDelete(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/attachment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2605,6 +2726,7 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.AttachmentInput{
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2627,6 +2749,7 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/attachment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")

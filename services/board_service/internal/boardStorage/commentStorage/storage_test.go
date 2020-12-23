@@ -89,7 +89,7 @@ func TestStorage_DeleteComment(t *testing.T) {
 		WithArgs(input.CommentID).
 		WillReturnError(errors.New(""))
 
-	err = storage.DeleteComment(input)
+	_, err = storage.DeleteComment(input)
 	if err == nil {
 		t.Error("expected error")
 		return

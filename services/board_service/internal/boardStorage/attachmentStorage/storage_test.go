@@ -59,7 +59,7 @@ func TestStorage_RemoveAttachment(t *testing.T) {
 		WithArgs(input.AttachmentID).
 		WillReturnError(errors.New(""))
 
-	err = storage.RemoveAttachment(input)
+	_, err = storage.RemoveAttachment(input)
 	if err == nil {
 		t.Error("expected error")
 		return

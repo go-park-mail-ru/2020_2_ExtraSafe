@@ -91,7 +91,7 @@ func TestStorage_DeleteChecklistFail(t *testing.T) {
 		WithArgs(input.ChecklistID).
 		WillReturnError(errors.New(""))
 
-	err = storage.DeleteChecklist(input)
+	_, err = storage.DeleteChecklist(input)
 	if err == nil {
 		t.Error("expected error")
 		return

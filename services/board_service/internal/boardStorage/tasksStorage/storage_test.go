@@ -175,7 +175,7 @@ func TestStorage_DeleteTask(t *testing.T) {
 		WithArgs(taskInput.TaskID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = storage.DeleteTask(taskInput)
+	_, err = storage.DeleteTask(taskInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -202,7 +202,7 @@ func TestStorage_DeleteTaskFail(t *testing.T) {
 		WithArgs(taskInput.TaskID).
 		WillReturnError(errors.New("fail deleting exec"))
 
-	err = storage.DeleteTask(taskInput)
+	_, err = storage.DeleteTask(taskInput)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
