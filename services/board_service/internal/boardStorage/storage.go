@@ -118,12 +118,13 @@ func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardI
 	var boardID int64
 
 	url := createSharedUrl(boardInput.UserID, boardInput.BoardName)
+	urlString := strconv.FormatUint(uint64(url), 10)
 	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star, shared_url) VALUES ($1, $2, $3, $4, $5) RETURNING boardID",
 		boardInput.UserID,
 		boardInput.BoardName,
 		boardInput.Theme,
 		boardInput.Star,
-		url).
+		urlString).
 		Scan(&boardID)
 
 	if err != nil {
@@ -489,7 +490,7 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 }
 
 func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
-	var url int
+	var url string
 	err := s.db.QueryRow("SELECT shared_url FROM boards WHERE boardID = $1", boardInput.BoardID).Scan(&url)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -498,7 +499,7 @@ func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
 		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetSharedURL"}
 	}
 
-	return strconv.Itoa(url), nil
+	return url, nil
 }
 
 func createSharedUrl(adminID int64, boardName string) uint32 {
