@@ -9,7 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
@@ -28,12 +30,12 @@ jobs:
           docker push keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
 
       - name: Upload docker-compose.yml
-          uses: actions/upload-artifact@v2
-          with:
-            name: Backend
-            path: |
-            ./docker-compose.yml
-            ./init
+        uses: actions/upload-artifact@v2
+        with:
+          name: Backend
+          path: |
+          ./docker-compose.yml
+          ./init
 
   deploy:
     runs-on: ubuntu-latest
