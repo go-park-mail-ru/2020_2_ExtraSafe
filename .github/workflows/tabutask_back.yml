@@ -63,7 +63,6 @@ jobs:
       - name: Run backend
         uses: appleboy/ssh-action@master
         with:
-          envs: GITHUB_SHA
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
@@ -76,6 +75,7 @@ jobs:
             cd ..
             mkdir -p attachments
             mkdir -p avatars
+            docker stop tabutask_auth tabutask_board tabutask_profile tabutask_main
             docker rm -v $(docker ps -a -q)
             docker image prune -a
             docker-compose up -d
