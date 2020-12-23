@@ -10,6 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"github.com/labstack/echo"
 	"io"
+	"sync"
 )
 
 //go:generate mockgen -destination=../../../cmd/handlers/mock/mock_boardsService.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards ServiceBoard
@@ -68,8 +69,8 @@ type ServiceBoard interface {
 type service struct {
 	boardService protoBoard.BoardClient
 	validator    Validator
-	hubs         map[int64]*websocket.BoardHub
-	mainHub      *websocket.NotificationHub
+	hubs    *sync.Map
+	mainHub *websocket.NotificationHub
 }
 
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
@@ -79,7 +80,7 @@ func NewService(boardService protoBoard.BoardClient, validator Validator) Servic
 		mainHub: mHub,
 		boardService: boardService,
 		validator:    validator,
-		hubs:         make(map[int64]*websocket.BoardHub, 0),
+		hubs: new(sync.Map),
 	}
 }
 
@@ -175,8 +176,8 @@ func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside
 
 func (s *service) WebSocketBoard(request models.BoardInput, c echo.Context) (err error) {
 	var hub *websocket.BoardHub
-	if h, ok := s.hubs[request.BoardID]; ok {
-		hub = h
+	if h, ok := s.hubs.Load(request.BoardID); ok {
+		hub = h.(*websocket.BoardHub)
 	} else {
 		hub = s.createHub(request.BoardID)
 	}
@@ -1307,20 +1308,22 @@ func (s *service) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 }
 
 func (s *service) createHub(boardID int64) *websocket.BoardHub {
-	hub := websocket.NewHub(boardID, &s.hubs)
-	s.hubs[boardID] = hub
+	hub := websocket.NewHub(boardID, s.hubs)
+	s.hubs.Store(boardID, hub)
 	go hub.Run()
 	return hub
 }
 
 func (s *service) deleteHub(boardID int64) {
-	s.hubs[boardID].StopHub()
-	delete(s.hubs, boardID)
+	if hub, ok := s.hubs.Load(boardID); ok {
+		hub.(*websocket.BoardHub).StopHub()
+		s.hubs.Delete(boardID)
+	}
 }
 
 func (s *service) broadcast(message models.WS, boardID int64) {
-	if hub, ok := s.hubs[boardID]; ok {
-		hub.Broadcast(message)
+	if hub, ok := s.hubs.Load(boardID); ok {
+		hub.(*websocket.BoardHub).Broadcast(message)
 	}
 }
 
