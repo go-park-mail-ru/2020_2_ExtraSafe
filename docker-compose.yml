@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   tarantool:
-    image: keithzetterstrom/tabutask_tarantool
+    image: tabutask_tarantool
     container_name: tabutask_tarantool
     expose:
       - 3301
@@ -10,7 +10,7 @@ services:
       - /home/ubuntu/data/tarantool:/var/lib/tarantool
 
   auth:
-    image: keithzetterstrom/tabutask_auth
+    image: tabutask_auth
     container_name: tabutask_auth
     restart: always
     expose:
@@ -31,7 +31,7 @@ services:
       - ./init/:/docker-entrypoint-initdb.d/
 
   board:
-    image: keithzetterstrom/tabutask_board
+    image: tabutask_board
     container_name: tabutask_board
     restart: always
     expose:
@@ -44,7 +44,7 @@ services:
       - postgres
 
   profile:
-    image: keithzetterstrom/tabutask_profile
+    image: tabutask_profile
     container_name: tabutask_profile
     restart: always
     expose:
@@ -58,7 +58,7 @@ services:
       - postgres
 
   main:
-    image: keithzetterstrom/tabutask_main
+    image: tabutask_main
     container_name: tabutask_main
     restart: always
     ports:
