@@ -60,20 +60,6 @@ jobs:
           source: "Backend"
           target: "/home/ubuntu/Tabutask"
 
-#      - name: Pull Docker images
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.PRIVATE_KEY }}
-#          script: |
-#            export PATH=/snap/bin:$PATH
-#            docker pull keithzetterstrom/tabutask_auth:latest
-#            docker pull keithzetterstrom/tabutask_profile:latest
-#            docker pull keithzetterstrom/tabutask_main:latest
-#            docker pull keithzetterstrom/tabutask_tarantool:latest
-#            docker pull keithzetterstrom/tabutask_board:latest
-
       - name: Run backend
         uses: appleboy/ssh-action@master
         with:
@@ -90,5 +76,6 @@ jobs:
             cd ..
             mkdir -p attachments
             mkdir -p avatars
-            docker rm -vf $(docker ps -a -q)
-            docker-compose up
+            docker rm -v $(docker ps -a -q)
+            docker image prune -a
+            docker-compose up -d
