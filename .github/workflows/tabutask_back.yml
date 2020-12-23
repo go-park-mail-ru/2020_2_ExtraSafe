@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
@@ -28,7 +28,7 @@ jobs:
           docker push keithzetterstrom/tabutask_board:${GITHUB_SHA::8}
 
       - name: Upload docker-compose.yml
-          uses: actions/upload-artifact@master
+          uses: actions/upload-artifact@v2
           with:
             name: Backend
             path: |
@@ -40,7 +40,7 @@ jobs:
     needs: build
     steps:
       - name: Download docker-compose.yml
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v1
         with:
           name: docker-compose
 
