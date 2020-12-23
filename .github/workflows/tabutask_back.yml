@@ -16,11 +16,11 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build Docker images
-        run: sudo docker build -t keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} -f ./build/dockerFiles/auth.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
-          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool
+        run: sudo docker build -t keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} -t keithzetterstrom/tabutask_auth:latest -f ./build/dockerFiles/auth.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -t keithzetterstrom/tabutask_profile:latest -f ./build/dockerFiles/profile.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -t keithzetterstrom/tabutask_board:latest -f ./build/dockerFiles/board.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -t keithzetterstrom/tabutask_main:latest -f ./build/dockerFiles/main.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -t keithzetterstrom/tabutask_tarantool:latest -f ./build/tarantool/Dockerfile ./build/tarantool
 
       - name: Push Docker images
         run: docker push keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} &&
