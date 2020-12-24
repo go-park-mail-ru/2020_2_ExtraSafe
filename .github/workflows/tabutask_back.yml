@@ -13,7 +13,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run tests with coverage
-        run: go test -coverpkg=./... -coverprofile=cover ./... && cat cover | grep -v "mock" | grep -v  "easyjson" | grep -v "proto" > cover.out &&
+        run: mkdir attachments &&
+          mkdir avatars &&
+          go test -coverpkg=./... -coverprofile=cover ./... && cat cover | grep -v "mock" | grep -v  "easyjson" | grep -v "proto" > cover.out &&
           go tool cover -func=cover.out
 
 #  build:
