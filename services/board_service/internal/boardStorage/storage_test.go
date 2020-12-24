@@ -2519,7 +2519,7 @@ func TestStorage_AssignUser(t *testing.T) {
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().AssignUser(input).Times(1).Return(nil)
 	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Times(1).Return(output.CardID, nil)
-	mockTasks.EXPECT().GetTaskNameByID(input.TaskID).Return(output.Name, nil)
+	mockTasks.EXPECT().GetTaskName(models.TaskInput{TaskID: input.TaskID}).Return(output.Name, nil)
 
 	storage := &storage{tasksStorage: mockTasks}
 

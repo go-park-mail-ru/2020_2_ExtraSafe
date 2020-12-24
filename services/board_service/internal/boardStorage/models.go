@@ -22,7 +22,7 @@ type TasksStorage interface {
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
-	GetTaskNameByID(taskID int64) (string, error)
+	GetTaskName(taskInput models.TaskInput) (string, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
 	AssignUser(input models.TaskAssigner) (err error)
