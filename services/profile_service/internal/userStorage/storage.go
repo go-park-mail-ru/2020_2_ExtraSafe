@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"golang.org/x/crypto/argon2"
 )
@@ -78,6 +79,8 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 	rand.Read(salt)
 	hashedPass := hashPass(salt, userInput.Password)
 
+	fmt.Println(userInput)
+
 	err := s.db.QueryRow("INSERT INTO users (email, password, username, fullname, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING userID",
 						userInput.Email,
 						hashedPass,
@@ -85,6 +88,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 						"",
 						"default/default_avatar.png").Scan(&ID)
 	if err != nil {
+		fmt.Println(err)
 		return 0, models.UserOutside{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateUser"}
 	}
@@ -95,6 +99,7 @@ func (s *storage) CreateUser(userInput models.UserInputReg) (int64, models.UserO
 		FullName: "",
 		Avatar:   "default/default_avatar.png",
 	}
+	fmt.Println(user)
 
 	return ID, user, nil
 }
