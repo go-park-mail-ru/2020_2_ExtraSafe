@@ -2998,3 +2998,125 @@ func TestService_CheckCommentPermissionFail(t *testing.T) {
 		return
 	}
 }
+
+func TestService_GetSharedURL(t *testing.T) {
+	input := &protoBoard.BoardInput{
+		UserID:  1,
+		BoardID: 1,
+	}
+
+	userInput := models.BoardInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().GetSharedURL(userInput).Return("url", nil)
+
+	_, err := service.GetSharedURL(context.Background(), input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestService_GetSharedURLFail(t *testing.T) {
+	input := &protoBoard.BoardInput{
+		UserID:  1,
+		BoardID: 1,
+	}
+
+	userInput := models.BoardInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().GetSharedURL(userInput).Return("", errStorage)
+
+	_, err := service.GetSharedURL(context.Background(), input)
+	if err == nil {
+		t.Errorf("expected err")
+		return
+	}
+}
+
+func TestService_InviteUserToBoard(t *testing.T) {
+	input := &protoBoard.BoardInviteInput{
+		UserID:  1,
+		BoardID: 1,
+		UrlHash: "hash",
+	}
+
+	userInput := models.BoardInviteInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+		UrlHash: input.UrlHash,
+	}
+
+	board := models.BoardOutsideShort{
+		BoardID: input.BoardID,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().GetBoardByURL(userInput).Return(board, nil)
+
+	_, err := service.InviteUserToBoard(context.Background(), input)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestService_InviteUserToBoardFail(t *testing.T) {
+	input := &protoBoard.BoardInviteInput{
+		UserID:  1,
+		BoardID: 1,
+		UrlHash: "hash",
+	}
+
+	userInput := models.BoardInviteInput{
+		UserID:  input.UserID,
+		BoardID: input.BoardID,
+		UrlHash: input.UrlHash,
+	}
+
+	board := models.BoardOutsideShort{
+		BoardID: input.BoardID,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
+
+	service := &service{boardStorage: mockBoardStorage}
+
+	mockBoardStorage.EXPECT().GetBoardByURL(userInput).Return(board, errStorage)
+
+	_, err := service.InviteUserToBoard(context.Background(), input)
+	if err == nil {
+		t.Error("expected err")
+		return
+	}
+}

@@ -13,7 +13,7 @@ func (s *storage) AssignUser(input models.TaskAssigner) (task models.TaskAssignU
 	if err != nil {
 		return
 	}
-	task.TaskName, err = s.tasksStorage.GetTaskNameByID(input.TaskID)
+	task.TaskName, err = s.tasksStorage.GetTaskName(models.TaskInput{TaskID: input.TaskID})
 	if err != nil {
 		return
 	}

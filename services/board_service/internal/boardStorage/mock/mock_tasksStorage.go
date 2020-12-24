@@ -165,19 +165,19 @@ func (mr *MockTasksStorageMockRecorder) GetTaskByID(arg0 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskByID", reflect.TypeOf((*MockTasksStorage)(nil).GetTaskByID), arg0)
 }
 
-// GetTaskNameByID mocks base method
-func (m *MockTasksStorage) GetTaskNameByID(arg0 int64) (string, error) {
+// GetTaskName mocks base method
+func (m *MockTasksStorage) GetTaskName(arg0 models.TaskInput) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTaskNameByID", arg0)
+	ret := m.ctrl.Call(m, "GetTaskName", arg0)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetTaskNameByID indicates an expected call of GetTaskNameByID
-func (mr *MockTasksStorageMockRecorder) GetTaskNameByID(arg0 interface{}) *gomock.Call {
+// GetTaskName indicates an expected call of GetTaskName
+func (mr *MockTasksStorageMockRecorder) GetTaskName(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskNameByID", reflect.TypeOf((*MockTasksStorage)(nil).GetTaskNameByID), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskName", reflect.TypeOf((*MockTasksStorage)(nil).GetTaskName), arg0)
 }
 
 // GetTasksByCard mocks base method
