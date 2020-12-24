@@ -29,6 +29,7 @@ services:
       - init/database.env
     volumes:
       - ./init/:/docker-entrypoint-initdb.d/
+      - /home/ubuntu/var/lib/postgresql/data:/var/lib/postgresql/data/
 
   board:
     image: keithzetterstrom/tabutask_board:latest

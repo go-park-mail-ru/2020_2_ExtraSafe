@@ -75,7 +75,7 @@ jobs:
             cd ..
             mkdir -p attachments
             mkdir -p avatars
-            docker stop tabutask_auth tabutask_board tabutask_profile tabutask_main
+            docker stop tabutask_auth tabutask_board tabutask_profile tabutask_main tabutask_postgres tabutask_tarantool
             docker rm -v $(docker ps -a -q)
             docker image prune -a
             docker-compose up -d
