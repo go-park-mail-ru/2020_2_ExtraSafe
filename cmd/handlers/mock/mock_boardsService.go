@@ -7,6 +7,7 @@ package mock
 import (
 	models "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	gomock "github.com/golang/mock/gomock"
+	echo "github.com/labstack/echo"
 	reflect "reflect"
 )
 
@@ -196,11 +197,12 @@ func (mr *MockServiceBoardMockRecorder) CheckBoardPermission(arg0, arg1, arg2 in
 }
 
 // CheckCardPermission mocks base method
-func (m *MockServiceBoard) CheckCardPermission(arg0, arg1 int64) error {
+func (m *MockServiceBoard) CheckCardPermission(arg0, arg1 int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckCardPermission", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckCardPermission indicates an expected call of CheckCardPermission
@@ -210,11 +212,12 @@ func (mr *MockServiceBoardMockRecorder) CheckCardPermission(arg0, arg1 interface
 }
 
 // CheckCommentPermission mocks base method
-func (m *MockServiceBoard) CheckCommentPermission(arg0, arg1 int64, arg2 bool) error {
+func (m *MockServiceBoard) CheckCommentPermission(arg0, arg1 int64, arg2 bool) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckCommentPermission", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckCommentPermission indicates an expected call of CheckCommentPermission
@@ -224,11 +227,12 @@ func (mr *MockServiceBoardMockRecorder) CheckCommentPermission(arg0, arg1, arg2 
 }
 
 // CheckTaskPermission mocks base method
-func (m *MockServiceBoard) CheckTaskPermission(arg0, arg1 int64) error {
+func (m *MockServiceBoard) CheckTaskPermission(arg0, arg1 int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckTaskPermission", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckTaskPermission indicates an expected call of CheckTaskPermission
@@ -484,6 +488,21 @@ func (mr *MockServiceBoardMockRecorder) GetCard(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCard", reflect.TypeOf((*MockServiceBoard)(nil).GetCard), arg0)
 }
 
+// GetSharedURL mocks base method
+func (m *MockServiceBoard) GetSharedURL(arg0 models.BoardInput) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSharedURL", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSharedURL indicates an expected call of GetSharedURL
+func (mr *MockServiceBoardMockRecorder) GetSharedURL(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSharedURL", reflect.TypeOf((*MockServiceBoard)(nil).GetSharedURL), arg0)
+}
+
 // GetTask mocks base method
 func (m *MockServiceBoard) GetTask(arg0 models.TaskInput) (models.TaskOutside, error) {
 	m.ctrl.T.Helper()
@@ -497,6 +516,21 @@ func (m *MockServiceBoard) GetTask(arg0 models.TaskInput) (models.TaskOutside, e
 func (mr *MockServiceBoardMockRecorder) GetTask(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTask", reflect.TypeOf((*MockServiceBoard)(nil).GetTask), arg0)
+}
+
+// InviteUserToBoard mocks base method
+func (m *MockServiceBoard) InviteUserToBoard(arg0 models.BoardInviteInput) (models.BoardOutsideShort, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InviteUserToBoard", arg0)
+	ret0, _ := ret[0].(models.BoardOutsideShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InviteUserToBoard indicates an expected call of InviteUserToBoard
+func (mr *MockServiceBoardMockRecorder) InviteUserToBoard(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteUserToBoard", reflect.TypeOf((*MockServiceBoard)(nil).InviteUserToBoard), arg0)
 }
 
 // RemoveMember mocks base method
@@ -539,4 +573,32 @@ func (m *MockServiceBoard) TasksOrderChange(arg0 models.TasksOrderInput) error {
 func (mr *MockServiceBoardMockRecorder) TasksOrderChange(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TasksOrderChange", reflect.TypeOf((*MockServiceBoard)(nil).TasksOrderChange), arg0)
+}
+
+// WebSocketBoard mocks base method
+func (m *MockServiceBoard) WebSocketBoard(arg0 models.BoardInput, arg1 echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WebSocketBoard", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WebSocketBoard indicates an expected call of WebSocketBoard
+func (mr *MockServiceBoardMockRecorder) WebSocketBoard(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WebSocketBoard", reflect.TypeOf((*MockServiceBoard)(nil).WebSocketBoard), arg0, arg1)
+}
+
+// WebSocketNotification mocks base method
+func (m *MockServiceBoard) WebSocketNotification(arg0 models.UserInput, arg1 echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WebSocketNotification", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WebSocketNotification indicates an expected call of WebSocketNotification
+func (mr *MockServiceBoardMockRecorder) WebSocketNotification(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WebSocketNotification", reflect.TypeOf((*MockServiceBoard)(nil).WebSocketNotification), arg0, arg1)
 }

@@ -8,13 +8,13 @@ import (
 )
 
 func TestStorage_CreateUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
+	tConn, err := tarantool.Connect("tarantool:3301", tarantool.Opts{ User: "guest" })
 
 	if err != nil {
 		fmt.Println("Connection refused")
 		return
 	}
+	defer tConn.Close()
 
 	userID := int64(1)
 	SID := "lalalalalalalalala"
@@ -25,13 +25,14 @@ func TestStorage_CreateUserSession(t *testing.T) {
 }
 
 func TestStorage_CreateUserSessionFail(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
+	tConn, err := tarantool.Connect("tarantool:3301", tarantool.Opts{ User: "guest" })
 
 	if err != nil {
 		fmt.Println("Connection refused")
 		return
 	}
+	defer tConn.Close()
+
 
 	userID := int64(1)
 	SID := "lalalalalalalalala"
@@ -42,13 +43,14 @@ func TestStorage_CreateUserSessionFail(t *testing.T) {
 }
 
 func TestStorage_CheckUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
+	tConn, err := tarantool.Connect("tarantool:3301", tarantool.Opts{ User: "guest" })
 
 	if err != nil {
 		fmt.Println("Connection refused")
 		return
 	}
+	defer tConn.Close()
+
 
 	userID := int64(1)
 	SID := "lalalalalalalalala"
@@ -59,13 +61,13 @@ func TestStorage_CheckUserSession(t *testing.T) {
 }
 
 func TestStorage_CheckUserSessionFail(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
+	tConn, err := tarantool.Connect("tarantool:3301", tarantool.Opts{ User: "guest" })
 
 	if err != nil {
 		fmt.Println("Connection refused")
 		return
 	}
+	defer tConn.Close()
 
 	//userID := int64(1)
 	SID := "lalalala"
@@ -77,13 +79,13 @@ func TestStorage_CheckUserSessionFail(t *testing.T) {
 }
 
 func TestStorage_DeleteUserSession(t *testing.T) {
-	tConn, err := tarantool.Connect("127.0.0.1:3301", tarantool.Opts{ User: "guest" })
-	defer tConn.Close()
+	tConn, err := tarantool.Connect("tarantool:3301", tarantool.Opts{ User: "guest" })
 
 	if err != nil {
 		fmt.Println("Connection refused")
 		return
 	}
+	defer tConn.Close()
 
 	SID := "lalalalalalalalala"
 	sessionStorage := NewStorage(tConn)

@@ -1,12 +1,15 @@
 package boardStorage
 
 import (
+	"encoding/json"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
+	mocks "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/mock"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
+	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
 )
@@ -141,14 +144,24 @@ func TestStorage_AddTag(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, tagStorage: tagStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+	storage := &storage{db: db, tagStorage: tagStorage.NewStorage(db), tasksStorage: mockTasks}
 
 	mock.
 		ExpectExec("INSERT INTO task_tags").
 		WithArgs(input.TaskID, input.TagID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = storage.AddTag(input)
+	mock.
+		ExpectQuery("SELECT").
+		WithArgs(input.TagID).
+		WillReturnRows(sqlmock.NewRows([]string{"tagID", "name", "color"}).AddRow(input.TagID, "name", "color"))
+
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Return(int64(1), nil)
+
+	_, err = storage.AddTag(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -170,14 +183,20 @@ func TestStorage_RemoveTag(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, tagStorage: tagStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, tagStorage: tagStorage.NewStorage(db), tasksStorage: mockTasks}
 
 	mock.
 		ExpectExec("DELETE FROM task_tags").
 		WithArgs(input.TaskID, input.TagID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = storage.RemoveTag(input)
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Return(int64(1), nil)
+
+	_, err = storage.RemoveTag(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -200,6 +219,8 @@ func TestStorage_CreateComment(t *testing.T) {
 		CommentID: 1,
 		Message: input.Message,
 		Order: input.Order,
+		TaskID: input.TaskID,
+		CardID: 1,
 	}
 
 	db, mock, err := sqlmock.New()
@@ -208,12 +229,18 @@ func TestStorage_CreateComment(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db), tasksStorage: mockTasks}
 
 	mock.
 		ExpectQuery("INSERT INTO comments").
 		WithArgs(input.Message, input.TaskID, input.Order, input.UserID).
-		WillReturnRows(sqlmock.NewRows([]string{"commentID"}).AddRow(1))
+		WillReturnRows(sqlmock.NewRows([]string{"commentID", "taskID"}).AddRow(1, input.TaskID))
+
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Return(expect.CardID, nil)
 
 	comment, err := storage.CreateComment(input)
 	if err != nil {
@@ -239,6 +266,8 @@ func TestStorage_UpdateComment(t *testing.T) {
 	expect := models.CommentOutside{
 		CommentID: 1,
 		Message: input.Message,
+		CardID: 1,
+		TaskID: 1,
 	}
 
 	db, mock, err := sqlmock.New()
@@ -247,12 +276,18 @@ func TestStorage_UpdateComment(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db),  tasksStorage: mockTasks}
 
 	mock.
-		ExpectExec("UPDATE comments SET").
+		ExpectQuery("UPDATE comments SET").
 		WithArgs(input.Message, input.CommentID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"taskID"}).AddRow(expect.TaskID))
+
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
 
 	comment, err := storage.UpdateComment(input)
 	if err != nil {
@@ -274,20 +309,32 @@ func TestStorage_DeleteComment(t *testing.T) {
 		CommentID: 1,
 	}
 
+	expect := models.CommentOutside {
+		TaskID: 1,
+		CommentID: input.CommentID,
+		CardID: 1,
+	}
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, commentStorage: commentStorage.NewStorage(db),  tasksStorage: mockTasks}
 
 	mock.
-		ExpectExec("DELETE FROM comments").
+		ExpectQuery("DELETE FROM comments").
 		WithArgs(input.CommentID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"taskID"}).AddRow(expect.TaskID))
 
-	err = storage.DeleteComment(input)
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
+
+	_, err = storage.DeleteComment(input)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -304,13 +351,15 @@ func TestStorage_CreateChecklist(t *testing.T) {
 		ChecklistID: 0,
 		TaskID:      1,
 		Name:        "check",
-		Items:       nil,
+		Items:       json.RawMessage{},
 	}
 
 	expect := models.ChecklistOutside{
 		ChecklistID: 1,
-		Items: input.Items,
-		Name: input.Name,
+		Items:       input.Items,
+		Name:        input.Name,
+		TaskID:      input.TaskID,
+		CardID:      1,
 	}
 
 	db, mock, err := sqlmock.New()
@@ -319,12 +368,18 @@ func TestStorage_CreateChecklist(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db),  tasksStorage: mockTasks}
 
 	mock.
 		ExpectQuery("INSERT INTO checklists").
 		WithArgs(input.TaskID, input.Name, input.Items).
-		WillReturnRows(sqlmock.NewRows([]string{"checklistID"}).AddRow(1))
+		WillReturnRows(sqlmock.NewRows([]string{"checklistID"}).AddRow(expect.ChecklistID))
+
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
 
 	checklist, err := storage.CreateChecklist(input)
 	if err != nil {
@@ -350,8 +405,10 @@ func TestStorage_UpdateChecklist(t *testing.T) {
 
 	expect := models.ChecklistOutside{
 		ChecklistID: 1,
-		Items: input.Items,
-		Name: input.Name,
+		Items:       input.Items,
+		Name:        input.Name,
+		TaskID:      input.TaskID,
+		CardID:      1,
 	}
 
 	db, mock, err := sqlmock.New()
@@ -360,12 +417,18 @@ func TestStorage_UpdateChecklist(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db),  tasksStorage: mockTasks}
 
 	mock.
-		ExpectExec("UPDATE checklists SET").
+		ExpectQuery("UPDATE checklists SET").
 		WithArgs(input.Name, input.Items, input.ChecklistID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"taskID"}).AddRow(expect.TaskID))
+
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
 
 	checklist, err := storage.UpdateChecklist(input)
 	if err != nil {
@@ -387,20 +450,32 @@ func TestStorage_DeleteChecklist(t *testing.T) {
 		ChecklistID: 1,
 	}
 
+	expect := models.ChecklistOutside{
+		ChecklistID: 1,
+		TaskID:      input.TaskID,
+		CardID: 1,
+	}
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, checklistStorage: checklistStorage.NewStorage(db),  tasksStorage: mockTasks}
 
 	mock.
-		ExpectExec("DELETE FROM checklists").
+		ExpectQuery("DELETE FROM checklists").
 		WithArgs(input.ChecklistID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"taskID"}).AddRow(expect.TaskID))
 
-	err = storage.DeleteChecklist(input)
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
+
+	_, err = storage.DeleteChecklist(input)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -423,6 +498,8 @@ func TestStorage_AddAttachment(t *testing.T) {
 		AttachmentID: 1,
 		Filename:     input.Filename,
 		Filepath:     input.Filepath,
+		TaskID: input.TaskID,
+		CardID: 1,
 	}
 
 	db, mock, err := sqlmock.New()
@@ -431,12 +508,18 @@ func TestStorage_AddAttachment(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, attachmentStorage: attachmentStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, attachmentStorage: attachmentStorage.NewStorage(db), tasksStorage: mockTasks}
 
 	mock.
 		ExpectQuery("INSERT INTO attachments").
 		WithArgs(input.TaskID, input.Filename, input.Filepath).
-		WillReturnRows(sqlmock.NewRows([]string{"attachmentID"}).AddRow(1))
+		WillReturnRows(sqlmock.NewRows([]string{"attachmentID", "taskID"}).AddRow(expect.AttachmentID, expect.TaskID))
+
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
 
 	attachment, err := storage.AddAttachment(input)
 	if err != nil {
@@ -458,20 +541,32 @@ func TestStorage_RemoveAttachment(t *testing.T) {
 		AttachmentID: 1,
 	}
 
+	expect := models.AttachmentOutside{
+		AttachmentID: 1,
+		TaskID: input.TaskID,
+		CardID: 1,
+	}
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	storage := &storage{db: db, attachmentStorage: attachmentStorage.NewStorage(db)}
+	ctrlTasks := gomock.NewController(t)
+	defer ctrlTasks.Finish()
+	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
+
+	storage := &storage{db: db, attachmentStorage: attachmentStorage.NewStorage(db), tasksStorage: mockTasks}
 
 	mock.
-		ExpectExec("DELETE FROM attachments").
+		ExpectQuery("DELETE FROM attachments").
 		WithArgs(input.AttachmentID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"attachmentID", "taskID"}).AddRow(expect.AttachmentID, expect.TaskID))
 
-	err = storage.RemoveAttachment(input)
+	mockTasks.EXPECT().GetCardIDByTask(expect.TaskID).Return(expect.CardID, nil)
+
+	_, err = storage.RemoveAttachment(input)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return

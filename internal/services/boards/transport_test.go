@@ -23,6 +23,7 @@ func TestTransport_BoardRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/users/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("3")
@@ -30,6 +31,7 @@ func TestTransport_BoardRead(t *testing.T) {
 	expectedUserInput := models.BoardInput{
 		UserID:  1,
 		BoardID: 3,
+		SessionID: "13",
 	}
 
 	transp := &transport{}
@@ -74,6 +76,7 @@ func TestTransport_BoardChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/users/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("3")
@@ -81,6 +84,7 @@ func TestTransport_BoardChangeRead(t *testing.T) {
 	expectedUserInput := models.BoardChangeInput{
 		UserID:    1,
 		BoardID:   3,
+		SessionID: "13",
 		BoardName: "tx",
 		Theme:     "dark",
 		Star:      false,
@@ -130,6 +134,7 @@ func TestTransport_BoardMemberRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/users/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("3")
@@ -137,6 +142,7 @@ func TestTransport_BoardMemberRead(t *testing.T) {
 	expectedUserInput := models.BoardMemberInput{
 		UserID:    1,
 		BoardID:   3,
+		SessionID: "13",
 		MemberName: "kit",
 	}
 
@@ -255,12 +261,16 @@ func TestTransport_CardChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	expectedUserInput := models.CardInput{
 		UserID:  1,
+		BoardID: 4,
+		SessionID: "13",
 		CardID:  4,
 		Name:    "todo",
 		Order:   1,
@@ -381,9 +391,13 @@ func TestTransport_CardOrderRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.CardsOrderInput{
 		UserID: 1,
+		BoardID: 4,
+		SessionID: "13",
 		Cards:  []models.CardOrder{},
 	}
 
@@ -430,12 +444,16 @@ func TestTransport_TaskChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	expectedUserInput := models.TaskInput{
 		UserID:      1,
+		BoardID: 4,
+		SessionID: "13",
 		TaskID:      4,
 		CardID:      4,
 		Name:        "back",
@@ -487,6 +505,8 @@ func TestTransport_TaskChangeReadFail2(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("a")
@@ -570,8 +590,12 @@ func TestTransport_TasksOrderRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.TasksOrderInput{
+		BoardID: 4,
+		SessionID: "13",
 		UserID: 1,
 		Tasks:  []models.TasksOrder{},
 	}
@@ -617,11 +641,15 @@ func TestTransport_TasksUserRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("5")
 
 	expectedUserInput := models.TaskAssignerInput{
+		BoardID: 4,
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       5,
 		AssignerName: "kit",
@@ -671,12 +699,14 @@ func TestTransport_TagChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	expectedUserInput := models.TagInput{
 		UserID:  1,
+		SessionID: "13",
 		TaskID:  4,
 		TagID:   2,
 		BoardID: 1,
@@ -728,12 +758,16 @@ func TestTransport_TagTaskRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	expectedUserInput := models.TaskTagInput{
 		UserID: 1,
+		SessionID: "13",
+		BoardID: 4,
 		TaskID: 2,
 		TagID:  3,
 	}
@@ -806,6 +840,8 @@ func TestTransport_CommentChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -813,6 +849,8 @@ func TestTransport_CommentChangeRead(t *testing.T) {
 	expectedUserInput := models.CommentInput{
 		CommentID: 5,
 		TaskID:    4,
+		SessionID: "13",
+		BoardID: 4,
 		Message:   "gggg",
 		Order:     1,
 		UserID:    1,
@@ -888,12 +926,16 @@ func TestTransport_ChecklistChangeRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	expectedUserInput := models.ChecklistInput{
 		UserID:      1,
+		SessionID: "13",
+		BoardID: 4,
 		ChecklistID: 5,
 		TaskID:      4,
 		Name:        "ffff",
@@ -974,9 +1016,13 @@ func TestTransport_AttachmentAddRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.AttachmentInput{
 		UserID:       1,
+		SessionID: "13",
+		BoardID: 4,
 		TaskID:       2,
 		Filename:     "ttt",
 	}
@@ -1010,9 +1056,13 @@ func TestTransport_AttachmentDeleteRead(t *testing.T) {
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.AttachmentInput{
 		UserID:       1,
+		SessionID: "13",
+		BoardID: 4,
 		TaskID:       4,
 		AttachmentID: 5,
 		Filename:     "ffff",
@@ -1097,6 +1147,72 @@ func TestTransport_UserShortWrite(t *testing.T) {
 	transp := &transport{}
 
 	response, _ := transp.UserShortWrite(input)
+
+	if !reflect.DeepEqual(response, expectedResponse) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedResponse, response)
+		return
+	}
+}
+
+func TestTransport_URLRead(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("4", "12345")
+
+	expectedUserInput := models.BoardInviteInput{
+		UserID:  1,
+		BoardID: 4,
+		UrlHash: "12345",
+	}
+
+	transp := &transport{}
+
+	userInput, _ := transp.URLRead(c)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	if !reflect.DeepEqual(userInput, expectedUserInput) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedUserInput, userInput)
+		return
+	}
+}
+
+func TestTransport_URLReadFail(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("J", "12345")
+
+	transp := &transport{}
+
+	_, err := transp.URLRead(c)
+
+	if err == nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestTransport_URLWrite(t *testing.T) {
+	input := "12345"
+
+	expectedResponse:= models.ResponseURL{
+		Status: 200,
+		URL:    "12345",
+	}
+
+	transp := &transport{}
+
+	response, _ := transp.URLWrite(input)
 
 	if !reflect.DeepEqual(response, expectedResponse) {
 		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedResponse, response)

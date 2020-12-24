@@ -49,11 +49,12 @@ func (mr *MockBoardStorageMockRecorder) AddAttachment(arg0 interface{}) *gomock.
 }
 
 // AddTag mocks base method
-func (m *MockBoardStorage) AddTag(arg0 models.TaskTagInput) error {
+func (m *MockBoardStorage) AddTag(arg0 models.TaskTagInput) (models.TagOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddTag", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.TagOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // AddTag indicates an expected call of AddTag
@@ -77,11 +78,12 @@ func (mr *MockBoardStorageMockRecorder) AddUser(arg0 interface{}) *gomock.Call {
 }
 
 // AssignUser mocks base method
-func (m *MockBoardStorage) AssignUser(arg0 models.TaskAssigner) error {
+func (m *MockBoardStorage) AssignUser(arg0 models.TaskAssigner) (models.TaskAssignUserOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AssignUser", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.TaskAssignUserOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // AssignUser indicates an expected call of AssignUser
@@ -178,11 +180,12 @@ func (mr *MockBoardStorageMockRecorder) CheckBoardPermission(arg0, arg1, arg2 in
 }
 
 // CheckCardPermission mocks base method
-func (m *MockBoardStorage) CheckCardPermission(arg0, arg1 int64) error {
+func (m *MockBoardStorage) CheckCardPermission(arg0, arg1 int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckCardPermission", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckCardPermission indicates an expected call of CheckCardPermission
@@ -192,11 +195,12 @@ func (mr *MockBoardStorageMockRecorder) CheckCardPermission(arg0, arg1 interface
 }
 
 // CheckCommentPermission mocks base method
-func (m *MockBoardStorage) CheckCommentPermission(arg0, arg1 int64, arg2 bool) error {
+func (m *MockBoardStorage) CheckCommentPermission(arg0, arg1 int64, arg2 bool) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckCommentPermission", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckCommentPermission indicates an expected call of CheckCommentPermission
@@ -206,11 +210,12 @@ func (mr *MockBoardStorageMockRecorder) CheckCommentPermission(arg0, arg1, arg2 
 }
 
 // CheckTaskPermission mocks base method
-func (m *MockBoardStorage) CheckTaskPermission(arg0, arg1 int64) error {
+func (m *MockBoardStorage) CheckTaskPermission(arg0, arg1 int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckTaskPermission", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckTaskPermission indicates an expected call of CheckTaskPermission
@@ -338,11 +343,12 @@ func (mr *MockBoardStorageMockRecorder) DeleteCard(arg0 interface{}) *gomock.Cal
 }
 
 // DeleteChecklist mocks base method
-func (m *MockBoardStorage) DeleteChecklist(arg0 models.ChecklistInput) error {
+func (m *MockBoardStorage) DeleteChecklist(arg0 models.ChecklistInput) (models.ChecklistOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteChecklist", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.ChecklistOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteChecklist indicates an expected call of DeleteChecklist
@@ -352,11 +358,12 @@ func (mr *MockBoardStorageMockRecorder) DeleteChecklist(arg0 interface{}) *gomoc
 }
 
 // DeleteComment mocks base method
-func (m *MockBoardStorage) DeleteComment(arg0 models.CommentInput) error {
+func (m *MockBoardStorage) DeleteComment(arg0 models.CommentInput) (models.CommentOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteComment", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.CommentOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteComment indicates an expected call of DeleteComment
@@ -380,11 +387,12 @@ func (mr *MockBoardStorageMockRecorder) DeleteTag(arg0 interface{}) *gomock.Call
 }
 
 // DeleteTask mocks base method
-func (m *MockBoardStorage) DeleteTask(arg0 models.TaskInput) error {
+func (m *MockBoardStorage) DeleteTask(arg0 models.TaskInput) (models.TaskInternalShort, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteTask", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.TaskInternalShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteTask indicates an expected call of DeleteTask
@@ -394,11 +402,12 @@ func (mr *MockBoardStorageMockRecorder) DeleteTask(arg0 interface{}) *gomock.Cal
 }
 
 // DismissUser mocks base method
-func (m *MockBoardStorage) DismissUser(arg0 models.TaskAssigner) error {
+func (m *MockBoardStorage) DismissUser(arg0 models.TaskAssigner) (models.TaskAssignUserOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DismissUser", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.TaskAssignUserOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DismissUser indicates an expected call of DismissUser
@@ -420,6 +429,36 @@ func (m *MockBoardStorage) GetBoard(arg0 models.BoardInput) (models.BoardInterna
 func (mr *MockBoardStorageMockRecorder) GetBoard(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoard", reflect.TypeOf((*MockBoardStorage)(nil).GetBoard), arg0)
+}
+
+// GetBoardByURL mocks base method
+func (m *MockBoardStorage) GetBoardByURL(arg0 models.BoardInviteInput) (models.BoardOutsideShort, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoardByURL", arg0)
+	ret0, _ := ret[0].(models.BoardOutsideShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardByURL indicates an expected call of GetBoardByURL
+func (mr *MockBoardStorageMockRecorder) GetBoardByURL(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardByURL", reflect.TypeOf((*MockBoardStorage)(nil).GetBoardByURL), arg0)
+}
+
+// GetBoardShort mocks base method
+func (m *MockBoardStorage) GetBoardShort(arg0 models.BoardInput) (models.BoardOutsideShort, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoardShort", arg0)
+	ret0, _ := ret[0].(models.BoardOutsideShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardShort indicates an expected call of GetBoardShort
+func (mr *MockBoardStorageMockRecorder) GetBoardShort(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardShort", reflect.TypeOf((*MockBoardStorage)(nil).GetBoardShort), arg0)
 }
 
 // GetBoardsList mocks base method
@@ -452,6 +491,21 @@ func (mr *MockBoardStorageMockRecorder) GetCard(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCard", reflect.TypeOf((*MockBoardStorage)(nil).GetCard), arg0)
 }
 
+// GetSharedURL mocks base method
+func (m *MockBoardStorage) GetSharedURL(arg0 models.BoardInput) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSharedURL", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSharedURL indicates an expected call of GetSharedURL
+func (mr *MockBoardStorageMockRecorder) GetSharedURL(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSharedURL", reflect.TypeOf((*MockBoardStorage)(nil).GetSharedURL), arg0)
+}
+
 // GetTask mocks base method
 func (m *MockBoardStorage) GetTask(arg0 models.TaskInput) (models.TaskInternal, []int64, error) {
 	m.ctrl.T.Helper()
@@ -469,11 +523,12 @@ func (mr *MockBoardStorageMockRecorder) GetTask(arg0 interface{}) *gomock.Call {
 }
 
 // RemoveAttachment mocks base method
-func (m *MockBoardStorage) RemoveAttachment(arg0 models.AttachmentInternal) error {
+func (m *MockBoardStorage) RemoveAttachment(arg0 models.AttachmentInternal) (models.AttachmentOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAttachment", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.AttachmentOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // RemoveAttachment indicates an expected call of RemoveAttachment
@@ -483,11 +538,12 @@ func (mr *MockBoardStorageMockRecorder) RemoveAttachment(arg0 interface{}) *gomo
 }
 
 // RemoveTag mocks base method
-func (m *MockBoardStorage) RemoveTag(arg0 models.TaskTagInput) error {
+func (m *MockBoardStorage) RemoveTag(arg0 models.TaskTagInput) (models.TagOutside, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveTag", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(models.TagOutside)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // RemoveTag indicates an expected call of RemoveTag

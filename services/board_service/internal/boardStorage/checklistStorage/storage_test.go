@@ -58,7 +58,7 @@ func TestStorage_UpdateChecklistFail(t *testing.T) {
 	storage := &storage{db: db}
 
 	mock.
-		ExpectExec("UPDATE checklists SET").
+		ExpectQuery("UPDATE checklists SET").
 		WithArgs(input.Name, input.Items, input.ChecklistID).
 		WillReturnError(errors.New(""))
 
@@ -87,11 +87,11 @@ func TestStorage_DeleteChecklistFail(t *testing.T) {
 	storage := &storage{db: db}
 
 	mock.
-		ExpectExec("DELETE FROM checklists").
+		ExpectQuery("DELETE FROM checklists").
 		WithArgs(input.ChecklistID).
 		WillReturnError(errors.New(""))
 
-	err = storage.DeleteChecklist(input)
+	_, err = storage.DeleteChecklist(input)
 	if err == nil {
 		t.Error("expected error")
 		return

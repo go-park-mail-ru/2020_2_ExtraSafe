@@ -503,7 +503,31 @@ func TestService_AddUserToBoard(t *testing.T) {
 		MemberID:  2,
 	}
 
-	userProfile := &protoProfile.UserOutsideShort{ID: input.MemberID}
+	user := &protoProfile.UserOutsideShort{
+		ID:       2,
+		Email:    "lallaa",
+		Username:  request.MemberName,
+		FullName: "lalalla",
+		Avatar:   "default",
+	}
+
+	board := models.BoardOutsideShort{
+		BoardID: input.BoardID,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	boardOutside := &protoProfile.BoardOutsideShort{Name: board.Name}
+
+	initiator := &protoProfile.UsersOutsideShort{Users: nil}
+	initiator.Users = append(initiator.Users, &protoProfile.UserOutsideShort{ID: request.UserID})
+
+	userProfile := &protoBoard.BoardMemberOutside{
+		Board:     boardOutside,
+		User:      user,
+		Initiator: initiator.Users[0].Username,
+	}
 
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
@@ -515,9 +539,22 @@ func TestService_AddUserToBoard(t *testing.T) {
 
 	mockProfileService.EXPECT().
 						GetUserByUsername(context.Background(), &protoProfile.UserName{UserName: request.MemberName}).
-						Return(userProfile, nil)
+						Return(user, nil)
+
+	mockProfileService.
+		EXPECT().
+		GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).
+		Return(initiator, nil)
 
 	mockBoardStorage.EXPECT().AddUser(input).Return(nil)
+
+	mockBoardStorage.
+		EXPECT().
+		GetBoardShort(models.BoardInput{
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+	}).
+		Return(board, nil)
 
 	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
@@ -569,7 +606,16 @@ func TestService_AddUserToBoardFail2(t *testing.T) {
 		MemberID:  2,
 	}
 
-	userProfile := &protoProfile.UserOutsideShort{ID: input.MemberID}
+	user := &protoProfile.UserOutsideShort{
+		ID:       2,
+		Email:    "lallaa",
+		Username:  request.MemberName,
+		FullName: "lalalla",
+		Avatar:   "default",
+	}
+
+	initiator := &protoProfile.UsersOutsideShort{Users: nil}
+	initiator.Users = append(initiator.Users, &protoProfile.UserOutsideShort{ID: request.UserID})
 
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
@@ -581,7 +627,12 @@ func TestService_AddUserToBoardFail2(t *testing.T) {
 
 	mockProfileService.EXPECT().
 		GetUserByUsername(context.Background(), &protoProfile.UserName{UserName: request.MemberName}).
-		Return(userProfile, nil)
+		Return(user, nil)
+
+	mockProfileService.
+		EXPECT().
+		GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).
+		Return(initiator, nil)
 
 	mockBoardStorage.EXPECT().AddUser(input).Return(errStorage)
 
@@ -1146,6 +1197,7 @@ func TestService_ChangeTaskFail(t *testing.T) {
 		t.Error("expected error")
 		return
 	}
+
 }
 
 func TestService_DeleteTask(t *testing.T) {
@@ -1161,17 +1213,27 @@ func TestService_DeleteTask(t *testing.T) {
 		TaskID:      request.TaskID,
 	}
 
+	task := models.TaskInternalShort{TaskID: input.TaskID, CardID: input.CardID}
+	output := &protoBoard.TaskOutsideSuperShort{
+		TaskID: task.TaskID,
+		CardID:   task.CardID,
+	}
+
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteTask(input).Return(nil)
+	mockBoardStorage.EXPECT().DeleteTask(input).Return(task, nil)
 
-	_, err := service.DeleteTask(context.Background(), request)
+	res, err := service.DeleteTask(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, res) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -1195,7 +1257,7 @@ func TestService_DeleteTaskFail(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteTask(input).Return(errStorage)
+	mockBoardStorage.EXPECT().DeleteTask(input).Return(models.TaskInternalShort{}, errStorage)
 
 	_, err := service.DeleteTask(context.Background(), request)
 	if err == nil {
@@ -1297,18 +1359,35 @@ func TestService_AssignUser(t *testing.T) {
 		UserID: 1,
 	}
 
-	expect := &protoProfile.UserOutsideShort{
-		ID:       1,
+	task := models.TaskAssignUserOutside {
+		TaskID: request.TaskID,
+		CardID: 1,
+		TaskName: "ala",
+	}
+
+	user := &protoProfile.UserOutsideShort{
+		ID:       2,
 		Email:    "lala",
 		Username: "pkaterina",
 		FullName: "lala",
 		Avatar:   "",
 	}
 
+	initiator := &protoProfile.UsersOutsideShort{Users: nil}
+	initiator.Users = append(initiator.Users, &protoProfile.UserOutsideShort{ID: request.UserID})
+
+	output := &protoBoard.TaskAssignUserOutside{
+		Assigner: user,
+		TaskID:   task.TaskID,
+		CardID:   task.CardID,
+		Initiator: initiator.Users[0].Username,
+		TaskName: task.TaskName,
+	}
+
 	input := models.TaskAssigner{
 		UserID:     request.UserID,
 		TaskID:     request.TaskID,
-		AssignerID: expect.ID,
+		AssignerID: user.ID,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -1324,20 +1403,25 @@ func TestService_AssignUser(t *testing.T) {
 	mockProfileService.
 		EXPECT().
 		GetUserByUsername(context.Background(), &protoProfile.UserName{UserName: request.AssignerName}).
-		Return(expect, nil)
+		Return(user, nil)
 
 	mockBoardStorage.
 		EXPECT().
 		AssignUser(input).
-		Return(nil)
+		Return(task, nil)
 
-	output, err := service.AssignUser(context.Background(), request)
+	mockProfileService.
+		EXPECT().
+		GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).
+		Return(initiator, nil)
+
+	res, err := service.AssignUser(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-	if !reflect.DeepEqual(output, expect) {
-		t.Errorf("results not match, want %v, have %v", expect, output)
+	if !reflect.DeepEqual(output, res) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -1406,7 +1490,7 @@ func TestService_AssignUserAssigningFail(t *testing.T) {
 	mockBoardStorage.
 		EXPECT().
 		AssignUser(input).
-		Return(errStorage)
+		Return(models.TaskAssignUserOutside{}, errStorage)
 
 	_, err := service.AssignUser(context.Background(), request)
 	if err == nil {
@@ -1432,6 +1516,18 @@ func TestService_DismissUser(t *testing.T) {
 		AssignerID: expect.ID,
 	}
 
+	task := models.TaskAssignUserOutside {
+		TaskID: request.TaskID,
+		CardID: 1,
+		TaskName: "ala",
+	}
+
+	output := &protoBoard.TaskAssignUserOutside{
+		Assigner: expect,
+		TaskID:   task.TaskID,
+		CardID:   task.CardID,
+	}
+
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
@@ -1450,11 +1546,15 @@ func TestService_DismissUser(t *testing.T) {
 	mockBoardStorage.
 		EXPECT().
 		DismissUser(input).
-		Return(nil)
+		Return(task, nil)
 
-	_, err := service.DismissUser(context.Background(), request)
+	res, err := service.DismissUser(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, res) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -1519,7 +1619,7 @@ func TestService_DismissUserDismissFail(t *testing.T) {
 	mockBoardStorage.
 		EXPECT().
 		DismissUser(input).
-		Return(errStorage)
+		Return(models.TaskAssignUserOutside{}, errStorage)
 
 	_, err := service.DismissUser(context.Background(), request)
 	if err == nil {
@@ -1753,16 +1853,36 @@ func TestService_AddTag(t *testing.T) {
 		TaskID: request.TaskID,
 	}
 
+	tag := models.TagOutside{
+		CardID: 1,
+		TaskID: request.TaskID,
+		TagID:  1,
+		Color:  "lala",
+		Name:   "lala",
+	}
+
+	output := &protoBoard.TagOutside{
+		TaskID: tag.TaskID,
+		CardID: tag.CardID,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service :=  &service{boardStorage: mockBoardStorage}
-	mockBoardStorage.EXPECT().AddTag(input).Return(nil)
+	mockBoardStorage.EXPECT().AddTag(input).Return(tag, nil)
 
-	_, err := service.AddTag(context.Background(), request)
+	res, err := service.AddTag(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(res, output) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -1785,7 +1905,7 @@ func TestService_AddTagFail(t *testing.T) {
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service :=  &service{boardStorage: mockBoardStorage}
-	mockBoardStorage.EXPECT().AddTag(input).Return(errStorage)
+	mockBoardStorage.EXPECT().AddTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.AddTag(context.Background(), request)
 	if err == nil {
@@ -1806,16 +1926,36 @@ func TestService_RemoveTag(t *testing.T) {
 		TaskID: request.TaskID,
 	}
 
+	tag := models.TagOutside{
+		CardID: 1,
+		TaskID: request.TaskID,
+		TagID:  1,
+		Color:  "lala",
+		Name:   "lala",
+	}
+
+	output := &protoBoard.TagOutside{
+		TaskID: tag.TaskID,
+		CardID: tag.CardID,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
+	}
+
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service :=  &service{boardStorage: mockBoardStorage}
-	mockBoardStorage.EXPECT().RemoveTag(input).Return(nil)
+	mockBoardStorage.EXPECT().RemoveTag(input).Return(tag,nil)
 
-	_, err := service.RemoveTag(context.Background(), request)
+	res, err := service.RemoveTag(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(res, output) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -1838,7 +1978,7 @@ func TestService_RemoveTagFail(t *testing.T) {
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service :=  &service{boardStorage: mockBoardStorage}
-	mockBoardStorage.EXPECT().RemoveTag(input).Return(errStorage)
+	mockBoardStorage.EXPECT().RemoveTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.RemoveTag(context.Background(), request)
 	if err == nil {
@@ -2128,17 +2268,33 @@ func TestService_DeleteComment(t *testing.T) {
 		UserID:    request.UserID,
 	}
 
+	comment := models.CommentOutside{
+		CommentID: request.CommentID,
+		TaskID:    request.TaskID,
+		CardID:    1,
+	}
+
+	output := &protoBoard.CommentOutside{
+		CommentID: comment.CommentID,
+		CardID: comment.CardID,
+		TaskID: comment.TaskID,
+	}
+
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteComment(input).Return(nil)
+	mockBoardStorage.EXPECT().DeleteComment(input).Return(comment, nil)
 
-	_, err := service.DeleteComment(context.Background(), request)
+	res, err := service.DeleteComment(context.Background(), request)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(output, res) {
+		t.Errorf("results not match, want %v, have %v", output, res)
 		return
 	}
 }
@@ -2166,7 +2322,7 @@ func TestService_DeleteCommentFail(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteComment(input).Return(errStorage)
+	mockBoardStorage.EXPECT().DeleteComment(input).Return(models.CommentOutside{}, errStorage)
 
 	_, err := service.DeleteComment(context.Background(), request)
 	if err == nil {
@@ -2358,7 +2514,7 @@ func TestService_DeleteChecklist(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteChecklist(input).Return(nil)
+	mockBoardStorage.EXPECT().DeleteChecklist(input).Return(models.ChecklistOutside{}, nil)
 
 	_, err := service.DeleteChecklist(context.Background(), request)
 	if err != nil {
@@ -2390,7 +2546,7 @@ func TestService_DeleteChecklistFail(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().DeleteChecklist(input).Return(errStorage)
+	mockBoardStorage.EXPECT().DeleteChecklist(input).Return(models.ChecklistOutside{}, errStorage)
 
 	_, err := service.DeleteChecklist(context.Background(), request)
 	if err == nil {
@@ -2562,7 +2718,7 @@ func TestService_RemoveAttachment(t *testing.T) {
 
 	service := NewService(mockBoardStorage, mockFileStorage, mockProfileService)
 
-	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(nil)
+	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(models.AttachmentOutside{}, nil)
 	mockFileStorage.EXPECT().DeleteFile(input.Filename, false).Return(nil)
 
 	_, err := service.RemoveAttachment(context.Background(), request)
@@ -2591,7 +2747,7 @@ func TestService_RemoveAttachmentFail(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(errStorage)
+	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(models.AttachmentOutside{}, errStorage)
 
 	_, err := service.RemoveAttachment(context.Background(), request)
 	if err == nil {
@@ -2623,7 +2779,7 @@ func TestService_RemoveAttachmentDeleteFail(t *testing.T) {
 
 	service := &service{boardStorage: mockBoardStorage, fileStorage: mockFileStorage}
 
-	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(nil)
+	mockBoardStorage.EXPECT().RemoveAttachment(input).Return(models.AttachmentOutside{}, nil)
 	mockFileStorage.EXPECT().DeleteFile(input.Filename, false).Return(errStorage)
 
 	_, err := service.RemoveAttachment(context.Background(), request)
@@ -2698,10 +2854,10 @@ func TestService_CheckCardPermission(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
+	expect := &protoBoard.BoardID{BoardID: 1}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckCardPermission(input.UserID, input.ElementID).Return(nil)
+	mockBoardStorage.EXPECT().CheckCardPermission(input.UserID, input.ElementID).Return(int64(1), nil)
 
 	output, err := service.CheckCardPermission(context.Background(), input)
 	if err != nil {
@@ -2725,10 +2881,10 @@ func TestService_CheckCardPermissionFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
+	expect := &protoBoard.BoardID{}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckCardPermission(input.UserID, input.ElementID).Return(errStorage)
+	mockBoardStorage.EXPECT().CheckCardPermission(input.UserID, input.ElementID).Return(int64(0), errStorage)
 
 	output, err := service.CheckCardPermission(context.Background(), input)
 	if err == nil {
@@ -2752,10 +2908,10 @@ func TestService_CheckTaskPermission(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
+	expect := &protoBoard.BoardID{BoardID: 1}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(nil)
+	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(int64(1),nil)
 
 	output, err := service.CheckTaskPermission(context.Background(), input)
 	if err != nil {
@@ -2779,18 +2935,13 @@ func TestService_CheckTaskPermissionFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(errStorage)
+	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(int64(0), errStorage)
 
-	output, err := service.CheckTaskPermission(context.Background(), input)
+	_, err := service.CheckTaskPermission(context.Background(), input)
 	if err == nil {
 		t.Errorf("expected err: %s", err)
-		return
-	}
-	if !reflect.DeepEqual(output, expect) {
-		t.Errorf("results not match, want %v, have %v", expect, output)
 		return
 	}
 }
@@ -2806,10 +2957,13 @@ func TestService_CheckCommentPermission(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
+	expect := &protoBoard.BoardID{BoardID: 1}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin).Return(nil)
+	mockBoardStorage.
+		EXPECT().
+		CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin).
+		Return(expect.BoardID, nil)
 
 	output, err := service.CheckCommentPermission(context.Background(), input)
 	if err != nil {
@@ -2833,18 +2987,14 @@ func TestService_CheckCommentPermissionFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	expect := &protoBoard.Nothing{Dummy: true}
+	expect := &protoBoard.BoardID{BoardID: 1}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin).Return(errStorage)
+	mockBoardStorage.EXPECT().CheckCommentPermission(input.UserID, input.ElementID, input.IfAdmin).Return(expect.BoardID, errStorage)
 
-	output, err := service.CheckCommentPermission(context.Background(), input)
+	_, err := service.CheckCommentPermission(context.Background(), input)
 	if err == nil {
 		t.Errorf("unexpected err: %s", err)
-		return
-	}
-	if !reflect.DeepEqual(output, expect) {
-		t.Errorf("results not match, want %v, have %v", expect, output)
 		return
 	}
 }

@@ -34,7 +34,7 @@ func main() {
 	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
-		log.Fatalf("Cannot connect to database", err)
+		log.Fatalln("Cannot connect to database", err)
 	}
 
 	db.SetMaxIdleConns(3)
@@ -42,7 +42,7 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("Cannot connect to database", err)
+		log.Fatalln("Cannot connect to database", err)
 	}
 
 	taskStorage := tasksStorage.NewStorage(db)
@@ -64,7 +64,7 @@ func main() {
 		grpc.WithInsecure(),
 	)
 	if err != nil {
-		log.Fatalf("cant connect to grpc")
+		log.Fatalln("cant connect to grpc")
 	}
 	defer grpcConn.Close()
 

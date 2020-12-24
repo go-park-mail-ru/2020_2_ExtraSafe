@@ -25,6 +25,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 	//тут создание объектов
 	storage := &storage{db: db}
 
+
 	boardInput := models.BoardChangeInput{
 		UserID:    1,
 		BoardID:   0,
@@ -32,6 +33,12 @@ func TestStorage_CreateBoard(t *testing.T) {
 		Theme:     "dark",
 		Star:      false,
 	}
+
+	url := createSharedUrl(boardInput.UserID, boardInput.BoardName)
+	if url == 0 {
+		t.Errorf("cannot get url")
+	}
+//	urlString := strconv.FormatUint(uint64(url), 10)
 
 	expectBoardOutside := models.BoardInternal{
 		BoardID:  1,
@@ -45,7 +52,7 @@ func TestStorage_CreateBoard(t *testing.T) {
 
 	mock.
 		ExpectQuery("INSERT INTO boards").
-		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star).
+		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star, sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
 	board, err := storage.CreateBoard(boardInput)
@@ -83,7 +90,7 @@ func TestStorage_CreateBoardFail(t *testing.T) {
 
 	mock.
 		ExpectQuery("INSERT INTO boards").
-		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star).
+		WithArgs(boardInput.UserID, boardInput.BoardName, boardInput.Theme, boardInput.Star, sqlmock.AnyArg()).
 		WillReturnError(sql.ErrNoRows)
 
 	_, err = storage.CreateBoard(boardInput)
@@ -1635,7 +1642,7 @@ func TestStorage_CheckCardPermission(t *testing.T) {
 		WithArgs(userID, cardID).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
-	err = storage.CheckCardPermission(userID, cardID)
+	_, err = storage.CheckCardPermission(userID, cardID)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -1663,7 +1670,7 @@ func TestStorage_CheckCardPermissionQueryFail(t *testing.T) {
 		WithArgs(userID, cardID).
 		WillReturnError(errors.New(""))
 
-	err = storage.CheckCardPermission(userID, cardID)
+	_, err = storage.CheckCardPermission(userID, cardID)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -1691,7 +1698,7 @@ func TestStorage_CheckCardPermissionFail(t *testing.T) {
 		WithArgs(userID, cardID).
 		WillReturnError(sql.ErrNoRows)
 
-	err = storage.CheckCardPermission(userID, cardID)
+	_, err = storage.CheckCardPermission(userID, cardID)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -1803,18 +1810,23 @@ func TestStorage_ChangeTask(t *testing.T) {
 
 func TestStorage_DeleteTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID: 1 }
+	
+	output := models.TaskInternalShort{
+		TaskID: 1,
+		CardID: 1,
+	}
 
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
-	mockTasks.EXPECT().DeleteTask(taskInput).Times(1).Return(nil)
+	mockTasks.EXPECT().DeleteTask(taskInput).Times(1).Return(output, nil)
 
 	storage := &storage{
 		tasksStorage: mockTasks,
 	}
 
-	err := storage.DeleteTask(taskInput)
+	_, err := storage.DeleteTask(taskInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -2205,7 +2217,7 @@ func TestStorage_CheckTaskPermission(t *testing.T) {
 		WithArgs(userID, taskID).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
-	err = storage.CheckTaskPermission(userID, taskID)
+	_, err = storage.CheckTaskPermission(userID, taskID)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -2233,7 +2245,7 @@ func TestStorage_CheckTaskPermissionQueryFail(t *testing.T) {
 		WithArgs(userID, taskID).
 		WillReturnError(errors.New(""))
 
-	err = storage.CheckTaskPermission(userID, taskID)
+	_, err = storage.CheckTaskPermission(userID, taskID)
 	if err == nil {
 		t.Errorf("expected err")
 		return
@@ -2261,7 +2273,7 @@ func TestStorage_CheckTaskPermissionFail(t *testing.T) {
 		WithArgs(userID, taskID).
 		WillReturnError(sql.ErrNoRows)
 
-	err = storage.CheckTaskPermission(userID, taskID)
+	_, err = storage.CheckTaskPermission(userID, taskID)
 	if err == nil {
 		t.Errorf("expected err")
 		return
@@ -2393,7 +2405,7 @@ func TestStorage_CheckCommentPermissionIfAdminFalse(t *testing.T) {
 		WithArgs(userID, commentID).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
-	err = storage.CheckCommentPermission(userID, commentID, false)
+	_, err = storage.CheckCommentPermission(userID, commentID, false)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -2421,7 +2433,7 @@ func TestStorage_CheckCommentPermissionIfAdminTrue(t *testing.T) {
 		WithArgs(userID, commentID).
 		WillReturnRows(sqlmock.NewRows([]string{"boardID"}).AddRow(1))
 
-	err = storage.CheckCommentPermission(userID, commentID, true)
+	_, err = storage.CheckCommentPermission(userID, commentID, true)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -2449,7 +2461,7 @@ func TestStorage_CheckCommentPermissionQueryError(t *testing.T) {
 		WithArgs(userID, commentID).
 		WillReturnError(errors.New(""))
 
-	err = storage.CheckCommentPermission(userID, commentID, true)
+	_, err = storage.CheckCommentPermission(userID, commentID, true)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -2477,7 +2489,7 @@ func TestStorage_CheckCommentPermissionDenied(t *testing.T) {
 		WithArgs(userID, commentID).
 		WillReturnError(sql.ErrNoRows)
 
-	err = storage.CheckCommentPermission(userID, commentID, true)
+	_, err = storage.CheckCommentPermission(userID, commentID, true)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -2495,15 +2507,21 @@ func TestStorage_AssignUser(t *testing.T) {
 		AssignerID: 2,
 	}
 
+	output := models.TaskInternalShort{
+		TaskID: input.TaskID,
+		CardID: 1,
+	}
+
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().AssignUser(input).Times(1).Return(nil)
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Times(1).Return(output.CardID, nil)
 
 	storage := &storage{tasksStorage: mockTasks}
 
-	err := storage.AssignUser(input)
+	_, err := storage.AssignUser(input)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -2517,15 +2535,21 @@ func TestStorage_DismissUser(t *testing.T) {
 		AssignerID: 2,
 	}
 
+	output := models.TaskInternalShort{
+		TaskID: input.TaskID,
+		CardID: 1,
+	}
+
 	ctrlTasks := gomock.NewController(t)
 	defer ctrlTasks.Finish()
 
 	mockTasks := mocks.NewMockTasksStorage(ctrlTasks)
 	mockTasks.EXPECT().DismissUser(input).Times(1).Return(nil)
+	mockTasks.EXPECT().GetCardIDByTask(input.TaskID).Times(1).Return(output.CardID, nil)
 
 	storage := &storage{tasksStorage: mockTasks}
 
-	err := storage.DismissUser(input)
+	_, err := storage.DismissUser(input)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return

@@ -13,8 +13,8 @@ services:
     image: keithzetterstrom/tabutask_auth:latest
     container_name: tabutask_auth
     restart: always
-    expose:
-      - 9081
+    ports:
+      - 9081:9081
     env_file:
       - config.env
     depends_on:
