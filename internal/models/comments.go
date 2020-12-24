@@ -1,6 +1,5 @@
 package models
 
-
 type Comment struct {
 	CommentID int64
 	TaskID    int64
@@ -9,7 +8,7 @@ type Comment struct {
 	UserID    int64
 }
 
-//===================================================<-Input
+// ===================================================<-Input
 type CommentInput struct {
 	CommentID int64  `json:"commentID"`
 	TaskID    int64  `json:"taskID"`
@@ -20,7 +19,7 @@ type CommentInput struct {
 	SessionID string `json:"-"`
 }
 
-//===================================================<-Internal
+// ===================================================<-Internal
 type CommentInternal struct {
 	CommentID int64
 	CardID    int64
@@ -30,7 +29,7 @@ type CommentInternal struct {
 	UserID    int64
 }
 
-//===================================================<-Outside
+// ===================================================<-Outside
 type CommentOutside struct {
 	CommentID int64            `json:"commentID,omitempty"`
 	TaskID    int64            `json:"taskID,omitempty"`
@@ -40,4 +39,4 @@ type CommentOutside struct {
 	User      UserOutsideShort `json:"commentAuthor,omitempty"`
 }
 
-//===================================================<-Other
+// ===================================================<-Other

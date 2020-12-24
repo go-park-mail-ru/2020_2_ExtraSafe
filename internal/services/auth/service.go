@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"github.com/labstack/echo"
@@ -28,7 +28,7 @@ type service struct {
 func NewService(authService protoAuth.AuthClient, validator Validator) ServiceAuth {
 	return &service{
 		authService: authService,
-		validator: validator,
+		validator:   validator,
 	}
 }
 
@@ -46,7 +46,7 @@ func (s *service) CheckCookie(c echo.Context) (int64, error) {
 
 	user, err := s.authService.CheckCookie(ctx, input)
 	if err != nil {
-		return -1, errorWorker.ConvertStatusToError(err)
+		return -1, errorworker.ConvertStatusToError(err)
 	}
 	return user.ID, nil
 }
@@ -57,7 +57,7 @@ func (s *service) Auth(request models.UserInput) (response models.UserBoardsOuts
 
 	user, err := s.authService.Auth(ctx, input)
 	if err != nil {
-		return models.UserBoardsOutside{}, errorWorker.ConvertStatusToError(err)
+		return models.UserBoardsOutside{}, errorworker.ConvertStatusToError(err)
 	}
 
 	boards := make([]models.BoardOutsideShort, 0)
@@ -95,7 +95,7 @@ func (s *service) Login(request models.UserInputLogin) (userSession models.UserS
 	user, err := s.authService.Login(ctx, input)
 	if err != nil {
 		fmt.Println(err)
-		return models.UserSession{}, errorWorker.ConvertStatusToError(err)
+		return models.UserSession{}, errorworker.ConvertStatusToError(err)
 	}
 
 	userSession.UserID = user.UserID
@@ -103,7 +103,6 @@ func (s *service) Login(request models.UserInputLogin) (userSession models.UserS
 
 	return userSession, nil
 }
-
 
 func (s *service) Registration(request models.UserInputReg) (userSession models.UserSession, err error) {
 	ctx := context.Background()
@@ -121,7 +120,7 @@ func (s *service) Registration(request models.UserInputReg) (userSession models.
 
 	user, err := s.authService.Registration(ctx, input)
 	if err != nil {
-		return models.UserSession{}, errorWorker.ConvertStatusToError(err)
+		return models.UserSession{}, errorworker.ConvertStatusToError(err)
 	}
 
 	userSession.UserID = user.UserID
@@ -148,4 +147,3 @@ func (s *service) Logout(c echo.Context) (err error) {
 	}
 	return nil
 }
-

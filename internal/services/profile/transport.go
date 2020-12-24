@@ -45,7 +45,6 @@ func (t transport) ProfileChangeRead(c echo.Context) (request models.UserInputPr
 	if err == nil {
 		fileContent, _ := file.Open()
 		var byteContainer []byte
-		byteContainer = make([]byte, file.Size)
 		byteContainer, _ = ioutil.ReadAll(fileContent)
 		userInput.Avatar = byteContainer
 	}

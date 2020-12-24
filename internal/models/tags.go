@@ -7,7 +7,7 @@ type Tag struct {
 	Name    string
 }
 
-//===================================================<-Input
+// ===================================================<-Input
 type TagInput struct {
 	SessionID string `json:"-"`
 	UserID    int64  `json:"-"`
@@ -18,10 +18,9 @@ type TagInput struct {
 	Name      string `json:"tagName"`
 }
 
-//===================================================<-Internal
+// ===================================================<-Internal
 
-
-//===================================================<-Outside
+// ===================================================<-Outside
 type TagOutside struct {
 	CardID int64  `json:"cardID"`
 	TaskID int64  `json:"taskID"`
@@ -30,4 +29,4 @@ type TagOutside struct {
 	Name   string `json:"tagName"`
 }
 
-//===================================================<-Other
+// ===================================================<-Other

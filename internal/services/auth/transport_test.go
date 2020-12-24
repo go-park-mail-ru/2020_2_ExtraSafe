@@ -133,7 +133,7 @@ func TestTransport_AuthWrite(t *testing.T) {
 		Boards:   nil,
 	}
 
-	expectedResponse:= models.ResponseUserAuth{
+	expectedResponse := models.ResponseUserAuth{
 		Status:   200,
 		Token:    "12345",
 		Email:    "mariya@mail.ru",
@@ -154,9 +154,9 @@ func TestTransport_AuthWrite(t *testing.T) {
 }
 
 func TestTransport_LoginWrite(t *testing.T) {
-	expectedResponse:= models.ResponseToken{
-		Status:   200,
-		Token:    "12345",
+	expectedResponse := models.ResponseToken{
+		Status: 200,
+		Token:  "12345",
 	}
 
 	transp := &transport{}
@@ -170,8 +170,8 @@ func TestTransport_LoginWrite(t *testing.T) {
 }
 
 func TestTransport_RegWrite(t *testing.T) {
-	expectedResponse:= models.ResponseStatus{
-		Status:   200,
+	expectedResponse := models.ResponseStatus{
+		Status: 200,
 	}
 
 	transp := NewTransport()

@@ -1,0 +1,76 @@
+run:
+  concurrency: 4
+  timeout: 1m
+  tests: false
+
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+
+linters-settings:
+  dogsled:
+    max-blank-identifiers: 2
+
+  errcheck:
+    check-type-assertions: false
+    check-black: false
+
+  gofmt:
+    simplify: true
+
+  golint:
+    min-confidence: 0.8
+
+  gomnd:
+    settings:
+      mnd:
+        checks: argument,case,condition,operation,return,assign
+
+
+linters:
+  disable-all: true
+  enable:
+    - megacheck
+    - govet
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - exhaustive
+    #- gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - golint
+    # - gomnd
+    - goprintffuncname
+    #- gosec
+    - gosimple
+    - govet
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    # - rowserrcheck
+    - scopelint
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+
+
+issues:
+  exclude:
+    - w.Write
+    - decoder.Write
+    - composites

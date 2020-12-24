@@ -22,16 +22,15 @@ import (
 	"strings"
 )
 
-
 func main() {
 	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
 	dbPort := os.Getenv("TABUTASK_DB_PORT")
-	driverName:= os.Getenv("TABUTASK_BOARDS_DRIVER")
-	userName:= os.Getenv("TABUTASK_BOARDS_USER")
-	password:= os.Getenv("TABUTASK_BOARDS_PASSWORD")
-	dbName:= os.Getenv("TABUTASK_BOARDS_NAME")
+	driverName := os.Getenv("TABUTASK_BOARDS_DRIVER")
+	userName := os.Getenv("TABUTASK_BOARDS_USER")
+	password := os.Getenv("TABUTASK_BOARDS_PASSWORD")
+	dbName := os.Getenv("TABUTASK_BOARDS_NAME")
 
-	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
+	connections := strings.Join([]string{"host=", dbAddr, "port=", dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
 	db, err := sql.Open(driverName, connections)
 	if err != nil {
 		log.Fatalln("Cannot connect to database", err)
@@ -51,13 +50,13 @@ func main() {
 	commentsStorage := commentStorage.NewStorage(db)
 	checklistsStorage := checklistStorage.NewStorage(db)
 	attachStorage := attachmentStorage.NewStorage(db)
-	bStorage := boardStorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage, attachStorage)
+	bStorage := boardstorage.NewStorage(db, cardStorage, taskStorage, tagsStorage, commentsStorage, checklistsStorage, attachStorage)
 
 	fileStorage := fStorage.NewStorage()
 
 	// =============================
 
-	profileServiceAddr:= os.Getenv("PROFILE_SERVICE_ADDR")
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
 
 	grpcConn, err := grpc.Dial(
 		profileServiceAddr,
@@ -70,7 +69,7 @@ func main() {
 
 	// =============================
 
-	boardServiceAddr:= os.Getenv("BOARDS_SERVICE_ADDR")
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
 
 	lis, err := net.Listen("tcp", boardServiceAddr)
 	if err != nil {

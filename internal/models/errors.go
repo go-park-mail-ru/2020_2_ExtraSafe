@@ -14,6 +14,6 @@ func (c ServeError) Error() string {
 }
 
 type MultiErrors struct {
-	Codes         []string `json:"codes"`
-	Descriptions  []string `json:"descriptions"`
+	Codes        []string `json:"codes"`
+	Descriptions []string `json:"descriptions"`
 }

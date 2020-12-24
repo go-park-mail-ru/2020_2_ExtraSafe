@@ -1,6 +1,5 @@
 package models
 
-
 type Board struct {
 	BoardID  int64   `json:"boardID"`
 	AdminID  int64   `json:"adminID"`
@@ -10,7 +9,7 @@ type Board struct {
 	UsersIDs []int64 `json:"usersIDs"`
 }
 
-//===================================================<-Input
+// ===================================================<-Input
 type BoardInput struct {
 	UserID    int64  `json:"-"`
 	SessionID string `json:"-"`
@@ -39,7 +38,7 @@ type BoardInviteInput struct {
 	UrlHash string
 }
 
-//===================================================<-Internal
+// ===================================================<-Internal
 type BoardInternal struct {
 	BoardID  int64          `json:"boardID"`
 	AdminID  int64          `json:"adminID"`
@@ -51,7 +50,7 @@ type BoardInternal struct {
 	Tags     []TagOutside
 }
 
-//===================================================<-Outside
+// ===================================================<-Outside
 type BoardOutside struct {
 	BoardID int64              `json:"boardID"`
 	Admin   UserOutsideShort   `json:"boardAdmin"`
@@ -76,7 +75,7 @@ type BoardMemberOutside struct {
 	Initiator string `json:"initiator"`
 }
 
-//===================================================<-Other
+// ===================================================<-Other
 type BoardMember struct {
 	UserID   int64
 	BoardID  int64

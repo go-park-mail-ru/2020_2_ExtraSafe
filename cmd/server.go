@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	protoAuth "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
@@ -25,7 +25,6 @@ import (
 	"log"
 	"os"
 )
-
 
 func main() {
 	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
@@ -51,7 +50,7 @@ func main() {
 		grpc.WithInsecure(),
 	)
 	if err != nil {
-		log.Fatalf("cant connect to grpc")
+		log.Fatalln("cant connect to grpc")
 	}
 	defer grpcConnProfile.Close()
 
@@ -71,7 +70,7 @@ func main() {
 	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	internalLogger := logger.NewLogger(&zeroLogger)
-	errWorker := errorWorker.NewErrorWorker()
+	errWorker := errorworker.NewErrorWorker()
 
 	boardClient := protoBoard.NewBoardClient(grpcConnBoard)
 	profileClient := protoProfile.NewProfileClient(grpcConnProfile)

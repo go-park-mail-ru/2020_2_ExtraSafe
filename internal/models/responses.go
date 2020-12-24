@@ -3,7 +3,7 @@ package models
 import "encoding/json"
 
 type ResponseStatus struct {
-	Status   int    `json:"status"`
+	Status int `json:"status"`
 }
 
 type ResponseToken struct {
@@ -11,7 +11,7 @@ type ResponseToken struct {
 	Token  string `json:"token"`
 }
 
-//===================================================<-User
+// ===================================================<-User
 type ResponseUser struct {
 	Status   int    `json:"status"`
 	Email    string `json:"email"`
@@ -30,13 +30,13 @@ type ResponseUserAuth struct {
 	Boards   []BoardOutsideShort `json:"boards"`
 }
 
-//===================================================<-Board
+// ===================================================<-Board
 type ResponseBoardShort struct {
-	Status  int                `json:"status"`
-	BoardID int64             `json:"boardID"`
-	Name    string             `json:"boardName"`
-	Theme   string             `json:"theme"`
-	Star    bool               `json:"star"`
+	Status  int    `json:"status"`
+	BoardID int64  `json:"boardID"`
+	Name    string `json:"boardName"`
+	Theme   string `json:"theme"`
+	Star    bool   `json:"star"`
 }
 
 type ResponseBoard struct {
@@ -61,11 +61,11 @@ type ResponseURL struct {
 	URL    string `json:"sharedURL"`
 }
 
-//===================================================<-Card
+// ===================================================<-Card
 type ResponseCardShort struct {
-	Status int           `json:"status"`
-	CardID int64         `json:"cardID"`
-	Name   string        `json:"cardName"`
+	Status int    `json:"status"`
+	CardID int64  `json:"cardID"`
+	Name   string `json:"cardName"`
 }
 
 type ResponseCard struct {
@@ -76,12 +76,12 @@ type ResponseCard struct {
 	Tasks  []TaskOutsideShort `json:"cardTasks"`
 }
 
-//===================================================<-Task
+// ===================================================<-Task
 type ResponseTaskSuperShort struct {
-	Status      int                 `json:"status"`
-	TaskID      int64               `json:"taskID"`
-	Name        string              `json:"taskName"`
-	Description string              `json:"taskDescription"`
+	Status      int    `json:"status"`
+	TaskID      int64  `json:"taskID"`
+	Name        string `json:"taskName"`
+	Description string `json:"taskDescription"`
 }
 
 type ResponseTask struct {
@@ -97,7 +97,7 @@ type ResponseTask struct {
 	Attachments []AttachmentOutside `json:"taskAttachments"`
 }
 
-//===================================================<-Tag
+// ===================================================<-Tag
 type ResponseTag struct {
 	Status  int    `json:"status"`
 	TagID   int64  `json:"tagID"`
@@ -105,7 +105,7 @@ type ResponseTag struct {
 	TagName string `json:"tagName"`
 }
 
-//===================================================<-Comment
+// ===================================================<-Comment
 type ResponseComment struct {
 	Status    int              `json:"status"`
 	CommentID int64            `json:"commentID"`
@@ -114,7 +114,7 @@ type ResponseComment struct {
 	User      UserOutsideShort `json:"commentAuthor"`
 }
 
-//===================================================<-Checklist
+// ===================================================<-Checklist
 type ResponseChecklist struct {
 	Status      int             `json:"status"`
 	ChecklistID int64           `json:"checklistID"`
@@ -122,7 +122,7 @@ type ResponseChecklist struct {
 	Items       json.RawMessage `json:"checklistItems"`
 }
 
-//===================================================<-Attachment
+// ===================================================<-Attachment
 type ResponseAttachment struct {
 	Status       int    `json:"status"`
 	AttachmentID int64  `json:"attachmentID"`
@@ -130,7 +130,7 @@ type ResponseAttachment struct {
 	Filepath     string `json:"attachmentFilePath"`
 }
 
-//===================================================<-WebSocket
+// ===================================================<-WebSocket
 type WS struct {
 	SessionID string      `json:"-"`
 	Method    string      `json:"method"`
@@ -138,6 +138,6 @@ type WS struct {
 }
 
 type NotificationMessage struct {
-	UserID int64       `json:"-"`
-	Body   WS `json:"body"`
+	UserID int64 `json:"-"`
+	Body   WS    `json:"body"`
 }

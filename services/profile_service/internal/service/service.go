@@ -2,9 +2,9 @@ package profile
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgStorage"
-	uStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userStorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/imgstorage"
+	uStorage "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/profile_service/internal/userstorage"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	"golang.org/x/net/context"
@@ -21,18 +21,18 @@ type Service interface {
 	GetUserByUsername(_ context.Context, input *protoProfile.UserName) (output *protoProfile.UserOutsideShort, err error)
 }
 type service struct {
-	userStorage uStorage.UserStorage
-	avatarStorage imgStorage.AvatarStorage
-	boardService protoBoard.BoardClient
+	userStorage   uStorage.UserStorage
+	avatarStorage imgstorage.AvatarStorage
+	boardService  protoBoard.BoardClient
 }
 
 var ServiceName = "ProfileService"
 
-func NewService(userStorage uStorage.UserStorage, avatarStorage imgStorage.AvatarStorage, boardService protoBoard.BoardClient) *service {
+func NewService(userStorage uStorage.UserStorage, avatarStorage imgstorage.AvatarStorage, boardService protoBoard.BoardClient) *service {
 	return &service{
-		userStorage: userStorage,
+		userStorage:   userStorage,
 		avatarStorage: avatarStorage,
-		boardService: boardService,
+		boardService:  boardService,
 	}
 }
 
@@ -42,9 +42,9 @@ func (s *service) CheckUser(_ context.Context, input *protoProfile.UserInputLogi
 		Password: input.Password,
 	}
 
-	userID, _, err :=  s.userStorage.CheckUser(userInput)
+	userID, _, err := s.userStorage.CheckUser(userInput)
 	if err != nil {
-		return nil, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return nil, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserID{ID: userID}
@@ -59,9 +59,9 @@ func (s *service) CreateUser(_ context.Context, input *protoProfile.UserInputReg
 		Password: input.Password,
 	}
 
-	userID, _, err :=  s.userStorage.CreateUser(userInput)
+	userID, _, err := s.userStorage.CreateUser(userInput)
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return output, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserID{ID: userID}
@@ -76,7 +76,7 @@ func (s *service) Profile(_ context.Context, input *protoProfile.UserID) (output
 
 	user, err := s.userStorage.GetUserProfile(userInput)
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return output, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserOutside{
@@ -133,7 +133,7 @@ func (s *service) ProfileChange(_ context.Context, input *protoProfile.UserInput
 	}
 
 	if len(multiErrors.Codes) != 0 {
-		return nil, errorWorker.ConvertErrorToStatus(models.ServeError{Codes: multiErrors.Codes,
+		return nil, errorworker.ConvertErrorToStatus(models.ServeError{Codes: multiErrors.Codes,
 			Descriptions: multiErrors.Descriptions, MethodName: "ProfileChange"}, ServiceName)
 	}
 
@@ -156,7 +156,7 @@ func (s *service) PasswordChange(_ context.Context, input *protoProfile.UserInpu
 
 	user, err := s.userStorage.ChangeUserPassword(userInput)
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return output, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserOutside{
@@ -178,14 +178,14 @@ func (s *service) GetUsersByIDs(_ context.Context, input *protoProfile.UserIDS) 
 
 	users, err := s.userStorage.GetUsersByIDs(userIDS)
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return output, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UsersOutsideShort{Users: nil}
 
 	for _, userShort := range users {
 		output.Users = append(output.Users, &protoProfile.UserOutsideShort{
-			ID: userShort.ID,
+			ID:       userShort.ID,
 			Email:    userShort.Email,
 			Username: userShort.Username,
 			FullName: userShort.FullName,
@@ -199,11 +199,11 @@ func (s *service) GetUsersByIDs(_ context.Context, input *protoProfile.UserIDS) 
 func (s *service) GetUserByUsername(_ context.Context, input *protoProfile.UserName) (output *protoProfile.UserOutsideShort, err error) {
 	user, err := s.userStorage.GetUserByUsername(input.UserName)
 	if err != nil {
-		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
+		return output, errorworker.ConvertErrorToStatus(err.(models.ServeError), ServiceName)
 	}
 
 	output = &protoProfile.UserOutsideShort{
-		ID: user.ID,
+		ID:       user.ID,
 		Email:    user.Email,
 		Username: user.Username,
 		FullName: user.FullName,

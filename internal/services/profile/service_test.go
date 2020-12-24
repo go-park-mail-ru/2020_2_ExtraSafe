@@ -57,9 +57,9 @@ func TestService_ProfileChange(t *testing.T) {
 		FullName: "",
 	}
 
-	request :=  &protoProfile.UserInputProfile {
-		ID: input.ID,
-		Email: input.Email,
+	request := &protoProfile.UserInputProfile{
+		ID:       input.ID,
+		Email:    input.Email,
 		Username: input.Username,
 		FullName: input.FullName,
 	}
@@ -68,7 +68,7 @@ func TestService_ProfileChange(t *testing.T) {
 		Email:    input.Email,
 		Username: input.Username,
 		FullName: input.FullName,
-		Avatar: "default/default_avatar.png",
+		Avatar:   "default/default_avatar.png",
 	}
 
 	expect := &protoProfile.UserOutside{
@@ -134,7 +134,7 @@ func TestService_Boards(t *testing.T) {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-	if !reflect.DeepEqual(boards,output) {
+	if !reflect.DeepEqual(boards, output) {
 		t.Errorf("results not match, want \n%v, \nhave \n%v", output, boards)
 		return
 	}

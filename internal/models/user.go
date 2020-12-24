@@ -10,7 +10,7 @@ type User struct {
 	Boards   []BoardInternal
 }
 
-//===================================================<-Input
+// ===================================================<-Input
 type UserInput struct {
 	SessionID string `json:"-"`
 	ID        int64  `json:"id"`
@@ -41,7 +41,7 @@ type UserInputPassword struct {
 	Password    string `json:"password" valid:"required~512, passwordValid~512"`
 }
 
-//===================================================<-Internal
+// ===================================================<-Internal
 type UserInternal struct {
 	ID       int64  `json:"-"`
 	Email    string `json:"email"`
@@ -50,7 +50,7 @@ type UserInternal struct {
 	Avatar   string `json:"avatar"`
 }
 
-//===================================================<-Outside
+// ===================================================<-Outside
 type UserOutside struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
@@ -74,7 +74,7 @@ type UserBoardsOutside struct {
 	Boards   []BoardOutsideShort `json:"boards"`
 }
 
-//===================================================<-Other
+// ===================================================<-Other
 type UserAvatar struct {
 	ID     int64
 	Avatar string

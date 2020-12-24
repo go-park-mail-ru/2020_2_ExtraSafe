@@ -1,6 +1,5 @@
 package models
 
-
 type Task struct {
 	TaskID      int64  `json:"taskID"`
 	CardID      int64  `json:"cardID"`
@@ -9,7 +8,7 @@ type Task struct {
 	Order       int64  `json:"order"`
 }
 
-//===================================================<-Input
+// ===================================================<-Input
 type TaskInput struct {
 	SessionID   string `json:"-"`
 	BoardID     int64  `json:"-"`
@@ -55,7 +54,7 @@ type TaskAssignerInput struct {
 	AssignerName string `json:"assignerUsername"`
 }
 
-//===================================================<-Internal
+// ===================================================<-Internal
 type TaskInternalShort struct {
 	TaskID      int64
 	CardID      int64
@@ -80,7 +79,7 @@ type TaskInternal struct {
 	Attachments []AttachmentOutside
 }
 
-//===================================================<-Outside
+// ===================================================<-Outside
 type TaskOutside struct {
 	TaskID      int64               `json:"taskID"`
 	Name        string              `json:"taskName"`
@@ -118,9 +117,9 @@ type TaskAssignUserOutside struct {
 	CardID    int64  `json:"cardID"`
 }
 
-//===================================================<-Other
+// ===================================================<-Other
 type TaskAssigner struct {
-	UserID      int64
-	TaskID      int64
-	AssignerID  int64
+	UserID     int64
+	TaskID     int64
+	AssignerID int64
 }

@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/cmd/handlers/mock"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
 	logger2 "github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
@@ -26,7 +26,7 @@ func TestMiddlew_CORS(t *testing.T) {
 	defer ctrlTransport.Finish()
 	mockTransportService := mock.NewMockTransportAuth(ctrlTransport)
 
-	worker := errorWorker.NewErrorWorker()
+	worker := errorworker.NewErrorWorker()
 
 	zeroLogger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 	logger := logger2.NewLogger(&zeroLogger)

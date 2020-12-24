@@ -72,7 +72,7 @@ func (t transport) BoardChangeRead(c echo.Context) (request models.BoardChangeIn
 	userInput := new(models.BoardChangeInput)
 
 	boardID := c.Param("ID")
-	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
+	userInput.BoardID, _ = strconv.ParseInt(boardID, 10, 64)
 
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardChangeInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -89,7 +89,7 @@ func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberIn
 	userInput := new(models.BoardMemberInput)
 
 	boardID := c.Param("ID")
-	userInput.BoardID, err = strconv.ParseInt(boardID, 10, 64)
+	userInput.BoardID, _ = strconv.ParseInt(boardID, 10, 64)
 
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardMemberInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -353,7 +353,6 @@ func (t transport) AttachmentAddRead(c echo.Context) (request models.AttachmentI
 	if err == nil {
 		fileContent, _ := file.Open()
 		var byteContainer []byte
-		byteContainer = make([]byte, file.Size)
 		byteContainer, _ = ioutil.ReadAll(fileContent)
 		userInput.File = byteContainer
 	}

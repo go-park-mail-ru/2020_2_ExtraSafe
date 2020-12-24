@@ -10,13 +10,13 @@ package protoAuth
 
 import (
 	context "context"
+	profile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	profile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 	reflect "reflect"
 	sync "sync"
 )

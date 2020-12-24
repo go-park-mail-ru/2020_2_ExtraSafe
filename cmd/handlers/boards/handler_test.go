@@ -20,8 +20,8 @@ func TestHandler_Board(t *testing.T) {
 
 	input := models.BoardInput{
 		SessionID: "13",
-		UserID:  1,
-		BoardID: 4,
+		UserID:    1,
+		BoardID:   4,
 	}
 
 	outside := models.BoardOutside{
@@ -69,8 +69,8 @@ func TestHandler_BoardFail(t *testing.T) {
 
 	input := models.BoardInput{
 		SessionID: "13",
-		UserID:  1,
-		BoardID: 4,
+		UserID:    1,
+		BoardID:   4,
 	}
 
 	outside := models.BoardOutside{
@@ -393,7 +393,7 @@ func TestHandler_BoardAddMember(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
-		SessionID: "13",
+		SessionID:  "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -442,7 +442,7 @@ func TestHandler_BoardAddMemberFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
-		SessionID: "13",
+		SessionID:  "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -491,7 +491,7 @@ func TestHandler_BoardRemoveMember(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
-		SessionID: "13",
+		SessionID:  "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -532,7 +532,7 @@ func TestHandler_BoardRemoveMemberFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.BoardMemberInput{
-		SessionID: "13",
+		SessionID:  "13",
 		UserID:     1,
 		BoardID:    4,
 		MemberName: "kit",
@@ -574,9 +574,9 @@ func TestHandler_Card(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   1,
 	}
 
 	outside := models.CardOutside{
@@ -623,9 +623,9 @@ func TestHandler_CardFail(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   1,
 	}
 
 	outside := models.CardOutside{
@@ -672,11 +672,11 @@ func TestHandler_CardCreate(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	outside := models.CardOutsideShort{
@@ -721,11 +721,11 @@ func TestHandler_CardCreateFail(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	outside := models.CardOutsideShort{
@@ -770,11 +770,11 @@ func TestHandler_CardChange(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	outside := models.CardOutsideShort{
@@ -819,11 +819,11 @@ func TestHandler_CardChangeFail(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	outside := models.CardOutsideShort{
@@ -868,11 +868,11 @@ func TestHandler_CardDelete(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	mockProfileService.EXPECT().DeleteCard(input).Return(nil)
@@ -912,11 +912,11 @@ func TestHandler_CardDeleteFail(t *testing.T) {
 
 	input := models.CardInput{
 		SessionID: "13",
-		UserID:  1,
-		CardID:  4,
-		BoardID: 4,
-		Name:   "todo",
-		Order:  1,
+		UserID:    1,
+		CardID:    4,
+		BoardID:   4,
+		Name:      "todo",
+		Order:     1,
 	}
 
 	mockProfileService.EXPECT().DeleteCard(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -956,9 +956,9 @@ func TestHandler_CardOrder(t *testing.T) {
 
 	input := models.CardsOrderInput{
 		SessionID: "13",
-		UserID: 1,
-		BoardID: 4,
-		Cards:  []models.CardOrder{},
+		UserID:    1,
+		BoardID:   4,
+		Cards:     []models.CardOrder{},
 	}
 
 	mockProfileService.EXPECT().CardOrderChange(input).Return(nil)
@@ -998,9 +998,9 @@ func TestHandler_CardOrderFail(t *testing.T) {
 
 	input := models.CardsOrderInput{
 		SessionID: "13",
-		UserID: 1,
-		BoardID: 4,
-		Cards:  []models.CardOrder{},
+		UserID:    1,
+		BoardID:   4,
+		Cards:     []models.CardOrder{},
 	}
 
 	mockProfileService.EXPECT().CardOrderChange(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -1040,9 +1040,9 @@ func TestHandler_Task(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		BoardID: 4,
-		TaskID: int64(4),
-		UserID: 1,
+		BoardID:   4,
+		TaskID:    int64(4),
+		UserID:    1,
 	}
 
 	outside := models.TaskOutside{
@@ -1094,9 +1094,9 @@ func TestHandler_TaskFail(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		BoardID: 4,
-		TaskID: int64(4),
-		UserID: 1,
+		BoardID:   4,
+		TaskID:    int64(4),
+		UserID:    1,
 	}
 
 	outside := models.TaskOutside{
@@ -1148,9 +1148,9 @@ func TestHandler_TaskCreate(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		TaskID: int64(4),
-		BoardID: 4,
-		UserID: 1,
+		TaskID:    int64(4),
+		BoardID:   4,
+		UserID:    1,
 	}
 
 	outside := models.TaskOutsideSuperShort{
@@ -1196,9 +1196,9 @@ func TestHandler_TaskCreateFail(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		TaskID: int64(4),
-		BoardID: 4,
-		UserID: 1,
+		TaskID:    int64(4),
+		BoardID:   4,
+		UserID:    1,
 	}
 
 	outside := models.TaskOutsideSuperShort{
@@ -1244,9 +1244,9 @@ func TestHandler_TaskChange(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		BoardID: 4,
-		TaskID: int64(4),
-		UserID: 1,
+		BoardID:   4,
+		TaskID:    int64(4),
+		UserID:    1,
 	}
 
 	outside := models.TaskOutsideSuperShort{
@@ -1292,9 +1292,9 @@ func TestHandler_TaskChangeFail(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		BoardID: 4,
-		TaskID: int64(4),
-		UserID: 1,
+		BoardID:   4,
+		TaskID:    int64(4),
+		UserID:    1,
 	}
 
 	outside := models.TaskOutsideSuperShort{
@@ -1340,9 +1340,9 @@ func TestHandler_TaskDelete(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
-		BoardID: 4,
-		TaskID: int64(4),
-		UserID: 1,
+		BoardID:   4,
+		TaskID:    int64(4),
+		UserID:    1,
 	}
 
 	mockProfileService.EXPECT().DeleteTask(input).Return(nil)
@@ -1381,10 +1381,10 @@ func TestHandler_TaskDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskInput{
-		TaskID: int64(4),
+		TaskID:    int64(4),
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
+		BoardID:   4,
+		UserID:    1,
 	}
 
 	mockProfileService.EXPECT().DeleteTask(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -1424,9 +1424,9 @@ func TestHandler_TaskOrder(t *testing.T) {
 
 	input := models.TasksOrderInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		Tasks:  nil,
+		BoardID:   4,
+		UserID:    1,
+		Tasks:     nil,
 	}
 
 	mockProfileService.EXPECT().TasksOrderChange(input).Return(nil)
@@ -1466,9 +1466,9 @@ func TestHandler_TaskOrderFail(t *testing.T) {
 
 	input := models.TasksOrderInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		Tasks:  nil,
+		BoardID:   4,
+		UserID:    1,
+		Tasks:     nil,
 	}
 
 	mockProfileService.EXPECT().TasksOrderChange(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -1507,8 +1507,8 @@ func TestHandler_TaskUserAdd(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1558,8 +1558,8 @@ func TestHandler_TaskUserAddFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1609,8 +1609,8 @@ func TestHandler_TaskUserRemove(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1652,8 +1652,8 @@ func TestHandler_TaskUserRemoveFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.TaskAssignerInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1696,12 +1696,12 @@ func TestHandler_TagCreate(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	output := models.TagOutside{
@@ -1746,12 +1746,12 @@ func TestHandler_TagCreateFail(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	output := models.TagOutside{
@@ -1796,12 +1796,12 @@ func TestHandler_TagChange(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	output := models.TagOutside{
@@ -1846,12 +1846,12 @@ func TestHandler_TagChangeFail(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	output := models.TagOutside{
@@ -1896,12 +1896,12 @@ func TestHandler_TagDelete(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	mockProfileService.EXPECT().DeleteTag(input).Return(nil)
@@ -1940,12 +1940,12 @@ func TestHandler_TagDeleteFail(t *testing.T) {
 
 	input := models.TagInput{
 		SessionID: "13",
-		UserID:  1,
-		TaskID:  4,
-		TagID:   4,
-		BoardID: 1,
-		Color:   "red",
-		Name:    "fds",
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
+		BoardID:   1,
+		Color:     "red",
+		Name:      "fds",
 	}
 
 	mockProfileService.EXPECT().DeleteTag(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -1984,10 +1984,10 @@ func TestHandler_TagAdd(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		TaskID: 4,
-		TagID:  4,
+		BoardID:   4,
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
 	}
 
 	mockProfileService.EXPECT().AddTag(input).Return(nil)
@@ -2027,10 +2027,10 @@ func TestHandler_TagAddFail(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		TaskID: 4,
-		TagID:  4,
+		BoardID:   4,
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
 	}
 
 	mockProfileService.EXPECT().AddTag(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -2070,10 +2070,10 @@ func TestHandler_TagRemove(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		TaskID: 4,
-		TagID:  4,
+		BoardID:   4,
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
 	}
 
 	mockProfileService.EXPECT().RemoveTag(input).Return(nil)
@@ -2113,10 +2113,10 @@ func TestHandler_TagRemoveFail(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
-		BoardID: 4,
-		UserID: 1,
-		TaskID: 4,
-		TagID:  4,
+		BoardID:   4,
+		UserID:    1,
+		TaskID:    4,
+		TagID:     4,
 	}
 
 	mockProfileService.EXPECT().RemoveTag(input).Return(models.ServeError{Codes: []string{models.ServerError}})
@@ -2156,7 +2156,7 @@ func TestHandler_CommentCreate(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2208,7 +2208,7 @@ func TestHandler_CommentCreateFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2260,7 +2260,7 @@ func TestHandler_CommentChange(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2312,7 +2312,7 @@ func TestHandler_CommentChangeFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2364,7 +2364,7 @@ func TestHandler_CommentDelete(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2409,7 +2409,7 @@ func TestHandler_CommentDeleteFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
-		BoardID: 4,
+		BoardID:   4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2453,8 +2453,8 @@ func TestHandler_ChecklistCreate(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2504,8 +2504,8 @@ func TestHandler_ChecklistCreateFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2555,8 +2555,8 @@ func TestHandler_ChecklistChange(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2606,8 +2606,8 @@ func TestHandler_ChecklistChangeFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2657,8 +2657,8 @@ func TestHandler_ChecklistDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2702,8 +2702,8 @@ func TestHandler_ChecklistDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.ChecklistInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:   "13",
+		BoardID:     4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2755,8 +2755,8 @@ func TestHandler_AttachmentDelete(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.AttachmentInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2799,8 +2799,8 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
 
 	input := models.AttachmentInput{
-		SessionID: "13",
-		BoardID: 4,
+		SessionID:    "13",
+		BoardID:      4,
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2879,8 +2879,8 @@ func TestHandler_SharedURL(t *testing.T) {
 
 	input := models.BoardInput{
 		SessionID: "13",
-		UserID:  1,
-		BoardID: 4,
+		UserID:    1,
+		BoardID:   4,
 	}
 
 	outside := "12345"
@@ -2919,8 +2919,8 @@ func TestHandler_SharedURLFail(t *testing.T) {
 
 	input := models.BoardInput{
 		SessionID: "13",
-		UserID:  1,
-		BoardID: 4,
+		UserID:    1,
+		BoardID:   4,
 	}
 
 	outside := "12345"
@@ -3018,7 +3018,6 @@ func TestHandler_BoardInvite(t *testing.T) {
 	c.SetParamNames("ID", "url")
 	c.SetParamValues("4", "12345")
 
-
 	mockProfileService.EXPECT().InviteUserToBoard(input).Return(outside, nil)
 
 	boardTransport := boards.NewTransport()
@@ -3061,7 +3060,6 @@ func TestHandler_BoardInviteFail(t *testing.T) {
 	c.Set("userId", int64(1))
 	c.SetParamNames("ID", "url")
 	c.SetParamValues("4", "12345")
-
 
 	mockProfileService.EXPECT().InviteUserToBoard(input).Return(outside, models.ServeError{Codes: []string{"500"}})
 

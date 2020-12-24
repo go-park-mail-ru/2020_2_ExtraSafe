@@ -3,7 +3,7 @@ package profile
 import (
 	"context"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
 )
@@ -19,13 +19,13 @@ type ServiceProfile interface {
 
 type service struct {
 	profileService protoProfile.ProfileClient
-	validator     validation.Service
+	validator      validation.Service
 }
 
 func NewService(profileService protoProfile.ProfileClient, validator validation.Service) ServiceProfile {
 	return &service{
 		profileService: profileService,
-		validator: validator,
+		validator:      validator,
 	}
 }
 
@@ -36,7 +36,7 @@ func (s *service) Profile(request models.UserInput) (user models.UserOutside, er
 
 	output, err := s.profileService.Profile(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+		return models.UserOutside{}, errorworker.ConvertStatusToError(err)
 	}
 
 	user.Username = output.Username
@@ -54,11 +54,11 @@ func (s *service) Boards(request models.UserInput) (boards []models.BoardOutside
 
 	output, err := s.profileService.Boards(ctx, input)
 	if err != nil {
-		return nil, errorWorker.ConvertStatusToError(err)
+		return nil, errorworker.ConvertStatusToError(err)
 	}
 
 	boards = make([]models.BoardOutsideShort, 0)
-	for _, board := range output.Boards{
+	for _, board := range output.Boards {
 		boards = append(boards, models.BoardOutsideShort{
 			BoardID: board.BoardID,
 			Name:    board.Name,
@@ -88,7 +88,7 @@ func (s *service) ProfileChange(request models.UserInputProfile) (user models.Us
 
 	output, err := s.profileService.ProfileChange(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+		return models.UserOutside{}, errorworker.ConvertStatusToError(err)
 	}
 
 	user.Username = output.Username
@@ -114,7 +114,7 @@ func (s *service) PasswordChange(request models.UserInputPassword) (user models.
 
 	output, err := s.profileService.PasswordChange(ctx, input)
 	if err != nil {
-		return models.UserOutside{}, errorWorker.ConvertStatusToError(err)
+		return models.UserOutside{}, errorworker.ConvertStatusToError(err)
 	}
 
 	user.Username = output.Username
