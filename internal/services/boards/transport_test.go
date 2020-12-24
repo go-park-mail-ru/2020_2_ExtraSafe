@@ -1154,6 +1154,72 @@ func TestTransport_UserShortWrite(t *testing.T) {
 	}
 }
 
+func TestTransport_URLRead(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("4", "12345")
+
+	expectedUserInput := models.BoardInviteInput{
+		UserID:  1,
+		BoardID: 4,
+		UrlHash: "12345",
+	}
+
+	transp := &transport{}
+
+	userInput, _ := transp.URLRead(c)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	if !reflect.DeepEqual(userInput, expectedUserInput) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedUserInput, userInput)
+		return
+	}
+}
+
+func TestTransport_URLReadFail(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("J", "12345")
+
+	transp := &transport{}
+
+	_, err := transp.URLRead(c)
+
+	if err == nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestTransport_URLWrite(t *testing.T) {
+	input := "12345"
+
+	expectedResponse:= models.ResponseURL{
+		Status: 200,
+		URL:    "12345",
+	}
+
+	transp := &transport{}
+
+	response, _ := transp.URLWrite(input)
+
+	if !reflect.DeepEqual(response, expectedResponse) {
+		t.Errorf("results not match, want \n%v, \nhave \n%v", expectedResponse, response)
+		return
+	}
+}
+
 
 func fileUploadRequest(params map[string]string, paramName, path string) (io.Reader, *multipart.Writer, error) {
 	file, err := os.Open(path)
