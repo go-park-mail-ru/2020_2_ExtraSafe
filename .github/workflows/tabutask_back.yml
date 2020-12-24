@@ -54,6 +54,7 @@ jobs:
           path: |
             ./docker-compose.yml
             ./init
+            ./default
 
   deploy:
     runs-on: ubuntu-latest
