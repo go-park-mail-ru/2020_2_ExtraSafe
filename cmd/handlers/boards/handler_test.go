@@ -205,7 +205,7 @@ func TestHandler_BoardCreateFail(t *testing.T) {
 
 	err := boardHandler.BoardCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -305,7 +305,7 @@ func TestHandler_BoardChangeFail(t *testing.T) {
 
 	err := boardHandler.BoardChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -381,7 +381,7 @@ func TestHandler_BoardDeleteFail(t *testing.T) {
 
 	err := boardHandler.BoardDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -479,7 +479,7 @@ func TestHandler_BoardAddMemberFail(t *testing.T) {
 
 	err := boardHandler.BoardAddMember(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -561,7 +561,7 @@ func TestHandler_BoardRemoveMemberFail(t *testing.T) {
 
 	err := boardHandler.BoardRemoveMember(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -576,6 +576,7 @@ func TestHandler_Card(t *testing.T) {
 		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
+		BoardID: 1,
 	}
 
 	outside := models.CardOutside{
@@ -624,6 +625,7 @@ func TestHandler_CardFail(t *testing.T) {
 		SessionID: "13",
 		UserID:  1,
 		CardID:  4,
+		BoardID: 1,
 	}
 
 	outside := models.CardOutside{
@@ -657,7 +659,7 @@ func TestHandler_CardFail(t *testing.T) {
 
 	err := boardHandler.Card(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -699,7 +701,7 @@ func TestHandler_CardCreate(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
-	c.Set("boardID", int64(1))
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -748,14 +750,14 @@ func TestHandler_CardCreateFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
-	c.Set("boardID", int64(1))
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CardCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -797,6 +799,7 @@ func TestHandler_CardChange(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -845,13 +848,14 @@ func TestHandler_CardChangeFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CardChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -888,6 +892,7 @@ func TestHandler_CardDelete(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -931,13 +936,14 @@ func TestHandler_CardDeleteFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CardDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -951,6 +957,7 @@ func TestHandler_CardOrder(t *testing.T) {
 	input := models.CardsOrderInput{
 		SessionID: "13",
 		UserID: 1,
+		BoardID: 4,
 		Cards:  []models.CardOrder{},
 	}
 
@@ -971,6 +978,7 @@ func TestHandler_CardOrder(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -991,6 +999,7 @@ func TestHandler_CardOrderFail(t *testing.T) {
 	input := models.CardsOrderInput{
 		SessionID: "13",
 		UserID: 1,
+		BoardID: 4,
 		Cards:  []models.CardOrder{},
 	}
 
@@ -1011,13 +1020,14 @@ func TestHandler_CardOrderFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/card/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CardOrder(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1030,6 +1040,7 @@ func TestHandler_Task(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
+		BoardID: 4,
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1063,6 +1074,7 @@ func TestHandler_Task(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1082,6 +1094,7 @@ func TestHandler_TaskFail(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
+		BoardID: 4,
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1115,13 +1128,14 @@ func TestHandler_TaskFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.Task(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1135,6 +1149,7 @@ func TestHandler_TaskCreate(t *testing.T) {
 	input := models.TaskInput{
 		SessionID: "13",
 		TaskID: int64(4),
+		BoardID: 4,
 		UserID: 1,
 	}
 
@@ -1161,6 +1176,7 @@ func TestHandler_TaskCreate(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1181,6 +1197,7 @@ func TestHandler_TaskCreateFail(t *testing.T) {
 	input := models.TaskInput{
 		SessionID: "13",
 		TaskID: int64(4),
+		BoardID: 4,
 		UserID: 1,
 	}
 
@@ -1207,13 +1224,14 @@ func TestHandler_TaskCreateFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1226,6 +1244,7 @@ func TestHandler_TaskChange(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
+		BoardID: 4,
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1253,6 +1272,7 @@ func TestHandler_TaskChange(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1272,6 +1292,7 @@ func TestHandler_TaskChangeFail(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
+		BoardID: 4,
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1299,13 +1320,14 @@ func TestHandler_TaskChangeFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1318,6 +1340,7 @@ func TestHandler_TaskDelete(t *testing.T) {
 
 	input := models.TaskInput{
 		SessionID: "13",
+		BoardID: 4,
 		TaskID: int64(4),
 		UserID: 1,
 	}
@@ -1339,6 +1362,7 @@ func TestHandler_TaskDelete(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1358,6 +1382,8 @@ func TestHandler_TaskDeleteFail(t *testing.T) {
 
 	input := models.TaskInput{
 		TaskID: int64(4),
+		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 	}
 
@@ -1378,13 +1404,14 @@ func TestHandler_TaskDeleteFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1397,6 +1424,7 @@ func TestHandler_TaskOrder(t *testing.T) {
 
 	input := models.TasksOrderInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		Tasks:  nil,
 	}
@@ -1418,6 +1446,7 @@ func TestHandler_TaskOrder(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1437,6 +1466,7 @@ func TestHandler_TaskOrderFail(t *testing.T) {
 
 	input := models.TasksOrderInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		Tasks:  nil,
 	}
@@ -1458,13 +1488,14 @@ func TestHandler_TaskOrderFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskOrder(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1477,6 +1508,7 @@ func TestHandler_TaskUserAdd(t *testing.T) {
 
 	input := models.TaskAssignerInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1507,6 +1539,7 @@ func TestHandler_TaskUserAdd(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1526,6 +1559,7 @@ func TestHandler_TaskUserAddFail(t *testing.T) {
 
 	input := models.TaskAssignerInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1556,13 +1590,14 @@ func TestHandler_TaskUserAddFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskUserAdd(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1575,6 +1610,7 @@ func TestHandler_TaskUserRemove(t *testing.T) {
 
 	input := models.TaskAssignerInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1597,6 +1633,7 @@ func TestHandler_TaskUserRemove(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1616,6 +1653,7 @@ func TestHandler_TaskUserRemoveFail(t *testing.T) {
 
 	input := models.TaskAssignerInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AssignerName: "kit",
@@ -1638,13 +1676,14 @@ func TestHandler_TaskUserRemoveFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/task/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TaskUserRemove(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1744,7 +1783,7 @@ func TestHandler_TagCreateFail(t *testing.T) {
 
 	err := boardHandler.TagCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1844,7 +1883,7 @@ func TestHandler_TagChangeFail(t *testing.T) {
 
 	err := boardHandler.TagChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1932,7 +1971,7 @@ func TestHandler_TagDeleteFail(t *testing.T) {
 
 	err := boardHandler.TagDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -1945,6 +1984,7 @@ func TestHandler_TagAdd(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -1967,6 +2007,7 @@ func TestHandler_TagAdd(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -1986,6 +2027,7 @@ func TestHandler_TagAddFail(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -2008,13 +2050,14 @@ func TestHandler_TagAddFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TagAdd(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2027,6 +2070,7 @@ func TestHandler_TagRemove(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -2049,6 +2093,7 @@ func TestHandler_TagRemove(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2068,6 +2113,7 @@ func TestHandler_TagRemoveFail(t *testing.T) {
 
 	input := models.TaskTagInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID: 1,
 		TaskID: 4,
 		TagID:  4,
@@ -2090,13 +2136,14 @@ func TestHandler_TagRemoveFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/tag/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.TagRemove(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2109,6 +2156,7 @@ func TestHandler_CommentCreate(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2140,6 +2188,7 @@ func TestHandler_CommentCreate(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2159,6 +2208,7 @@ func TestHandler_CommentCreateFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2190,13 +2240,14 @@ func TestHandler_CommentCreateFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CommentCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2209,6 +2260,7 @@ func TestHandler_CommentChange(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2240,6 +2292,7 @@ func TestHandler_CommentChange(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2259,6 +2312,7 @@ func TestHandler_CommentChangeFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2290,13 +2344,14 @@ func TestHandler_CommentChangeFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CommentChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2309,6 +2364,7 @@ func TestHandler_CommentDelete(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2333,6 +2389,7 @@ func TestHandler_CommentDelete(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2352,6 +2409,7 @@ func TestHandler_CommentDeleteFail(t *testing.T) {
 
 	input := models.CommentInput{
 		SessionID: "13",
+		BoardID: 4,
 		CommentID: 5,
 		TaskID:    4,
 		Message:   "gggg",
@@ -2376,13 +2434,14 @@ func TestHandler_CommentDeleteFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/comment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.CommentDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2395,6 +2454,7 @@ func TestHandler_ChecklistCreate(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2425,6 +2485,7 @@ func TestHandler_ChecklistCreate(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2444,6 +2505,7 @@ func TestHandler_ChecklistCreateFail(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2474,13 +2536,14 @@ func TestHandler_ChecklistCreateFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.ChecklistCreate(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2493,6 +2556,7 @@ func TestHandler_ChecklistChange(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2523,6 +2587,7 @@ func TestHandler_ChecklistChange(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2542,6 +2607,7 @@ func TestHandler_ChecklistChangeFail(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2572,13 +2638,14 @@ func TestHandler_ChecklistChangeFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.ChecklistChange(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2591,6 +2658,7 @@ func TestHandler_ChecklistDelete(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2615,6 +2683,7 @@ func TestHandler_ChecklistDelete(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2634,6 +2703,7 @@ func TestHandler_ChecklistDeleteFail(t *testing.T) {
 
 	input := models.ChecklistInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:      1,
 		ChecklistID: 5,
 		TaskID:      4,
@@ -2658,13 +2728,14 @@ func TestHandler_ChecklistDeleteFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/checklist/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.ChecklistDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -2685,6 +2756,7 @@ func TestHandler_AttachmentDelete(t *testing.T) {
 
 	input := models.AttachmentInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2708,6 +2780,7 @@ func TestHandler_AttachmentDelete(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/attachment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
@@ -2727,6 +2800,7 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 
 	input := models.AttachmentInput{
 		SessionID: "13",
+		BoardID: 4,
 		UserID:       1,
 		TaskID:       4,
 		AttachmentID: 5,
@@ -2750,13 +2824,14 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("userId", int64(1))
 	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
 	c.SetPath("/attachment/:ID")
 	c.SetParamNames("ID")
 	c.SetParamValues("4")
 
 	err := boardHandler.AttachmentDelete(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}

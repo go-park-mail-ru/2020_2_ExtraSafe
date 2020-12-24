@@ -156,6 +156,7 @@ func (t transport) CardOrderRead(c echo.Context) (tasksOrder models.CardsOrderIn
 
 	userInput.UserID = c.Get("userId").(int64)
 	userInput.BoardID = c.Get("boardID").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
 
 	return *userInput, nil
 }
