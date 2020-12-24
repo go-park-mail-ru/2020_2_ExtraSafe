@@ -3,7 +3,7 @@ name: Test build and deploy Tabutask backend
 on:
   push:
     branches:
-      - ci/cd-stable2
+      - develop
 
 jobs:
   test:
