@@ -493,9 +493,6 @@ func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
 	var url string
 	err := s.db.QueryRow("SELECT shared_url FROM boards WHERE boardID = $1", boardInput.BoardID).Scan(&url)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", models.ServeError{Codes: []string{"400"}, OriginalError: err, MethodName: "GetSharedURL"}
-		}
 		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetSharedURL"}
 	}
 

@@ -2555,3 +2555,237 @@ func TestStorage_DismissUser(t *testing.T) {
 		return
 	}
 }
+
+func TestStorage_GetSharedURL(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	board := models.BoardInput{BoardID: 1}
+	url := "sharedUrl"
+
+	mock.
+		ExpectQuery("SELECT shared_url").
+		WithArgs(board.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"shared_url"}).AddRow(url))
+
+	storage := &storage{db: db}
+	_, err = storage.GetSharedURL(board)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err != nil {
+		t.Errorf("unexpected err %s", err)
+		return
+	}
+}
+
+func TestStorage_GetSharedURLFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	board := models.BoardInput{BoardID: 1}
+
+	mock.
+		ExpectQuery("SELECT shared_url").
+		WithArgs(board.BoardID).
+		WillReturnError(errors.New(""))
+
+	storage := &storage{db: db}
+	_, err = storage.GetSharedURL(board)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+}
+
+func TestStorage_GetBoardByURL(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	board := models.BoardInviteInput{
+		UrlHash: "urlShared",
+		UserID: 1,
+		BoardID: 1,
+	}
+
+	expect := models.BoardOutsideShort{
+		BoardID: 1,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	mock.
+		ExpectQuery("SELECT boardID, boardName, theme, star FROM boards WHERE shared_url").
+		WithArgs(board.UrlHash).
+		WillReturnRows(sqlmock.NewRows([]string{"boardID", "boardName", "theme", "star"}).
+			AddRow(expect.BoardID, expect.Name, expect.Theme, expect.Star))
+
+	mock.
+		ExpectExec("INSERT INTO board_members").
+		WithArgs(board.BoardID, board.UserID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	storage := &storage{db: db}
+
+	_, err = storage.GetBoardByURL(board)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestStorage_GetBoardByURLFailGet(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	board := models.BoardInviteInput{
+		UrlHash: "urlShared",
+		UserID: 1,
+		BoardID: 1,
+	}
+
+	mock.
+		ExpectQuery("SELECT boardID, boardName, theme, star FROM boards WHERE shared_url").
+		WithArgs(board.UrlHash).
+		WillReturnError(errors.New(""))
+
+	storage := &storage{db: db}
+
+	_, err = storage.GetBoardByURL(board)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Error("expected err")
+		return
+	}
+}
+
+func TestStorage_GetBoardByURLExecFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	board := models.BoardInviteInput{
+		UrlHash: "urlShared",
+		UserID: 1,
+		BoardID: 1,
+	}
+
+	expect := models.BoardOutsideShort{
+		BoardID: 1,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	mock.
+		ExpectQuery("SELECT boardID, boardName, theme, star FROM boards WHERE shared_url").
+		WithArgs(board.UrlHash).
+		WillReturnRows(sqlmock.NewRows([]string{"boardID", "boardName", "theme", "star"}).
+			AddRow(expect.BoardID, expect.Name, expect.Theme, expect.Star))
+
+	mock.
+		ExpectExec("INSERT INTO board_members").
+		WithArgs(board.BoardID, board.UserID).
+		WillReturnError(errors.New(""))
+
+	storage := &storage{db: db}
+
+	_, err = storage.GetBoardByURL(board)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Error("expected err")
+		return
+	}
+}
+
+func TestStorage_GetBoardShort(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{BoardID: 1}
+
+	expect := models.BoardOutsideShort{
+		BoardID: boardInput.BoardID,
+		Name:    "name",
+		Theme:   "theme",
+		Star:    false,
+	}
+
+	mock.
+		ExpectQuery("SELECT boardID, boardName, theme, star FROM boards").
+		WithArgs(boardInput.BoardID).
+		WillReturnRows(sqlmock.NewRows([]string{"boardID", "boardName", "theme", "star"}).
+			AddRow(expect.BoardID, expect.Name, expect.Theme, expect.Star))
+
+	storage := &storage{db: db}
+
+	_, err = storage.GetBoardShort(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err != nil {
+		t.Error("unexpected err", err)
+		return
+	}
+}
+
+func TestStorage_GetBoardShortFail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	boardInput := models.BoardInput{BoardID: 1}
+
+	mock.
+		ExpectQuery("SELECT boardID, boardName, theme, star FROM boards").
+		WithArgs(boardInput.BoardID).
+		WillReturnError(errors.New(""))
+
+	storage := &storage{db: db}
+
+	_, err = storage.GetBoardShort(boardInput)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+	if err == nil {
+		t.Error("expected err")
+		return
+	}
+}
