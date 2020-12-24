@@ -38,6 +38,10 @@ func easyjsonAa748b4bDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels(in 
 		switch key {
 		case "checklistID":
 			out.ChecklistID = int64(in.Int64())
+		case "taskID":
+			out.TaskID = int64(in.Int64())
+		case "cardID":
+			out.CardID = int64(in.Int64())
 		case "checklistName":
 			out.Name = string(in.String())
 		case "checklistItems":
@@ -58,19 +62,50 @@ func easyjsonAa748b4bEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels(out
 	out.RawByte('{')
 	first := true
 	_ = first
-	{
+	if in.ChecklistID != 0 {
 		const prefix string = ",\"checklistID\":"
+		first = false
 		out.RawString(prefix[1:])
 		out.Int64(int64(in.ChecklistID))
 	}
-	{
+	if in.TaskID != 0 {
+		const prefix string = ",\"taskID\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.Int64(int64(in.TaskID))
+	}
+	if in.CardID != 0 {
+		const prefix string = ",\"cardID\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.Int64(int64(in.CardID))
+	}
+	if in.Name != "" {
 		const prefix string = ",\"checklistName\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.String(string(in.Name))
 	}
-	{
+	if len(in.Items) != 0 {
 		const prefix string = ",\"checklistItems\":"
-		out.RawString(prefix)
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
 		out.Raw((in.Items).MarshalJSON())
 	}
 	out.RawByte('}')

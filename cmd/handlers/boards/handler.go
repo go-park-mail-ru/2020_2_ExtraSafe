@@ -11,6 +11,7 @@ import (
 type Handler interface {
 	BoardCreate(c echo.Context) error
 	Board(c echo.Context) error
+	BoardWS(c echo.Context) error
 	BoardChange(c echo.Context) error
 	BoardDelete(c echo.Context) error
 	BoardAddMember(c echo.Context) error
@@ -46,6 +47,11 @@ type Handler interface {
 
 	AttachmentCreate(c echo.Context) error
 	AttachmentDelete(c echo.Context) error
+
+	SharedURL(c echo.Context) error
+	BoardInvite(c echo.Context) error
+
+	Notification(c echo.Context) error
 }
 
 type handler struct {
@@ -73,11 +79,9 @@ func (h *handler) BoardCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.BoardShortWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Board(c echo.Context) error {
@@ -91,11 +95,9 @@ func (h *handler) Board(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.BoardWrite(board)
+	response, err := h.boardsTransport.BoardWrite(board)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) BoardChange(c echo.Context) error {
@@ -109,11 +111,9 @@ func (h *handler) BoardChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.BoardShortWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) BoardDelete(c echo.Context) error {
@@ -141,11 +141,9 @@ func (h *handler) BoardAddMember(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.UserShortWrite(user)
+	response, err := h.boardsTransport.UserShortWrite(user)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) BoardRemoveMember(c echo.Context) error {
@@ -173,11 +171,9 @@ func (h *handler) CardCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.CardShortWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Card(c echo.Context) error {
@@ -191,11 +187,9 @@ func (h *handler) Card(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.CardWrite(card)
+	response, err := h.boardsTransport.CardWrite(card)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) CardChange(c echo.Context) error {
@@ -209,11 +203,9 @@ func (h *handler) CardChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.CardShortWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) CardDelete(c echo.Context) error {
@@ -255,11 +247,9 @@ func (h *handler) TaskCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.TaskSuperShortWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Task(c echo.Context) error {
@@ -273,11 +263,9 @@ func (h *handler) Task(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.TaskWrite(task)
+	response, err := h.boardsTransport.TaskWrite(task)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TaskChange(c echo.Context) error {
@@ -291,11 +279,9 @@ func (h *handler) TaskChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.TaskSuperShortWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TaskDelete(c echo.Context) error {
@@ -337,11 +323,9 @@ func (h *handler) TaskUserAdd(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.UserShortWrite(user)
+	response, err := h.boardsTransport.UserShortWrite(user)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TaskUserRemove(c echo.Context) error {
@@ -369,11 +353,9 @@ func (h *handler) TagCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.TagWrite(tag)
+	response, err := h.boardsTransport.TagWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TagChange(c echo.Context) error {
@@ -387,11 +369,9 @@ func (h *handler) TagChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.TagWrite(tag)
+	response, err := h.boardsTransport.TagWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) TagDelete(c echo.Context) error {
@@ -447,11 +427,9 @@ func (h *handler) CommentCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.CommentWrite(tag)
+	response, err := h.boardsTransport.CommentWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) CommentChange(c echo.Context) error {
@@ -465,11 +443,9 @@ func (h *handler) CommentChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.CommentWrite(tag)
+	response, err := h.boardsTransport.CommentWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) CommentDelete(c echo.Context) error {
@@ -497,11 +473,9 @@ func (h *handler) ChecklistCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.ChecklistWrite(tag)
+	response, err := h.boardsTransport.ChecklistWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) ChecklistChange(c echo.Context) error {
@@ -515,11 +489,9 @@ func (h *handler) ChecklistChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.ChecklistWrite(tag)
+	response, err := h.boardsTransport.ChecklistWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) ChecklistDelete(c echo.Context) error {
@@ -547,11 +519,9 @@ func (h *handler) AttachmentCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, err := h.boardsTransport.AttachmentWrite(tag)
+	response, err := h.boardsTransport.AttachmentWrite(tag)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) AttachmentDelete(c echo.Context) error {
@@ -566,4 +536,58 @@ func (h *handler) AttachmentDelete(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, models.ResponseStatus{Status: 200})
+}
+
+func (h *handler) SharedURL(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	url, err := h.boardsService.GetSharedURL(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.URLWrite(url)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardInvite(c echo.Context) error {
+	userInput, err := h.boardsTransport.URLRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	board, err := h.boardsService.InviteUserToBoard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.BoardShortWrite(board)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardWS(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	_ = h.boardsService.WebSocketBoard(userInput, c)
+
+	return nil
+}
+
+func (h *handler) Notification(c echo.Context) error  {
+	userInput := models.UserInput{
+		ID: c.Get("userId").(int64),
+		SessionID: c.Get("sessionID").(string),
+	}
+
+	_ = h.boardsService.WebSocketNotification(userInput, c)
+
+	return nil
 }

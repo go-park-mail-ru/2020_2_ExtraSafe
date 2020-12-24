@@ -106,12 +106,13 @@ func TestStorage_ChangeTask(t *testing.T) {
 		TaskID: 1,
 		Name:   taskInput.Name,
 		Description: taskInput.Description,
+		CardID: 1,
 	}
 
 	mock.
-		ExpectExec("UPDATE tasks SET").
+		ExpectQuery("UPDATE tasks SET").
 		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"cardID"}).AddRow(expectTaskOutside.CardID))
 
 	task, err := storage.ChangeTask(taskInput)
 	if err != nil {
@@ -144,7 +145,7 @@ func TestStorage_ChangeTaskFail(t *testing.T) {
 	}
 
 	mock.
-		ExpectExec("UPDATE tasks SET").
+		ExpectQuery("UPDATE tasks SET").
 		WithArgs(taskInput.Name, taskInput.Description, taskInput.TaskID).
 		WillReturnError(errors.New("fail update exec"))
 
@@ -171,11 +172,11 @@ func TestStorage_DeleteTask(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID:  1 }
 
 	mock.
-		ExpectExec("DELETE FROM tasks WHERE taskID").
+		ExpectQuery("DELETE FROM tasks WHERE taskID").
 		WithArgs(taskInput.TaskID).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"cardID"}).AddRow(int64(1)))
 
-	err = storage.DeleteTask(taskInput)
+	_, err = storage.DeleteTask(taskInput)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -198,11 +199,11 @@ func TestStorage_DeleteTaskFail(t *testing.T) {
 	taskInput := models.TaskInput{ TaskID:  1 }
 
 	mock.
-		ExpectExec("DELETE FROM tasks WHERE taskID").
+		ExpectQuery("DELETE FROM tasks WHERE taskID").
 		WithArgs(taskInput.TaskID).
 		WillReturnError(errors.New("fail deleting exec"))
 
-	err = storage.DeleteTask(taskInput)
+	_, err = storage.DeleteTask(taskInput)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -652,6 +653,114 @@ func TestStorage_GetAssignersScanFail(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"userID", "taskID"}).AddRow(1, 1))
 
 	_, err = storage.GetAssigners(input)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetCardIDByTask(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT cardID FROM tasks WHERE taskID").
+		WithArgs(input.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"cardID"}).AddRow(int64(1)))
+
+	_, err = storage.GetCardIDByTask(input.TaskID)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetCardIDByTaskFail(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT cardID FROM tasks WHERE taskID").
+		WithArgs(input.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetCardIDByTask(input.TaskID)
+	if err == nil {
+		t.Error("expected error")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetTaskName(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT taskName FROM tasks WHERE taskID").
+		WithArgs(input.TaskID).
+		WillReturnRows(sqlmock.NewRows([]string{"taskName"}).AddRow("taskName"))
+
+	_, err = storage.GetTaskName(input)
+	if err != nil {
+		t.Error("unexpected error", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+		return
+	}
+}
+
+func TestStorage_GetTaskNameFail(t *testing.T) {
+	input := models.TaskInput{TaskID: 1}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	storage := &storage{db: db}
+
+	mock.
+		ExpectQuery("SELECT taskName FROM tasks WHERE taskID").
+		WithArgs(input.TaskID).
+		WillReturnError(errors.New(""))
+
+	_, err = storage.GetTaskName(input)
 	if err == nil {
 		t.Error("expected error")
 		return

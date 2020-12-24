@@ -56,6 +56,11 @@ type ResponseBoards struct {
 	Boards []BoardOutsideShort `json:"boards"`
 }
 
+type ResponseURL struct {
+	Status int    `json:"status"`
+	URL    string `json:"sharedURL"`
+}
+
 //===================================================<-Card
 type ResponseCardShort struct {
 	Status int           `json:"status"`
@@ -123,4 +128,16 @@ type ResponseAttachment struct {
 	AttachmentID int64  `json:"attachmentID"`
 	Filename     string `json:"attachmentFileName"`
 	Filepath     string `json:"attachmentFilePath"`
+}
+
+//===================================================<-WebSocket
+type WS struct {
+	SessionID string      `json:"-"`
+	Method    string      `json:"method"`
+	Body      interface{} `json:"body"`
+}
+
+type NotificationMessage struct {
+	UserID int64       `json:"-"`
+	Body   WS `json:"body"`
 }

@@ -26,43 +26,45 @@ import (
 	"os"
 )
 
+
 func main() {
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
+	authServiceAddr := os.Getenv("AUTH_SERVICE_ADDR")
+	mainServiceAddr := os.Getenv("TABUTASK_SERVER_ADDR")
 
 	// =============================
 
-	grpcConn3, err := grpc.Dial(
-		"127.0.0.1:9083",
+	grpcConnBoard, err := grpc.Dial(
+		boardServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn3.Close()
+	defer grpcConnBoard.Close()
 
 	// =============================
-	// =============================
 
-	grpcConn2, err := grpc.Dial(
-		"127.0.0.1:9082",
+	grpcConnProfile, err := grpc.Dial(
+		profileServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn2.Close()
+	defer grpcConnProfile.Close()
 
 	// =============================
 
-	// =============================
-
-	grpcConn1, err := grpc.Dial(
-		"127.0.0.1:9081",
+	grpcConnAuth, err := grpc.Dial(
+		authServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalf("cant connect to grpc")
 	}
-	defer grpcConn1.Close()
+	defer grpcConnAuth.Close()
 
 	// =============================
 
@@ -71,9 +73,9 @@ func main() {
 	internalLogger := logger.NewLogger(&zeroLogger)
 	errWorker := errorWorker.NewErrorWorker()
 
-	boardClient := protoBoard.NewBoardClient(grpcConn3)
-	profileClient := protoProfile.NewProfileClient(grpcConn2)
-	authClient := protoAuth.NewAuthClient(grpcConn1)
+	boardClient := protoBoard.NewBoardClient(grpcConnBoard)
+	profileClient := protoProfile.NewProfileClient(grpcConnProfile)
+	authClient := protoAuth.NewAuthClient(grpcConnAuth)
 
 	validationService := validation.NewService()
 	authService := auth.NewService(authClient, validationService)
@@ -95,5 +97,5 @@ func main() {
 
 	handlers.Router(e, profHandler, aHandler, boardHandler, middlewaresService)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(mainServiceAddr))
 }

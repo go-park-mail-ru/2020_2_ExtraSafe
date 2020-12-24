@@ -38,7 +38,11 @@ func (e errorWorker) RespError(c echo.Context, serveError error) (err error) {
 	responseErr := new(ResponseError)
 	responseErr.Codes = serveError.(models.ServeError).Codes
 	responseErr.Status = 500
-	return c.JSON(http.StatusBadRequest, responseErr)
+	err = c.JSON(http.StatusBadRequest, responseErr)
+	if err != nil {
+		return err
+	}
+	return serveError
 }
 
 func (e errorWorker) TransportError(c echo.Context) (err error) {
@@ -87,18 +91,25 @@ func ConvertErrorToStatus(servError models.ServeError, serviceName string) error
 }
 
 func ConvertStatusToError(inputError error) (servError models.ServeError) {
-	st := status.Convert(inputError)
+	descriptions := make([]string, 0)
+	errCodes := make([]string, 0)
 
-	servError.MethodName = st.Message()
+	st := status.Convert(inputError)
 
 	for _, detail := range st.Details() {
 		switch t := detail.(type) {
 		case *errdetails.BadRequest:
 			for _, violation := range t.GetFieldViolations() {
-				servError.Codes = append(servError.Codes, violation.GetField())
-				servError.Descriptions = append(servError.Descriptions, violation.GetDescription())
+				errCodes = append(errCodes, violation.GetField())
+				descriptions = append(descriptions, violation.GetDescription())
 			}
 		}
+	}
+
+	servError = models.ServeError{
+		Codes:         errCodes,
+		Descriptions:  descriptions,
+		MethodName:    st.Message(),
 	}
 
 	return servError

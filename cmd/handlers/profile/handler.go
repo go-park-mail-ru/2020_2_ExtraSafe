@@ -39,11 +39,9 @@ func (h *handler) Profile(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, _ := h.profileTransport.ProfileWrite(user)
+	response, _ := h.profileTransport.ProfileWrite(user)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Boards(c echo.Context) error {
@@ -57,11 +55,9 @@ func (h *handler) Boards(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, _ := h.profileTransport.BoardsWrite(boards)
+	response, _ := h.profileTransport.BoardsWrite(boards)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) ProfileChange(c echo.Context) error {
@@ -75,11 +71,9 @@ func (h *handler) ProfileChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, _ := h.profileTransport.ProfileWrite(user)
+	response, _ := h.profileTransport.ProfileWrite(user)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) PasswordChange(c echo.Context) error {
@@ -93,9 +87,7 @@ func (h *handler) PasswordChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	result, _ := h.profileTransport.ProfileWrite(user)
+	response, _ := h.profileTransport.ProfileWrite(user)
 
-	response, _ := result.MarshalJSON()
-
-	return c.JSONBlob(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }

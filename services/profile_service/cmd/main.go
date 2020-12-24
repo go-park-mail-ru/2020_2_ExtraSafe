@@ -12,12 +12,23 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"strings"
 )
 
+
 func main() {
-	db, err := sql.Open("postgres", "user=tabutask_admin password=1221 dbname=tabutask_users")
+	dbAddr := os.Getenv("TABUTASK_DB_ADDR")
+	dbPort := os.Getenv("TABUTASK_DB_PORT")
+	driverName:= os.Getenv("TABUTASK_USERS_DRIVER")
+	userName:= os.Getenv("TABUTASK_USERS_USER")
+	password:= os.Getenv("TABUTASK_USERS_PASSWORD")
+	dbName:= os.Getenv("TABUTASK_USERS_NAME")
+
+	connections := strings.Join([]string{"host=",dbAddr, "port=",  dbPort, "user=", userName, "password=", password, "dbname=", dbName, "sslmode=disable"}, " ")
+	db, err := sql.Open(driverName, connections)
 	if err != nil {
-		return
+		log.Fatalln("Cannot connect to database", err)
 	}
 
 	db.SetMaxIdleConns(3)
@@ -25,7 +36,7 @@ func main() {
 
 	err = db.Ping()
 	if err != nil {
-		return
+		log.Fatalln("Cannot ping to database", err)
 	}
 
 	profileStorage := userStorage.NewStorage(db)
@@ -33,8 +44,10 @@ func main() {
 
 	// =============================
 
+	boardServiceAddr := os.Getenv("BOARDS_SERVICE_ADDR")
+
 	grpcConn, err := grpc.Dial(
-		"127.0.0.1:9083",
+		boardServiceAddr,
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -43,10 +56,11 @@ func main() {
 	defer grpcConn.Close()
 
 	// =============================
+	profileServiceAddr := os.Getenv("PROFILE_SERVICE_ADDR")
 
-	lis, err := net.Listen("tcp", ":9082")
+	lis, err := net.Listen("tcp", profileServiceAddr)
 	if err != nil {
-		log.Fatalln("cant listet port", err)
+		log.Fatalln("cant listen port", err)
 	}
 
 	// =============================
@@ -59,6 +73,10 @@ func main() {
 
 	protoProfile.RegisterProfileServer(server, handler)
 
-	fmt.Println("starting server at :9082")
-	server.Serve(lis)
+	fmt.Println("starting server at : ", lis.Addr())
+
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalln("Serve auth", err)
+	}
 }

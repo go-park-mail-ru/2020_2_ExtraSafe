@@ -83,8 +83,8 @@ func TestHandler_AuthFail(t *testing.T) {
 
 	err := authHandler.Auth(c)
 
-	if err != nil {
-		t.Errorf("results not match")
+	if err == nil {
+		t.Errorf("results not match %s", err)
 		return
 	}
 }
@@ -161,7 +161,7 @@ func TestHandler_LoginFail(t *testing.T) {
 
 	err := authHandler.Login(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}
@@ -241,7 +241,7 @@ func TestHandler_RegistrationFail(t *testing.T) {
 
 	err := authHandler.Registration(c)
 
-	if err != nil {
+	if err == nil {
 		t.Errorf("results not match")
 		return
 	}

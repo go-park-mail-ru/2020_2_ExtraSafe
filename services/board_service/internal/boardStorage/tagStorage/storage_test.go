@@ -126,7 +126,7 @@ func TestStorage_AddTag(t *testing.T) {
 		WithArgs(input.TaskID, input.TagID).
 		WillReturnError(errors.New(""))
 
-	err = storage.AddTag(input)
+	_, err = storage.AddTag(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return
@@ -155,7 +155,7 @@ func TestStorage_RemoveTag(t *testing.T) {
 		WithArgs(input.TaskID, input.TagID).
 		WillReturnError(errors.New(""))
 
-	err = storage.RemoveTag(input)
+	_, err = storage.RemoveTag(input)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 		return

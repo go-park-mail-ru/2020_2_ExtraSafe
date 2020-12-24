@@ -57,14 +57,14 @@ func (mr *MockBoardClientMockRecorder) AddAttachment(arg0 interface{}, arg1 ...i
 }
 
 // AddTag mocks base method
-func (m *MockBoardClient) AddTag(arg0 context.Context, arg1 *protoBoard.TaskTagInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) AddTag(arg0 context.Context, arg1 *protoBoard.TaskTagInput, arg2 ...grpc.CallOption) (*protoBoard.TagOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddTag", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.TagOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -77,14 +77,14 @@ func (mr *MockBoardClientMockRecorder) AddTag(arg0, arg1 interface{}, arg2 ...in
 }
 
 // AddUserToBoard mocks base method
-func (m *MockBoardClient) AddUserToBoard(arg0 context.Context, arg1 *protoBoard.BoardMemberInput, arg2 ...grpc.CallOption) (*protoProfile.UserOutsideShort, error) {
+func (m *MockBoardClient) AddUserToBoard(arg0 context.Context, arg1 *protoBoard.BoardMemberInput, arg2 ...grpc.CallOption) (*protoBoard.BoardMemberOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddUserToBoard", varargs...)
-	ret0, _ := ret[0].(*protoProfile.UserOutsideShort)
+	ret0, _ := ret[0].(*protoBoard.BoardMemberOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -97,14 +97,14 @@ func (mr *MockBoardClientMockRecorder) AddUserToBoard(arg0, arg1 interface{}, ar
 }
 
 // AssignUser mocks base method
-func (m *MockBoardClient) AssignUser(arg0 context.Context, arg1 *protoBoard.TaskAssignerInput, arg2 ...grpc.CallOption) (*protoProfile.UserOutsideShort, error) {
+func (m *MockBoardClient) AssignUser(arg0 context.Context, arg1 *protoBoard.TaskAssignerInput, arg2 ...grpc.CallOption) (*protoBoard.TaskAssignUserOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AssignUser", varargs...)
-	ret0, _ := ret[0].(*protoProfile.UserOutsideShort)
+	ret0, _ := ret[0].(*protoBoard.TaskAssignUserOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -277,14 +277,14 @@ func (mr *MockBoardClientMockRecorder) CheckBoardPermission(arg0, arg1 interface
 }
 
 // CheckCardPermission mocks base method
-func (m *MockBoardClient) CheckCardPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) CheckCardPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.BoardID, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CheckCardPermission", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.BoardID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -297,14 +297,14 @@ func (mr *MockBoardClientMockRecorder) CheckCardPermission(arg0, arg1 interface{
 }
 
 // CheckCommentPermission mocks base method
-func (m *MockBoardClient) CheckCommentPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) CheckCommentPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.BoardID, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CheckCommentPermission", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.BoardID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -317,14 +317,14 @@ func (mr *MockBoardClientMockRecorder) CheckCommentPermission(arg0, arg1 interfa
 }
 
 // CheckTaskPermission mocks base method
-func (m *MockBoardClient) CheckTaskPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) CheckTaskPermission(arg0 context.Context, arg1 *protoBoard.CheckPermissions, arg2 ...grpc.CallOption) (*protoBoard.BoardID, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CheckTaskPermission", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.BoardID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -477,14 +477,14 @@ func (mr *MockBoardClientMockRecorder) DeleteBoard(arg0, arg1 interface{}, arg2 
 }
 
 // DeleteCard mocks base method
-func (m *MockBoardClient) DeleteCard(arg0 context.Context, arg1 *protoBoard.CardInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) DeleteCard(arg0 context.Context, arg1 *protoBoard.CardInput, arg2 ...grpc.CallOption) (*protoBoard.CardOutsideShort, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteCard", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.CardOutsideShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -497,14 +497,14 @@ func (mr *MockBoardClientMockRecorder) DeleteCard(arg0, arg1 interface{}, arg2 .
 }
 
 // DeleteChecklist mocks base method
-func (m *MockBoardClient) DeleteChecklist(arg0 context.Context, arg1 *protoBoard.ChecklistInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) DeleteChecklist(arg0 context.Context, arg1 *protoBoard.ChecklistInput, arg2 ...grpc.CallOption) (*protoBoard.ChecklistOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteChecklist", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.ChecklistOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -517,14 +517,14 @@ func (mr *MockBoardClientMockRecorder) DeleteChecklist(arg0, arg1 interface{}, a
 }
 
 // DeleteComment mocks base method
-func (m *MockBoardClient) DeleteComment(arg0 context.Context, arg1 *protoBoard.CommentInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) DeleteComment(arg0 context.Context, arg1 *protoBoard.CommentInput, arg2 ...grpc.CallOption) (*protoBoard.CommentOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteComment", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.CommentOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -557,14 +557,14 @@ func (mr *MockBoardClientMockRecorder) DeleteTag(arg0, arg1 interface{}, arg2 ..
 }
 
 // DeleteTask mocks base method
-func (m *MockBoardClient) DeleteTask(arg0 context.Context, arg1 *protoBoard.TaskInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) DeleteTask(arg0 context.Context, arg1 *protoBoard.TaskInput, arg2 ...grpc.CallOption) (*protoBoard.TaskOutsideSuperShort, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteTask", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.TaskOutsideSuperShort)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -577,14 +577,14 @@ func (mr *MockBoardClientMockRecorder) DeleteTask(arg0, arg1 interface{}, arg2 .
 }
 
 // DismissUser mocks base method
-func (m *MockBoardClient) DismissUser(arg0 context.Context, arg1 *protoBoard.TaskAssignerInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) DismissUser(arg0 context.Context, arg1 *protoBoard.TaskAssignerInput, arg2 ...grpc.CallOption) (*protoBoard.TaskAssignUserOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DismissUser", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.TaskAssignUserOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -656,6 +656,26 @@ func (mr *MockBoardClientMockRecorder) GetCard(arg0, arg1 interface{}, arg2 ...i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCard", reflect.TypeOf((*MockBoardClient)(nil).GetCard), varargs...)
 }
 
+// GetSharedURL mocks base method
+func (m *MockBoardClient) GetSharedURL(arg0 context.Context, arg1 *protoBoard.BoardInput, arg2 ...grpc.CallOption) (*protoBoard.SharedURL, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetSharedURL", varargs...)
+	ret0, _ := ret[0].(*protoBoard.SharedURL)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSharedURL indicates an expected call of GetSharedURL
+func (mr *MockBoardClientMockRecorder) GetSharedURL(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSharedURL", reflect.TypeOf((*MockBoardClient)(nil).GetSharedURL), varargs...)
+}
+
 // GetTask mocks base method
 func (m *MockBoardClient) GetTask(arg0 context.Context, arg1 *protoBoard.TaskInput, arg2 ...grpc.CallOption) (*protoBoard.TaskOutside, error) {
 	m.ctrl.T.Helper()
@@ -676,15 +696,35 @@ func (mr *MockBoardClientMockRecorder) GetTask(arg0, arg1 interface{}, arg2 ...i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTask", reflect.TypeOf((*MockBoardClient)(nil).GetTask), varargs...)
 }
 
+// InviteUserToBoard mocks base method
+func (m *MockBoardClient) InviteUserToBoard(arg0 context.Context, arg1 *protoBoard.BoardInviteInput, arg2 ...grpc.CallOption) (*protoProfile.BoardOutsideShort, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "InviteUserToBoard", varargs...)
+	ret0, _ := ret[0].(*protoProfile.BoardOutsideShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InviteUserToBoard indicates an expected call of InviteUserToBoard
+func (mr *MockBoardClientMockRecorder) InviteUserToBoard(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteUserToBoard", reflect.TypeOf((*MockBoardClient)(nil).InviteUserToBoard), varargs...)
+}
+
 // RemoveAttachment mocks base method
-func (m *MockBoardClient) RemoveAttachment(arg0 context.Context, arg1 *protoBoard.AttachmentInfo, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) RemoveAttachment(arg0 context.Context, arg1 *protoBoard.AttachmentInfo, arg2 ...grpc.CallOption) (*protoBoard.AttachmentOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RemoveAttachment", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.AttachmentOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -697,14 +737,14 @@ func (mr *MockBoardClientMockRecorder) RemoveAttachment(arg0, arg1 interface{}, 
 }
 
 // RemoveTag mocks base method
-func (m *MockBoardClient) RemoveTag(arg0 context.Context, arg1 *protoBoard.TaskTagInput, arg2 ...grpc.CallOption) (*protoBoard.Nothing, error) {
+func (m *MockBoardClient) RemoveTag(arg0 context.Context, arg1 *protoBoard.TaskTagInput, arg2 ...grpc.CallOption) (*protoBoard.TagOutside, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RemoveTag", varargs...)
-	ret0, _ := ret[0].(*protoBoard.Nothing)
+	ret0, _ := ret[0].(*protoBoard.TagOutside)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

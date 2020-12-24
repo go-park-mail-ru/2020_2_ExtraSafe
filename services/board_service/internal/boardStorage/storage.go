@@ -7,6 +7,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
+	"hash/adler32"
+	"strconv"
+	"time"
 )
 
 //go:generate mockgen -destination=../../../board_service/internal/service/mock/mock_boardStorage.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage BoardStorage
@@ -24,40 +27,44 @@ type BoardStorage interface {
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
-	DeleteTask(taskInput models.TaskInput) error
+	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	AddUser(input models.BoardMember) (err error)
 	RemoveUser(input models.BoardMember) (err error)
 
 	GetBoard(boardInput models.BoardInput) (models.BoardInternal, error)
+	GetBoardShort(boardInput models.BoardInput) (models.BoardOutsideShort, error)
 	GetCard(cardInput models.CardInput) (models.CardInternal, error)
 	GetTask(taskInput models.TaskInput) (models.TaskInternal, []int64, error)
 	GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error)
 
-	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
-	CheckCardPermission(userID int64, cardID int64) (err error)
-	CheckTaskPermission(userID int64, taskID int64) (err error)
-	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error)
+	GetSharedURL(boardInput models.BoardInput) (string, error)
+	GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error)
 
-	AssignUser(input models.TaskAssigner) (err error)
-	DismissUser(input models.TaskAssigner) (err error)
+	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
+	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
+	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
+	CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error)
+
+	AssignUser(input models.TaskAssigner) (task models.TaskAssignUserOutside, err error)
+	DismissUser(input models.TaskAssigner) (task models.TaskAssignUserOutside, err error)
 
 	CreateTag(input models.TagInput) (tag models.TagOutside, err error)
 	UpdateTag(input models.TagInput) (tag models.TagOutside, err error)
 	DeleteTag(input models.TagInput) (err error)
-	AddTag(input models.TaskTagInput) (err error)
-	RemoveTag(input models.TaskTagInput) (err error)
+	AddTag(input models.TaskTagInput) (tag models.TagOutside, err error)
+	RemoveTag(input models.TaskTagInput) (tag models.TagOutside, err error)
 
 	CreateComment(input models.CommentInput) (comment models.CommentOutside, err error)
 	UpdateComment(input models.CommentInput) (comment models.CommentOutside, err error)
-	DeleteComment(input models.CommentInput) (err error)
+	DeleteComment(input models.CommentInput) (comment models.CommentOutside, err error)
 
 	CreateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 	UpdateChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
-	DeleteChecklist(input models.ChecklistInput) (err error)
+	DeleteChecklist(input models.ChecklistInput) (checklist models.ChecklistOutside, err error)
 
 	AddAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
-	RemoveAttachment(input models.AttachmentInternal) (err error)
+	RemoveAttachment(input models.AttachmentInternal) (attachment models.AttachmentOutside, err error)
 }
 
 type storage struct {
@@ -110,11 +117,15 @@ func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsi
 func (s *storage) CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error) {
 	var boardID int64
 
-	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star) VALUES ($1, $2, $3, $4) RETURNING boardID",
+	url := createSharedUrl(boardInput.UserID, boardInput.BoardName)
+	urlString := strconv.FormatUint(uint64(url), 10)
+	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star, shared_url) VALUES ($1, $2, $3, $4, $5) RETURNING boardID",
 		boardInput.UserID,
 		boardInput.BoardName,
 		boardInput.Theme,
-		boardInput.Star).Scan(&boardID)
+		boardInput.Star,
+		urlString).
+		Scan(&boardID)
 
 	if err != nil {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -199,6 +210,19 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 	return board, nil
 }
 
+func (s *storage) GetBoardShort(boardInput models.BoardInput) (models.BoardOutsideShort, error) {
+	board := models.BoardOutsideShort{}
+
+	err := s.db.QueryRow("SELECT boardID, boardName, theme, star FROM boards WHERE boardID = $1", boardInput.BoardID).
+		Scan(&board.BoardID, &board.Name, &board.Theme, &board.Star)
+	if err != nil {
+		return board, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoardShort"}
+	}
+
+	return board, nil
+}
+
 func (s *storage) getBoardMembers(boardInput models.BoardInput) ([]int64, error) {
 	members := make([]int64, 0)
 
@@ -279,7 +303,7 @@ func (s *storage) ChangeTaskOrder(taskInput models.TasksOrderInput) error {
 	return s.tasksStorage.ChangeTaskOrder(taskInput)
 }
 
-func (s *storage) DeleteTask(taskInput models.TaskInput) error {
+func (s *storage) DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error) {
 	return s.tasksStorage.DeleteTask(taskInput)
 }
 
@@ -401,28 +425,24 @@ func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bo
 	return true, nil
 }
 
-func (s *storage) CheckCardPermission(userID int64, cardID int64) (err error) {
-	var boardID int64
-
+func (s *storage) CheckCardPermission(userID int64, cardID int64) (boardID int64, err error) {
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
 								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
 								"WHERE (B.adminID = $1 OR M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckCardPermission"}
 	}
 
-	return nil
+	return boardID, nil
 }
 
-func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
-	var boardID int64
-
+func (s *storage) CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error) {
 	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
 								"JOIN cards C on C.boardID = B.boardID " +
 								"JOIN tasks T on T.cardID = C.cardID " +
@@ -430,19 +450,18 @@ func (s *storage) CheckTaskPermission(userID int64, taskID int64) (err error) {
 								"WHERE (B.adminID = $1 OR M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckTaskPermission"}
 	}
 
-	return nil
+	return boardID, nil
 }
 
-func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (err error) {
-	var boardID int64
+func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin bool) (boardID int64, err error) {
 	var query string
 
 	if ifAdmin {
@@ -459,13 +478,47 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	err = s.db.QueryRow(query, userID, commentID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCommentPermission"}
 	}
 
 	if err == sql.ErrNoRows {
-		return models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
+		return 0, models.ServeError{Codes: []string{"403"}, Descriptions: []string{"Permissions denied"},
 			MethodName: "CheckCommentPermission"}
 	}
 
-	return nil
+	return boardID, nil
+}
+
+func (s *storage) GetSharedURL(boardInput models.BoardInput) (string, error) {
+	var url string
+	err := s.db.QueryRow("SELECT shared_url FROM boards WHERE boardID = $1", boardInput.BoardID).Scan(&url)
+	if err != nil {
+		return "", models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "GetSharedURL"}
+	}
+
+	return url, nil
+}
+
+func createSharedUrl(adminID int64, boardName string) uint32 {
+	data := []byte(strconv.FormatInt(adminID, 10) + boardName + time.Now().String())
+	return adler32.Checksum(data)
+}
+
+func (s *storage) GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error) {
+	board := models.BoardOutsideShort{}
+
+	err := s.db.QueryRow("SELECT boardID, boardName, theme, star FROM boards WHERE shared_url = $1", boardInput.UrlHash).
+		Scan(&board.BoardID, &board.Name, &board.Theme, &board.Star)
+
+	if err != nil {
+		return models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetBoardByURL"}
+	}
+
+	_, err = s.db.Exec("INSERT INTO board_members (boardID, userID) VALUES ($1, $2)", boardInput.BoardID, boardInput.UserID)
+	if err != nil {
+		return models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "AddUser"}
+	}
+
+	return board, nil
 }

@@ -8,7 +8,8 @@ CREATE TABLE boards (
     adminID      INTEGER,
     boardName    TEXT,
     theme        TEXT,
-    star         BOOLEAN
+    star         BOOLEAN,
+    shared_url  TEXT
 );
 
 CREATE TABLE cards (
@@ -48,7 +49,6 @@ CREATE TABLE comments (
     userID INTEGER
 );
 
--- ID  ДОСКИ!!!!
 CREATE TABLE tags (
     tagID SERIAL PRIMARY KEY,
     boardID  INTEGER REFERENCES boards(boardID)  ON DELETE CASCADE,

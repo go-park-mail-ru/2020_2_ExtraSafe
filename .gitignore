@@ -29,3 +29,5 @@ test_data.sql
 useful
 /test.sql
 
+config.env
+init/database.env

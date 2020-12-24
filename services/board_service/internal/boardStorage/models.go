@@ -18,13 +18,16 @@ type CardsStorage interface {
 type TasksStorage interface {
 	CreateTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 	ChangeTask(taskInput models.TaskInput) (models.TaskInternal, error)
-	DeleteTask(taskInput models.TaskInput) error
+	DeleteTask(taskInput models.TaskInput) (models.TaskInternalShort, error)
 
 	GetTasksByCard(cardInput models.CardInput) ([]models.TaskInternalShort, error)
 	GetTaskByID(taskInput models.TaskInput) (models.TaskInternal, error)
+	GetTaskName(taskInput models.TaskInput) (string, error)
 	ChangeTaskOrder(taskInput models.TasksOrderInput) error
 
 	AssignUser(input models.TaskAssigner) (err error)
 	DismissUser(input models.TaskAssigner) (err error)
 	GetAssigners(input models.TaskInput) (assignerIDs []int64, err error)
+
+	GetCardIDByTask(taskInput int64) (cardID int64, err error)
 }

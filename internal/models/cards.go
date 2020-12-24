@@ -10,11 +10,12 @@ type Card struct {
 
 //===================================================<-Input
 type CardInput struct {
-	UserID  int64  `json:"-"`
-	CardID  int64  `json:"cardID"`
-	BoardID int64  `json:"boardID"`
-	Name    string `json:"cardName"`
-	Order   int64  `json:"cardOrder"`
+	SessionID string `json:"-"`
+	UserID    int64  `json:"-"`
+	CardID    int64  `json:"cardID"`
+	BoardID   int64  `json:"boardID"`
+	Name      string `json:"cardName"`
+	Order     int64  `json:"cardOrder"`
 }
 
 type CardOrder struct {
@@ -23,8 +24,10 @@ type CardOrder struct {
 }
 
 type CardsOrderInput struct {
-	UserID int64       `json:"-"`
-	Cards  []CardOrder `json:"cards"`
+	SessionID string      `json:"-"`
+	UserID    int64       `json:"-"`
+	BoardID   int64       `json:"-"`
+	Cards     []CardOrder `json:"cards"`
 }
 
 //===================================================<-Internal

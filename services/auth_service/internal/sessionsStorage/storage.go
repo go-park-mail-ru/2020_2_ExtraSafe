@@ -49,7 +49,7 @@ func (s *storage) CheckUserSession(sessionId string) (int64, error) {
 	}
 
 	if len(resp.Tuples()) == 0 {
-		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("Empty sessions DB "),
+		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("No such session "),
 			MethodName: "CheckUserSession"}
 	}
 
