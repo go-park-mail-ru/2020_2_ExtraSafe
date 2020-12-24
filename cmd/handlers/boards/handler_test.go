@@ -2836,3 +2836,245 @@ func TestHandler_AttachmentDeleteFail(t *testing.T) {
 		return
 	}
 }
+
+func TestHandler_Notification(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.UserInput{
+		SessionID: "13",
+		ID:        1,
+	}
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	mockProfileService.EXPECT().WebSocketNotification(input, c).Return(nil)
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+
+	err := boardHandler.Notification(c)
+
+	if err != nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestHandler_SharedURL(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.BoardInput{
+		SessionID: "13",
+		UserID:  1,
+		BoardID: 4,
+	}
+
+	outside := "12345"
+
+	mockProfileService.EXPECT().GetSharedURL(input).Return(outside, nil)
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.SetPath("/board/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues("4")
+
+	err := boardHandler.SharedURL(c)
+
+	if err != nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestHandler_SharedURLFail(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.BoardInput{
+		SessionID: "13",
+		UserID:  1,
+		BoardID: 4,
+	}
+
+	outside := "12345"
+
+	mockProfileService.EXPECT().GetSharedURL(input).Return(outside, models.ServeError{Codes: []string{"500"}})
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.SetPath("/board/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues("4")
+
+	err := boardHandler.SharedURL(c)
+
+	if err == nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestHandler_BoardWS(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.BoardInput{
+		UserID:    1,
+		SessionID: "13",
+		BoardID:   4,
+	}
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.Set("sessionID", "13")
+	c.Set("boardID", int64(4))
+	c.SetPath("/board/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues("4")
+
+	mockProfileService.EXPECT().WebSocketBoard(input, c).Return(nil)
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	err := boardHandler.BoardWS(c)
+
+	if err != nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestHandler_BoardInvite(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.BoardInviteInput{
+		UserID:  1,
+		BoardID: 4,
+		UrlHash: "12345",
+	}
+
+	outside := models.BoardOutsideShort{
+		BoardID: 4,
+		Name:    "vs",
+		Theme:   "hy",
+		Star:    false,
+	}
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("4", "12345")
+
+
+	mockProfileService.EXPECT().InviteUserToBoard(input).Return(outside, nil)
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	err := boardHandler.BoardInvite(c)
+
+	if err != nil {
+		t.Errorf("results not match")
+		return
+	}
+}
+
+func TestHandler_BoardInviteFail(t *testing.T) {
+	ctrlBoard := gomock.NewController(t)
+	defer ctrlBoard.Finish()
+	mockProfileService := mock.NewMockServiceBoard(ctrlBoard)
+
+	input := models.BoardInviteInput{
+		UserID:  1,
+		BoardID: 4,
+		UrlHash: "12345",
+	}
+
+	outside := models.BoardOutsideShort{
+		BoardID: 4,
+		Name:    "vs",
+		Theme:   "hy",
+		Star:    false,
+	}
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("userId", int64(1))
+	c.SetParamNames("ID", "url")
+	c.SetParamValues("4", "12345")
+
+
+	mockProfileService.EXPECT().InviteUserToBoard(input).Return(outside, models.ServeError{Codes: []string{"500"}})
+
+	boardTransport := boards.NewTransport()
+
+	errorWorker := errorWorker2.NewErrorWorker()
+
+	boardHandler := NewHandler(mockProfileService, boardTransport, errorWorker)
+
+	err := boardHandler.BoardInvite(c)
+
+	if err == nil {
+		t.Errorf("results not match")
+		return
+	}
+}
