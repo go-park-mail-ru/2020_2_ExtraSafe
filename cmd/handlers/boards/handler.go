@@ -3,7 +3,7 @@ package boardsHandler
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -55,16 +55,16 @@ type Handler interface {
 }
 
 type handler struct {
-	boardsService   boards.ServiceBoard
+	boardsService boards.ServiceBoard
 	boardsTransport boards.Transport
-	errorWorker     errorworker.ErrorWorker
+	errorWorker errorWorker.ErrorWorker
 }
 
-func NewHandler(boardsService boards.ServiceBoard, boardsTransport boards.Transport, errorWorker errorworker.ErrorWorker) Handler {
+func NewHandler(boardsService boards.ServiceBoard, boardsTransport boards.Transport, errorWorker errorWorker.ErrorWorker) *handler {
 	return &handler{
-		boardsService:   boardsService,
+		boardsService: boardsService,
 		boardsTransport: boardsTransport,
-		errorWorker:     errorWorker,
+		errorWorker: errorWorker,
 	}
 }
 
@@ -79,7 +79,7 @@ func (h *handler) BoardCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.BoardShortWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -95,7 +95,7 @@ func (h *handler) Board(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.BoardWrite(board)
+	response, err := h.boardsTransport.BoardWrite(board)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -111,7 +111,7 @@ func (h *handler) BoardChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.BoardShortWrite(board)
+	response, err := h.boardsTransport.BoardShortWrite(board)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -141,7 +141,7 @@ func (h *handler) BoardAddMember(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.UserShortWrite(user)
+	response, err := h.boardsTransport.UserShortWrite(user)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -171,7 +171,7 @@ func (h *handler) CardCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.CardShortWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -187,7 +187,7 @@ func (h *handler) Card(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.CardWrite(card)
+	response, err := h.boardsTransport.CardWrite(card)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -203,7 +203,7 @@ func (h *handler) CardChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.CardShortWrite(card)
+	response, err := h.boardsTransport.CardShortWrite(card)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -247,7 +247,7 @@ func (h *handler) TaskCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.TaskSuperShortWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -263,7 +263,7 @@ func (h *handler) Task(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.TaskWrite(task)
+	response, err := h.boardsTransport.TaskWrite(task)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -279,7 +279,7 @@ func (h *handler) TaskChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.TaskSuperShortWrite(task)
+	response, err := h.boardsTransport.TaskSuperShortWrite(task)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -323,7 +323,7 @@ func (h *handler) TaskUserAdd(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.UserShortWrite(user)
+	response, err := h.boardsTransport.UserShortWrite(user)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -353,7 +353,7 @@ func (h *handler) TagCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.TagWrite(tag)
+	response, err := h.boardsTransport.TagWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -369,7 +369,7 @@ func (h *handler) TagChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.TagWrite(tag)
+	response, err := h.boardsTransport.TagWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -427,7 +427,7 @@ func (h *handler) CommentCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.CommentWrite(tag)
+	response, err := h.boardsTransport.CommentWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -443,7 +443,7 @@ func (h *handler) CommentChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.CommentWrite(tag)
+	response, err := h.boardsTransport.CommentWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -473,7 +473,7 @@ func (h *handler) ChecklistCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.ChecklistWrite(tag)
+	response, err := h.boardsTransport.ChecklistWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -489,7 +489,7 @@ func (h *handler) ChecklistChange(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.ChecklistWrite(tag)
+	response, err := h.boardsTransport.ChecklistWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -519,7 +519,7 @@ func (h *handler) AttachmentCreate(c echo.Context) error {
 		return h.errorWorker.RespError(c, err)
 	}
 
-	response, _ := h.boardsTransport.AttachmentWrite(tag)
+	response, err := h.boardsTransport.AttachmentWrite(tag)
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -581,9 +581,9 @@ func (h *handler) BoardWS(c echo.Context) error {
 	return nil
 }
 
-func (h *handler) Notification(c echo.Context) error {
+func (h *handler) Notification(c echo.Context) error  {
 	userInput := models.UserInput{
-		ID:        c.Get("userId").(int64),
+		ID: c.Get("userId").(int64),
 		SessionID: c.Get("sessionID").(string),
 	}
 

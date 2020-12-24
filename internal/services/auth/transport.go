@@ -23,13 +23,13 @@ func NewTransport() TransportAuth {
 	return &transport{}
 }
 
-func (t transport) AuthRead(c echo.Context) (request models.UserInput, err error) {
+func (t transport) AuthRead(c echo.Context) (request models.UserInput, err error)  {
 	userInput := new(models.UserInput)
 	userInput.ID = c.Get("userId").(int64)
 	return *userInput, nil
 }
 
-func (t transport) RegRead(c echo.Context) (request models.UserInputReg, err error) {
+func (t transport) RegRead(c echo.Context) (request models.UserInputReg, err error)  {
 	userInput := new(models.UserInputReg)
 
 	if err := c.Bind(userInput); err != nil {
@@ -39,7 +39,7 @@ func (t transport) RegRead(c echo.Context) (request models.UserInputReg, err err
 	return *userInput, nil
 }
 
-func (t transport) LoginRead(c echo.Context) (request models.UserInputLogin, err error) {
+func (t transport) LoginRead(c echo.Context) (request models.UserInputLogin, err error)  {
 	userInput := new(models.UserInputLogin)
 
 	if err := c.Bind(userInput); err != nil {
@@ -49,7 +49,7 @@ func (t transport) LoginRead(c echo.Context) (request models.UserInputLogin, err
 	return *userInput, nil
 }
 
-func (t transport) AuthWrite(user models.UserBoardsOutside, token string) (response models.ResponseUserAuth, err error) {
+func (t transport)AuthWrite(user models.UserBoardsOutside, token string) (response models.ResponseUserAuth, err error)  {
 	response.Status = 200
 	response.Token = token
 	response.Email = user.Email
@@ -60,13 +60,13 @@ func (t transport) AuthWrite(user models.UserBoardsOutside, token string) (respo
 	return response, nil
 }
 
-func (t transport) LoginWrite(token string) (response models.ResponseToken, err error) {
+func (t transport)LoginWrite(token string) (response models.ResponseToken, err error)  {
 	response.Status = 200
 	response.Token = token
 	return response, nil
 }
 
-func (t transport) RegWrite() (response models.ResponseStatus, err error) {
+func (t transport) RegWrite() (response models.ResponseStatus, err error)  {
 	response.Status = 200
 	return response, nil
 }

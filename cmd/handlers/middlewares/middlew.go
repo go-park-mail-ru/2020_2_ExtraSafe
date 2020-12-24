@@ -5,7 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/logger"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -28,20 +28,20 @@ type Middleware interface {
 }
 
 type middlew struct {
-	errorWorker    errorworker.ErrorWorker
-	authService    auth.ServiceAuth
-	authTransport  auth.TransportAuth
-	boardService   boards.ServiceBoard
+	errorWorker errorWorker.ErrorWorker
+	authService auth.ServiceAuth
+	authTransport auth.TransportAuth
+	boardService boards.ServiceBoard
 	internalLogger logger.Logger
 }
 
-func NewMiddleware(errorWorker errorworker.ErrorWorker, authService auth.ServiceAuth, authTransport auth.TransportAuth,
+func NewMiddleware(errorWorker errorWorker.ErrorWorker, authService auth.ServiceAuth, authTransport auth.TransportAuth,
 	boardService boards.ServiceBoard, internalLogger logger.Logger) Middleware {
 	return middlew{
-		errorWorker:    errorWorker,
-		authService:    authService,
-		authTransport:  authTransport,
-		boardService:   boardService,
+		errorWorker: errorWorker,
+		authService: authService,
+		authTransport: authTransport,
+		boardService: boardService,
 		internalLogger: internalLogger,
 	}
 }
@@ -64,7 +64,7 @@ func (m middlew) CORS() echo.MiddlewareFunc {
 
 func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID, err := m.authService.CheckCookie(c)
+		userId, err := m.authService.CheckCookie(c)
 		if err != nil {
 			if err := m.errorWorker.RespError(c, err); err != nil {
 				return err
@@ -74,7 +74,7 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 
 		session, _ := c.Cookie("tabutask_id")
 
-		c.Set("userId", userID)
+		c.Set("userId", userId)
 		c.Set("sessionID", session.Value)
 
 		return next(c)
@@ -83,12 +83,12 @@ func (m middlew) CookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m middlew) AuthCookieSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID, err := m.authService.CheckCookie(c)
+	userId, err := m.authService.CheckCookie(c)
 		if err == nil {
 			userInput := new(models.UserInput)
-			userInput.ID = userID
+			userInput.ID = userId
 			user, _ := m.authService.Auth(*userInput)
-			token, _ := csrf.GenerateToken(userID)
+			token, _ := csrf.GenerateToken(userId)
 			response, err := m.authTransport.AuthWrite(user, token)
 			if err != nil {
 				if err := m.errorWorker.RespError(c, err); err != nil {

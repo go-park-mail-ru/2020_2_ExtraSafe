@@ -1,5 +1,6 @@
 package models
 
+
 type Card struct {
 	CardID  int64  `json:"columnID"`
 	BoardID int64  `json:"boardID"`
@@ -7,7 +8,7 @@ type Card struct {
 	Order   int64  `json:"order"`
 }
 
-// ===================================================<-Input
+//===================================================<-Input
 type CardInput struct {
 	SessionID string `json:"-"`
 	UserID    int64  `json:"-"`
@@ -29,7 +30,7 @@ type CardsOrderInput struct {
 	Cards     []CardOrder `json:"cards"`
 }
 
-// ===================================================<-Internal
+//===================================================<-Internal
 type CardInternal struct {
 	CardID int64
 	Name   string
@@ -37,7 +38,7 @@ type CardInternal struct {
 	Tasks  []TaskInternalShort
 }
 
-// ===================================================<-Outside
+//===================================================<-Outside
 type CardOutside struct {
 	CardID int64              `json:"cardID"`
 	Name   string             `json:"cardName"`
@@ -50,4 +51,4 @@ type CardOutsideShort struct {
 	Name   string `json:"cardName"`
 }
 
-// ===================================================<-Other
+//===================================================<-Other

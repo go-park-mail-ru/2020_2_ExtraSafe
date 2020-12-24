@@ -9,7 +9,7 @@ import (
 //go:generate mockgen -destination=./mock/mock_validator.go -package=mock github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/boards Validator
 
 type UserStorage interface {
-	GetUsersByIDs(userIDs []int64) ([]models.UserOutsideShort, error) // 0 структура - админ доски
+	GetUsersByIDs(userIDs []int64) ([] models.UserOutsideShort, error) // 0 структура - админ доски
 }
 
 type BoardStorage interface {

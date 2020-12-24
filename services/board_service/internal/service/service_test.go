@@ -181,13 +181,13 @@ func TestService_ChangeBoardFail(t *testing.T) {
 
 func TestService_DeleteBoard(t *testing.T) {
 	request := &protoBoard.BoardInput{
-		UserID:  1,
-		BoardID: 1,
+		UserID:    1,
+		BoardID:   1,
 	}
 
 	input := models.BoardInput{
-		UserID:  request.UserID,
-		BoardID: request.BoardID,
+		UserID:    request.UserID,
+		BoardID:   request.BoardID,
 	}
 
 	expect := &protoBoard.Nothing{Dummy: true}
@@ -213,13 +213,13 @@ func TestService_DeleteBoard(t *testing.T) {
 
 func TestService_DeleteBoardFail(t *testing.T) {
 	request := &protoBoard.BoardInput{
-		UserID:  1,
-		BoardID: 1,
+		UserID:    1,
+		BoardID:   1,
 	}
 
 	input := models.BoardInput{
-		UserID:  request.UserID,
-		BoardID: request.BoardID,
+		UserID:    request.UserID,
+		BoardID:   request.BoardID,
 	}
 
 	expect := &protoBoard.Nothing{Dummy: true}
@@ -254,7 +254,7 @@ func TestService_GetBoard(t *testing.T) {
 		CardID: 1,
 		Name:   "card",
 		Order:  1,
-		Tasks:  []models.TaskInternalShort{},
+		Tasks: []models.TaskInternalShort{},
 	}
 
 	cardsInternal := make([]models.CardInternal, 0)
@@ -279,7 +279,7 @@ func TestService_GetBoard(t *testing.T) {
 		Tags:     tagsInternal,
 	}
 
-	users := make([]*protoProfile.UserOutsideShort, 0)
+	users := make([]*protoProfile.UserOutsideShort,0)
 	users = append(users, &protoProfile.UserOutsideShort{ID: internal.UsersIDs[0]})
 
 	cards := make([]*protoBoard.CardOutside, 0)
@@ -289,10 +289,10 @@ func TestService_GetBoard(t *testing.T) {
 		CardID: card.CardID,
 		Name:   card.Name,
 		Order:  card.Order,
-		Tasks:  tasks,
+		Tasks: tasks,
 	})
 
-	expect := &protoBoard.BoardOutside{
+	expect :=  &protoBoard.BoardOutside{
 		BoardID: internal.BoardID,
 		Admin:   &protoProfile.UserOutsideShort{ID: internal.AdminID},
 		Name:    internal.Name,
@@ -308,7 +308,7 @@ func TestService_GetBoard(t *testing.T) {
 	membersIDs = append(membersIDs, internal.UsersIDs...)
 
 	members := &protoProfile.UsersOutsideShort{Users: nil}
-	members.Users = append(members.Users, &protoProfile.UserOutsideShort{ID: internal.AdminID}, &protoProfile.UserOutsideShort{ID: internal.UsersIDs[0]})
+	members.Users = append(members.Users, &protoProfile.UserOutsideShort{ID: internal.AdminID},  &protoProfile.UserOutsideShort{ID: internal.UsersIDs[0]})
 
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
@@ -319,7 +319,7 @@ func TestService_GetBoard(t *testing.T) {
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlUser)
 
 	mockBoardStorage.EXPECT().GetBoard(input).Return(internal, nil)
-	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: membersIDs}).Return(members, nil)
+	mockProfileService.EXPECT().GetUsersByIDs(context.Background(),  &protoProfile.UserIDS{UserIDs: membersIDs}).Return(members, nil)
 
 	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
@@ -412,7 +412,7 @@ func TestService_GetBoardUsersFail(t *testing.T) {
 		CardID: 1,
 		Name:   "card",
 		Order:  1,
-		Tasks:  []models.TaskInternalShort{},
+		Tasks: []models.TaskInternalShort{},
 	}
 
 	cardsInternal := make([]models.CardInternal, 0)
@@ -444,7 +444,7 @@ func TestService_GetBoardUsersFail(t *testing.T) {
 		CardID: card.CardID,
 		Name:   card.Name,
 		Order:  card.Order,
-		Tasks:  tasks,
+		Tasks: tasks,
 	})
 
 	membersIDs := make([]int64, 0)
@@ -460,7 +460,7 @@ func TestService_GetBoardUsersFail(t *testing.T) {
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlUser)
 
 	mockBoardStorage.EXPECT().GetBoard(input).Return(internal, nil)
-	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: membersIDs}).Return(&protoProfile.UsersOutsideShort{}, errors.New(""))
+	mockProfileService.EXPECT().GetUsersByIDs(context.Background(),  &protoProfile.UserIDS{UserIDs: membersIDs}).Return(&protoProfile.UsersOutsideShort{}, errors.New(""))
 
 	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
@@ -498,15 +498,15 @@ func TestService_AddUserToBoard(t *testing.T) {
 	}
 
 	input := models.BoardMember{
-		UserID:   request.UserID,
-		BoardID:  request.BoardID,
-		MemberID: 2,
+		UserID:    request.UserID,
+		BoardID:   request.BoardID,
+		MemberID:  2,
 	}
 
 	user := &protoProfile.UserOutsideShort{
 		ID:       2,
 		Email:    "lallaa",
-		Username: request.MemberName,
+		Username:  request.MemberName,
 		FullName: "lalalla",
 		Avatar:   "default",
 	}
@@ -538,8 +538,8 @@ func TestService_AddUserToBoard(t *testing.T) {
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlUser)
 
 	mockProfileService.EXPECT().
-		GetUserByUsername(context.Background(), &protoProfile.UserName{UserName: request.MemberName}).
-		Return(user, nil)
+						GetUserByUsername(context.Background(), &protoProfile.UserName{UserName: request.MemberName}).
+						Return(user, nil)
 
 	mockProfileService.
 		EXPECT().
@@ -551,9 +551,9 @@ func TestService_AddUserToBoard(t *testing.T) {
 	mockBoardStorage.
 		EXPECT().
 		GetBoardShort(models.BoardInput{
-			UserID:  input.UserID,
-			BoardID: input.BoardID,
-		}).
+		UserID:    input.UserID,
+		BoardID:   input.BoardID,
+	}).
 		Return(board, nil)
 
 	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
@@ -601,15 +601,15 @@ func TestService_AddUserToBoardFail2(t *testing.T) {
 	}
 
 	input := models.BoardMember{
-		UserID:   request.UserID,
-		BoardID:  request.BoardID,
-		MemberID: 2,
+		UserID:    request.UserID,
+		BoardID:   request.BoardID,
+		MemberID:  2,
 	}
 
 	user := &protoProfile.UserOutsideShort{
 		ID:       2,
 		Email:    "lallaa",
-		Username: request.MemberName,
+		Username:  request.MemberName,
 		FullName: "lalalla",
 		Avatar:   "default",
 	}
@@ -653,9 +653,9 @@ func TestService_RemoveUserToBoard(t *testing.T) {
 	}
 
 	input := models.BoardMember{
-		UserID:   request.UserID,
-		BoardID:  request.BoardID,
-		MemberID: 2,
+		UserID:    request.UserID,
+		BoardID:   request.BoardID,
+		MemberID:  2,
 	}
 
 	userProfile := &protoProfile.UserOutsideShort{ID: input.MemberID}
@@ -899,13 +899,13 @@ func TestService_DeleteCardFail(t *testing.T) {
 
 func TestService_GetCard(t *testing.T) {
 	request := &protoBoard.CardInput{
-		UserID: 1,
-		CardID: 1,
+		UserID:  1,
+		CardID:  1,
 	}
 
 	input := models.CardInput{
-		UserID: request.UserID,
-		CardID: request.CardID,
+		UserID:  request.UserID,
+		CardID:  request.CardID,
 	}
 
 	internal := models.CardInternal{
@@ -917,7 +917,7 @@ func TestService_GetCard(t *testing.T) {
 	expect := &protoBoard.CardOutside{
 		CardID: internal.CardID,
 		Name:   internal.Name,
-		Order:  internal.Order,
+		Order: internal.Order,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -941,13 +941,13 @@ func TestService_GetCard(t *testing.T) {
 
 func TestService_GetCardFail(t *testing.T) {
 	request := &protoBoard.CardInput{
-		UserID: 1,
-		CardID: 1,
+		UserID:  1,
+		CardID:  1,
 	}
 
 	input := models.CardInput{
-		UserID: request.UserID,
-		CardID: request.CardID,
+		UserID:  request.UserID,
+		CardID:  request.CardID,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -967,7 +967,7 @@ func TestService_GetCardFail(t *testing.T) {
 
 func TestService_CardOrderChange(t *testing.T) {
 	cards := make([]*protoBoard.CardOrder, 0)
-	card := &protoBoard.CardOrder{Order: 1, CardID: 1}
+	card :=  &protoBoard.CardOrder{Order: 1, CardID: 1}
 	cards = append(cards, card)
 
 	request := &protoBoard.CardsOrderInput{
@@ -1002,7 +1002,7 @@ func TestService_CardOrderChange(t *testing.T) {
 
 func TestService_CardOrderChangeFail(t *testing.T) {
 	cards := make([]*protoBoard.CardOrder, 0)
-	card := &protoBoard.CardOrder{Order: 1, CardID: 1}
+	card :=  &protoBoard.CardOrder{Order: 1, CardID: 1}
 	cards = append(cards, card)
 
 	request := &protoBoard.CardsOrderInput{
@@ -1202,21 +1202,21 @@ func TestService_ChangeTaskFail(t *testing.T) {
 
 func TestService_DeleteTask(t *testing.T) {
 	request := &protoBoard.TaskInput{
-		UserID: 1,
-		TaskID: 0,
-		CardID: 1,
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
 	}
 
 	input := models.TaskInput{
-		UserID: request.UserID,
-		CardID: request.CardID,
-		TaskID: request.TaskID,
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		TaskID:      request.TaskID,
 	}
 
 	task := models.TaskInternalShort{TaskID: input.TaskID, CardID: input.CardID}
 	output := &protoBoard.TaskOutsideSuperShort{
 		TaskID: task.TaskID,
-		CardID: task.CardID,
+		CardID:   task.CardID,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -1240,15 +1240,15 @@ func TestService_DeleteTask(t *testing.T) {
 
 func TestService_DeleteTaskFail(t *testing.T) {
 	request := &protoBoard.TaskInput{
-		UserID: 1,
-		TaskID: 0,
-		CardID: 1,
+		UserID:      1,
+		TaskID:      0,
+		CardID:      1,
 	}
 
 	input := models.TaskInput{
-		UserID: request.UserID,
-		CardID: request.CardID,
-		TaskID: request.TaskID,
+		UserID:      request.UserID,
+		CardID:      request.CardID,
+		TaskID:      request.TaskID,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -1272,11 +1272,12 @@ func TestService_GetTask(t *testing.T) {
 
 func TestService_TasksOrderChange(t *testing.T) {
 	tasks := make([]*protoBoard.TaskOrder, 0)
-	task := &protoBoard.TaskOrder{Order: 1, TaskID: 1}
+	task :=  &protoBoard.TaskOrder{Order: 1, TaskID: 1}
 	tasks = append(tasks, task)
 	tasksIn := &protoBoard.TasksOrder{CardID: 1, Tasks: tasks}
 	tasksSlice := make([]*protoBoard.TasksOrder, 0)
 	tasksSlice = append(tasksSlice, tasksIn)
+
 
 	request := &protoBoard.TasksOrderInput{
 		UserID: 1,
@@ -1312,11 +1313,12 @@ func TestService_TasksOrderChange(t *testing.T) {
 
 func TestService_TasksOrderChangeFail(t *testing.T) {
 	tasks := make([]*protoBoard.TaskOrder, 0)
-	task := &protoBoard.TaskOrder{Order: 1, TaskID: 1}
+	task :=  &protoBoard.TaskOrder{Order: 1, TaskID: 1}
 	tasks = append(tasks, task)
 	tasksIn := &protoBoard.TasksOrder{CardID: 1, Tasks: tasks}
 	tasksSlice := make([]*protoBoard.TasksOrder, 0)
 	tasksSlice = append(tasksSlice, tasksIn)
+
 
 	request := &protoBoard.TasksOrderInput{
 		UserID: 1,
@@ -1352,14 +1354,14 @@ func TestService_TasksOrderChangeFail(t *testing.T) {
 
 func TestService_AssignUser(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
-	task := models.TaskAssignUserOutside{
-		TaskID:   request.TaskID,
-		CardID:   1,
+	task := models.TaskAssignUserOutside {
+		TaskID: request.TaskID,
+		CardID: 1,
 		TaskName: "ala",
 	}
 
@@ -1375,11 +1377,11 @@ func TestService_AssignUser(t *testing.T) {
 	initiator.Users = append(initiator.Users, &protoProfile.UserOutsideShort{ID: request.UserID})
 
 	output := &protoBoard.TaskAssignUserOutside{
-		Assigner:  user,
-		TaskID:    task.TaskID,
-		CardID:    task.CardID,
+		Assigner: user,
+		TaskID:   task.TaskID,
+		CardID:   task.CardID,
 		Initiator: initiator.Users[0].Username,
-		TaskName:  task.TaskName,
+		TaskName: task.TaskName,
 	}
 
 	input := models.TaskAssigner{
@@ -1426,9 +1428,9 @@ func TestService_AssignUser(t *testing.T) {
 
 func TestService_AssignUserGetUserFail(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
 	ctrlProfile := gomock.NewController(t)
@@ -1451,9 +1453,9 @@ func TestService_AssignUserGetUserFail(t *testing.T) {
 
 func TestService_AssignUserAssigningFail(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
 	expect := &protoProfile.UserOutsideShort{
@@ -1499,13 +1501,13 @@ func TestService_AssignUserAssigningFail(t *testing.T) {
 
 func TestService_DismissUser(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
 	expect := &protoProfile.UserOutsideShort{
-		ID: 1,
+		ID:       1,
 	}
 
 	input := models.TaskAssigner{
@@ -1514,9 +1516,9 @@ func TestService_DismissUser(t *testing.T) {
 		AssignerID: expect.ID,
 	}
 
-	task := models.TaskAssignUserOutside{
-		TaskID:   request.TaskID,
-		CardID:   1,
+	task := models.TaskAssignUserOutside {
+		TaskID: request.TaskID,
+		CardID: 1,
 		TaskName: "ala",
 	}
 
@@ -1559,9 +1561,9 @@ func TestService_DismissUser(t *testing.T) {
 
 func TestService_DismissUserGetUserFail(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
 	ctrlProfile := gomock.NewController(t)
@@ -1584,13 +1586,13 @@ func TestService_DismissUserGetUserFail(t *testing.T) {
 
 func TestService_DismissUserDismissFail(t *testing.T) {
 	request := &protoBoard.TaskAssignerInput{
-		TaskID:       1,
+		TaskID: 1,
 		AssignerName: "pkaterina",
-		UserID:       1,
+		UserID: 1,
 	}
 
 	expect := &protoProfile.UserOutsideShort{
-		ID: 1,
+		ID:       1,
 	}
 
 	input := models.TaskAssigner{
@@ -1659,7 +1661,7 @@ func TestService_CreateTag(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().CreateTag(input).Return(internal, nil)
 
 	output, err := service.CreateTag(context.Background(), request)
@@ -1695,7 +1697,7 @@ func TestService_CreateTagFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().CreateTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.CreateTag(context.Background(), request)
@@ -1717,7 +1719,7 @@ func TestService_ChangeTag(t *testing.T) {
 
 	input := models.TagInput{
 		UserID:  request.UserID,
-		TagID:   request.TagID,
+		TagID: request.TagID,
 		BoardID: request.BoardID,
 		Color:   request.Color,
 		Name:    request.Name,
@@ -1739,7 +1741,7 @@ func TestService_ChangeTag(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().UpdateTag(input).Return(internal, nil)
 
 	output, err := service.ChangeTag(context.Background(), request)
@@ -1774,7 +1776,7 @@ func TestService_ChangeTagFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().UpdateTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.ChangeTag(context.Background(), request)
@@ -1793,7 +1795,7 @@ func TestService_DeleteTag(t *testing.T) {
 
 	input := models.TagInput{
 		UserID:  request.UserID,
-		TagID:   request.TagID,
+		TagID: request.TagID,
 		BoardID: request.BoardID,
 	}
 
@@ -1801,7 +1803,7 @@ func TestService_DeleteTag(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().DeleteTag(input).Return(nil)
 
 	_, err := service.DeleteTag(context.Background(), request)
@@ -1820,7 +1822,7 @@ func TestService_DeleteTagFail(t *testing.T) {
 
 	input := models.TagInput{
 		UserID:  request.UserID,
-		TagID:   request.TagID,
+		TagID: request.TagID,
 		BoardID: request.BoardID,
 	}
 
@@ -1828,7 +1830,7 @@ func TestService_DeleteTagFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().DeleteTag(input).Return(errStorage)
 
 	_, err := service.DeleteTag(context.Background(), request)
@@ -1840,14 +1842,14 @@ func TestService_DeleteTagFail(t *testing.T) {
 
 func TestService_AddTag(t *testing.T) {
 	request := &protoBoard.TaskTagInput{
-		UserID: 1,
-		TaskID: 1,
-		TagID:  0,
+		UserID:  1,
+		TaskID:  1,
+		TagID:   0,
 	}
 
 	input := models.TaskTagInput{
-		UserID: request.UserID,
-		TagID:  request.TagID,
+		UserID:  request.UserID,
+		TagID: request.TagID,
 		TaskID: request.TaskID,
 	}
 
@@ -1862,16 +1864,16 @@ func TestService_AddTag(t *testing.T) {
 	output := &protoBoard.TagOutside{
 		TaskID: tag.TaskID,
 		CardID: tag.CardID,
-		TagID:  tag.TagID,
-		Color:  tag.Color,
-		Name:   tag.Name,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
 	}
 
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().AddTag(input).Return(tag, nil)
 
 	res, err := service.AddTag(context.Background(), request)
@@ -1887,14 +1889,14 @@ func TestService_AddTag(t *testing.T) {
 
 func TestService_AddTagFail(t *testing.T) {
 	request := &protoBoard.TaskTagInput{
-		UserID: 1,
-		TaskID: 1,
-		TagID:  0,
+		UserID:  1,
+		TaskID:  1,
+		TagID:   0,
 	}
 
 	input := models.TaskTagInput{
-		UserID: request.UserID,
-		TagID:  request.TagID,
+		UserID:  request.UserID,
+		TagID: request.TagID,
 		TaskID: request.TaskID,
 	}
 
@@ -1902,7 +1904,7 @@ func TestService_AddTagFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().AddTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.AddTag(context.Background(), request)
@@ -1913,14 +1915,14 @@ func TestService_AddTagFail(t *testing.T) {
 }
 func TestService_RemoveTag(t *testing.T) {
 	request := &protoBoard.TaskTagInput{
-		UserID: 1,
-		TaskID: 1,
-		TagID:  0,
+		UserID:  1,
+		TaskID:  1,
+		TagID:   0,
 	}
 
 	input := models.TaskTagInput{
-		UserID: request.UserID,
-		TagID:  request.TagID,
+		UserID:  request.UserID,
+		TagID: request.TagID,
 		TaskID: request.TaskID,
 	}
 
@@ -1935,17 +1937,17 @@ func TestService_RemoveTag(t *testing.T) {
 	output := &protoBoard.TagOutside{
 		TaskID: tag.TaskID,
 		CardID: tag.CardID,
-		TagID:  tag.TagID,
-		Color:  tag.Color,
-		Name:   tag.Name,
+		TagID: tag.TagID,
+		Color: tag.Color,
+		Name:  tag.Name,
 	}
 
 	ctrlBoard := gomock.NewController(t)
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
-	mockBoardStorage.EXPECT().RemoveTag(input).Return(tag, nil)
+	service :=  &service{boardStorage: mockBoardStorage}
+	mockBoardStorage.EXPECT().RemoveTag(input).Return(tag,nil)
 
 	res, err := service.RemoveTag(context.Background(), request)
 	if err != nil {
@@ -1960,14 +1962,14 @@ func TestService_RemoveTag(t *testing.T) {
 
 func TestService_RemoveTagFail(t *testing.T) {
 	request := &protoBoard.TaskTagInput{
-		UserID: 1,
-		TaskID: 1,
-		TagID:  0,
+		UserID:  1,
+		TaskID:  1,
+		TagID:   0,
 	}
 
 	input := models.TaskTagInput{
-		UserID: request.UserID,
-		TagID:  request.TagID,
+		UserID:  request.UserID,
+		TagID: request.TagID,
 		TaskID: request.TaskID,
 	}
 
@@ -1975,7 +1977,7 @@ func TestService_RemoveTagFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 	mockBoardStorage.EXPECT().RemoveTag(input).Return(models.TagOutside{}, errStorage)
 
 	_, err := service.RemoveTag(context.Background(), request)
@@ -2026,7 +2028,7 @@ func TestService_CreateComment(t *testing.T) {
 	defer ctrlProfile.Finish()
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlProfile)
 
-	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
+	service :=  &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
 	mockBoardStorage.EXPECT().CreateComment(input).Return(internal, nil)
 	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).Return(internalUser, nil)
@@ -2063,7 +2065,7 @@ func TestService_CreateCommentFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 
 	mockBoardStorage.EXPECT().CreateComment(input).Return(models.CommentOutside{}, errStorage)
 
@@ -2105,7 +2107,7 @@ func TestService_CreateCommentGetUserFail(t *testing.T) {
 	defer ctrlProfile.Finish()
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlProfile)
 
-	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
+	service :=  &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
 	mockBoardStorage.EXPECT().CreateComment(input).Return(internal, nil)
 	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).Return(&protoProfile.UsersOutsideShort{}, errors.New(""))
@@ -2158,7 +2160,7 @@ func TestService_ChangeComment(t *testing.T) {
 	defer ctrlProfile.Finish()
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlProfile)
 
-	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
+	service :=  &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
 	mockBoardStorage.EXPECT().UpdateComment(input).Return(internal, nil)
 	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).Return(internalUser, nil)
@@ -2195,7 +2197,7 @@ func TestService_ChangeCommentFail(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardStorage := mocks.NewMockBoardStorage(ctrlBoard)
 
-	service := &service{boardStorage: mockBoardStorage}
+	service :=  &service{boardStorage: mockBoardStorage}
 
 	mockBoardStorage.EXPECT().UpdateComment(input).Return(models.CommentOutside{}, errStorage)
 
@@ -2237,7 +2239,7 @@ func TestService_ChangeCommentGetUserFail(t *testing.T) {
 	defer ctrlProfile.Finish()
 	mockProfileService := serviceMocks.NewMockProfileClient(ctrlProfile)
 
-	service := &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
+	service :=  &service{boardStorage: mockBoardStorage, profileService: mockProfileService}
 
 	mockBoardStorage.EXPECT().UpdateComment(input).Return(internal, nil)
 	mockProfileService.EXPECT().GetUsersByIDs(context.Background(), &protoProfile.UserIDS{UserIDs: []int64{input.UserID}}).Return(&protoProfile.UsersOutsideShort{}, errors.New(""))
@@ -2274,8 +2276,8 @@ func TestService_DeleteComment(t *testing.T) {
 
 	output := &protoBoard.CommentOutside{
 		CommentID: comment.CommentID,
-		CardID:    comment.CardID,
-		TaskID:    comment.TaskID,
+		CardID: comment.CardID,
+		TaskID: comment.TaskID,
 	}
 
 	ctrlBoard := gomock.NewController(t)
@@ -2552,7 +2554,6 @@ func TestService_DeleteChecklistFail(t *testing.T) {
 		return
 	}
 }
-
 /*
 func TestService_AddAttachment(t *testing.T) {
 	request := &protoBoard.AttachmentInput{
@@ -2910,7 +2911,7 @@ func TestService_CheckTaskPermission(t *testing.T) {
 	expect := &protoBoard.BoardID{BoardID: 1}
 	service := &service{boardStorage: mockBoardStorage}
 
-	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(int64(1), nil)
+	mockBoardStorage.EXPECT().CheckTaskPermission(input.UserID, input.ElementID).Return(int64(1),nil)
 
 	output, err := service.CheckTaskPermission(context.Background(), input)
 	if err != nil {

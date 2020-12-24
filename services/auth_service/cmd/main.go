@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/service"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/sessionstorage"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/auth_service/internal/sessionsStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/auth"
 	protoBoard "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/board"
 	protoProfile "github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile"
@@ -14,12 +14,13 @@ import (
 	"os"
 )
 
+
 func main() {
 	// =============================
-	userName := os.Getenv("TABUTASK_SESSIONS_USER")
+	userName:= os.Getenv("TABUTASK_SESSIONS_USER")
 	addr := os.Getenv("TABUTASK_SESSIONS_ADDR")
 
-	tConn, err := tarantool.Connect(addr, tarantool.Opts{User: userName})
+	tConn, err := tarantool.Connect(addr, tarantool.Opts{ User: userName })
 	if err != nil {
 		fmt.Println("Connection refused", err)
 		return
@@ -27,7 +28,7 @@ func main() {
 
 	defer tConn.Close()
 
-	authStorage := sessionstorage.NewStorage(tConn)
+	authStorage := sessionsStorage.NewStorage(tConn)
 
 	// =============================
 

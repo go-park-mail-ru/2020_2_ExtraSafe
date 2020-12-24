@@ -8,7 +8,9 @@ import (
 	"github.com/labstack/echo"
 )
 
-func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handler, board boardsHandler.Handler, middle middlewares.Middleware) {
+func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handler, board boardsHandler.Handler,
+	middle middlewares.Middleware) {
+
 	e.Use(middle.Logger)
 
 	e.Any("/api/", middle.CookieSession(auth.Auth))

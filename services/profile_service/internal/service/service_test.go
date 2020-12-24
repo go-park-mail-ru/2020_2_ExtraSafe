@@ -26,14 +26,14 @@ func TestService_CheckUser(t *testing.T) {
 		Password: request.Password,
 	}
 
-	expectedUser := &protoProfile.UserID{ID: 1}
+	expectedUser:= &protoProfile.UserID{ ID: 1 }
 
 	ctrlUser := gomock.NewController(t)
 	defer ctrlUser.Finish()
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	mockUserStorage.EXPECT().CheckUser(userInput).Return(int64(1), models.UserOutside{}, nil)
@@ -65,7 +65,7 @@ func TestService_CheckUserFail(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	errStorage := models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("")}
@@ -92,14 +92,14 @@ func TestService_CreateUser(t *testing.T) {
 		Password: input.Password,
 	}
 
-	expectedUser := &protoProfile.UserID{ID: 1}
+	expectedUser:= &protoProfile.UserID{ ID: 1 }
 
 	ctrlUser := gomock.NewController(t)
 	defer ctrlUser.Finish()
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	mockUserStorage.EXPECT().CreateUser(userInput).Return(int64(1), models.UserOutside{}, nil)
@@ -133,7 +133,7 @@ func TestService_CreateUserFail(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 	errStorage := models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("")}
 
@@ -170,7 +170,7 @@ func TestService_GetUserByUsername(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	mockUserStorage.EXPECT().GetUserByUsername(input.UserName).Return(internal, nil)
@@ -193,7 +193,7 @@ func TestService_GetUserByUsernameFail(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 	errStorage := models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("")}
 
@@ -232,7 +232,7 @@ func TestService_GetUsersByIDs(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	mockUserStorage.EXPECT().GetUsersByIDs(userIDs).Return(internal, nil)
@@ -256,7 +256,7 @@ func TestService_GetUsersByIDsFail(t *testing.T) {
 	mockUserStorage := mocks.NewMockUserStorage(ctrlUser)
 
 	service := &service{
-		userStorage: mockUserStorage,
+		userStorage:  mockUserStorage,
 	}
 
 	errStorage := models.ServeError{Codes: []string{"500"}, OriginalError: errors.New("")}
@@ -347,7 +347,7 @@ func TestService_ProfileChange(t *testing.T) {
 	mockAvatarStorage := mocks.NewMockAvatarStorage(ctrlAvatar)
 
 	service := &service{
-		userStorage:   mockUserStorage,
+		userStorage: mockUserStorage,
 		avatarStorage: mockAvatarStorage,
 	}
 
@@ -364,7 +364,7 @@ func TestService_ProfileChange(t *testing.T) {
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   request.Avatar,
+		Avatar:  request.Avatar,
 	}
 	userAvatar := models.UserAvatar{
 		ID:     1,
@@ -375,14 +375,14 @@ func TestService_ProfileChange(t *testing.T) {
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   "default/default_avatar.png",
+		Avatar: "default/default_avatar.png",
 	}
 
 	expect := &protoProfile.UserOutside{
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   internal.Avatar,
+		Avatar: 	internal.Avatar,
 	}
 
 	mockUserStorage.EXPECT().GetUserAvatar(models.UserInput{ID: request.ID}).Return(userAvatar, nil)
@@ -410,7 +410,7 @@ func TestService_ProfileChangeAvatarFail(t *testing.T) {
 	mockAvatarStorage := mocks.NewMockAvatarStorage(ctrlAvatar)
 
 	service := &service{
-		userStorage:   mockUserStorage,
+		userStorage: mockUserStorage,
 		avatarStorage: mockAvatarStorage,
 	}
 
@@ -447,7 +447,7 @@ func TestService_ProfileChangeError(t *testing.T) {
 	defer ctrlBoard.Finish()
 	mockBoardService := mockBoards.NewMockBoardClient(ctrlBoard)
 
-	service := NewService(mockUserStorage, mockAvatarStorage, mockBoardService)
+	service := NewService(mockUserStorage,mockAvatarStorage,mockBoardService)
 
 	request := &protoProfile.UserInputProfile{
 		ID:       1,
@@ -462,7 +462,7 @@ func TestService_ProfileChangeError(t *testing.T) {
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   request.Avatar,
+		Avatar:  request.Avatar,
 	}
 	userAvatar := models.UserAvatar{
 		ID:     1,
@@ -498,7 +498,7 @@ func TestService_ProfileChangeMultiErrors(t *testing.T) {
 	mockAvatarStorage := mocks.NewMockAvatarStorage(ctrlAvatar)
 
 	service := &service{
-		userStorage:   mockUserStorage,
+		userStorage: mockUserStorage,
 		avatarStorage: mockAvatarStorage,
 	}
 
@@ -515,7 +515,7 @@ func TestService_ProfileChangeMultiErrors(t *testing.T) {
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   request.Avatar,
+		Avatar:  request.Avatar,
 	}
 	userAvatar := models.UserAvatar{
 		ID:     1,
@@ -549,7 +549,7 @@ func TestService_ProfileChangeFail(t *testing.T) {
 	mockAvatarStorage := mocks.NewMockAvatarStorage(ctrlAvatar)
 
 	service := &service{
-		userStorage:   mockUserStorage,
+		userStorage: mockUserStorage,
 		avatarStorage: mockAvatarStorage,
 	}
 
@@ -566,7 +566,7 @@ func TestService_ProfileChangeFail(t *testing.T) {
 		Email:    request.Email,
 		Username: request.Username,
 		FullName: request.FullName,
-		Avatar:   request.Avatar,
+		Avatar:  request.Avatar,
 	}
 	userAvatar := models.UserAvatar{
 		ID:     1,
@@ -686,7 +686,7 @@ func TestService_Boards(t *testing.T) {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-	if !reflect.DeepEqual(boards, expected) {
+	if !reflect.DeepEqual(boards,expected) {
 		t.Errorf("results not match, want \n%v, \nhave \n%v", expected, boards)
 		return
 	}

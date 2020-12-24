@@ -9,7 +9,7 @@ type Checklist struct {
 	Items       json.RawMessage
 }
 
-// ===================================================<-Input
+//===================================================<-Input
 type ChecklistInput struct {
 	SessionID   string          `json:"-"`
 	UserID      int64           `json:"-"`
@@ -20,9 +20,10 @@ type ChecklistInput struct {
 	Items       json.RawMessage `json:"checklistItems"`
 }
 
-// ===================================================<-Internal
+//===================================================<-Internal
 
-// ===================================================<-Outside
+
+//===================================================<-Outside
 type ChecklistOutside struct {
 	ChecklistID int64           `json:"checklistID,omitempty"`
 	TaskID      int64           `json:"taskID,omitempty"`
@@ -31,4 +32,4 @@ type ChecklistOutside struct {
 	Items       json.RawMessage `json:"checklistItems,omitempty"`
 }
 
-// ===================================================<-Other
+//===================================================<-Other

@@ -7,24 +7,24 @@ import (
 )
 
 type BoardHub struct {
-	boardID    int64
-	users      map[string]*Client
-	broadcast  chan interface{}
-	register   chan *Client
+	boardID int64
+	users map[string]*Client
+	broadcast chan interface{}
+	register chan *Client
 	unregister chan *Client
-	stop       chan bool
-	hubs       *sync.Map
+	stop chan bool
+	hubs *sync.Map
 }
 
 func NewHub(boardID int64, hubs *sync.Map) *BoardHub {
 	return &BoardHub{
-		boardID:    boardID,
+		boardID: boardID,
 		broadcast:  make(chan interface{}),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		users:      make(map[string]*Client),
-		stop:       make(chan bool),
-		hubs:       hubs,
+		users: make(map[string]*Client),
+		stop: make(chan bool),
+		hubs: hubs,
 	}
 }
 
@@ -57,7 +57,7 @@ func (h *BoardHub) Run() {
 				}
 			}
 
-		case status := <-h.stop:
+		case status := <- h.stop:
 			if status == true {
 				return
 			}
@@ -80,11 +80,11 @@ func (h *BoardHub) Broadcast(message interface{}) {
 	h.broadcast <- message
 }
 
-func (h *BoardHub) Register(client *Client) {
+func (h * BoardHub) Register(client *Client) {
 	h.register <- client
 }
 
-func (h *BoardHub) Unregister(client *Client) {
+func (h * BoardHub) Unregister(client *Client) {
 	h.unregister <- client
 }
 

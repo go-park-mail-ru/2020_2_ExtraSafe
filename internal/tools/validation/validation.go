@@ -71,7 +71,7 @@ func (s *service) ValidateChangePassword(request models.UserInputPassword) (err 
 	return nil
 }
 
-func IsPasswordValid(i interface{}, _ interface{}) bool {
+func IsPasswordValid(i interface{}, o interface{}) bool {
 	subject, ok := i.(string)
 	if !ok {
 		return false
@@ -80,11 +80,11 @@ func IsPasswordValid(i interface{}, _ interface{}) bool {
 		return false
 	}
 
-	re := regexp.MustCompile("^[a-zA-Z0-9~!@#$%^&*-_+=`|(){}:;\"'<>,.?/]+$")
+	re := regexp.MustCompile( "^[a-zA-Z0-9~!@#$%^&*-_+=`|\\(){}:;\"'<>,.?/]+$")
 	return re.MatchString(subject)
 }
 
-func IsFullNameValid(i interface{}, _ interface{}) bool {
+func IsFullNameValid(i interface{}, o interface{}) bool {
 	subject, ok := i.(string)
 	if !ok {
 		return false
@@ -93,11 +93,11 @@ func IsFullNameValid(i interface{}, _ interface{}) bool {
 		return false
 	}
 
-	re := regexp.MustCompile("^[a-zA-Zа-яА-Я _]+")
+	re := regexp.MustCompile( "^[a-zA-Zа-яА-Я _]+")
 	return re.MatchString(subject)
 }
 
-func IsUsernameValid(i interface{}, _ interface{}) bool {
+func IsUsernameValid(i interface{}, o interface{}) bool {
 	subject, ok := i.(string)
 	if !ok {
 		return false
@@ -106,11 +106,11 @@ func IsUsernameValid(i interface{}, _ interface{}) bool {
 		return false
 	}
 
-	re := regexp.MustCompile("^[a-zA-Z0-9_]+$")
+	re := regexp.MustCompile( "^[a-zA-Z0-9_]+$")
 	return re.MatchString(subject)
 }
 
-func IsEmailValid(i interface{}, _ interface{}) bool {
+func IsEmailValid(i interface{}, o interface{}) bool {
 	subject, ok := i.(string)
 	if !ok {
 		return false
@@ -119,7 +119,7 @@ func IsEmailValid(i interface{}, _ interface{}) bool {
 		return false
 	}
 
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	re := regexp.MustCompile( "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
 	return re.MatchString(subject)
 }
 

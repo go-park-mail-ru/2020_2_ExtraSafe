@@ -2,7 +2,7 @@ package profileHandler
 
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/profile"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -17,14 +17,14 @@ type Handler interface {
 type handler struct {
 	profileService   profile.ServiceProfile
 	profileTransport profile.Transport
-	errorWorker      errorworker.ErrorWorker
+	errorWorker     errorWorker.ErrorWorker
 }
 
-func NewHandler(profileService profile.ServiceProfile, profileTransport profile.Transport, errorWorker errorworker.ErrorWorker) Handler {
+func NewHandler(profileService profile.ServiceProfile, profileTransport profile.Transport, errorWorker errorWorker.ErrorWorker) *handler {
 	return &handler{
 		profileService:   profileService,
 		profileTransport: profileTransport,
-		errorWorker:      errorWorker,
+		errorWorker:     errorWorker,
 	}
 }
 

@@ -32,17 +32,17 @@ var upgrader = websocket.Upgrader{
 }
 
 type Client struct {
-	hub       Hub
-	conn      *websocket.Conn
-	send      chan interface{}
-	userID    int64
+	hub Hub
+	conn *websocket.Conn
+	send chan interface{}
+	userID int64
 	sessionID string
 }
 
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.Unregister(c)
-		_ = c.conn.Close()
+		c.conn.Close()
 	}()
 
 	c.conn.SetReadLimit(maxMessageSize)
@@ -51,10 +51,7 @@ func (c *Client) readPump() {
 		return
 	}
 
-	c.conn.SetPongHandler(func(string) error {
-		if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {return err}
-		return nil
-	})
+	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		_, _, err := c.conn.ReadMessage()
 		if err != nil {
@@ -70,16 +67,14 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		_ = c.conn.Close()
+		c.conn.Close()
 	}()
 	for {
 		select {
 		case message, ok := <-c.send:
-			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
-				return
-			}
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 

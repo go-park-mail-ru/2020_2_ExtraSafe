@@ -29,8 +29,8 @@ func TestTransport_BoardRead(t *testing.T) {
 	c.SetParamValues("3")
 
 	expectedUserInput := models.BoardInput{
-		UserID:    1,
-		BoardID:   3,
+		UserID:  1,
+		BoardID: 3,
 		SessionID: "13",
 	}
 
@@ -140,9 +140,9 @@ func TestTransport_BoardMemberRead(t *testing.T) {
 	c.SetParamValues("3")
 
 	expectedUserInput := models.BoardMemberInput{
-		UserID:     1,
-		BoardID:    3,
-		SessionID:  "13",
+		UserID:    1,
+		BoardID:   3,
+		SessionID: "13",
 		MemberName: "kit",
 	}
 
@@ -184,35 +184,35 @@ func TestTransport_BoardMemberReadFail(t *testing.T) {
 func TestTransport_BoardWrite(t *testing.T) {
 	input := models.BoardOutside{
 		BoardID: 3,
-		Admin: models.UserOutsideShort{
+		Admin:   models.UserOutsideShort{
 			Email:    "mariya@mail.ru",
 			Username: "kit",
 			FullName: "kit tik",
 			Avatar:   "pig.png",
 		},
-		Name:  "kt",
-		Theme: "dark",
-		Star:  false,
-		Users: nil,
-		Cards: nil,
-		Tags:  nil,
+		Name:    "kt",
+		Theme:   "dark",
+		Star:    false,
+		Users:   nil,
+		Cards:   nil,
+		Tags:    nil,
 	}
 
-	expectedResponse := models.ResponseBoard{
+	expectedResponse:= models.ResponseBoard{
 		Status:  200,
 		BoardID: 3,
-		Admin: models.UserOutsideShort{
+		Admin:   models.UserOutsideShort{
 			Email:    "mariya@mail.ru",
 			Username: "kit",
 			FullName: "kit tik",
 			Avatar:   "pig.png",
 		},
-		Name:  "kt",
-		Theme: "dark",
-		Star:  false,
-		Users: nil,
-		Cards: nil,
-		Tags:  nil,
+		Name:    "kt",
+		Theme:   "dark",
+		Star:    false,
+		Users:   nil,
+		Cards:   nil,
+		Tags:    nil,
 	}
 
 	transp := &transport{}
@@ -231,9 +231,10 @@ func TestTransport_BoardShortWrite(t *testing.T) {
 		Name:    "kt",
 		Theme:   "dark",
 		Star:    false,
+
 	}
 
-	expectedResponse := models.ResponseBoardShort{
+	expectedResponse:= models.ResponseBoardShort{
 		Status:  200,
 		BoardID: 3,
 		Name:    "kt",
@@ -267,12 +268,12 @@ func TestTransport_CardChangeRead(t *testing.T) {
 	c.SetParamValues("4")
 
 	expectedUserInput := models.CardInput{
-		UserID:    1,
-		BoardID:   4,
+		UserID:  1,
+		BoardID: 4,
 		SessionID: "13",
-		CardID:    4,
-		Name:      "todo",
-		Order:     1,
+		CardID:  4,
+		Name:    "todo",
+		Order:   1,
 	}
 
 	transp := &transport{}
@@ -341,7 +342,7 @@ func TestTransport_CardWrite(t *testing.T) {
 		Tasks:  nil,
 	}
 
-	expectedResponse := models.ResponseCard{
+	expectedResponse:= models.ResponseCard{
 		Status: 200,
 		CardID: 4,
 		Name:   "todo",
@@ -365,7 +366,7 @@ func TestTransport_CardShortWrite(t *testing.T) {
 		Name:   "todo",
 	}
 
-	expectedResponse := models.ResponseCardShort{
+	expectedResponse:= models.ResponseCardShort{
 		Status: 200,
 		CardID: 4,
 		Name:   "todo",
@@ -394,10 +395,10 @@ func TestTransport_CardOrderRead(t *testing.T) {
 	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.CardsOrderInput{
-		UserID:    1,
-		BoardID:   4,
+		UserID: 1,
+		BoardID: 4,
 		SessionID: "13",
-		Cards:     []models.CardOrder{},
+		Cards:  []models.CardOrder{},
 	}
 
 	transp := &transport{}
@@ -451,8 +452,8 @@ func TestTransport_TaskChangeRead(t *testing.T) {
 
 	expectedUserInput := models.TaskInput{
 		UserID:      1,
-		BoardID:     4,
-		SessionID:   "13",
+		BoardID: 4,
+		SessionID: "13",
 		TaskID:      4,
 		CardID:      4,
 		Name:        "back",
@@ -533,7 +534,7 @@ func TestTransport_TaskWrite(t *testing.T) {
 		Attachments: nil,
 	}
 
-	expectedResponse := models.ResponseTask{
+	expectedResponse:= models.ResponseTask{
 		Status:      200,
 		TaskID:      5,
 		Name:        "back",
@@ -563,7 +564,7 @@ func TestTransport_TaskSuperShortWrite(t *testing.T) {
 		Description: "rrr rrr",
 	}
 
-	expectedResponse := models.ResponseTaskSuperShort{
+	expectedResponse:= models.ResponseTaskSuperShort{
 		Status:      200,
 		TaskID:      5,
 		Name:        "back",
@@ -593,10 +594,10 @@ func TestTransport_TasksOrderRead(t *testing.T) {
 	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.TasksOrderInput{
-		BoardID:   4,
+		BoardID: 4,
 		SessionID: "13",
-		UserID:    1,
-		Tasks:     []models.TasksOrder{},
+		UserID: 1,
+		Tasks:  []models.TasksOrder{},
 	}
 
 	transp := &transport{}
@@ -647,8 +648,8 @@ func TestTransport_TasksUserRead(t *testing.T) {
 	c.SetParamValues("5")
 
 	expectedUserInput := models.TaskAssignerInput{
-		BoardID:      4,
-		SessionID:    "13",
+		BoardID: 4,
+		SessionID: "13",
 		UserID:       1,
 		TaskID:       5,
 		AssignerName: "kit",
@@ -704,13 +705,13 @@ func TestTransport_TagChangeRead(t *testing.T) {
 	c.SetParamValues("4")
 
 	expectedUserInput := models.TagInput{
-		UserID:    1,
+		UserID:  1,
 		SessionID: "13",
-		TaskID:    4,
-		TagID:     2,
-		BoardID:   1,
-		Color:     "red",
-		Name:      "fds",
+		TaskID:  4,
+		TagID:   2,
+		BoardID: 1,
+		Color:   "red",
+		Name:    "fds",
 	}
 
 	transp := &transport{}
@@ -764,11 +765,11 @@ func TestTransport_TagTaskRead(t *testing.T) {
 	c.SetParamValues("4")
 
 	expectedUserInput := models.TaskTagInput{
-		UserID:    1,
+		UserID: 1,
 		SessionID: "13",
-		BoardID:   4,
-		TaskID:    2,
-		TagID:     3,
+		BoardID: 4,
+		TaskID: 2,
+		TagID:  3,
 	}
 
 	transp := &transport{}
@@ -813,11 +814,11 @@ func TestTransport_TagWrite(t *testing.T) {
 		Name:  "fsd",
 	}
 
-	expectedResponse := models.ResponseTag{
+	expectedResponse:= models.ResponseTag{
 		Status:  200,
-		TagID:   6,
-		Color:   "red",
-		TagName: "fsd",
+		TagID: 6,
+		Color: "red",
+		TagName:  "fsd",
 	}
 
 	transp := &transport{}
@@ -849,7 +850,7 @@ func TestTransport_CommentChangeRead(t *testing.T) {
 		CommentID: 5,
 		TaskID:    4,
 		SessionID: "13",
-		BoardID:   4,
+		BoardID: 4,
 		Message:   "gggg",
 		Order:     1,
 		UserID:    1,
@@ -898,7 +899,7 @@ func TestTransport_CommentWrite(t *testing.T) {
 		User:      models.UserOutsideShort{},
 	}
 
-	expectedResponse := models.ResponseComment{
+	expectedResponse:= models.ResponseComment{
 		Status:    200,
 		CommentID: 7,
 		Message:   "gdfv df",
@@ -933,8 +934,8 @@ func TestTransport_ChecklistChangeRead(t *testing.T) {
 
 	expectedUserInput := models.ChecklistInput{
 		UserID:      1,
-		SessionID:   "13",
-		BoardID:     4,
+		SessionID: "13",
+		BoardID: 4,
 		ChecklistID: 5,
 		TaskID:      4,
 		Name:        "ffff",
@@ -983,8 +984,8 @@ func TestTransport_ChecklistWrite(t *testing.T) {
 		Items:       nil,
 	}
 
-	expectedResponse := models.ResponseChecklist{
-		Status:      200,
+	expectedResponse:= models.ResponseChecklist{
+		Status:    200,
 		ChecklistID: 6,
 		Name:        "check",
 		Items:       nil,
@@ -1007,7 +1008,7 @@ func TestTransport_AttachmentAddRead(t *testing.T) {
 
 	e := echo.New()
 	body, writer, err := fileUploadRequest(params, "file", "../../../default/default_avatar.png")
-	if err != nil {
+	if err != nil{
 		return
 	}
 	req := httptest.NewRequest(http.MethodPost, "/", body)
@@ -1019,11 +1020,11 @@ func TestTransport_AttachmentAddRead(t *testing.T) {
 	c.Set("boardID", int64(4))
 
 	expectedUserInput := models.AttachmentInput{
-		UserID:    1,
+		UserID:       1,
 		SessionID: "13",
-		BoardID:   4,
-		TaskID:    2,
-		Filename:  "ttt",
+		BoardID: 4,
+		TaskID:       2,
+		Filename:     "ttt",
 	}
 
 	file, _ := os.Open("../../../default/default_avatar.png")
@@ -1060,8 +1061,8 @@ func TestTransport_AttachmentDeleteRead(t *testing.T) {
 
 	expectedUserInput := models.AttachmentInput{
 		UserID:       1,
-		SessionID:    "13",
-		BoardID:      4,
+		SessionID: "13",
+		BoardID: 4,
 		TaskID:       4,
 		AttachmentID: 5,
 		Filename:     "ffff",
@@ -1109,8 +1110,8 @@ func TestTransport_AttachmentWrite(t *testing.T) {
 		Filepath:     "ppp",
 	}
 
-	expectedResponse := models.ResponseAttachment{
-		Status:       200,
+	expectedResponse:= models.ResponseAttachment{
+		Status:    200,
 		AttachmentID: 11,
 		Filename:     "ttt",
 		Filepath:     "ppp",
@@ -1135,8 +1136,8 @@ func TestTransport_UserShortWrite(t *testing.T) {
 		Avatar:   "fdf",
 	}
 
-	expectedResponse := models.ResponseUser{
-		Status:   200,
+	expectedResponse:= models.ResponseUser{
+		Status:    200,
 		Email:    "mam",
 		Username: "kit",
 		FullName: "tik",
@@ -1204,7 +1205,7 @@ func TestTransport_URLReadFail(t *testing.T) {
 func TestTransport_URLWrite(t *testing.T) {
 	input := "12345"
 
-	expectedResponse := models.ResponseURL{
+	expectedResponse:= models.ResponseURL{
 		Status: 200,
 		URL:    "12345",
 	}
@@ -1218,6 +1219,7 @@ func TestTransport_URLWrite(t *testing.T) {
 		return
 	}
 }
+
 
 func fileUploadRequest(params map[string]string, paramName, path string) (io.Reader, *multipart.Writer, error) {
 	file, err := os.Open(path)

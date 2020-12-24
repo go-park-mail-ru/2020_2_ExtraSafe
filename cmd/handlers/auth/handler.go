@@ -3,7 +3,7 @@ package authHandler
 import (
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/services/auth"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/csrf"
-	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorworker"
+	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
@@ -19,10 +19,10 @@ type Handler interface {
 type handler struct {
 	authService   auth.ServiceAuth
 	authTransport auth.TransportAuth
-	errorWorker   errorworker.ErrorWorker
+	errorWorker   errorWorker.ErrorWorker
 }
 
-func NewHandler(authService auth.ServiceAuth, authTransport auth.TransportAuth, errorWorker errorworker.ErrorWorker) Handler {
+func NewHandler(authService auth.ServiceAuth, authTransport auth.TransportAuth, errorWorker errorWorker.ErrorWorker) *handler {
 	return &handler{
 		authService:   authService,
 		authTransport: authTransport,
@@ -87,7 +87,7 @@ func (h *handler) Logout(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *handler) Registration(c echo.Context) error {
+func (h *handler) Registration(c echo.Context) error{
 	userInput, err := h.authTransport.RegRead(c)
 	if err != nil {
 		return h.errorWorker.TransportError(c)

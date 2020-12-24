@@ -39,11 +39,11 @@ func TestTransport_ProfileRead(t *testing.T) {
 }
 
 func TestTransport_BoardsWrite(t *testing.T) {
-	input := []models.BoardOutsideShort{{BoardID: 1, Name: "ex", Theme: "dark", Star: true}}
+	input := []models.BoardOutsideShort{models.BoardOutsideShort{BoardID: 1, Name: "ex", Theme: "dark", Star: true}}
 
-	expectedResponse := models.ResponseBoards{
-		Status: 200,
-		Boards: []models.BoardOutsideShort{{BoardID: 1, Name: "ex", Theme: "dark", Star: true}},
+	expectedResponse:= models.ResponseBoards{
+		Status:   200,
+		Boards:   []models.BoardOutsideShort{models.BoardOutsideShort{BoardID: 1, Name: "ex", Theme: "dark", Star: true}},
 	}
 
 	transp := NewTransport()
@@ -64,7 +64,7 @@ func TestTransport_ProfileWrite(t *testing.T) {
 		Avatar:   "pig.png",
 	}
 
-	expectedResponse := models.ResponseUser{
+	expectedResponse:= models.ResponseUser{
 		Status:   200,
 		Email:    "mariya@mail.ru",
 		Username: "kit",
@@ -138,7 +138,7 @@ func TestTransport_ProfileChangeRead(t *testing.T) {
 
 	e := echo.New()
 	body, writer, err := fileUploadRequest(params, "avatar", "../../../default/default_avatar.png")
-	if err != nil {
+	if err != nil{
 		return
 	}
 	req := httptest.NewRequest(http.MethodPost, "/", body)

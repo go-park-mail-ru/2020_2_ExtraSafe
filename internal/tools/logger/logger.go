@@ -25,7 +25,7 @@ func (l logger) WriteLog(err error, c echo.Context) error {
 	if err == nil {
 		infoLog := l.zeroLogger.Info()
 		infoLog.
-			Time("Request time", time.Now()).
+			Time("Request time",time.Now()).
 			Str("URL", c.Request().RequestURI).
 			Int("Status", c.Response().Status)
 		infoLog.Send()
@@ -33,10 +33,10 @@ func (l logger) WriteLog(err error, c echo.Context) error {
 	}
 
 	servError, ok := err.(models.ServeError)
-	if !ok {
+	if ok != true {
 		errLog := l.zeroLogger.Error()
 		errLog.
-			Time("Request time", time.Now()).
+			Time("Request time",time.Now()).
 			Str("URL", c.Request().RequestURI).
 			Int("Status", c.Response().Status).
 			Str("Error ", err.Error())
@@ -48,7 +48,7 @@ func (l logger) WriteLog(err error, c echo.Context) error {
 		errLog := l.zeroLogger.Error()
 		if len(err.(models.ServeError).Descriptions) == 0 {
 			errLog.
-				Time("Request time", time.Now()).
+				Time("Request time",time.Now()).
 				Str("URL", c.Request().RequestURI).
 				Int("Status", c.Response().Status).
 				Str("Error code", code).
