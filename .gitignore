@@ -30,3 +30,4 @@ useful
 /test.sql
 
 config.env
+init/database.env
