@@ -295,6 +295,14 @@ func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMe
 		MemberID:  user.ID,
 	}
 
+	if user.ID != input.UserID {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(models.ServeError{
+			Codes:         []string{"500"},
+			Descriptions:  []string{"Permissions denied"},
+			MethodName:    "RemoveUserToBoard",
+		}, NameService)
+	}
+
 	err = s.boardStorage.RemoveUser(userInput)
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)

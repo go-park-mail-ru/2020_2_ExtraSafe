@@ -34,7 +34,7 @@ func Router(e *echo.Echo, profile profileHandler.Handler, auth authHandler.Handl
 	e.PUT("/api/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardChange))))
 	e.DELETE("/api/board/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardDelete))))
 	e.PUT("/api/board/:ID/user-add/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardAddMember))))
-	e.PUT("/api/board/:ID/user-remove/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardAdminPermission(board.BoardRemoveMember))))
+	e.PUT("/api/board/:ID/user-remove/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardUserPermission(board.BoardRemoveMember))))
 
 	e.GET("/api/card/:ID/", middle.CookieSession(middle.CheckCardUserPermission(board.Card)))
 	e.POST("/api/card/:ID/", middle.CookieSession(middle.CSRFToken(middle.CheckBoardUserPermission(board.CardCreate))))
