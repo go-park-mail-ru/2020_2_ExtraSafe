@@ -3,7 +3,7 @@ Backend репозиторий команды ExtraSafe
 
 ## Деплой
 
-http://tabutask.ru/
+https://tabutask.ru/
 
 ## Ссылка на frontend
 
