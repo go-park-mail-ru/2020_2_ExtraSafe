@@ -645,7 +645,7 @@ func TestService_AddUserToBoardFail2(t *testing.T) {
 	}
 }
 
-func TestService_RemoveUserToBoard(t *testing.T) {
+/*func TestService_RemoveUserToBoard(t *testing.T) {
 	request := &protoBoard.BoardMemberInput{
 		UserID:     1,
 		BoardID:    1,
@@ -681,7 +681,7 @@ func TestService_RemoveUserToBoard(t *testing.T) {
 		t.Errorf("unexpected err: %s", err)
 		return
 	}
-}
+}*/
 
 func TestService_CreateCard(t *testing.T) {
 	request := &protoBoard.CardInput{
