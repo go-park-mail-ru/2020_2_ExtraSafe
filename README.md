@@ -5,6 +5,10 @@ Backend репозиторий команды ExtraSafe
 
 http://tabutask.ru/
 
+## Ссылка на frontend
+
+https://github.com/frontend-park-mail-ru/2020_2_ExtraSafe
+
 ## Авторы
 
 * **Мария Богомолова** - *Фулстек* - [keithzetterstrom](https://github.com/keithzetterstrom)
