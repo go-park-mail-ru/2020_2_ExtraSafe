@@ -1,3 +1,0 @@
-sudo docker build -t keithzetterstrom/teamproject_tarantool_image .
-sudo docker tag keithzetterstrom/teamproject_tarantool_image felixgreen/teamproject_tarantool_image
-sudo docker push keithzetterstrom/teamproject_tarantool_image
