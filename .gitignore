@@ -31,3 +31,4 @@ useful
 
 config.env
 init/database.env
+build.sh
