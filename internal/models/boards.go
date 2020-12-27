@@ -40,18 +40,16 @@ type BoardInviteInput struct {
 }
 
 type BoardInputTemplate struct {
-	UserID    int64  `json:"-"`
-	SessionID string `json:"-"`
-	Template  string `json:"template"`
-	BoardName string `json:"boardName"`
+	UserID       int64  `json:"-"`
+	SessionID    string `json:"-"`
+	TemplateSlug string `json:"templateSlug"`
+	BoardName    string `json:"boardName"`
 }
 
 //===================================================<-Internal
 type BoardInternalTemplate struct {
 	AdminID  int64          `json:"adminID"`
-	Name     string         `json:"boardName"`
-	Theme    string         `json:"boardTheme"`
-	Star     bool           `json:"boardStar"`
+	BoardName     string         `json:"boardName"`
 	Cards    []CardInternal `json:"cards"`
 	Tags     []TagOutside	`json:"tags"`
 }
@@ -84,6 +82,12 @@ type BoardOutsideShort struct {
 	Name    string `json:"boardName"`
 	Theme   string `json:"boardTheme"`
 	Star    bool   `json:"boardStar"`
+}
+
+type BoardTemplateOutsideShort struct {
+	TemplateSlug string `json:"templateSlug"`
+	TemplateName string `json:"templateName"`
+	Description  string `json:"templateDescription"`
 }
 
 type BoardMemberOutside struct {

@@ -34,7 +34,7 @@ message BoardInviteInput {
 
 message BoardInputTemplate {
   int64 UserID = 1;
-  string Template = 2;
+  string TemplateSlug = 2;
   string BoardName = 3;
 }
 
