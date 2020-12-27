@@ -10,6 +10,7 @@ type Storage interface {
 	ChangeCard(cardInput models.CardInput) (models.CardInternal, error)
 	DeleteCard(cardInput models.CardInput) error
 
+	CreateCardInternal(cardInput models.CardInternal, boardID int64) (models.CardInternal, error)
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardInternal, error)
 	GetCardByID(cardInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(taskInput models.CardsOrderInput) error
@@ -43,6 +44,21 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 		Tasks:  []models.TaskOutsideShort{},
 	}
 	return card, nil
+}
+
+func (s *storage) CreateCardInternal(cardInput models.CardInternal, boardID int64) (models.CardInternal, error) {
+	var cardID int64
+
+	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
+		boardID, cardInput.Name, cardInput.Order).Scan(&cardID)
+
+	if err != nil {
+		return models.CardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateCard"}
+	}
+
+	cardInput.CardID = cardID
+	return cardInput, nil
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {

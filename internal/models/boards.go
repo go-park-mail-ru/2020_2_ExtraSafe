@@ -48,20 +48,22 @@ type BoardInputTemplate struct {
 
 //===================================================<-Internal
 type BoardInternalTemplate struct {
+	Slug string `json:"templateSlug"`
 	AdminID  int64          `json:"adminID"`
-	BoardName     string         `json:"boardName"`
+	BoardName     string     `json:"templateName"`
+	Description string `json:"templateDescription"`
 	Cards    []CardInternal `json:"cards"`
 	Tags     []TagOutside	`json:"tags"`
 }
 
 type BoardInternal struct {
-	BoardID  int64          `json:"boardID"`
-	AdminID  int64          `json:"adminID"`
-	Name     string         `json:"boardName"`
-	Theme    string         `json:"boardTheme"`
-	Star     bool           `json:"boardStar"`
-	Cards    []CardInternal `json:"cards"`
-	UsersIDs []int64        `json:"usersIDs"`
+	BoardID  int64
+	AdminID  int64
+	Name     string
+	Theme    string
+	Star     bool
+	Cards    []CardInternal
+	UsersIDs []int64
 	Tags     []TagOutside
 }
 

@@ -9,6 +9,7 @@ type CardsStorage interface {
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
 	DeleteCard(userInput models.CardInput) error
+	CreateCardInternal(cardInput models.CardInternal, boardID int64) (models.CardInternal, error)
 
 	GetCardsByBoard(boardInput models.BoardInput) ([]models.CardInternal, error)
 	GetCardByID(cardInput models.CardInput) (models.CardInternal, error)

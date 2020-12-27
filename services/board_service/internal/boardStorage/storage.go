@@ -2,12 +2,16 @@ package boardStorage
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/attachmentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/checklistStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/commentStorage"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage/tagStorage"
 	"hash/adler32"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"time"
 )
@@ -21,7 +25,7 @@ type BoardStorage interface {
 	CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error)
 
 	//GetTemplate(boardInput models.BoardInput) (, error)
-	//GetTemplates() error
+	GetTemplates() ([]models.BoardTemplateOutsideShort, error)
 
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
@@ -83,11 +87,147 @@ type storage struct {
 	attachmentStorage attachmentStorage.Storage
 }
 
-func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
-	panic("implement me")
+func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
+	files, err := ioutil.ReadDir("../../../templates")
+	if err != nil {
+		return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "GetTemplates"}
+	}
+
+	templates := make([]models.BoardTemplateOutsideShort, 0)
+
+	for _, file := range files {
+		templateJsonFile, err := os.Open(file.Name())
+		if err != nil {
+			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetTemplates"}
+		}
+		templateJsonFile.Close()
+
+		templateValue, _ := ioutil.ReadAll(templateJsonFile)
+
+		board := models.BoardInternalTemplate{}
+
+		err = json.Unmarshal(templateValue, &board)
+		if err != nil {
+			fmt.Println("cannot unmarshall", err)
+			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+				MethodName: "GetTemplates"}
+		}
+
+		template := models.BoardTemplateOutsideShort{
+			TemplateSlug: board.Slug,
+			TemplateName: board.BoardName,
+			Description:  board.Description,
+		}
+		templates = append(templates, template)
+	}
+
+	return templates, nil
 }
 
+/*func (s *storage) getTemplate(templateSlug string) {
 
+}*/
+
+func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
+	fileTemplate := fmt.Sprintf("%s.json", boardInput.TemplateSlug)
+	fmt.Println(fileTemplate)
+
+	templateJsonFile, err := os.Open(fileTemplate)
+	if err != nil {
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateBoardFromTemplate"}
+	}
+	defer templateJsonFile.Close()
+
+	templateValue, _ := ioutil.ReadAll(templateJsonFile)
+
+	board := models.BoardInternalTemplate{}
+
+	err = json.Unmarshal(templateValue, &board)
+	if err != nil {
+		fmt.Println("cannot unmarshall", err)
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "CreateBoardFromTemplate"}
+	}
+
+	//create board
+	boardOutside, err := s.createBoardInternal(board)
+	if err != nil {
+		return models.BoardInternal{}, err
+	}
+
+	//create tags
+	for _, currentTag := range board.Tags {
+		tag, err := s.tagStorage.CreateTag(models.TagInput{
+			BoardID:   boardOutside.BoardID,
+			Color:     currentTag.Color,
+			Name:      currentTag.Name,
+		})
+		if err != nil {
+			return models.BoardInternal{}, err
+		}
+
+		boardOutside.Tags = append(boardOutside.Tags, tag)
+	}
+
+	for _, currentCard := range board.Cards {
+		//create cards
+		card, err := s.cardsStorage.CreateCardInternal(currentCard, boardOutside.BoardID)
+		if err != nil {
+			return models.BoardInternal{}, err
+		}
+
+		for j, currentTask := range card.Tasks {
+			inputTask := models.TaskInput{
+				CardID:      card.CardID,
+				Name:        currentTask.Name,
+				Description: currentTask.Description,
+				Order:       currentTask.Order,
+			}
+			//create tasks
+			task, err := s.tasksStorage.CreateTask(inputTask)
+			if err != nil {
+				return models.BoardInternal{}, err
+			}
+
+			card.Tasks = append(card.Tasks, task)
+		}
+
+		boardOutside.Cards = append(boardOutside.Cards, card)
+	}
+
+	return boardOutside, nil
+}
+
+func (s *storage) createBoardInternal(boardInput models.BoardInternalTemplate) (models.BoardInternal, error) {
+	var boardID int64
+
+	url := createSharedUrl(boardInput.AdminID, boardInput.BoardName)
+	urlString := strconv.FormatUint(uint64(url), 10)
+	err := s.db.QueryRow("INSERT INTO boards (adminID, boardName, theme, star, shared_url) VALUES ($1, $2, $3, $4, $5) RETURNING boardID",
+		boardInput.AdminID,
+		boardInput.BoardName,
+		"",
+		false,
+		urlString).
+		Scan(&boardID)
+
+	if err != nil {
+		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "createBoardInternal"}
+	}
+
+	board := models.BoardInternal{
+		BoardID:  boardID,
+		AdminID:  boardInput.AdminID,
+		Name:     boardInput.BoardName,
+		Cards:    []models.CardInternal{},
+		UsersIDs: []int64{},
+	}
+	return board, nil
+}
 
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
 	return &storage{
