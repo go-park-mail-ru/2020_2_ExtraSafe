@@ -19,6 +19,10 @@ type BoardStorage interface {
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
 
+	//GetTemplate(boardInput models.BoardInput) (, error)
+	//GetTemplates() error
+
+
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
 	ChangeCardOrder(cardInput models.CardsOrderInput) error
