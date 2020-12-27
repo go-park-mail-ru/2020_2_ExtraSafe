@@ -11,6 +11,7 @@ type Transport interface {
 	BoardRead(c echo.Context) (request models.BoardInput, err error)
 	BoardChangeRead(c echo.Context) (request models.BoardChangeInput, err error)
 	BoardMemberRead(c echo.Context) (request models.BoardMemberInput, err error)
+	BoardTemplateRead(c echo.Context) (request models.BoardInputTemplate, err error)
 	BoardWrite(board models.BoardOutside) (response models.ResponseBoard, err error)
 	BoardShortWrite(board models.BoardOutsideShort) (response models.ResponseBoardShort, err error)
 
@@ -94,6 +95,20 @@ func (t transport) BoardMemberRead(c echo.Context) (request models.BoardMemberIn
 	if err := c.Bind(userInput); err != nil {
 		return models.BoardMemberInput{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "BoardChangeRead"}
+	}
+
+	userInput.UserID = c.Get("userId").(int64)
+	userInput.SessionID = c.Get("sessionID").(string)
+
+	return *userInput, nil
+}
+
+func (t transport) BoardTemplateRead(c echo.Context) (request models.BoardInputTemplate, err error) {
+	userInput := new(models.BoardInputTemplate)
+
+	if err := c.Bind(userInput); err != nil {
+		return models.BoardInputTemplate{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
+			MethodName: "BoardTemplateRead"}
 	}
 
 	userInput.UserID = c.Get("userId").(int64)

@@ -23,6 +23,7 @@ type ServiceBoard interface {
 	DeleteBoard(request models.BoardInput) (err error)
 	AddMember(request models.BoardMemberInput) (user models.UserOutsideShort, err error)
 	RemoveMember(request models.BoardMemberInput) (err error)
+	CreateBoardByTemplate(request models.BoardInputTemplate) (board models.BoardOutside, err error)
 
 	CreateCard(request models.CardInput) (card models.CardOutsideShort, err error)
 	GetCard(request models.CardInput) (board models.CardOutside, err error)
@@ -73,6 +74,7 @@ type service struct {
 	mainHub *websocket.NotificationHub
 }
 
+
 func NewService(boardService protoBoard.BoardClient, validator Validator) ServiceBoard {
 	mHub := websocket.NewNotificationHub()
 	go mHub.Run()
@@ -106,6 +108,64 @@ func (s *service) CreateBoard(request models.BoardChangeInput) (board models.Boa
 	board.Theme = boardInternal.Theme
 	
 	return board, err
+}
+
+func (s *service) CreateBoardByTemplate(request models.BoardInputTemplate) (board models.BoardOutside, err error) {
+	ctx := context.Background()
+
+	input := &protoBoard.BoardInputTemplate{
+		UserID:  request.UserID,
+		TemplateSlug: request.TemplateSlug,
+		BoardName: request.BoardName,
+	}
+
+	boardInternal, err := s.boardService.CreateTemplateBoard(ctx, input)
+	if err != nil {
+		return models.BoardOutside{}, errorWorker.ConvertStatusToError(err)
+	}
+
+	board.Admin = models.UserOutsideShort{
+		Email:    boardInternal.Admin.Email,
+		Username: boardInternal.Admin.Username,
+		FullName: boardInternal.Admin.FullName,
+		Avatar:   boardInternal.Admin.Avatar,
+	}
+
+	for _, card := range boardInternal.Cards{
+		tasks := make([]models.TaskOutsideShort, 0)
+		for _, task := range card.Tasks {
+			tasks = append(tasks, models.TaskOutsideShort{
+				TaskID:      task.TaskID,
+				Name:        task.Name,
+				Description: task.Description,
+				Order:       task.Order,
+				Tags:        convertTags(task.Tags),
+				Users:       []models.UserOutsideShort{},
+				Checklists:  convertChecklists(task.Checklists),
+			})
+		}
+		board.Cards = append(board.Cards, models.CardOutside{
+			CardID: card.CardID,
+			Name:   card.Name,
+			Order:  card.Order,
+			Tasks:  tasks,
+		})
+	}
+
+	board.BoardID = boardInternal.BoardID
+	board.Name = boardInternal.Name
+	board.Theme = boardInternal.Theme
+	board.Star = boardInternal.Star
+	board.Admin = models.UserOutsideShort{
+		Email: boardInternal.Admin.Email,
+		Username: boardInternal.Admin.Username,
+		FullName:  boardInternal.Admin.FullName,
+		Avatar: boardInternal.Admin.Avatar,
+	}
+	board.Tags = convertTags(boardInternal.Tags)
+	board.Users = []models.UserOutsideShort{}
+
+	return board, nil
 }
 
 func (s *service) GetBoard(request models.BoardInput) (board models.BoardOutside, err error) {

@@ -96,6 +96,11 @@ type BoardMemberOutside struct {
 	Initiator string `json:"initiator"`
 }
 
+type BoardsOutside struct {
+	Boards []BoardOutsideShort
+	Templates []BoardTemplateOutsideShort
+}
+
 //===================================================<-Other
 type BoardMember struct {
 	UserID   int64

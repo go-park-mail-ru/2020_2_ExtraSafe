@@ -252,6 +252,69 @@ func (x *BoardOutsideShort) GetStar() bool {
 	return false
 }
 
+type BoardTemplateOutsideShort struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TemplateSlug string `protobuf:"bytes,1,opt,name=TemplateSlug,json=templateSlug,proto3" json:"TemplateSlug,omitempty"`
+	TemplateName string `protobuf:"bytes,2,opt,name=TemplateName,json=templateName,proto3" json:"TemplateName,omitempty"`
+	Description  string `protobuf:"bytes,3,opt,name=Description,json=description,proto3" json:"Description,omitempty"`
+}
+
+func (x *BoardTemplateOutsideShort) Reset() {
+	*x = BoardTemplateOutsideShort{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_profile_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoardTemplateOutsideShort) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoardTemplateOutsideShort) ProtoMessage() {}
+
+func (x *BoardTemplateOutsideShort) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoardTemplateOutsideShort.ProtoReflect.Descriptor instead.
+func (*BoardTemplateOutsideShort) Descriptor() ([]byte, []int) {
+	return file_profile_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *BoardTemplateOutsideShort) GetTemplateSlug() string {
+	if x != nil {
+		return x.TemplateSlug
+	}
+	return ""
+}
+
+func (x *BoardTemplateOutsideShort) GetTemplateName() string {
+	if x != nil {
+		return x.TemplateName
+	}
+	return ""
+}
+
+func (x *BoardTemplateOutsideShort) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 type UserInputPassword struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -265,7 +328,7 @@ type UserInputPassword struct {
 func (x *UserInputPassword) Reset() {
 	*x = UserInputPassword{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[3]
+		mi := &file_profile_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -278,7 +341,7 @@ func (x *UserInputPassword) String() string {
 func (*UserInputPassword) ProtoMessage() {}
 
 func (x *UserInputPassword) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[3]
+	mi := &file_profile_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -291,7 +354,7 @@ func (x *UserInputPassword) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInputPassword.ProtoReflect.Descriptor instead.
 func (*UserInputPassword) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{3}
+	return file_profile_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UserInputPassword) GetID() int64 {
@@ -320,13 +383,14 @@ type BoardsOutsideShort struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Boards []*BoardOutsideShort `protobuf:"bytes,1,rep,name=boards,proto3" json:"boards,omitempty"`
+	Boards    []*BoardOutsideShort         `protobuf:"bytes,1,rep,name=boards,proto3" json:"boards,omitempty"`
+	Templates []*BoardTemplateOutsideShort `protobuf:"bytes,2,rep,name=templates,proto3" json:"templates,omitempty"`
 }
 
 func (x *BoardsOutsideShort) Reset() {
 	*x = BoardsOutsideShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[4]
+		mi := &file_profile_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -339,7 +403,7 @@ func (x *BoardsOutsideShort) String() string {
 func (*BoardsOutsideShort) ProtoMessage() {}
 
 func (x *BoardsOutsideShort) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[4]
+	mi := &file_profile_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -352,12 +416,19 @@ func (x *BoardsOutsideShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BoardsOutsideShort.ProtoReflect.Descriptor instead.
 func (*BoardsOutsideShort) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{4}
+	return file_profile_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BoardsOutsideShort) GetBoards() []*BoardOutsideShort {
 	if x != nil {
 		return x.Boards
+	}
+	return nil
+}
+
+func (x *BoardsOutsideShort) GetTemplates() []*BoardTemplateOutsideShort {
+	if x != nil {
+		return x.Templates
 	}
 	return nil
 }
@@ -374,7 +445,7 @@ type UserInputLogin struct {
 func (x *UserInputLogin) Reset() {
 	*x = UserInputLogin{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[5]
+		mi := &file_profile_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -387,7 +458,7 @@ func (x *UserInputLogin) String() string {
 func (*UserInputLogin) ProtoMessage() {}
 
 func (x *UserInputLogin) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[5]
+	mi := &file_profile_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +471,7 @@ func (x *UserInputLogin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInputLogin.ProtoReflect.Descriptor instead.
 func (*UserInputLogin) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{5}
+	return file_profile_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserInputLogin) GetEmail() string {
@@ -430,7 +501,7 @@ type UserInputReg struct {
 func (x *UserInputReg) Reset() {
 	*x = UserInputReg{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[6]
+		mi := &file_profile_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -443,7 +514,7 @@ func (x *UserInputReg) String() string {
 func (*UserInputReg) ProtoMessage() {}
 
 func (x *UserInputReg) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[6]
+	mi := &file_profile_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -456,7 +527,7 @@ func (x *UserInputReg) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInputReg.ProtoReflect.Descriptor instead.
 func (*UserInputReg) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{6}
+	return file_profile_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UserInputReg) GetEmail() string {
@@ -491,7 +562,7 @@ type UserID struct {
 func (x *UserID) Reset() {
 	*x = UserID{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[7]
+		mi := &file_profile_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -504,7 +575,7 @@ func (x *UserID) String() string {
 func (*UserID) ProtoMessage() {}
 
 func (x *UserID) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[7]
+	mi := &file_profile_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -517,7 +588,7 @@ func (x *UserID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserID.ProtoReflect.Descriptor instead.
 func (*UserID) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{7}
+	return file_profile_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserID) GetID() int64 {
@@ -542,7 +613,7 @@ type UserBoardsOutside struct {
 func (x *UserBoardsOutside) Reset() {
 	*x = UserBoardsOutside{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[8]
+		mi := &file_profile_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -555,7 +626,7 @@ func (x *UserBoardsOutside) String() string {
 func (*UserBoardsOutside) ProtoMessage() {}
 
 func (x *UserBoardsOutside) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[8]
+	mi := &file_profile_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -568,7 +639,7 @@ func (x *UserBoardsOutside) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserBoardsOutside.ProtoReflect.Descriptor instead.
 func (*UserBoardsOutside) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{8}
+	return file_profile_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UserBoardsOutside) GetEmail() string {
@@ -621,7 +692,7 @@ type UserOutsideShort struct {
 func (x *UserOutsideShort) Reset() {
 	*x = UserOutsideShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[9]
+		mi := &file_profile_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -634,7 +705,7 @@ func (x *UserOutsideShort) String() string {
 func (*UserOutsideShort) ProtoMessage() {}
 
 func (x *UserOutsideShort) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[9]
+	mi := &file_profile_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -647,7 +718,7 @@ func (x *UserOutsideShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserOutsideShort.ProtoReflect.Descriptor instead.
 func (*UserOutsideShort) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{9}
+	return file_profile_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UserOutsideShort) GetID() int64 {
@@ -696,7 +767,7 @@ type UsersOutsideShort struct {
 func (x *UsersOutsideShort) Reset() {
 	*x = UsersOutsideShort{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[10]
+		mi := &file_profile_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -709,7 +780,7 @@ func (x *UsersOutsideShort) String() string {
 func (*UsersOutsideShort) ProtoMessage() {}
 
 func (x *UsersOutsideShort) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[10]
+	mi := &file_profile_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -722,7 +793,7 @@ func (x *UsersOutsideShort) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UsersOutsideShort.ProtoReflect.Descriptor instead.
 func (*UsersOutsideShort) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{10}
+	return file_profile_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UsersOutsideShort) GetUsers() []*UserOutsideShort {
@@ -743,7 +814,7 @@ type UserIDS struct {
 func (x *UserIDS) Reset() {
 	*x = UserIDS{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[11]
+		mi := &file_profile_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -756,7 +827,7 @@ func (x *UserIDS) String() string {
 func (*UserIDS) ProtoMessage() {}
 
 func (x *UserIDS) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[11]
+	mi := &file_profile_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -769,7 +840,7 @@ func (x *UserIDS) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserIDS.ProtoReflect.Descriptor instead.
 func (*UserIDS) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{11}
+	return file_profile_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UserIDS) GetUserIDs() []int64 {
@@ -790,7 +861,7 @@ type UserName struct {
 func (x *UserName) Reset() {
 	*x = UserName{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_profile_proto_msgTypes[12]
+		mi := &file_profile_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -803,7 +874,7 @@ func (x *UserName) String() string {
 func (*UserName) ProtoMessage() {}
 
 func (x *UserName) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_proto_msgTypes[12]
+	mi := &file_profile_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -816,7 +887,7 @@ func (x *UserName) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserName.ProtoReflect.Descriptor instead.
 func (*UserName) Descriptor() ([]byte, []int) {
-	return file_profile_proto_rawDescGZIP(), []int{12}
+	return file_profile_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UserName) GetUserName() string {
@@ -853,18 +924,31 @@ var file_profile_proto_rawDesc = []byte{
 	0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
 	0x12, 0x14, 0x0a, 0x05, 0x54, 0x68, 0x65, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x05, 0x74, 0x68, 0x65, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x53, 0x74, 0x61, 0x72, 0x18, 0x04,
-	0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x73, 0x74, 0x61, 0x72, 0x22, 0x61, 0x0a, 0x11, 0x55, 0x73,
-	0x65, 0x72, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12,
-	0x0e, 0x0a, 0x02, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x44, 0x12,
-	0x20, 0x0a, 0x0b, 0x4f, 0x6c, 0x64, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6f, 0x6c, 0x64, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72,
-	0x64, 0x12, 0x1a, 0x0a, 0x08, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x4d, 0x0a,
-	0x12, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x53, 0x68,
-	0x6f, 0x72, 0x74, 0x12, 0x37, 0x0a, 0x06, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x72, 0x6f, 0x66, 0x69,
-	0x6c, 0x65, 0x2e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x53,
-	0x68, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x22, 0x42, 0x0a, 0x0e,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x73, 0x74, 0x61, 0x72, 0x22, 0x85, 0x01, 0x0a, 0x19, 0x42,
+	0x6f, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x4f, 0x75, 0x74, 0x73,
+	0x69, 0x64, 0x65, 0x53, 0x68, 0x6f, 0x72, 0x74, 0x12, 0x22, 0x0a, 0x0c, 0x54, 0x65, 0x6d, 0x70,
+	0x6c, 0x61, 0x74, 0x65, 0x53, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c,
+	0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x53, 0x6c, 0x75, 0x67, 0x12, 0x22, 0x0a, 0x0c,
+	0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0c, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x4e, 0x61, 0x6d, 0x65,
+	0x12, 0x20, 0x0a, 0x0b, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
+	0x6f, 0x6e, 0x22, 0x61, 0x0a, 0x11, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x50,
+	0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x49, 0x44, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x44, 0x12, 0x20, 0x0a, 0x0b, 0x4f, 0x6c, 0x64, 0x50, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6f, 0x6c,
+	0x64, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x50, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x94, 0x01, 0x0a, 0x12, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x73,
+	0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x53, 0x68, 0x6f, 0x72, 0x74, 0x12, 0x37, 0x0a, 0x06,
+	0x62, 0x6f, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x42, 0x6f, 0x61, 0x72,
+	0x64, 0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x53, 0x68, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x62,
+	0x6f, 0x61, 0x72, 0x64, 0x73, 0x12, 0x45, 0x0a, 0x09, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74,
+	0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d,
+	0x70, 0x6c, 0x61, 0x74, 0x65, 0x4f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x53, 0x68, 0x6f, 0x72,
+	0x74, 0x52, 0x09, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x22, 0x42, 0x0a, 0x0e,
 	0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x14,
 	0x0a, 0x05, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65,
 	0x6d, 0x61, 0x69, 0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
@@ -958,47 +1042,49 @@ func file_profile_proto_rawDescGZIP() []byte {
 	return file_profile_proto_rawDescData
 }
 
-var file_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_profile_proto_goTypes = []interface{}{
-	(*UserOutside)(nil),        // 0: protoProfile.UserOutside
-	(*UserInputProfile)(nil),   // 1: protoProfile.UserInputProfile
-	(*BoardOutsideShort)(nil),  // 2: protoProfile.BoardOutsideShort
-	(*UserInputPassword)(nil),  // 3: protoProfile.UserInputPassword
-	(*BoardsOutsideShort)(nil), // 4: protoProfile.BoardsOutsideShort
-	(*UserInputLogin)(nil),     // 5: protoProfile.UserInputLogin
-	(*UserInputReg)(nil),       // 6: protoProfile.UserInputReg
-	(*UserID)(nil),             // 7: protoProfile.UserID
-	(*UserBoardsOutside)(nil),  // 8: protoProfile.UserBoardsOutside
-	(*UserOutsideShort)(nil),   // 9: protoProfile.UserOutsideShort
-	(*UsersOutsideShort)(nil),  // 10: protoProfile.UsersOutsideShort
-	(*UserIDS)(nil),            // 11: protoProfile.UserIDS
-	(*UserName)(nil),           // 12: protoProfile.UserName
+	(*UserOutside)(nil),               // 0: protoProfile.UserOutside
+	(*UserInputProfile)(nil),          // 1: protoProfile.UserInputProfile
+	(*BoardOutsideShort)(nil),         // 2: protoProfile.BoardOutsideShort
+	(*BoardTemplateOutsideShort)(nil), // 3: protoProfile.BoardTemplateOutsideShort
+	(*UserInputPassword)(nil),         // 4: protoProfile.UserInputPassword
+	(*BoardsOutsideShort)(nil),        // 5: protoProfile.BoardsOutsideShort
+	(*UserInputLogin)(nil),            // 6: protoProfile.UserInputLogin
+	(*UserInputReg)(nil),              // 7: protoProfile.UserInputReg
+	(*UserID)(nil),                    // 8: protoProfile.UserID
+	(*UserBoardsOutside)(nil),         // 9: protoProfile.UserBoardsOutside
+	(*UserOutsideShort)(nil),          // 10: protoProfile.UserOutsideShort
+	(*UsersOutsideShort)(nil),         // 11: protoProfile.UsersOutsideShort
+	(*UserIDS)(nil),                   // 12: protoProfile.UserIDS
+	(*UserName)(nil),                  // 13: protoProfile.UserName
 }
 var file_profile_proto_depIdxs = []int32{
 	2,  // 0: protoProfile.BoardsOutsideShort.boards:type_name -> protoProfile.BoardOutsideShort
-	2,  // 1: protoProfile.UserBoardsOutside.Boards:type_name -> protoProfile.BoardOutsideShort
-	9,  // 2: protoProfile.UsersOutsideShort.users:type_name -> protoProfile.UserOutsideShort
-	5,  // 3: protoProfile.Profile.CheckUser:input_type -> protoProfile.UserInputLogin
-	6,  // 4: protoProfile.Profile.CreateUser:input_type -> protoProfile.UserInputReg
-	7,  // 5: protoProfile.Profile.Profile:input_type -> protoProfile.UserID
-	7,  // 6: protoProfile.Profile.Boards:input_type -> protoProfile.UserID
-	1,  // 7: protoProfile.Profile.ProfileChange:input_type -> protoProfile.UserInputProfile
-	3,  // 8: protoProfile.Profile.PasswordChange:input_type -> protoProfile.UserInputPassword
-	11, // 9: protoProfile.Profile.GetUsersByIDs:input_type -> protoProfile.UserIDS
-	12, // 10: protoProfile.Profile.GetUserByUsername:input_type -> protoProfile.UserName
-	7,  // 11: protoProfile.Profile.CheckUser:output_type -> protoProfile.UserID
-	7,  // 12: protoProfile.Profile.CreateUser:output_type -> protoProfile.UserID
-	0,  // 13: protoProfile.Profile.Profile:output_type -> protoProfile.UserOutside
-	4,  // 14: protoProfile.Profile.Boards:output_type -> protoProfile.BoardsOutsideShort
-	0,  // 15: protoProfile.Profile.ProfileChange:output_type -> protoProfile.UserOutside
-	0,  // 16: protoProfile.Profile.PasswordChange:output_type -> protoProfile.UserOutside
-	10, // 17: protoProfile.Profile.GetUsersByIDs:output_type -> protoProfile.UsersOutsideShort
-	9,  // 18: protoProfile.Profile.GetUserByUsername:output_type -> protoProfile.UserOutsideShort
-	11, // [11:19] is the sub-list for method output_type
-	3,  // [3:11] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	3,  // 1: protoProfile.BoardsOutsideShort.templates:type_name -> protoProfile.BoardTemplateOutsideShort
+	2,  // 2: protoProfile.UserBoardsOutside.Boards:type_name -> protoProfile.BoardOutsideShort
+	10, // 3: protoProfile.UsersOutsideShort.users:type_name -> protoProfile.UserOutsideShort
+	6,  // 4: protoProfile.Profile.CheckUser:input_type -> protoProfile.UserInputLogin
+	7,  // 5: protoProfile.Profile.CreateUser:input_type -> protoProfile.UserInputReg
+	8,  // 6: protoProfile.Profile.Profile:input_type -> protoProfile.UserID
+	8,  // 7: protoProfile.Profile.Boards:input_type -> protoProfile.UserID
+	1,  // 8: protoProfile.Profile.ProfileChange:input_type -> protoProfile.UserInputProfile
+	4,  // 9: protoProfile.Profile.PasswordChange:input_type -> protoProfile.UserInputPassword
+	12, // 10: protoProfile.Profile.GetUsersByIDs:input_type -> protoProfile.UserIDS
+	13, // 11: protoProfile.Profile.GetUserByUsername:input_type -> protoProfile.UserName
+	8,  // 12: protoProfile.Profile.CheckUser:output_type -> protoProfile.UserID
+	8,  // 13: protoProfile.Profile.CreateUser:output_type -> protoProfile.UserID
+	0,  // 14: protoProfile.Profile.Profile:output_type -> protoProfile.UserOutside
+	5,  // 15: protoProfile.Profile.Boards:output_type -> protoProfile.BoardsOutsideShort
+	0,  // 16: protoProfile.Profile.ProfileChange:output_type -> protoProfile.UserOutside
+	0,  // 17: protoProfile.Profile.PasswordChange:output_type -> protoProfile.UserOutside
+	11, // 18: protoProfile.Profile.GetUsersByIDs:output_type -> protoProfile.UsersOutsideShort
+	10, // 19: protoProfile.Profile.GetUserByUsername:output_type -> protoProfile.UserOutsideShort
+	12, // [12:20] is the sub-list for method output_type
+	4,  // [4:12] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_profile_proto_init() }
@@ -1044,7 +1130,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserInputPassword); i {
+			switch v := v.(*BoardTemplateOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1056,7 +1142,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BoardsOutsideShort); i {
+			switch v := v.(*UserInputPassword); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1068,7 +1154,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserInputLogin); i {
+			switch v := v.(*BoardsOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1080,7 +1166,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserInputReg); i {
+			switch v := v.(*UserInputLogin); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1092,7 +1178,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserID); i {
+			switch v := v.(*UserInputReg); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1104,7 +1190,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserBoardsOutside); i {
+			switch v := v.(*UserID); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1116,7 +1202,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserOutsideShort); i {
+			switch v := v.(*UserBoardsOutside); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1128,7 +1214,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UsersOutsideShort); i {
+			switch v := v.(*UserOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1140,7 +1226,7 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserIDS); i {
+			switch v := v.(*UsersOutsideShort); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1152,6 +1238,18 @@ func file_profile_proto_init() {
 			}
 		}
 		file_profile_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserIDS); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_profile_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UserName); i {
 			case 0:
 				return &v.state
@@ -1170,7 +1268,7 @@ func file_profile_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_profile_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -1195,7 +1293,6 @@ const _ = grpc.SupportPackageIsVersion6
 // ProfileClient is the client API for Profile service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-//go:generate mockgen -destination=../../mock/mock_profileServiceClient.go -package=mock  github.com/go-park-mail-ru/2020_2_ExtraSafe/services/proto/profile ProfileClient
 type ProfileClient interface {
 	CheckUser(ctx context.Context, in *UserInputLogin, opts ...grpc.CallOption) (*UserID, error)
 	CreateUser(ctx context.Context, in *UserInputReg, opts ...grpc.CallOption) (*UserID, error)

@@ -30,6 +30,12 @@ message BoardOutsideShort {
   bool Star = 4;
 }
 
+message BoardTemplateOutsideShort {
+  string TemplateSlug = 1;
+  string TemplateName = 2;
+  string Description = 3;
+}
+
 message UserInputPassword {
   int64 ID = 1;
   string OldPassword = 2;
@@ -38,6 +44,7 @@ message UserInputPassword {
 
 message BoardsOutsideShort {
   repeated BoardOutsideShort boards = 1;
+  repeated BoardTemplateOutsideShort templates = 2;
 }
 
 message UserInputLogin {

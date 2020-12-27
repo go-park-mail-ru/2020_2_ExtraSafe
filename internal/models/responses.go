@@ -52,8 +52,9 @@ type ResponseBoard struct {
 }
 
 type ResponseBoards struct {
-	Status int                 `json:"status"`
-	Boards []BoardOutsideShort `json:"boards"`
+	Status    int                         `json:"status"`
+	Boards    []BoardOutsideShort         `json:"boards"`
+	Templates []BoardTemplateOutsideShort `json:"templates"`
 }
 
 type ResponseURL struct {
