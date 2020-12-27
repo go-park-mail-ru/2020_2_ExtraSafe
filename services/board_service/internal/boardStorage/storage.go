@@ -78,12 +78,12 @@ type BoardStorage interface {
 }
 
 type storage struct {
-	db           *sql.DB
-	cardsStorage CardsStorage
-	tasksStorage TasksStorage
-	tagStorage tagStorage.Storage
-	commentStorage commentStorage.Storage
-	checklistStorage checklistStorage.Storage
+	db                *sql.DB
+	cardsStorage      CardsStorage
+	tasksStorage      TasksStorage
+	tagStorage        tagStorage.Storage
+	commentStorage    commentStorage.Storage
+	checklistStorage  checklistStorage.Storage
 	attachmentStorage attachmentStorage.Storage
 }
 
@@ -102,13 +102,11 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetTemplates"}
 		}
-		templateJsonFile.Close()
-
-		templateValue, _ := ioutil.ReadAll(templateJsonFile)
 
 		board := models.BoardInternalTemplate{}
 
-		err = json.Unmarshal(templateValue, &board)
+		err = json.NewDecoder(templateJsonFile).Decode(&board)
+		templateJsonFile.Close()
 		if err != nil {
 			fmt.Println("cannot unmarshall", err)
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -127,12 +125,10 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 }
 
 /*func (s *storage) getTemplate(templateSlug string) {
-
 }*/
 
 func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
-	fileTemplate := fmt.Sprintf("%s.json", boardInput.TemplateSlug)
-	fmt.Println(fileTemplate)
+	fileTemplate := fmt.Sprintf("../../../templates/%s.json", boardInput.TemplateSlug)
 
 	templateJsonFile, err := os.Open(fileTemplate)
 	if err != nil {
@@ -141,19 +137,17 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	}
 	defer templateJsonFile.Close()
 
-	templateValue, _ := ioutil.ReadAll(templateJsonFile)
-
 	board := models.BoardInternalTemplate{}
-
-	err = json.Unmarshal(templateValue, &board)
+	err = json.NewDecoder(templateJsonFile).Decode(&board)
 	if err != nil {
 		fmt.Println("cannot unmarshall", err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateBoardFromTemplate"}
 	}
 
-	//create board
 	board.AdminID = boardInput.UserID
+	board.BoardName = boardInput.BoardName
+	//create board
 	boardOutside, err := s.createBoardInternal(board)
 	if err != nil {
 		return models.BoardInternal{}, err
@@ -162,9 +156,9 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	//create tags
 	for _, currentTag := range board.Tags {
 		tag, err := s.tagStorage.CreateTag(models.TagInput{
-			BoardID:   boardOutside.BoardID,
-			Color:     currentTag.Color,
-			Name:      currentTag.Name,
+			BoardID: boardOutside.BoardID,
+			Color:   currentTag.Color,
+			Name:    currentTag.Name,
 		})
 		if err != nil {
 			return models.BoardInternal{}, err
@@ -180,8 +174,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 			return models.BoardInternal{}, err
 		}
 
-		fmt.Printf("card %+v\n", card)
-		for _, currentTask := range card.Tasks {
+		for _, currentTask := range currentCard.Tasks {
 			inputTask := models.TaskInput{
 				CardID:      card.CardID,
 				Name:        currentTask.Name,
@@ -196,10 +189,8 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 
 			card.Tasks = append(card.Tasks, task)
 		}
-		fmt.Printf("card with tasks %+v\n", card)
 
 		boardOutside.Cards = append(boardOutside.Cards, card)
-		fmt.Printf("board with cards and tasks %+v\n", boardOutside)
 	}
 
 	return boardOutside, nil
@@ -235,12 +226,12 @@ func (s *storage) createBoardInternal(boardInput models.BoardInternalTemplate) (
 
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
 	return &storage{
-		db: db,
-		cardsStorage: cardsStorage,
-		tasksStorage: tasksStorage,
-		tagStorage: tagStorage,
-		commentStorage: commentStorage,
-		checklistStorage: checklistStorage,
+		db:                db,
+		cardsStorage:      cardsStorage,
+		tasksStorage:      tasksStorage,
+		tagStorage:        tagStorage,
+		commentStorage:    commentStorage,
+		checklistStorage:  checklistStorage,
 		attachmentStorage: attachmentStorage,
 	}
 }
@@ -248,8 +239,8 @@ func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage
 func (s *storage) GetBoardsList(userInput models.UserInput) ([]models.BoardOutsideShort, error) {
 	boards := make([]models.BoardOutsideShort, 0)
 
-	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B " +
-									"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR M.userID = $1;", userInput.ID)
+	rows, err := s.db.Query("SELECT DISTINCT B.boardID, B.boardName, B.theme, B.star FROM boards B "+
+		"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID WHERE B.adminID = $1 OR M.userID = $1;", userInput.ID)
 	if err != nil {
 		return []models.BoardOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "GetBoardsList"}
@@ -305,7 +296,7 @@ func (s *storage) GetBoard(boardInput models.BoardInput) (models.BoardInternal, 
 	board.BoardID = boardInput.BoardID
 
 	err := s.db.QueryRow("SELECT adminID, boardName, theme, star FROM boards WHERE boardID = $1", boardInput.BoardID).
-				Scan(&board.AdminID, &board.Name, &board.Theme, &board.Star)
+		Scan(&board.AdminID, &board.Name, &board.Theme, &board.Star)
 
 	if err != nil {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -407,7 +398,7 @@ func (s *storage) ChangeBoard(boardInput models.BoardChangeInput) (models.BoardI
 	board := models.BoardInternal{}
 
 	err := s.db.QueryRow("UPDATE boards SET boardName = $1, theme = $2, star = $3 WHERE boardID = $4 RETURNING adminID",
-								boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
+		boardInput.BoardName, boardInput.Theme, boardInput.Star, boardInput.BoardID).Scan(&board.AdminID)
 	if err != nil {
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "ChangeBoard"}
@@ -586,10 +577,10 @@ func (s *storage) checkBoardUserPermission(userID int64, boardID int64) (flag bo
 }
 
 func (s *storage) CheckCardPermission(userID int64, cardID int64) (boardID int64, err error) {
-	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
-								"JOIN cards C on C.boardID = B.boardID " +
-								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
-								"WHERE (B.adminID = $1 OR M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B "+
+		"JOIN cards C on C.boardID = B.boardID "+
+		"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID "+
+		"WHERE (B.adminID = $1 OR M.userID = $1) AND cardID = $2", userID, cardID).Scan(&boardID)
 	if err != nil && err != sql.ErrNoRows {
 		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckCardPermission"}
 	}
@@ -603,11 +594,11 @@ func (s *storage) CheckCardPermission(userID int64, cardID int64) (boardID int64
 }
 
 func (s *storage) CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error) {
-	err = s.db.QueryRow("SELECT B.boardID FROM boards B " +
-								"JOIN cards C on C.boardID = B.boardID " +
-								"JOIN tasks T on T.cardID = C.cardID " +
-								"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID " +
-								"WHERE (B.adminID = $1 OR M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
+	err = s.db.QueryRow("SELECT B.boardID FROM boards B "+
+		"JOIN cards C on C.boardID = B.boardID "+
+		"JOIN tasks T on T.cardID = C.cardID "+
+		"LEFT OUTER JOIN board_members M ON B.boardID = M.boardID "+
+		"WHERE (B.adminID = $1 OR M.userID = $1) AND taskID = $2", userID, taskID).Scan(&boardID)
 
 	if err != nil && err != sql.ErrNoRows {
 		return 0, models.ServeError{Codes: []string{"500"}, OriginalError: err, MethodName: "CheckTaskPermission"}
@@ -627,10 +618,10 @@ func (s *storage) CheckCommentPermission(userID int64, commentID int64, ifAdmin 
 	if ifAdmin {
 		query = "SELECT B.boardID FROM boards B JOIN cards C on C.boardID = B.boardID JOIN tasks T on T.cardID = C.cardID JOIN comments Com on Com.taskID = T.taskID WHERE (B.adminID = $1 OR Com.userID = $1) AND Com.commentID = $2"
 		/*query = "SELECT B.boardID FROM boards B " +
-			"JOIN cards C on C.boardID = B.boardID " +
-			"JOIN tasks T on T.cardID = C.cardID " +
-			"JOIN comments Com on Com.taskID = T.taskID" +
-			"WHERE (B.adminID = $1 OR Com.userID = $1) AND Com.commentID = $2"*/
+		"JOIN cards C on C.boardID = B.boardID " +
+		"JOIN tasks T on T.cardID = C.cardID " +
+		"JOIN comments Com on Com.taskID = T.taskID" +
+		"WHERE (B.adminID = $1 OR Com.userID = $1) AND Com.commentID = $2"*/
 	} else {
 		query = "SELECT B.boardID FROM boards B JOIN cards C on C.boardID = B.boardID JOIN tasks T on T.cardID = C.cardID JOIN comments Com on Com.taskID = T.taskID WHERE Com.userID = $1 AND Com.commentID = $2"
 	}

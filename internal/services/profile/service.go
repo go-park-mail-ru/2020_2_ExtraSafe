@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/validation"
@@ -57,6 +58,8 @@ func (s *service) Boards(request models.UserInput) (boards models.BoardsOutside,
 		return models.BoardsOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
+	fmt.Println(output)
+
 	boards.Boards = make([]models.BoardOutsideShort, 0)
 	for _, board := range output.Boards{
 		boards.Boards = append(boards.Boards, models.BoardOutsideShort{
@@ -75,6 +78,8 @@ func (s *service) Boards(request models.UserInput) (boards models.BoardsOutside,
 			Description:  template.Description,
 		})
 	}
+	fmt.Println(boards.Templates)
+	fmt.Println(boards.Boards)
 
 	return boards, nil
 }

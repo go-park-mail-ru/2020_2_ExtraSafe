@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/labstack/echo"
 	"io/ioutil"
@@ -69,6 +70,7 @@ func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputP
 }
 
 func (t transport) BoardsWrite(boards models.BoardsOutside) (response models.ResponseBoards, err error) {
+	fmt.Println(boards)
 	response.Status = 200
 	response.Boards = boards.Boards
 	response.Templates = boards.Templates

@@ -78,6 +78,11 @@ func (s *service) GetBoardsList(_ context.Context, input *protoProfile.UserID) (
 		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
 	}
 
+	templateList, err := s.boardStorage.GetTemplates()
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
 	output = new(protoProfile.BoardsOutsideShort)
 
 	for _, board := range boardsList {
@@ -89,6 +94,19 @@ func (s *service) GetBoardsList(_ context.Context, input *protoProfile.UserID) (
 		}
 		output.Boards = append(output.Boards, &outputBoard)
 	}
+
+	for _, template := range templateList {
+		outputTemplate := protoProfile.BoardTemplateOutsideShort{
+			TemplateSlug: template.TemplateSlug,
+			TemplateName: template.TemplateName,
+			Description:  template.Description,
+		}
+		output.Templates = append(output.Templates, &outputTemplate)
+	}
+
+	fmt.Println("!=Boards: ", output.Boards)
+	fmt.Println("!=Templates: ", output.Templates)
+
 	return output, nil
 }
 
@@ -112,6 +130,61 @@ func (s *service) CreateBoard(_ context.Context, input *protoBoard.BoardChangeIn
 		Theme:   boardInternal.Theme,
 		Star:    boardInternal.Star,
 	}
+	return output, nil
+}
+
+func (s *service) CreateTemplateBoard(c context.Context, input *protoBoard.BoardInputTemplate) (output *protoBoard.BoardOutside, err error) {
+	userInput := models.BoardInputTemplate{
+		UserID:    input.UserID,
+		BoardName: input.BoardName,
+		TemplateSlug:     input.TemplateSlug,
+	}
+
+	boardInternal, err := s.boardStorage.CreateBoardFromTemplate(userInput)
+	if err != nil {
+		return output, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	fmt.Println(boardInternal)
+
+	members, err := s.profileService.GetUsersByIDs(c, &protoProfile.UserIDS{UserIDs: []int64{boardInternal.AdminID}})
+	if err != nil {
+		return output, err
+	}
+
+	cards := make([]*protoBoard.CardOutside, 0)
+	for _, card := range boardInternal.Cards {
+		tasks := make([]*protoBoard.TaskOutsideShort, 0)
+		for _, task := range card.Tasks {
+			tasks = append(tasks, &protoBoard.TaskOutsideShort{
+				TaskID:      task.TaskID,
+				Name:        task.Name,
+				Description: task.Description,
+				Order:       task.Order,
+				Tags: convertTags(task.Tags),
+				Users: nil,
+				Checklists: convertChecklists(task.Checklists),
+			})
+		}
+		cards = append(cards, &protoBoard.CardOutside{
+			CardID: card.CardID,
+			Name:   card.Name,
+			Order:  card.Order,
+			Tasks:  tasks,
+		})
+	}
+
+	output = &protoBoard.BoardOutside{
+		BoardID: boardInternal.BoardID,
+		Admin:   members.Users[0],
+		Name:    boardInternal.Name,
+		Theme:   boardInternal.Theme,
+		Star:    boardInternal.Star,
+		Users:   nil,
+		Cards:   cards,
+		Tags: 	 convertTags(boardInternal.Tags),
+	}
+
 	return output, nil
 }
 
