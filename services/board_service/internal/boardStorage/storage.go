@@ -97,7 +97,7 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 	templates := make([]models.BoardTemplateOutsideShort, 0)
 
 	for _, file := range files {
-		templateJsonFile, err := os.Open(file.Name())
+		templateJsonFile, err := os.Open(fmt.Sprintf("../../../templates/%s", file.Name()))
 		if err != nil {
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetTemplates"}
@@ -153,6 +153,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	}
 
 	//create board
+	board.AdminID = boardInput.UserID
 	boardOutside, err := s.createBoardInternal(board)
 	if err != nil {
 		return models.BoardInternal{}, err
@@ -179,6 +180,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 			return models.BoardInternal{}, err
 		}
 
+		fmt.Printf("card %+v\n", card)
 		for _, currentTask := range card.Tasks {
 			inputTask := models.TaskInput{
 				CardID:      card.CardID,
@@ -194,8 +196,10 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 
 			card.Tasks = append(card.Tasks, task)
 		}
+		fmt.Printf("card with tasks %+v\n", card)
 
 		boardOutside.Cards = append(boardOutside.Cards, card)
+		fmt.Printf("board with cards and tasks %+v\n", boardOutside)
 	}
 
 	return boardOutside, nil
