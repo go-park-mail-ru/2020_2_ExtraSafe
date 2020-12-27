@@ -103,14 +103,10 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 				MethodName: "GetTemplates"}
 		}
 
-		//templateValue, _ := ioutil.ReadAll(templateJsonFile)
-
 		board := models.BoardInternalTemplate{}
 
-		fmt.Println(templateJsonFile.Name())
 		err = json.NewDecoder(templateJsonFile).Decode(&board)
 		templateJsonFile.Close()
-		//err = json.Unmarshal(templateValue, &board)
 		if err != nil {
 			fmt.Println("cannot unmarshall", err)
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -134,7 +130,6 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 
 func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
 	fileTemplate := fmt.Sprintf("../../../templates/%s.json", boardInput.TemplateSlug)
-	fmt.Println(fileTemplate)
 
 	templateJsonFile, err := os.Open(fileTemplate)
 	if err != nil {
@@ -143,12 +138,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	}
 	defer templateJsonFile.Close()
 
-//	templateValue, _ := ioutil.ReadAll(templateJsonFile)
-
 	board := models.BoardInternalTemplate{}
-
-	fmt.Println(templateJsonFile.Name())
-	//err = json.Unmarshal(templateValue, &board)
 	err = json.NewDecoder(templateJsonFile).Decode(&board)
 	if err != nil {
 		fmt.Println("cannot unmarshall", err)
@@ -157,7 +147,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	}
 
 	board.AdminID = boardInput.UserID
-
+	board.BoardName = boardInput.BoardName
 	//create board
 	boardOutside, err := s.createBoardInternal(board)
 	if err != nil {
@@ -185,7 +175,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 			return models.BoardInternal{}, err
 		}
 
-		for _, currentTask := range card.Tasks {
+		for _, currentTask := range currentCard.Tasks {
 			inputTask := models.TaskInput{
 				CardID:      card.CardID,
 				Name:        currentTask.Name,
