@@ -1,0 +1,67 @@
+{
+  "templateSlug": "project",
+  "templateName": "Управление проектом",
+  "templateDescription" : "Шаблон для распределения задач при выполнении проекта",
+  "tags": [
+    {
+      "tagColor": "#72E6FF",
+      "tagName": "Бэкенд"
+    },
+    {
+      "tagColor": "#FCFF27",
+      "tagName": "Фронтенд"
+    },
+    {
+      "tagColor": "#FF8080",
+      "tagName": "Инфраструктура"
+    }
+  ],
+  "cards": [
+    {
+      "cardName": "Список задач",
+      "cardOrder": 0,
+      "tasks": [
+        {
+          "taskName": "Выбрать проект",
+          "taskDescription": "",
+          "taskOrder": 0
+        },
+        {
+          "taskName": "Продумать API",
+          "taskDescription": "",
+          "taskOrder": 1
+        },
+        {
+          "taskName": "Распределиться по ролям",
+          "taskDescription": "",
+          "taskOrder": 2
+        },
+        {
+          "taskName": "Оформить репозиторий",
+          "taskDescription": "",
+          "taskOrder": 3
+        }
+      ]
+    },
+    {
+      "cardName": "В разработке",
+      "cardOrder": 1
+    },
+    {
+      "cardName": "Ревью",
+      "cardOrder": 2
+    },
+    {
+      "cardName": "Тестирование",
+      "cardOrder": 3
+    },
+    {
+      "cardName": "Деплой",
+      "cardOrder": 4
+    },
+    {
+      "cardName": "Готово",
+      "cardOrder": 5
+    }
+  ]
+}
