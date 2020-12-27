@@ -97,18 +97,20 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 	templates := make([]models.BoardTemplateOutsideShort, 0)
 
 	for _, file := range files {
-		templateJsonFile, err := os.Open(file.Name())
+		templateJsonFile, err := os.Open(fmt.Sprintf("../../../templates/%s", file.Name()))
 		if err != nil {
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 				MethodName: "GetTemplates"}
 		}
-		templateJsonFile.Close()
 
-		templateValue, _ := ioutil.ReadAll(templateJsonFile)
+		//templateValue, _ := ioutil.ReadAll(templateJsonFile)
 
 		board := models.BoardInternalTemplate{}
 
-		err = json.Unmarshal(templateValue, &board)
+		fmt.Println(templateJsonFile.Name())
+		err = json.NewDecoder(templateJsonFile).Decode(&board)
+		templateJsonFile.Close()
+		//err = json.Unmarshal(templateValue, &board)
 		if err != nil {
 			fmt.Println("cannot unmarshall", err)
 			return []models.BoardTemplateOutsideShort{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
@@ -131,7 +133,7 @@ func (s *storage) GetTemplates() ([]models.BoardTemplateOutsideShort, error) {
 }*/
 
 func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
-	fileTemplate := fmt.Sprintf("%s.json", boardInput.TemplateSlug)
+	fileTemplate := fmt.Sprintf("../../../templates/%s.json", boardInput.TemplateSlug)
 	fmt.Println(fileTemplate)
 
 	templateJsonFile, err := os.Open(fileTemplate)
@@ -141,16 +143,20 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	}
 	defer templateJsonFile.Close()
 
-	templateValue, _ := ioutil.ReadAll(templateJsonFile)
+//	templateValue, _ := ioutil.ReadAll(templateJsonFile)
 
 	board := models.BoardInternalTemplate{}
 
-	err = json.Unmarshal(templateValue, &board)
+	fmt.Println(templateJsonFile.Name())
+	//err = json.Unmarshal(templateValue, &board)
+	err = json.NewDecoder(templateJsonFile).Decode(&board)
 	if err != nil {
 		fmt.Println("cannot unmarshall", err)
 		return models.BoardInternal{}, models.ServeError{Codes: []string{"500"}, OriginalError: err,
 			MethodName: "CreateBoardFromTemplate"}
 	}
+
+	board.AdminID = boardInput.UserID
 
 	//create board
 	boardOutside, err := s.createBoardInternal(board)

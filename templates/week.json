@@ -2,95 +2,101 @@
   "templateSlug": "week",
   "templateName": "Расписание на неделю",
   "templateDescription" : "",
+  "tags": [
+    {
+      "tagColor": "red",
+      "tagName": "kak"
+    }
+  ],
   "cards": [
     {
       "cardID": 1,
-      "name": "Понедельник",
-      "order": 0,
+      "cardName": "Понедельник",
+      "cardOrder": 0,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 2,
-      "name": "Вторник",
-      "order": 1,
+      "cardName": "Вторник",
+      "cardOrder": 1,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 3,
-      "name": "Среда",
-      "order": 2,
+      "cardName": "Среда",
+      "cardOrder": 2,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 4,
-      "name": "Четверг",
-      "order": 3,
+      "cardName": "Четверг",
+      "cardOrder": 3,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 5,
-      "name": "Пятница",
-      "order": 4,
+      "cardName": "Пятница",
+      "cardOrder": 4,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 6,
-      "name": "Суббота",
-      "order": 5,
+      "cardName": "Суббота",
+      "cardOrder": 5,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     },
     {
       "cardID": 7,
-      "name": "Воскресенье",
-      "order": 6,
+      "cardName": "Воскресенье",
+      "cardOrder": 6,
       "tasks": [
         {
           "taskID": 1,
-          "name": "tests",
-          "description": "test some func",
-          "order": 0
+          "taskName": "tests",
+          "taskDescription": "test some func",
+          "taskOrder": 0
         }
       ]
     }

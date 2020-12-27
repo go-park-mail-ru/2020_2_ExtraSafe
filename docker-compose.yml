@@ -41,6 +41,7 @@ services:
       - config.env
     volumes:
       - ./attachments:/attachments
+      - ./templates:/templates
     depends_on:
       - postgres
 
