@@ -16,6 +16,7 @@ type Handler interface {
 	BoardDelete(c echo.Context) error
 	BoardAddMember(c echo.Context) error
 	BoardRemoveMember(c echo.Context) error
+	BoardTemplate(c echo.Context) error
 
 	CardCreate(c echo.Context) error
 	Card(c echo.Context) error
@@ -91,6 +92,22 @@ func (h *handler) Board(c echo.Context) error {
 	}
 
 	board, err := h.boardsService.GetBoard(userInput)
+	if err != nil {
+		return h.errorWorker.RespError(c, err)
+	}
+
+	response, err := h.boardsTransport.BoardWrite(board)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) BoardTemplate(c echo.Context) error {
+	userInput, err := h.boardsTransport.BoardTemplateRead(c)
+	if err != nil {
+		return h.errorWorker.TransportError(c)
+	}
+
+	board, err := h.boardsService.CreateBoardByTemplate(userInput)
 	if err != nil {
 		return h.errorWorker.RespError(c, err)
 	}

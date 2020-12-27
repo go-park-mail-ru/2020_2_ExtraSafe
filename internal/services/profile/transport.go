@@ -12,7 +12,7 @@ type Transport interface {
 	ProfileChangeRead(c echo.Context) (request models.UserInputProfile, err error)
 	PasswordChangeRead(c echo.Context) (request models.UserInputPassword, err error)
 
-	BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error)
+	BoardsWrite(boards models.BoardsOutside) (response models.ResponseBoards, err error)
 	ProfileWrite(user models.UserOutside) (response models.ResponseUser, err error)
 }
 
@@ -68,9 +68,10 @@ func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputP
 	return *userInput, nil
 }
 
-func (t transport) BoardsWrite(boards []models.BoardOutsideShort) (response models.ResponseBoards, err error) {
+func (t transport) BoardsWrite(boards models.BoardsOutside) (response models.ResponseBoards, err error) {
 	response.Status = 200
-	response.Boards = boards
+	response.Boards = boards.Boards
+	response.Templates = boards.Templates
 	return response, nil
 }
 

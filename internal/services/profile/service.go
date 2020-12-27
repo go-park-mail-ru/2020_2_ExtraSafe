@@ -12,7 +12,7 @@ import (
 
 type ServiceProfile interface {
 	Profile(request models.UserInput) (user models.UserOutside, err error)
-	Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error)
+	Boards(request models.UserInput) (boards models.BoardsOutside, err error)
 	ProfileChange(request models.UserInputProfile) (user models.UserOutside, err error)
 	PasswordChange(request models.UserInputPassword) (user models.UserOutside, err error)
 }
@@ -47,23 +47,32 @@ func (s *service) Profile(request models.UserInput) (user models.UserOutside, er
 	return user, nil
 }
 
-func (s *service) Boards(request models.UserInput) (boards []models.BoardOutsideShort, err error) {
+func (s *service) Boards(request models.UserInput) (boards models.BoardsOutside, err error) {
 	ctx := context.Background()
 
 	input := &protoProfile.UserID{ID: request.ID}
 
 	output, err := s.profileService.Boards(ctx, input)
 	if err != nil {
-		return nil, errorWorker.ConvertStatusToError(err)
+		return models.BoardsOutside{}, errorWorker.ConvertStatusToError(err)
 	}
 
-	boards = make([]models.BoardOutsideShort, 0)
+	boards.Boards = make([]models.BoardOutsideShort, 0)
 	for _, board := range output.Boards{
-		boards = append(boards, models.BoardOutsideShort{
+		boards.Boards = append(boards.Boards, models.BoardOutsideShort{
 			BoardID: board.BoardID,
 			Name:    board.Name,
 			Theme:   board.Theme,
 			Star:    board.Star,
+		})
+	}
+
+	boards.Templates = make([]models.BoardTemplateOutsideShort, 0)
+	for _, template := range output.Templates{
+		boards.Templates = append(boards.Templates, models.BoardTemplateOutsideShort{
+			TemplateSlug: template.TemplateSlug,
+			TemplateName: template.TemplateName,
+			Description:  template.Description,
 		})
 	}
 
