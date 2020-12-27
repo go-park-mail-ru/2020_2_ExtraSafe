@@ -57,14 +57,14 @@ type TaskAssignerInput struct {
 
 //===================================================<-Internal
 type TaskInternalShort struct {
-	TaskID      int64
-	CardID      int64
-	Name        string
-	Description string
-	Order       int64
-	Tags        []TagOutside
-	Users       []int64
-	Checklists  []ChecklistOutside
+	TaskID      int64              `json:"taskID"`
+	CardID      int64              `json:"cardID"`
+	Name        string             `json:"taskName"`
+	Description string             `json:"taskDescription"`
+	Order       int64              `json:"taskOrder"`
+	Tags        []TagOutside       `json:"tags"`
+	Users       []int64            `json:"-"`
+	Checklists  []ChecklistOutside `json:"checklists"`
 }
 
 type TaskInternal struct {

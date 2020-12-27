@@ -32,10 +32,10 @@ type CardsOrderInput struct {
 
 //===================================================<-Internal
 type CardInternal struct {
-	CardID int64
-	Name   string
-	Order  int64
-	Tasks  []TaskInternalShort
+	CardID int64               `json:"cardID"`
+	Name   string              `json:"cardName"`
+	Order  int64               `json:"cardOrder"`
+	Tasks  []TaskInternalShort `json:"tasks"`
 }
 
 //===================================================<-Outside

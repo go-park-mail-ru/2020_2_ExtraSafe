@@ -39,13 +39,28 @@ type BoardInviteInput struct {
 	UrlHash string
 }
 
+type BoardInputTemplate struct {
+	UserID    int64  `json:"-"`
+	SessionID string `json:"-"`
+	Template  string `json:"template"`
+}
+
 //===================================================<-Internal
+type BoardInternalTemplate struct {
+	AdminID  int64          `json:"adminID"`
+	Name     string         `json:"boardName"`
+	Theme    string         `json:"boardTheme"`
+	Star     bool           `json:"boardStar"`
+	Cards    []CardInternal `json:"cards"`
+	Tags     []TagOutside	`json:"tags"`
+}
+
 type BoardInternal struct {
 	BoardID  int64          `json:"boardID"`
 	AdminID  int64          `json:"adminID"`
-	Name     string         `json:"name"`
-	Theme    string         `json:"theme"`
-	Star     bool           `json:"star"`
+	Name     string         `json:"boardName"`
+	Theme    string         `json:"boardTheme"`
+	Star     bool           `json:"boardStar"`
 	Cards    []CardInternal `json:"cards"`
 	UsersIDs []int64        `json:"usersIDs"`
 	Tags     []TagOutside

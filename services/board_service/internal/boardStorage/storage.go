@@ -18,10 +18,10 @@ type BoardStorage interface {
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
+	CreateBoardFromTemplate(boardInput models.BoardInternalTemplate) (models.BoardInternal, error)
 
 	//GetTemplate(boardInput models.BoardInput) (, error)
 	//GetTemplates() error
-
 
 	CreateCard(cardInput models.CardInput) (models.CardOutside, error)
 	ChangeCard(userInput models.CardInput) (models.CardInternal, error)
@@ -79,6 +79,10 @@ type storage struct {
 	commentStorage commentStorage.Storage
 	checklistStorage checklistStorage.Storage
 	attachmentStorage attachmentStorage.Storage
+}
+
+func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInternalTemplate) (models.BoardInternal, error) {
+	panic("implement me")
 }
 
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {

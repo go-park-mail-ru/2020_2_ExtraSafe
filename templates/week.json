@@ -1,5 +1,7 @@
 {
-  "templateName": "Расписание на неделю",
+  "boardName": "Расписание на неделю",
+  "boardTheme": "",
+  "boardStar": false,
   "cards": [
     {
       "cardID": 1,
