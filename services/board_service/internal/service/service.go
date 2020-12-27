@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/models"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/internal/tools/errorWorker"
 	"github.com/go-park-mail-ru/2020_2_ExtraSafe/services/board_service/internal/boardStorage"
@@ -284,6 +285,7 @@ func (s *service) AddUserToBoard(c context.Context, input *protoBoard.BoardMembe
 }
 
 func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMemberInput) (*protoBoard.Nothing, error) {
+	fmt.Println(input)
 	user, err := s.profileService.GetUserByUsername(c, &protoProfile.UserName{UserName: input.MemberName})
 	if err != nil {
 		return &protoBoard.Nothing{Dummy: true}, err
@@ -293,6 +295,19 @@ func (s *service) RemoveUserToBoard(c context.Context, input *protoBoard.BoardMe
 		UserID:    input.UserID,
 		BoardID:   input.BoardID,
 		MemberID:  user.ID,
+	}
+
+	ifAdmin, err := s.boardStorage.CheckIfAdmin(input.UserID, input.BoardID)
+	if err != nil {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(err.(models.ServeError), NameService)
+	}
+
+	if (user.ID != input.UserID) && !ifAdmin {
+		return &protoBoard.Nothing{Dummy: true}, errorWorker.ConvertErrorToStatus(models.ServeError{
+			Codes:         []string{"500"},
+			Descriptions:  []string{"Permissions denied!"},
+			MethodName:    "RemoveUserToBoard",
+		}, NameService)
 	}
 
 	err = s.boardStorage.RemoveUser(userInput)

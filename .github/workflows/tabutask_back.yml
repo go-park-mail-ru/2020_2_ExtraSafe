@@ -3,90 +3,93 @@ name: Test build and deploy Tabutask backend
 on:
   push:
     branches:
-      - ci/cd
+      - develop
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-      - uses: actions/checkout@v2
-
-      - name: Run tests with coverage
-        run: go test -coverpkg=./... -coverprofile=cover ./... && cat cover | grep -v "mock" | grep -v  "easyjson" | grep -v "proto" > cover.out &&
-          go tool cover -func=cover.out
-
-#  build:
+#  test:
 #    runs-on: ubuntu-latest
-#    needs: test
 #    steps:
 #      - name: Checkout code
 #        uses: actions/checkout@v2
 #
-#      - name: Login to DockerHub Registry
-#        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-#
-#      - name: Build Docker images
-#        run: sudo docker build -t keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} -f ./build/dockerFiles/auth.Dockerfile . &&
-#          sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
-#          sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
-#          sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
-#          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool &&
-#          sudo docker tag keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} keithzetterstrom/tabutask_auth:latest &&
-#          sudo docker tag keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} keithzetterstrom/tabutask_profile:latest &&
-#          sudo docker tag keithzetterstrom/tabutask_board:${GITHUB_SHA::8} keithzetterstrom/tabutask_board:latest &&
-#          sudo docker tag keithzetterstrom/tabutask_main:${GITHUB_SHA::8} keithzetterstrom/tabutask_main:latest &&
-#          sudo docker tag keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} keithzetterstrom/tabutask_tarantool:latest
-#
-#      - name: Push Docker images
-#        run: docker push keithzetterstrom/tabutask_auth &&
-#          docker push keithzetterstrom/tabutask_profile &&
-#          docker push keithzetterstrom/tabutask_main &&
-#          docker push keithzetterstrom/tabutask_tarantool &&
-#          docker push keithzetterstrom/tabutask_board
-#
-#      - name: Upload dependencies
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: Backend
-#          path: |
-#            ./docker-compose.yml
-#            ./init
-#
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: build
-#    steps:
-#      - name: Download dependencies
-#        uses: actions/download-artifact@v1
-#        with:
-#          name: Backend
-#
-#      - name: Transfer dependencies to server
-#        uses: appleboy/scp-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.PRIVATE_KEY }}
-#          source: "Backend"
-#          target: "/home/ubuntu/Tabutask"
-#
-#      - name: Run backend
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.PRIVATE_KEY }}
-#          script: |
-#            export PATH=/snap/bin:$PATH
-#            cd /home/ubuntu/Tabutask/Backend
-#            echo "${{ secrets.CONFIG_ENV }}" > config.env
-#            cd init
-#            echo "${{ secrets.DATABASE_ENV }}" > database.env
-#            cd ..
-#            mkdir -p attachments
-#            mkdir -p avatars
-#            docker stop tabutask_auth tabutask_board tabutask_profile tabutask_main tabutask_postgres tabutask_tarantool
-#            docker rm -v $(docker ps -a -q)
-#            docker image prune -a
-#            docker-compose up -d
+#      - name: Run tests with coverage
+#        run: mkdir attachments &&
+#          mkdir avatars &&
+#          go test -coverpkg=./... -coverprofile=cover ./... && cat cover | grep -v "mock" | grep -v  "easyjson" | grep -v "proto" > cover.out &&
+#          go tool cover -func=cover.out
+
+  build:
+    runs-on: ubuntu-latest
+#    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker images
+        run: sudo docker build -t keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} -f ./build/dockerFiles/auth.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} -f ./build/dockerFiles/profile.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_board:${GITHUB_SHA::8} -f ./build/dockerFiles/board.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_main:${GITHUB_SHA::8} -f ./build/dockerFiles/main.Dockerfile . &&
+          sudo docker build -t keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} -f ./build/tarantool/Dockerfile ./build/tarantool &&
+          sudo docker tag keithzetterstrom/tabutask_auth:${GITHUB_SHA::8} keithzetterstrom/tabutask_auth:latest &&
+          sudo docker tag keithzetterstrom/tabutask_profile:${GITHUB_SHA::8} keithzetterstrom/tabutask_profile:latest &&
+          sudo docker tag keithzetterstrom/tabutask_board:${GITHUB_SHA::8} keithzetterstrom/tabutask_board:latest &&
+          sudo docker tag keithzetterstrom/tabutask_main:${GITHUB_SHA::8} keithzetterstrom/tabutask_main:latest &&
+          sudo docker tag keithzetterstrom/tabutask_tarantool:${GITHUB_SHA::8} keithzetterstrom/tabutask_tarantool:latest
+
+      - name: Push Docker images
+        run: docker push keithzetterstrom/tabutask_auth &&
+          docker push keithzetterstrom/tabutask_profile &&
+          docker push keithzetterstrom/tabutask_main &&
+          docker push keithzetterstrom/tabutask_tarantool &&
+          docker push keithzetterstrom/tabutask_board
+
+      - name: Upload dependencies
+        uses: actions/upload-artifact@v2
+        with:
+          name: Backend
+          path: |
+            ./docker-compose.yml
+            ./init
+            ./default
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download dependencies
+        uses: actions/download-artifact@v1
+        with:
+          name: Backend
+
+      - name: Transfer dependencies to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "Backend"
+          target: "/home/ubuntu/Tabutask"
+
+      - name: Run backend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            export PATH=/snap/bin:$PATH
+            cd /home/ubuntu/Tabutask/Backend
+            echo "${{ secrets.CONFIG_ENV }}" > config.env
+            cd init
+            echo "${{ secrets.DATABASE_ENV }}" > database.env
+            cd ..
+            mkdir -p attachments
+            mkdir -p avatars
+            docker stop tabutask_auth tabutask_board tabutask_profile tabutask_main tabutask_postgres tabutask_tarantool
+            docker rm -v $(docker ps -a -q)
+            docker image prune -af
+            docker-compose up -d

@@ -45,6 +45,8 @@ type BoardStorage interface {
 	GetSharedURL(boardInput models.BoardInput) (string, error)
 	GetBoardByURL(boardInput models.BoardInviteInput) (models.BoardOutsideShort, error)
 
+	CheckIfAdmin(userID int64, boardID int64) (flag bool, err error)
+
 	CheckBoardPermission(userID int64, boardID int64, ifAdmin bool) (err error)
 	CheckCardPermission(userID int64, cardID int64) (boardID int64, err error)
 	CheckTaskPermission(userID int64, taskID int64) (boardID int64, err error)
@@ -403,6 +405,10 @@ func (s *storage) CheckBoardPermission(userID int64, boardID int64, ifAdmin bool
 	}
 
 	return nil
+}
+
+func (s *storage) CheckIfAdmin(userID int64, boardID int64) (flag bool, err error) {
+	return s.checkBoardAdminPermission(userID, boardID)
 }
 
 func (s *storage) checkBoardAdminPermission(userID int64, boardID int64) (flag bool, err error) {
