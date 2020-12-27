@@ -1,12 +1,12 @@
 {
-  "boardName": "Расписание на неделю",
-  "boardTheme": "",
-  "boardStar": false,
+  "templateSlug": "week",
+  "templateName": "Расписание на неделю",
+  "templateDescription" : "",
   "cards": [
     {
       "cardID": 1,
       "name": "Понедельник",
-      "order": 1,
+      "order": 0,
       "tasks": [
         {
           "taskID": 1,
@@ -19,7 +19,7 @@
     {
       "cardID": 2,
       "name": "Вторник",
-      "order": 2,
+      "order": 1,
       "tasks": [
         {
           "taskID": 1,
@@ -32,7 +32,7 @@
     {
       "cardID": 3,
       "name": "Среда",
-      "order": 3,
+      "order": 2,
       "tasks": [
         {
           "taskID": 1,
@@ -45,7 +45,7 @@
     {
       "cardID": 4,
       "name": "Четверг",
-      "order": 4,
+      "order": 3,
       "tasks": [
         {
           "taskID": 1,
@@ -58,7 +58,7 @@
     {
       "cardID": 5,
       "name": "Пятница",
-      "order": 5,
+      "order": 4,
       "tasks": [
         {
           "taskID": 1,
@@ -71,7 +71,7 @@
     {
       "cardID": 6,
       "name": "Суббота",
-      "order": 6,
+      "order": 5,
       "tasks": [
         {
           "taskID": 1,
@@ -84,7 +84,7 @@
     {
       "cardID": 7,
       "name": "Воскресенье",
-      "order": 7,
+      "order": 6,
       "tasks": [
         {
           "taskID": 1,

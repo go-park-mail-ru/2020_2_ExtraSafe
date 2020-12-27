@@ -87,6 +87,8 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 	panic("implement me")
 }
 
+
+
 func NewStorage(db *sql.DB, cardsStorage CardsStorage, tasksStorage TasksStorage, tagStorage tagStorage.Storage, commentStorage commentStorage.Storage, checklistStorage checklistStorage.Storage, attachmentStorage attachmentStorage.Storage) BoardStorage {
 	return &storage{
 		db: db,
