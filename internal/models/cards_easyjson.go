@@ -404,13 +404,13 @@ func easyjson1b92225fDecodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(in
 			continue
 		}
 		switch key {
-		case "CardID":
+		case "cardID":
 			out.CardID = int64(in.Int64())
-		case "Name":
+		case "cardName":
 			out.Name = string(in.String())
-		case "Order":
+		case "cardOrder":
 			out.Order = int64(in.Int64())
-		case "Tasks":
+		case "tasks":
 			if in.IsNull() {
 				in.Skip()
 				out.Tasks = nil
@@ -448,22 +448,22 @@ func easyjson1b92225fEncodeGithubComGoParkMailRu20202ExtraSafeInternalModels4(ou
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"CardID\":"
+		const prefix string = ",\"cardID\":"
 		out.RawString(prefix[1:])
 		out.Int64(int64(in.CardID))
 	}
 	{
-		const prefix string = ",\"Name\":"
+		const prefix string = ",\"cardName\":"
 		out.RawString(prefix)
 		out.String(string(in.Name))
 	}
 	{
-		const prefix string = ",\"Order\":"
+		const prefix string = ",\"cardOrder\":"
 		out.RawString(prefix)
 		out.Int64(int64(in.Order))
 	}
 	{
-		const prefix string = ",\"Tasks\":"
+		const prefix string = ",\"tasks\":"
 		out.RawString(prefix)
 		if in.Tasks == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")

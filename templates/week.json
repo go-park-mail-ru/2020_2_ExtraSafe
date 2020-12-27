@@ -1,7 +1,7 @@
 {
   "templateSlug": "week",
   "templateName": "Расписание на неделю",
-  "templateDescription" : "",
+  "templateDescription" : "Расписание дел по дням недели",
   "tags": [
     {
       "tagColor": "red",

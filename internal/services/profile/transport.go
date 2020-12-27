@@ -70,7 +70,8 @@ func (t transport) PasswordChangeRead(c echo.Context) (request models.UserInputP
 }
 
 func (t transport) BoardsWrite(boards models.BoardsOutside) (response models.ResponseBoards, err error) {
-	fmt.Println(boards)
+	fmt.Println("BoardsWriteTemplates", boards.Templates)
+	fmt.Println("BoardsWriteBoards", boards.Boards)
 	response.Status = 200
 	response.Boards = boards.Boards
 	response.Templates = boards.Templates

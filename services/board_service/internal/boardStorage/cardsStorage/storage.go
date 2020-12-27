@@ -49,6 +49,7 @@ func (s *storage) CreateCard(cardInput models.CardInput) (models.CardOutside, er
 func (s *storage) CreateCardInternal(cardInput models.CardInternal, boardID int64) (models.CardInternal, error) {
 	var cardID int64
 
+	card := models.CardInternal{}
 	err := s.db.QueryRow("INSERT INTO cards (boardID, cardName, cardOrder) VALUES ($1, $2, $3) RETURNING cardID",
 		boardID, cardInput.Name, cardInput.Order).Scan(&cardID)
 
@@ -57,8 +58,10 @@ func (s *storage) CreateCardInternal(cardInput models.CardInternal, boardID int6
 			MethodName: "CreateCard"}
 	}
 
-	cardInput.CardID = cardID
-	return cardInput, nil
+	card.Name = cardInput.Name
+	card.Order = cardInput.Order
+	card.CardID = cardID
+	return card, nil
 }
 
 func (s *storage) ChangeCard(cardInput models.CardInput) (models.CardInternal, error) {
