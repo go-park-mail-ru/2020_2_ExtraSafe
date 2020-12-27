@@ -179,7 +179,7 @@ func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) 
 			return models.BoardInternal{}, err
 		}
 
-		for j, currentTask := range card.Tasks {
+		for _, currentTask := range card.Tasks {
 			inputTask := models.TaskInput{
 				CardID:      card.CardID,
 				Name:        currentTask.Name,
