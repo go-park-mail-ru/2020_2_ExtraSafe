@@ -43,6 +43,7 @@ type BoardInputTemplate struct {
 	UserID    int64  `json:"-"`
 	SessionID string `json:"-"`
 	Template  string `json:"template"`
+	BoardName string `json:"boardName"`
 }
 
 //===================================================<-Internal

@@ -18,7 +18,7 @@ type BoardStorage interface {
 	CreateBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	ChangeBoard(boardInput models.BoardChangeInput) (models.BoardInternal, error)
 	DeleteBoard(boardInput models.BoardInput) error
-	CreateBoardFromTemplate(boardInput models.BoardInternalTemplate) (models.BoardInternal, error)
+	CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error)
 
 	//GetTemplate(boardInput models.BoardInput) (, error)
 	//GetTemplates() error
@@ -83,7 +83,7 @@ type storage struct {
 	attachmentStorage attachmentStorage.Storage
 }
 
-func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInternalTemplate) (models.BoardInternal, error) {
+func (s *storage) CreateBoardFromTemplate(boardInput models.BoardInputTemplate) (models.BoardInternal, error) {
 	panic("implement me")
 }
 

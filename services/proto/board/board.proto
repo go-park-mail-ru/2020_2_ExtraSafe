@@ -32,6 +32,12 @@ message BoardInviteInput {
   string UrlHash = 3;
 }
 
+message BoardInputTemplate {
+  int64 UserID = 1;
+  string Template = 2;
+  string BoardName = 3;
+}
+
 message BoardID {
   int64 BoardID = 1;
 }
@@ -291,6 +297,7 @@ service Board {
   rpc DeleteBoard (BoardInput) returns (Nothing) {}
   rpc AddUserToBoard (BoardMemberInput) returns (BoardMemberOutside) {}
   rpc RemoveUserToBoard (BoardMemberInput) returns (Nothing) {}
+  rpc CreateTemplateBoard (BoardInputTemplate) returns (BoardOutside) {}
 
   rpc CreateCard (CardInput) returns (CardOutsideShort) {}
   rpc GetCard (CardInput) returns (CardOutside) {}
