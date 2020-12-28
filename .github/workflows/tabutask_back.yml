@@ -55,6 +55,7 @@ jobs:
             ./docker-compose.yml
             ./init
             ./default
+            ./templates
 
   deploy:
     runs-on: ubuntu-latest
